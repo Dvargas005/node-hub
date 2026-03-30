@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    @apply bg-ice-white text-asphalt-black antialiased;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply px-6 py-20 md:px-12 md:py-28 lg:px-20 lg:py-32;
+  }
+
+  .container-narrow {
+    @apply mx-auto max-w-7xl;
+  }
+}
