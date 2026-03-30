@@ -2,16 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  DollarSign,
-  Users,
-  Globe,
   Palette,
   Code2,
   Megaphone,
-  ClipboardList,
-  MessageSquare,
-  Hammer,
-  PackageCheck,
   Check,
   ArrowRight,
   Loader2,
@@ -40,26 +33,26 @@ const t = {
       es: "Crecer en digital no debería ser tan complicado.",
       en: "Growing digitally shouldn't be this complicated.",
     },
-    cards: [
+    blocks: [
       {
         title: { es: "Costos impredecibles", en: "Unpredictable costs" },
         desc: {
-          es: "Freelancers que cobran por hora, agencias con cotizaciones infladas. Nunca sabes cuánto vas a gastar.",
-          en: "A logo costs $300–800. A landing page up to $1,500. You never know what you'll pay.",
+          es: "Contratar freelancers o agencias es una lotería. Un logo puede costar entre $300 y $800. Una landing page hasta $1,500. Y eso sin contar revisiones, idas y vueltas, ni el tiempo que pierdes buscando opciones.",
+          en: "Hiring freelancers or agencies is a gamble. A logo can cost between $300 and $800. A landing page up to $1,500. And that's before revisions, back and forth, and the time you lose shopping around.",
         },
       },
       {
         title: { es: "Sin acceso a talento", en: "No access to talent" },
         desc: {
-          es: "Encontrar diseñadores, devs y marketers confiables es un trabajo de tiempo completo.",
-          en: "Most micro-businesses have no digital team. Finding reliable talent is a full-time job.",
+          es: "La mayoría de los micro-negocios no tienen equipo digital. Diseñadores, desarrolladores y marketers están fuera del presupuesto. Terminas haciéndolo tú mismo o simplemente no se hace.",
+          en: "Most micro-businesses have no digital team. Designers, developers, and marketers are out of budget. You end up doing it yourself — or it simply doesn't get done.",
         },
       },
       {
         title: { es: "Barrera de idioma", en: "Language barriers" },
         desc: {
-          es: "Las mejores herramientas y equipos operan en inglés. Tu negocio necesita comunicación clara.",
-          en: "Bilingual support is rare and expensive. Your business needs clear communication.",
+          es: "Si tu negocio opera en español, encontrar soporte bilingüe es raro y costoso. La mayoría de los servicios disponibles son solo en inglés. Tu negocio necesita comunicación clara en tu idioma.",
+          en: "If your business operates in Spanish, finding bilingual support is rare and expensive. Most services are English-only. Your business needs clear communication in your language.",
         },
       },
     ],
@@ -74,58 +67,22 @@ const t = {
       {
         title: { es: "Diseño", en: "Design & Branding" },
         items: {
-          es: [
-            "Identidad visual",
-            "UI/UX para web y mobile",
-            "Social media assets",
-            "Presentaciones",
-            "Brand guidelines",
-          ],
-          en: [
-            "Visual identity",
-            "UI/UX for web & mobile",
-            "Social media assets",
-            "Presentations",
-            "Brand guidelines",
-          ],
+          es: ["Identidad visual", "UI/UX para web y mobile", "Social media assets", "Presentaciones", "Brand guidelines"],
+          en: ["Visual identity", "UI/UX for web & mobile", "Social media assets", "Presentations", "Brand guidelines"],
         },
       },
       {
         title: { es: "Web", en: "Web Development" },
         items: {
-          es: [
-            "Landing pages",
-            "Sitios corporativos",
-            "E-commerce",
-            "Web apps",
-            "Mantenimiento y hosting",
-          ],
-          en: [
-            "Landing pages",
-            "Corporate websites",
-            "E-commerce",
-            "Web apps",
-            "Maintenance & hosting",
-          ],
+          es: ["Landing pages", "Sitios corporativos", "E-commerce", "Web apps", "Mantenimiento y hosting"],
+          en: ["Landing pages", "Corporate websites", "E-commerce", "Web apps", "Maintenance & hosting"],
         },
       },
       {
         title: { es: "Marketing", en: "Digital Marketing" },
         items: {
-          es: [
-            "SEO y contenido",
-            "Email marketing",
-            "Gestión de redes sociales",
-            "Paid ads",
-            "Estrategia digital",
-          ],
-          en: [
-            "SEO & content",
-            "Email marketing",
-            "Social media management",
-            "Paid ads",
-            "Digital strategy",
-          ],
+          es: ["SEO y contenido", "Email marketing", "Gestión de redes sociales", "Paid ads", "Estrategia digital"],
+          en: ["SEO & content", "Email marketing", "Social media management", "Paid ads", "Digital strategy"],
         },
       },
     ],
@@ -136,29 +93,29 @@ const t = {
       {
         title: { es: "Suscríbete", en: "Subscribe" },
         desc: {
-          es: "Elige el plan que se adapte a tu negocio. Sin contratos, cancela cuando quieras.",
-          en: "Pick your plan and get started in 24 hours. No contracts, cancel anytime.",
+          es: "Elige el plan que se adapte a tu negocio. Sin contratos largos, sin letra chica. Tu equipo digital se activa en menos de 24 horas desde tu primera suscripción.",
+          en: "Pick the plan that fits your business. No long contracts, no fine print. Your digital team activates in under 24 hours from your first subscription.",
         },
       },
       {
         title: { es: "Describe", en: "Describe what you need" },
         desc: {
-          es: "Envía tus requests: diseños, páginas, campañas. Todo desde un solo canal.",
-          en: "Our AI assistant guides you through it. Designs, pages, campaigns — all from one channel.",
+          es: "Abre tus requests: diseños, páginas, campañas, todo desde un solo canal. Nuestro asistente inteligente te guía para que el brief quede perfecto a la primera.",
+          en: "Submit your requests: designs, pages, campaigns — all from one channel. Our smart assistant guides you so the brief is perfect from the start.",
         },
       },
       {
         title: { es: "Nosotros hacemos", en: "We deliver" },
         desc: {
-          es: "Nuestro equipo trabaja en tus requests con turnaround de 48-72h.",
-          en: "Our team works on your requests with a 48–72h turnaround.",
+          es: "Tu equipo creativo asignado trabaja en tus requests con tiempos de entrega de 48 a 72 horas hábiles. Diseñadores, developers y marketers — sin que tengas que coordinar nada.",
+          en: "Your assigned creative team works on your requests with 48–72 business hour turnarounds. Designers, developers, and marketers — without you having to coordinate a thing.",
         },
       },
       {
         title: { es: "Recibe", en: "Receive" },
         desc: {
-          es: "Entregas listas para usar. Revisiones ilimitadas hasta que estés satisfecho.",
-          en: "Ready-to-use deliverables. Unlimited revisions until you're satisfied.",
+          es: "Entrega lista para usar. Revisiones ilimitadas hasta que estés satisfecho. Tus archivos, tus diseños, listos para publicar o imprimir.",
+          en: "Ready-to-use deliverables. Unlimited revisions until you're satisfied. Your files, your designs, ready to publish or print.",
         },
       },
     ],
@@ -177,20 +134,8 @@ const t = {
         name: "Member",
         price: "$100",
         features: {
-          es: [
-            "5 créditos al mes",
-            "1 request activo a la vez",
-            "Turnaround 72h",
-            "Diseño + contenido",
-            "Soporte por email",
-          ],
-          en: [
-            "5 credits per month",
-            "1 active request at a time",
-            "72h turnaround",
-            "Design + content",
-            "Email support",
-          ],
+          es: ["5 créditos al mes", "1 request activo a la vez", "Turnaround 72h", "Diseño + contenido", "Soporte por email"],
+          en: ["5 credits per month", "1 active request at a time", "72h turnaround", "Design + content", "Email support"],
         },
         highlighted: false,
       },
@@ -198,22 +143,8 @@ const t = {
         name: "Growth",
         price: "$190",
         features: {
-          es: [
-            "12 créditos al mes",
-            "2 requests activos",
-            "Turnaround 48h",
-            "Diseño + web + contenido",
-            "Soporte prioritario",
-            "Brand strategy session",
-          ],
-          en: [
-            "12 credits per month",
-            "2 active requests",
-            "48h turnaround",
-            "Design + web + content",
-            "Priority support",
-            "Brand strategy session",
-          ],
+          es: ["12 créditos al mes", "2 requests activos", "Turnaround 48h", "Diseño + web + contenido", "Soporte prioritario", "Brand strategy session"],
+          en: ["12 credits per month", "2 active requests", "48h turnaround", "Design + web + content", "Priority support", "Brand strategy session"],
         },
         highlighted: true,
       },
@@ -221,34 +152,18 @@ const t = {
         name: "Pro",
         price: "$330",
         features: {
-          es: [
-            "25 créditos al mes",
-            "3 requests activos",
-            "Turnaround 24-48h",
-            "Diseño + web + marketing",
-            "Slack dedicado",
-            "Monthly strategy call",
-            "Rollover de créditos",
-          ],
-          en: [
-            "25 credits per month",
-            "3 active requests",
-            "24–48h turnaround",
-            "Design + web + marketing",
-            "Dedicated Slack channel",
-            "Monthly strategy call",
-            "Credit rollover",
-          ],
+          es: ["25 créditos al mes", "3 requests activos", "Turnaround 24-48h", "Diseño + web + marketing", "Slack dedicado", "Monthly strategy call", "Rollover de créditos"],
+          en: ["25 credits per month", "3 active requests", "24–48h turnaround", "Design + web + marketing", "Dedicated Slack channel", "Monthly strategy call", "Credit rollover"],
         },
         highlighted: false,
       },
     ],
   },
   waitlist: {
-    title: { es: "Únete al Waitlist", en: "Join the Waitlist" },
+    title: { es: "Sé de los primeros", en: "Be among the first" },
     subtitle: {
-      es: "Sé de los primeros en acceder cuando lancemos.",
-      en: "Be among the first to get access when we launch.",
+      es: "Los primeros 100 miembros reciben créditos extra.",
+      en: "The first 100 members get bonus credits.",
     },
     successTitle: { es: "¡Estás en la lista!", en: "You're on the list!" },
     successDesc: {
@@ -284,7 +199,7 @@ const t = {
 };
 
 /* ═══════════════════════════════════════════
-   SCROLL REVEAL HOOK
+   HOOKS
    ═══════════════════════════════════════════ */
 
 function useReveal() {
@@ -293,11 +208,7 @@ function useReveal() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReduced) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -311,13 +222,51 @@ function useReveal() {
       { threshold: 0.1 }
     );
 
-    const children = el.querySelectorAll(".reveal");
+    const children = el.querySelectorAll(".reveal, .reveal-scale");
     children.forEach((child) => observer.observe(child));
-
     return () => observer.disconnect();
   }, []);
 
   return ref;
+}
+
+function useCountUp(target: number, duration = 1200) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setValue(target);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasRun.current) {
+          hasRun.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setValue(Math.round(eased * target));
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return { ref, value };
 }
 
 /* ═══════════════════════════════════════════
@@ -356,34 +305,42 @@ function LanguageToggle({
 }
 
 /* ═══════════════════════════════════════════
-   SVG Hero Graphic
+   ANIMATED SVG — Hero Background
    ═══════════════════════════════════════════ */
 
-function NodeGraphic() {
+function HeroSVG() {
   const nodes = [
-    { cx: 80, cy: 60, r: 6 },
-    { cx: 200, cy: 30, r: 5 },
-    { cx: 320, cy: 70, r: 7 },
-    { cx: 150, cy: 140, r: 5 },
-    { cx: 270, cy: 130, r: 6 },
-    { cx: 380, cy: 50, r: 4 },
-    { cx: 50, cy: 150, r: 4 },
-    { cx: 350, cy: 160, r: 5 },
-    { cx: 120, cy: 90, r: 4 },
-    { cx: 240, cy: 90, r: 5 },
+    { cx: 50, cy: 40, r: 5 },
+    { cx: 180, cy: 20, r: 4 },
+    { cx: 320, cy: 55, r: 6 },
+    { cx: 130, cy: 110, r: 4 },
+    { cx: 260, cy: 100, r: 5 },
+    { cx: 400, cy: 35, r: 3 },
+    { cx: 30, cy: 130, r: 3 },
+    { cx: 370, cy: 125, r: 4 },
+    { cx: 100, cy: 70, r: 3 },
+    { cx: 220, cy: 65, r: 4 },
+    { cx: 470, cy: 70, r: 5 },
+    { cx: 500, cy: 120, r: 3 },
+    { cx: 440, cy: 140, r: 4 },
+    { cx: 150, cy: 150, r: 3 },
+    { cx: 300, cy: 145, r: 4 },
   ];
 
   const edges = [
     [0, 1], [1, 2], [0, 3], [1, 4], [2, 5], [3, 4],
     [6, 0], [6, 3], [4, 7], [2, 7], [0, 8], [8, 3],
-    [8, 9], [9, 4], [1, 9], [5, 7],
+    [8, 9], [9, 4], [1, 9], [5, 10], [10, 11], [11, 12],
+    [7, 12], [2, 10], [3, 13], [13, 14], [14, 7], [4, 14],
+    [6, 13], [5, 7],
   ];
 
   return (
     <svg
-      viewBox="0 0 420 190"
+      viewBox="0 0 540 170"
       fill="none"
-      className="w-full max-w-md opacity-80"
+      className="absolute inset-0 w-full h-full"
+      preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
       {edges.map(([a, b], i) => (
@@ -394,57 +351,77 @@ function NodeGraphic() {
           x2={nodes[b].cx}
           y2={nodes[b].cy}
           stroke="#FFC919"
-          strokeWidth="1"
-          strokeOpacity="0.4"
+          strokeWidth="0.8"
+          strokeOpacity="0.25"
+          className="hero-line"
+          style={{ animationDelay: `${i * 0.2}s` }}
         />
       ))}
       {nodes.map((n, i) => (
-        <circle key={i} cx={n.cx} cy={n.cy} r={n.r} fill="#FFC919" />
+        <circle
+          key={i}
+          cx={n.cx}
+          cy={n.cy}
+          r={n.r}
+          fill="#FFC919"
+          opacity="0.6"
+          className="hero-node"
+          style={
+            {
+              animationDelay: `${i * 0.3}s`,
+              "--base-r": `${n.r}px`,
+            } as React.CSSProperties
+          }
+        />
       ))}
     </svg>
   );
 }
 
 /* ═══════════════════════════════════════════
-   1. HERO
+   1. HERO — Layered: SVG → Giant N.O.D.E. → Content
    ═══════════════════════════════════════════ */
 
 function Hero({ l }: { l: Locale }) {
-  const ref = useReveal();
-
   return (
-    <section
-      ref={ref}
-      className="relative bg-asphalt-black text-ice-white section-padding overflow-hidden"
-    >
-      <div className="container-narrow flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-2xl reveal">
-          <h1 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] tracking-tight">
-            {t.hero.title1[l]}
-            <br />
-            <span className="text-gold-bar">{t.hero.title2[l]}</span>
-          </h1>
-          <p className="mt-6 text-lg md:text-xl text-ice-white/70 max-w-lg leading-relaxed">
-            {t.hero.subtitle[l]}
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <a
-              href="#waitlist"
-              className="inline-flex items-center gap-2 bg-gold-bar text-asphalt-black font-bold px-8 py-4 text-lg hover:brightness-110 transition-all"
-            >
-              {t.hero.cta1[l]}
-              <ArrowRight size={20} />
-            </a>
-            <a
-              href="#planes"
-              className="inline-flex items-center gap-2 border-2 border-ice-white/30 text-ice-white px-8 py-4 text-lg hover:border-ice-white/60 transition-all"
-            >
-              {t.hero.cta2[l]}
-            </a>
-          </div>
-        </div>
-        <div className="hidden lg:block flex-shrink-0 reveal" style={{ transitionDelay: "0.2s" }}>
-          <NodeGraphic />
+    <section className="relative bg-asphalt-black text-ice-white section-padding overflow-hidden min-h-[80vh] flex items-center">
+      {/* Layer 1: Animated SVG network */}
+      <div className="absolute inset-0 opacity-40">
+        <HeroSVG />
+      </div>
+
+      {/* Layer 2: Giant N.O.D.E. text */}
+      <span
+        className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-lexend)] font-black text-[clamp(8rem,20vw,15rem)] text-gold-bar/[0.06] select-none pointer-events-none leading-none"
+        aria-hidden="true"
+      >
+        N.O.D.E.
+      </span>
+
+      {/* Layer 3: Actual content */}
+      <div className="container-narrow relative z-10">
+        <h1 className="hero-fade font-[family-name:var(--font-lexend)] font-black text-[clamp(3rem,6vw,5rem)] leading-[1.05] tracking-tight max-w-3xl">
+          {t.hero.title1[l]}
+          <br />
+          <span className="text-gold-bar">{t.hero.title2[l]}</span>
+        </h1>
+        <p className="hero-fade-delay-1 mt-6 text-lg md:text-xl text-ice-white/60 max-w-lg leading-relaxed tracking-wide">
+          {t.hero.subtitle[l]}
+        </p>
+        <div className="hero-fade-delay-2 mt-10 flex flex-wrap gap-4">
+          <a
+            href="#waitlist"
+            className="inline-flex items-center gap-2 bg-gold-bar text-asphalt-black font-bold px-8 py-4 text-lg hover:brightness-110 transition-all"
+          >
+            {t.hero.cta1[l]}
+            <ArrowRight size={20} />
+          </a>
+          <a
+            href="#planes"
+            className="inline-flex items-center gap-2 border-2 border-ice-white/20 text-ice-white px-8 py-4 text-lg hover:border-ice-white/50 transition-all"
+          >
+            {t.hero.cta2[l]}
+          </a>
         </div>
       </div>
     </section>
@@ -452,10 +429,10 @@ function Hero({ l }: { l: Locale }) {
 }
 
 /* ═══════════════════════════════════════════
-   2. EL PROBLEMA
+   2. EL PROBLEMA — Editorial Blocks
    ═══════════════════════════════════════════ */
 
-const problemIcons = [DollarSign, Users, Globe];
+const problemNumbers = ["01", "02", "03"];
 
 function ElProblema({ l }: { l: Locale }) {
   const ref = useReveal();
@@ -463,31 +440,38 @@ function ElProblema({ l }: { l: Locale }) {
   return (
     <section ref={ref} className="bg-ice-white section-padding">
       <div className="container-narrow">
-        <h2 className="reveal font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl tracking-tight text-midnight-express">
+        <h2 className="reveal font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] tracking-tight text-midnight-express">
           {t.problema.title[l]}
         </h2>
-        <p className="reveal mt-4 text-lg text-asphalt-black/60 max-w-xl" style={{ transitionDelay: "0.1s" }}>
+        <p
+          className="reveal mt-4 text-[1.1rem] text-asphalt-black/50 max-w-xl tracking-wide leading-relaxed"
+          style={{ transitionDelay: "0.15s" }}
+        >
           {t.problema.subtitle[l]}
         </p>
-        <div className="mt-14 grid gap-8 md:grid-cols-3">
-          {t.problema.cards.map((card, i) => {
-            const Icon = problemIcons[i];
-            return (
-              <div
-                key={i}
-                className="reveal border border-asphalt-black/10 p-8 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-bar hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
-                style={{ transitionDelay: `${0.1 * (i + 1)}s` }}
+        <div className="mt-16 divide-y divide-asphalt-black/10">
+          {t.problema.blocks.map((block, i) => (
+            <div
+              key={i}
+              className="reveal editorial-block py-12 md:py-16 pl-4 md:pl-8 flex flex-col md:flex-row md:items-start gap-6 md:gap-16"
+              style={{ transitionDelay: `${0.15 * (i + 1)}s` }}
+            >
+              <span
+                className="editorial-number font-[family-name:var(--font-lexend)] font-black text-[5rem] md:text-[6rem] leading-none text-gold-bar/10 select-none shrink-0 md:w-48"
+                aria-hidden="true"
               >
-                <Icon size={32} className="text-gold-bar" strokeWidth={1.5} />
-                <h3 className="font-[family-name:var(--font-lexend)] font-bold text-xl">
-                  {card.title[l]}
+                // {problemNumbers[i]}
+              </span>
+              <div className="max-w-2xl">
+                <h3 className="font-[family-name:var(--font-lexend)] font-bold text-xl md:text-2xl text-asphalt-black">
+                  {block.title[l]}
                 </h3>
-                <p className="text-asphalt-black/60 leading-relaxed">
-                  {card.desc[l]}
+                <p className="mt-3 text-[1.1rem] text-asphalt-black/55 leading-[1.8]">
+                  {block.desc[l]}
                 </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -495,7 +479,7 @@ function ElProblema({ l }: { l: Locale }) {
 }
 
 /* ═══════════════════════════════════════════
-   3. LA SOLUCIÓN
+   3. LA SOLUCIÓN — More Breathing Room
    ═══════════════════════════════════════════ */
 
 const serviceIcons = [Palette, Code2, Megaphone];
@@ -504,36 +488,39 @@ function LaSolucion({ l }: { l: Locale }) {
   const ref = useReveal();
 
   return (
-    <section ref={ref} className="bg-midnight-express text-ice-white section-padding">
+    <section ref={ref} className="bg-midnight-express text-ice-white px-6 py-28 md:px-12 md:py-36 lg:px-20 lg:py-44">
       <div className="container-narrow">
-        <h2 className="reveal font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl tracking-tight">
+        <h2 className="reveal font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] tracking-tight">
           {t.solucion.title[l]}
         </h2>
-        <p className="reveal mt-4 text-lg text-ice-white/50 max-w-xl" style={{ transitionDelay: "0.1s" }}>
+        <p
+          className="reveal mt-4 text-[1.1rem] text-ice-white/40 max-w-xl tracking-wide"
+          style={{ transitionDelay: "0.15s" }}
+        >
           {t.solucion.subtitle[l]}
         </p>
-        <div className="mt-14 grid gap-10 md:grid-cols-3">
+        <div className="mt-16 grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-ice-white/10">
           {t.solucion.services.map((s, i) => {
             const Icon = serviceIcons[i];
             return (
               <div
                 key={i}
-                className="reveal border border-ice-white/10 p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-bar hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
-                style={{ transitionDelay: `${0.1 * (i + 1)}s` }}
+                className="reveal py-10 md:py-0 md:px-10 first:md:pl-0 last:md:pr-0"
+                style={{ transitionDelay: `${0.15 * (i + 1)}s` }}
               >
                 <Icon size={36} className="text-gold-bar" strokeWidth={1.5} />
-                <h3 className="mt-4 font-[family-name:var(--font-lexend)] font-bold text-2xl">
+                <h3 className="mt-5 font-[family-name:var(--font-lexend)] font-bold text-2xl md:text-[1.75rem]">
                   {s.title[l]}
                 </h3>
                 <ul className="mt-6 space-y-3">
                   {s.items[l].map((item) => (
                     <li
                       key={item}
-                      className="flex items-start gap-3 text-ice-white/70"
+                      className="flex items-start gap-3 text-ice-white/60 text-[1.05rem]"
                     >
                       <Check
                         size={18}
-                        className="mt-0.5 text-gold-bar flex-shrink-0"
+                        className="mt-1 text-gold-bar flex-shrink-0"
                       />
                       {item}
                     </li>
@@ -549,11 +536,47 @@ function LaSolucion({ l }: { l: Locale }) {
 }
 
 /* ═══════════════════════════════════════════
-   4. CÓMO FUNCIONA — Editorial Numbers
+   4. CÓMO FUNCIONA — Editorial Blocks + Counter
    ═══════════════════════════════════════════ */
 
-const stepIcons = [ClipboardList, MessageSquare, Hammer, PackageCheck];
-const stepNumbers = ["01", "02", "03", "04"];
+const stepTargets = [1, 2, 3, 4];
+
+function StepBlock({
+  step,
+  index,
+  l,
+}: {
+  step: (typeof t.funciona.steps)[0];
+  index: number;
+  l: Locale;
+}) {
+  const counter = useCountUp(stepTargets[index]);
+  const display = String(counter.value).padStart(2, "0");
+
+  return (
+    <div
+      className="reveal editorial-block relative overflow-hidden p-8 md:p-10 min-h-[240px] flex flex-col justify-end border border-asphalt-black/[0.06]"
+      style={{ transitionDelay: `${0.15 * (index + 1)}s` }}
+    >
+      <span
+        ref={counter.ref}
+        className="editorial-number absolute top-0 right-4 font-[family-name:var(--font-lexend)] font-black text-[6rem] md:text-[10rem] leading-none text-gold-bar/[0.08] select-none pointer-events-none"
+        aria-hidden="true"
+      >
+        <span className="text-[0.4em] opacity-30 font-sans">// </span>
+        {display}
+      </span>
+      <div className="relative z-10">
+        <h3 className="font-[family-name:var(--font-lexend)] font-bold text-xl md:text-2xl text-asphalt-black">
+          {step.title[l]}
+        </h3>
+        <p className="mt-3 text-[1.05rem] text-asphalt-black/55 leading-[1.8] max-w-md">
+          {step.desc[l]}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function ComoFunciona({ l }: { l: Locale }) {
   const ref = useReveal();
@@ -561,40 +584,13 @@ function ComoFunciona({ l }: { l: Locale }) {
   return (
     <section ref={ref} className="bg-ice-white section-padding">
       <div className="container-narrow">
-        <h2 className="reveal font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl tracking-tight text-midnight-express">
+        <h2 className="reveal font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] tracking-tight text-midnight-express">
           {t.funciona.title[l]}
         </h2>
-        <div className="mt-14 grid gap-6 sm:grid-cols-2">
-          {t.funciona.steps.map((step, i) => {
-            const Icon = stepIcons[i];
-            return (
-              <div
-                key={i}
-                className="reveal relative overflow-hidden border border-asphalt-black/10 p-8 md:p-10 min-h-[200px] flex flex-col justify-end transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-bar hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
-                style={{ transitionDelay: `${0.1 * (i + 1)}s` }}
-              >
-                <span
-                  className="absolute top-2 right-4 font-[family-name:var(--font-lexend)] font-black text-[8rem] leading-none text-gold-bar/[0.12] select-none pointer-events-none"
-                  aria-hidden="true"
-                >
-                  {stepNumbers[i]}
-                </span>
-                <div className="relative z-10">
-                  <Icon
-                    size={28}
-                    className="text-gold-bar mb-3"
-                    strokeWidth={1.5}
-                  />
-                  <h3 className="font-[family-name:var(--font-lexend)] font-bold text-xl md:text-2xl">
-                    {step.title[l]}
-                  </h3>
-                  <p className="mt-2 text-asphalt-black/60 leading-relaxed max-w-md">
-                    {step.desc[l]}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+        <div className="mt-16 grid gap-4 sm:grid-cols-2">
+          {t.funciona.steps.map((step, i) => (
+            <StepBlock key={i} step={step} index={i} l={l} />
+          ))}
         </div>
       </div>
     </section>
@@ -602,57 +598,64 @@ function ComoFunciona({ l }: { l: Locale }) {
 }
 
 /* ═══════════════════════════════════════════
-   5. PLANES
+   5. PLANES — Premium Glassmorphism
    ═══════════════════════════════════════════ */
 
 function Planes({ l }: { l: Locale }) {
   const ref = useReveal();
 
   return (
-    <section ref={ref} id="planes" className="bg-midnight-express text-ice-white section-padding">
+    <section
+      ref={ref}
+      id="planes"
+      className="bg-midnight-express text-ice-white section-padding"
+    >
       <div className="container-narrow">
-        <h2 className="reveal font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl tracking-tight text-center">
+        <h2 className="reveal font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] tracking-tight text-center">
           {t.planes.title[l]}
         </h2>
-        <p className="reveal mt-4 text-lg text-ice-white/50 text-center max-w-xl mx-auto" style={{ transitionDelay: "0.1s" }}>
+        <p
+          className="reveal mt-4 text-[1.1rem] text-ice-white/40 text-center max-w-xl mx-auto tracking-wide"
+          style={{ transitionDelay: "0.15s" }}
+        >
           {t.planes.subtitle[l]}
         </p>
-        <div className="mt-14 grid gap-8 md:grid-cols-3 items-start">
+        <div className="mt-16 grid gap-6 md:grid-cols-3 items-start">
           {t.planes.plans.map((plan, i) => (
             <div
               key={plan.name}
-              className={`reveal p-8 flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)] ${
+              className={`reveal-scale p-8 md:p-10 flex flex-col backdrop-blur-sm transition-all duration-500 ${
                 plan.highlighted
-                  ? "border-2 border-gold-bar bg-midnight-express relative hover:shadow-[0_10px_40px_rgba(255,201,25,0.15)]"
-                  : "border border-ice-white/10 bg-midnight-express/50 hover:border-gold-bar"
+                  ? "border-2 border-gold-bar bg-white/[0.07] relative hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(255,201,25,0.12)]"
+                  : "border border-ice-white/10 bg-white/[0.04] hover:-translate-y-2 hover:border-gold-bar/50 hover:shadow-[0_20px_50px_rgba(255,201,25,0.08)]"
               }`}
-              style={{ transitionDelay: `${0.1 * (i + 1)}s` }}
+              style={{ transitionDelay: `${0.15 * (i + 1)}s` }}
             >
               {plan.highlighted && (
-                <span className="absolute -top-4 left-8 bg-gold-bar text-asphalt-black font-bold text-sm px-4 py-1">
+                <span className="absolute -top-4 left-8 bg-gold-bar text-asphalt-black font-bold text-sm px-4 py-1.5 tracking-wide">
                   {t.planes.popular[l]}
                 </span>
               )}
               <h3 className="font-[family-name:var(--font-lexend)] font-bold text-2xl">
                 {plan.name}
               </h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="font-[family-name:var(--font-lexend)] font-black text-5xl">
+              <div className="mt-5 flex items-baseline gap-2">
+                <span className="font-[family-name:var(--font-lexend)] font-black text-[3.5rem] leading-none">
                   {plan.price}
                 </span>
-                <span className="text-ice-white/50 text-lg">
+                <span className="text-ice-white/40 text-base">
                   {t.planes.period[l]}
                 </span>
               </div>
-              <ul className="mt-8 space-y-3 flex-1">
+              <ul className="mt-8 space-y-3.5 flex-1">
                 {plan.features[l].map((f) => (
                   <li
                     key={f}
-                    className="flex items-start gap-3 text-ice-white/70"
+                    className="flex items-start gap-3 text-ice-white/60 text-[1.05rem]"
                   >
                     <Check
                       size={18}
-                      className="mt-0.5 text-gold-bar flex-shrink-0"
+                      className="mt-1 text-gold-bar flex-shrink-0"
                     />
                     {f}
                   </li>
@@ -660,10 +663,10 @@ function Planes({ l }: { l: Locale }) {
               </ul>
               <a
                 href="#waitlist"
-                className={`mt-8 block text-center font-bold py-4 transition-all duration-300 ${
+                className={`mt-10 block text-center font-bold py-4 text-lg transition-all duration-300 ${
                   plan.highlighted
                     ? "bg-gold-bar text-asphalt-black hover:brightness-110"
-                    : "border border-ice-white/30 text-ice-white hover:border-ice-white/60"
+                    : "border border-ice-white/20 text-ice-white hover:border-ice-white/50"
                 }`}
               >
                 {t.planes.cta[l]}
@@ -677,7 +680,7 @@ function Planes({ l }: { l: Locale }) {
 }
 
 /* ═══════════════════════════════════════════
-   6. WAITLIST
+   6. WAITLIST — Dark Midnight
    ═══════════════════════════════════════════ */
 
 function WaitlistSection({ l }: { l: Locale }) {
@@ -716,36 +719,46 @@ function WaitlistSection({ l }: { l: Locale }) {
     [form]
   );
 
+  const inputClass =
+    "w-full bg-transparent border border-ice-white/15 px-5 py-4 text-ice-white placeholder:text-ice-white/25 focus:outline-none focus:border-gold-bar transition-colors text-[1.05rem]";
+
   return (
     <section
       ref={ref}
       id="waitlist"
-      className="bg-midnight-express text-ice-white section-padding"
+      className="bg-[#000932] text-ice-white section-padding"
     >
       <div className="container-narrow max-w-2xl">
-        <h2 className="reveal font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl tracking-tight text-center">
+        <h2 className="reveal font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] tracking-tight text-center">
           {t.waitlist.title[l]}
         </h2>
-        <p className="reveal mt-4 text-lg text-ice-white/50 text-center" style={{ transitionDelay: "0.1s" }}>
+        <p
+          className="reveal mt-4 text-[1.1rem] text-ice-white/40 text-center tracking-wide"
+          style={{ transitionDelay: "0.15s" }}
+        >
           {t.waitlist.subtitle[l]}
         </p>
 
         {status === "success" ? (
-          <div className="reveal active mt-14 text-center p-10 border border-gold-bar/30">
+          <div className="reveal active mt-16 text-center p-12 border border-gold-bar/20 bg-white/[0.03]">
             <Check size={48} className="mx-auto text-gold-bar" />
             <p className="mt-4 font-[family-name:var(--font-lexend)] font-bold text-2xl">
               {t.waitlist.successTitle[l]}
             </p>
-            <p className="mt-2 text-ice-white/60">
+            <p className="mt-2 text-ice-white/50">
               {t.waitlist.successDesc[l]}
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="reveal mt-14 space-y-6" style={{ transitionDelay: "0.2s" }}>
+          <form
+            onSubmit={handleSubmit}
+            className="reveal mt-16 space-y-6"
+            style={{ transitionDelay: "0.3s" }}
+          >
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-bold mb-2 text-ice-white/70"
+                className="block text-sm font-bold mb-2 text-ice-white/50 tracking-wide"
               >
                 {t.waitlist.labelName[l]}
               </label>
@@ -755,14 +768,14 @@ function WaitlistSection({ l }: { l: Locale }) {
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-transparent border border-ice-white/20 px-5 py-4 text-ice-white placeholder:text-ice-white/30 focus:outline-none focus:border-gold-bar transition-colors"
+                className={inputClass}
                 placeholder={t.waitlist.placeholderName[l]}
               />
             </div>
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-bold mb-2 text-ice-white/70"
+                className="block text-sm font-bold mb-2 text-ice-white/50 tracking-wide"
               >
                 {t.waitlist.labelEmail[l]}
               </label>
@@ -772,7 +785,7 @@ function WaitlistSection({ l }: { l: Locale }) {
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full bg-transparent border border-ice-white/20 px-5 py-4 text-ice-white placeholder:text-ice-white/30 focus:outline-none focus:border-gold-bar transition-colors"
+                className={inputClass}
                 placeholder={t.waitlist.placeholderEmail[l]}
               />
             </div>
@@ -780,7 +793,7 @@ function WaitlistSection({ l }: { l: Locale }) {
               <div>
                 <label
                   htmlFor="business"
-                  className="block text-sm font-bold mb-2 text-ice-white/70"
+                  className="block text-sm font-bold mb-2 text-ice-white/50 tracking-wide"
                 >
                   {t.waitlist.labelBusiness[l]}
                 </label>
@@ -791,14 +804,14 @@ function WaitlistSection({ l }: { l: Locale }) {
                   onChange={(e) =>
                     setForm({ ...form, businessName: e.target.value })
                   }
-                  className="w-full bg-transparent border border-ice-white/20 px-5 py-4 text-ice-white placeholder:text-ice-white/30 focus:outline-none focus:border-gold-bar transition-colors"
+                  className={inputClass}
                   placeholder={t.waitlist.placeholderBusiness[l]}
                 />
               </div>
               <div>
                 <label
                   htmlFor="alliance"
-                  className="block text-sm font-bold mb-2 text-ice-white/70"
+                  className="block text-sm font-bold mb-2 text-ice-white/50 tracking-wide"
                 >
                   {t.waitlist.labelAlliance[l]}
                 </label>
@@ -809,7 +822,7 @@ function WaitlistSection({ l }: { l: Locale }) {
                   onChange={(e) =>
                     setForm({ ...form, allianceCode: e.target.value })
                   }
-                  className="w-full bg-transparent border border-ice-white/20 px-5 py-4 text-ice-white placeholder:text-ice-white/30 focus:outline-none focus:border-gold-bar transition-colors"
+                  className={inputClass}
                   placeholder={t.waitlist.placeholderAlliance[l]}
                 />
               </div>
@@ -817,7 +830,7 @@ function WaitlistSection({ l }: { l: Locale }) {
             <div>
               <label
                 htmlFor="language"
-                className="block text-sm font-bold mb-2 text-ice-white/70"
+                className="block text-sm font-bold mb-2 text-ice-white/50 tracking-wide"
               >
                 {t.waitlist.labelLanguage[l]}
               </label>
@@ -825,12 +838,9 @@ function WaitlistSection({ l }: { l: Locale }) {
                 id="language"
                 value={form.language}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    language: e.target.value as Locale,
-                  })
+                  setForm({ ...form, language: e.target.value as Locale })
                 }
-                className="w-full bg-transparent border border-ice-white/20 px-5 py-4 text-ice-white focus:outline-none focus:border-gold-bar transition-colors"
+                className={inputClass}
               >
                 <option value="es" className="bg-midnight-express">
                   Español
@@ -855,7 +865,7 @@ function WaitlistSection({ l }: { l: Locale }) {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full bg-gold-bar text-asphalt-black font-bold py-4 text-lg hover:brightness-110 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+              className="w-full bg-gold-bar text-asphalt-black font-bold py-5 text-lg hover:brightness-110 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {status === "loading" ? (
                 <>
@@ -882,7 +892,7 @@ function WaitlistSection({ l }: { l: Locale }) {
 
 function Footer({ l }: { l: Locale }) {
   return (
-    <footer className="bg-asphalt-black text-ice-white/50 px-6 py-12 md:px-12">
+    <footer className="bg-asphalt-black text-ice-white/40 px-6 py-14 md:px-12">
       <div className="container-narrow flex flex-col gap-8 md:flex-row md:justify-between md:items-center">
         <div>
           <p className="font-[family-name:var(--font-lexend)] font-black text-2xl text-ice-white">
@@ -891,10 +901,7 @@ function Footer({ l }: { l: Locale }) {
           <p className="mt-1 text-sm">by Nouvos</p>
         </div>
         <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-          <a
-            href="#waitlist"
-            className="hover:text-ice-white transition-colors"
-          >
+          <a href="#waitlist" className="hover:text-ice-white transition-colors">
             Waitlist
           </a>
           <a href="#planes" className="hover:text-ice-white transition-colors">
@@ -926,15 +933,11 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem("node-locale") as Locale | null;
-    if (saved === "en" || saved === "es") {
-      setLocale(saved);
-    }
+    if (saved === "en" || saved === "es") setLocale(saved);
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem("node-locale", locale);
-    }
+    if (mounted) localStorage.setItem("node-locale", locale);
   }, [locale, mounted]);
 
   return (
