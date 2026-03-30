@@ -6,141 +6,74 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #130A06;
+}
+::-webkit-scrollbar-thumb {
+  background: #FFC919;
+}
+
+/* Selection */
+::selection {
+  background: #FFC919;
+  color: #130A06;
+}
+
 @layer base {
   body {
-    @apply bg-ice-white text-asphalt-black antialiased;
+    @apply bg-asphalt-black text-white antialiased;
   }
 }
 
 @layer components {
-  .section-padding {
-    @apply px-6 py-24 md:px-12 md:py-32 lg:px-20 lg:py-40;
-  }
-
-  .container-narrow {
-    @apply mx-auto max-w-7xl;
+  .container-w {
+    @apply mx-auto w-full max-w-[1400px] px-[5%] md:px-[8%];
   }
 }
 
-/* ─── Hero Fade-In (no scroll, plays on load) ─── */
+/* ─── Hero fade-in ─── */
 @keyframes heroFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+.hero-fade { animation: heroFadeIn 1s ease-out both; }
+.hero-fade-d1 { animation: heroFadeIn 0.8s ease-out 0.3s both; }
+.hero-fade-d2 { animation: heroFadeIn 0.8s ease-out 0.6s both; }
+.hero-fade-d3 { animation: heroFadeIn 0.8s ease-out 0.9s both; }
 
-.hero-fade {
-  animation: heroFadeIn 0.8s ease-out both;
-}
-
-.hero-fade-delay-1 {
-  animation: heroFadeIn 0.8s ease-out 0.15s both;
-}
-
-.hero-fade-delay-2 {
-  animation: heroFadeIn 0.8s ease-out 0.3s both;
-}
-
-/* ─── Animated SVG: dash-offset + pulse ─── */
-@keyframes dashFlow {
-  from {
-    stroke-dashoffset: 200;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes nodePulse {
-  0%, 100% {
-    r: var(--base-r);
-    opacity: 0.6;
-  }
-  50% {
-    r: calc(var(--base-r) + 2px);
-    opacity: 1;
-  }
-}
-
-.hero-line {
-  stroke-dasharray: 200;
-  animation: dashFlow 4s linear infinite;
-}
-
-.hero-node {
-  animation: nodePulse 3s ease-in-out infinite;
-}
-
-/* ─── Scroll Reveal — More Aggressive ─── */
+/* ─── Scroll Reveal ─── */
 .reveal {
   opacity: 0;
   transform: translateY(60px);
   transition: opacity 1s ease-out, transform 1s ease-out;
 }
-
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Pricing card scale variant */
-.reveal-scale {
-  opacity: 0;
-  transform: translateY(60px) scale(0.92);
-  transition: opacity 1s ease-out, transform 1s ease-out;
-}
-
-.reveal-scale.active {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-/* Editorial block left-border hover */
-.editorial-block {
-  border-left: 3px solid transparent;
-  transition: border-color 0.4s ease, background-color 0.4s ease;
-}
-
-.editorial-block:hover {
-  border-left-color: #FFC919;
-  background-color: rgba(255, 201, 25, 0.03);
-}
-
-.editorial-block .editorial-number {
-  transition: opacity 0.4s ease;
-}
-
-.editorial-block:hover .editorial-number {
-  opacity: 0.2;
+/* ─── Text stroke for giant numbers ─── */
+.text-stroke {
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.9);
+  color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal-scale {
+  .reveal {
     opacity: 1;
     transform: none;
     transition: none;
   }
-
   .hero-fade,
-  .hero-fade-delay-1,
-  .hero-fade-delay-2 {
+  .hero-fade-d1,
+  .hero-fade-d2,
+  .hero-fade-d3 {
     animation: none;
     opacity: 1;
     transform: none;
-  }
-
-  .hero-line {
-    animation: none;
-    stroke-dasharray: none;
-  }
-
-  .hero-node {
-    animation: none;
   }
 }
