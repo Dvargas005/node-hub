@@ -6,6 +6,7 @@ import {
   useScroll,
   useTransform,
   useMotionValue,
+  useMotionValueEvent,
   useSpring,
   AnimatePresence,
 } from "framer-motion";
@@ -123,7 +124,22 @@ const C = {
       { num: "04", label: "// 04", title: "APPROVE, ITERATE, SCALE", para: "Receive ready-to-use deliverables. Need adjustments? Request unlimited revisions. Approve on first round and earn bonus credits. As your business grows, your plan grows with you — more credits, more speed, more services.", list: [["Unlimited Revisions", "01"], ["First-Round Bonus", "02"], ["Credit Packs", "03"], ["Plan Upgrades", "04"]] },
     ],
     about: { title: "Why N.O.D.E. exists", para: "N.O.D.E. is born from Nouvos Solutions — a logistics technology company that has spent years building systems for the global supply chain. We know what it means to operate with distributed teams, manage deliveries with real deadlines, and scale operations without losing quality. We apply exactly that mindset to creative services: clear processes, predictable deliveries, technology that amplifies human talent." },
-    quote: "In a world full of generic noise, we help businesses build their digital presence with a real team, proven processes, and technology that accelerates everything.",
+    manifesto: {
+      lines: [
+        "WE RUN CREATIVE",
+        "LIKE WE RUN LOGISTICS.",
+        "CLEAR PROCESSES.",
+        "REAL DEADLINES.",
+        "ZERO EXCUSES.",
+        "",
+        "NOT EVERY BUSINESS",
+        "CAN AFFORD THIS.",
+        "UNTIL NOW",
+      ],
+      lastWordPre: "NOW",
+      lastWordFade: "UNTIL",
+      reveal: "N.O.D.E.",
+    },
     pricing: {
       plans: [
         { name: "Member", price: "$100", per: "/mo", desc: "$140 in credits · 1 active request · 5-day turnaround" },
@@ -154,7 +170,22 @@ const C = {
       { num: "04", label: "// 04", title: "APRUEBA, ITERA, ESCALA", para: "Recibe entregas listas para usar. Si necesitas ajustes, pide revisiones ilimitadas. Aprueba a la primera y gana créditos bonus. A medida que tu negocio crece, tu plan crece contigo — más créditos, más velocidad, más servicios.", list: [["Revisiones Ilimitadas", "01"], ["Bonus Primera Ronda", "02"], ["Packs de Créditos", "03"], ["Upgrades de Plan", "04"]] },
     ],
     about: { title: "Por qué existe N.O.D.E.", para: "N.O.D.E. nace de Nouvos Solutions — una empresa de tecnología logística que lleva años construyendo sistemas para la cadena de suministro global. Sabemos lo que significa operar con equipos distribuidos, gestionar entregas con deadlines reales, y escalar operaciones sin perder calidad. Aplicamos exactamente esa mentalidad a los servicios creativos: procesos claros, entregas predecibles, tecnología que amplifica al talento humano." },
-    quote: "En un mundo lleno de ruido genérico, ayudamos a negocios a construir su presencia digital con un equipo real, procesos probados, y tecnología que acelera todo.",
+    manifesto: {
+      lines: [
+        "OPERAMOS LO CREATIVO",
+        "COMO OPERAMOS LA LOGÍSTICA.",
+        "PROCESOS CLAROS.",
+        "DEADLINES REALES.",
+        "CERO EXCUSAS.",
+        "",
+        "NO TODOS LOS NEGOCIOS",
+        "PUEDEN PAGARLO.",
+        "HASTA AHORA",
+      ],
+      lastWordPre: "AHORA",
+      lastWordFade: "HASTA",
+      reveal: "N.O.D.E.",
+    },
     pricing: {
       plans: [
         { name: "Member", price: "$100", per: "/mes", desc: "$140 en créditos · 1 request activo · Turnaround 5 días" },
@@ -245,6 +276,136 @@ function ServiceAccordion({ acc, idx }: { acc: { name: string; items: string[][]
 /* ═══════════════════════════════════════════
    PAGE
    ═══════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════
+   MANIFESTO — Scroll Fill + Glitch Reveal
+   ═══════════════════════════════════════════ */
+
+function ScrollWord({ word, progress, start, end, gold }: { word: string; progress: ReturnType<typeof useScroll>["scrollYProgress"]; start: number; end: number; gold: boolean }) {
+  const opacity = useTransform(progress, [start, end], [0.12, 1]);
+  const color = gold ? "#FFC919" : "#F5F6FC";
+  return (
+    <motion.span style={{ opacity, color }} className="inline-block mr-[0.3em]">
+      {word}
+    </motion.span>
+  );
+}
+
+function ManifestoSection({ lang }: { lang: "en" | "es" }) {
+  const m = C[lang].manifesto;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start 0.8", "end 0.2"] });
+  const [phase, setPhase] = useState<"scroll" | "glitch" | "reveal">("scroll");
+
+  // Build flat word list with metadata
+  const wordMeta: { word: string; isLastLine: boolean; isFadePart: boolean; isGlitchPart: boolean; gold: boolean }[] = [];
+  m.lines.forEach((line, li) => {
+    if (line === "") return;
+    const isLastLine = li === m.lines.length - 1;
+    line.split(" ").forEach((w) => {
+      const isFadePart = isLastLine && w === m.lastWordFade;
+      const isGlitchPart = isLastLine && w === m.lastWordPre;
+      wordMeta.push({ word: w, isLastLine, isFadePart, isGlitchPart, gold: isLastLine });
+    });
+  });
+
+  const total = wordMeta.length;
+
+  // Phase transitions
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (v > 0.92 && phase === "scroll") setPhase("glitch");
+    if (v < 0.88 && phase !== "scroll") setPhase("scroll");
+  });
+
+  useEffect(() => {
+    if (phase === "glitch") {
+      const timer = setTimeout(() => setPhase("reveal"), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [phase]);
+
+  // Render lines
+  let wordIdx = 0;
+
+  return (
+    <section ref={containerRef} className="relative min-h-[200vh] bg-[#0a0a0a]">
+      {/* Grain overlay */}
+      <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
+
+      <div className="sticky top-0 min-h-screen flex items-center justify-center px-6 md:px-12">
+        <div className="text-center max-w-5xl mx-auto font-[family-name:var(--font-lexend)] font-black uppercase text-[clamp(2.5rem,5.5vw,5rem)] leading-[1.15] tracking-[-0.02em]">
+          {m.lines.map((line, li) => {
+            if (line === "") return <div key={li} className="h-[0.6em]" />;
+            const isLastLine = li === m.lines.length - 1;
+            const words = line.split(" ");
+
+            return (
+              <div key={li}>
+                {words.map((w) => {
+                  const idx = wordIdx++;
+                  const start = idx / total;
+                  const end = (idx + 1) / total;
+
+                  // Last line special handling
+                  if (isLastLine) {
+                    const isFade = w === m.lastWordFade;
+                    const isGlitch = w === m.lastWordPre;
+
+                    if (isFade) {
+                      return (
+                        <motion.span
+                          key={`${li}-${w}`}
+                          className="inline-block mr-[0.3em]"
+                          animate={{ opacity: phase === "scroll" ? undefined : 0 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <ScrollWord word={w} progress={scrollYProgress} start={start} end={end} gold />
+                        </motion.span>
+                      );
+                    }
+
+                    if (isGlitch) {
+                      return (
+                        <span key={`${li}-${w}`} className="inline-block mr-[0.3em] relative">
+                          <AnimatePresence mode="wait">
+                            {phase === "reveal" ? (
+                              <motion.span
+                                key="node"
+                                initial={{ opacity: 0, scale: 1.2 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.6, ease }}
+                                className="inline-block text-[#FFC919] text-[1.2em]"
+                                style={{ textShadow: "0 0 40px rgba(255,201,25,0.3)" }}
+                              >
+                                {m.reveal}
+                              </motion.span>
+                            ) : (
+                              <motion.span
+                                key="word"
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.3 }}
+                                className={`inline-block ${phase === "glitch" ? "glitch-active" : ""}`}
+                                data-text={w}
+                              >
+                                <ScrollWord word={w} progress={scrollYProgress} start={start} end={end} gold />
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </span>
+                      );
+                    }
+                  }
+
+                  return <ScrollWord key={`${li}-${w}-${idx}`} word={w} progress={scrollYProgress} start={start} end={end} gold={isLastLine} />;
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const [lang, setLang] = useState<"en" | "es">("en");
@@ -382,18 +543,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ 5. QUOTE — parallax quote marks (FIX 4) ═══ */}
-      <section className="py-32 px-6 md:px-12 bg-[#130A06] relative overflow-hidden">
-        <div className="max-w-5xl mx-auto relative">
-          <ParaEl speed={-0.15} className="absolute -left-6 -top-6"><span className="quote-mark select-none" aria-hidden="true">&ldquo;</span></ParaEl>
-          <FadeUp>
-            <blockquote className="relative z-10 border-l-4 border-[#FFC919] pl-8 md:pl-16 font-[family-name:var(--font-atkinson)] font-bold italic text-[clamp(1.3rem,2.5vw,2rem)] text-[#F5F6FC] leading-[1.6]">
-              {t.quote}
-            </blockquote>
-          </FadeUp>
-          <ParaEl speed={-0.15} className="absolute -right-4 bottom-0"><span className="quote-mark rotate-180 select-none" aria-hidden="true">&rdquo;</span></ParaEl>
-        </div>
-      </section>
+      {/* ═══ 5. MANIFESTO — Scroll Fill + Glitch Reveal ═══ */}
+      <ManifestoSection lang={lang} />
 
       {/* ═══ 6. PRICING — Gold Bar stats rows (FIX 5) ═══ */}
       <section id="pricing" className="relative bg-[#FFC919] overflow-hidden">
