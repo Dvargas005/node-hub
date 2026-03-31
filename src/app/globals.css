@@ -1,3 +1,4 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,6 +27,11 @@
 ::selection {
   background: var(--gold-bar);
   color: var(--asphalt-black);
+}
+
+/* Global transitions */
+* {
+  transition: all 0.3s ease;
 }
 
 /* Reveal animation base */
@@ -86,6 +92,7 @@ button, input, img, div {
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.3);
+  font-family: var(--font-atkinson);
   font-size: 0.875rem;
 }
 
@@ -94,7 +101,6 @@ button, input, img, div {
   position: relative;
   cursor: pointer;
   color: rgba(245, 246, 252, 0.5);
-  transition: color 0.3s ease;
 }
 
 .filter-tab.active,
@@ -141,9 +147,9 @@ button, input, img, div {
   opacity: 1;
 }
 
+.service-card:hover img,
 .service-card:hover .img-placeholder {
   transform: translateY(-10px);
-  transition: transform 0.4s ease;
 }
 
 /* Process block separator */
@@ -180,19 +186,10 @@ button, input, img, div {
 .pricing-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(245, 246, 252, 0.1);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.pricing-card:hover {
-  transform: translateY(-8px);
 }
 
 .pricing-card.featured {
   border: 2px solid var(--gold-bar);
-}
-
-.pricing-card.featured:hover {
-  box-shadow: 0 20px 50px rgba(255, 201, 25, 0.1);
 }
 
 /* Form inputs */
@@ -202,11 +199,7 @@ button, input, img, div {
   color: var(--ice-white);
   padding: 1rem;
   width: 100%;
-  transition: border-color 0.3s ease;
-}
-
-.form-input::placeholder {
-  color: rgba(245, 246, 252, 0.3);
+  font-family: var(--font-atkinson);
 }
 
 .form-input:focus {
@@ -217,12 +210,4 @@ button, input, img, div {
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
 }

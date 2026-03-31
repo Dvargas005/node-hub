@@ -1,22 +1,14 @@
+// app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 
-/* ═══════════════════════════════════════════════════════════
-   LANGUAGE CONTENT
-   ═══════════════════════════════════════════════════════════ */
-
+// Language content
 const content = {
   en: {
     nav: {
       join: "Join Waitlist",
-      links: [
-        { label: "Services", href: "#services" },
-        { label: "Process", href: "#process" },
-        { label: "About", href: "#about" },
-        { label: "Plans", href: "#pricing" },
-        { label: "Contact", href: "#waitlist" },
-      ],
+      menu: "Menu",
     },
     hero: {
       label: "NETWORK ORGANIZED DELIVERY ENGINE",
@@ -29,12 +21,12 @@ const content = {
       subtitle: "Three service lines. Real deliverables.",
       filters: ["All", "Design", "Web", "Marketing"],
       items: [
-        { name: "Brand Starter", category: "Design", price: "from 2 credits", desc: "Complete brand identity package for new businesses" },
-        { name: "Landing Page", category: "Web", price: "from 5 credits", desc: "High-converting single page with AI-assisted copy" },
-        { name: "Content Pack", category: "Marketing", price: "from 3 credits", desc: "Blog posts, newsletters, and social content" },
-        { name: "Social Pack", category: "Design", price: "from 3 credits", desc: "30 days of branded social media graphics" },
-        { name: "SEO Foundation", category: "Web", price: "from 4 credits", desc: "Technical SEO setup and content optimization" },
-        { name: "Promo Campaign", category: "Marketing", price: "from 4 credits", desc: "End-to-end promotional campaign management" },
+        { name: "Brand Starter", category: "Design", price: "from $299 credits", desc: "Complete brand identity package for new businesses" },
+        { name: "Landing Page", category: "Web", price: "from $499 credits", desc: "High-converting single page with AI-assisted copy" },
+        { name: "Content Pack", category: "Marketing", price: "from $199 credits", desc: "Blog posts, newsletters, and social content" },
+        { name: "Social Pack", category: "Design", price: "from $249 credits", desc: "30 days of branded social media graphics" },
+        { name: "SEO Foundation", category: "Web", price: "from $399 credits", desc: "Technical SEO setup and content optimization" },
+        { name: "Promo Campaign", category: "Marketing", price: "from $599 credits", desc: "End-to-end promotional campaign management" },
       ],
     },
     process: {
@@ -95,59 +87,34 @@ const content = {
       title: "Why N.O.D.E. exists",
       para: "N.O.D.E. is born from Nouvos Solutions — a logistics technology company that has spent years building systems for the global supply chain. We know what it means to operate with distributed teams, manage deliveries with real deadlines, and scale operations without losing quality. We apply exactly that mindset to creative services: clear processes, predictable deliveries, technology that amplifies human talent.",
     },
-    quote:
-      "In a world full of generic noise, we help businesses build their digital presence with a real team, proven processes, and technology that accelerates everything.",
+    quote: "In a world full of generic noise, we help businesses build their digital presence with a real team, proven processes, and technology that accelerates everything.",
     pricing: {
       title: "Simple Pricing",
-      subtitle: "One monthly fee. Real deliverables.",
+      subtitle: "One monthly fee. Unlimited requests.",
       plans: [
-        {
-          name: "Member",
-          price: "$100",
-          period: "/mo",
-          features: ["5 credits per month", "1 active request", "72h turnaround", "Design + content", "Email support"],
-          featured: false,
-        },
-        {
-          name: "Growth",
-          price: "$190",
-          period: "/mo",
-          features: ["12 credits per month", "2 active requests", "48h turnaround", "Design + web + content", "Priority support", "Brand strategy session"],
-          featured: true,
-        },
-        {
-          name: "Pro",
-          price: "$330",
-          period: "/mo",
-          features: ["25 credits per month", "3 active requests", "24–48h turnaround", "Design + web + marketing", "Dedicated Slack", "Monthly strategy call", "Credit rollover"],
-          featured: false,
-        },
+        { name: "Member", price: "$299", period: "/month", features: ["5 requests per month", "48-72h delivery", "Unlimited revisions", "Basic design & web"], featured: false },
+        { name: "Growth", price: "$599", period: "/month", features: ["15 requests per month", "24-48h priority delivery", "Unlimited revisions", "Advanced design & dev", "SEO included"], featured: true },
+        { name: "Pro", price: "$999", period: "/month", features: ["Unlimited requests", "Same-day delivery", "Dedicated PM", "Full marketing stack", "Custom integrations"], featured: false },
       ],
     },
     waitlist: {
       title: "Be among the first",
-      subtitle: "The first 100 members get bonus credits.",
+      subtitle: "Join the waitlist for early access and exclusive pricing.",
       cta: "Join Waitlist",
       placeholder: "Enter your email",
+      sending: "Sending...",
       success: "You're on the list! We'll be in touch.",
       duplicate: "This email is already registered.",
       error: "Something went wrong. Try again.",
-      sending: "Sending...",
     },
     footer: {
-      rights: "© 2026 Nouvos Solutions LLC. All rights reserved.",
+      rights: "© 2026 Nouvos Solutions LLC",
     },
   },
   es: {
     nav: {
       join: "Unirse a Waitlist",
-      links: [
-        { label: "Servicios", href: "#services" },
-        { label: "Proceso", href: "#process" },
-        { label: "Nosotros", href: "#about" },
-        { label: "Planes", href: "#pricing" },
-        { label: "Contacto", href: "#waitlist" },
-      ],
+      menu: "Menú",
     },
     hero: {
       label: "NETWORK ORGANIZED DELIVERY ENGINE",
@@ -160,12 +127,12 @@ const content = {
       subtitle: "Tres líneas de servicio. Entregables reales.",
       filters: ["Todos", "Diseño", "Web", "Marketing"],
       items: [
-        { name: "Brand Starter", category: "Diseño", price: "desde 2 créditos", desc: "Paquete completo de identidad de marca para nuevos negocios" },
-        { name: "Landing Page", category: "Web", price: "desde 5 créditos", desc: "Página de alta conversión con copy asistido por AI" },
-        { name: "Content Pack", category: "Marketing", price: "desde 3 créditos", desc: "Posts de blog, newsletters y contenido social" },
-        { name: "Social Pack", category: "Diseño", price: "desde 3 créditos", desc: "30 días de gráficos de redes sociales con marca" },
-        { name: "SEO Foundation", category: "Web", price: "desde 4 créditos", desc: "Configuración técnica SEO y optimización de contenido" },
-        { name: "Promo Campaign", category: "Marketing", price: "desde 4 créditos", desc: "Gestión integral de campañas promocionales" },
+        { name: "Brand Starter", category: "Diseño", price: "desde $299 créditos", desc: "Paquete completo de identidad de marca para nuevos negocios" },
+        { name: "Landing Page", category: "Web", price: "desde $499 créditos", desc: "Página única de alta conversión con copy asistido por AI" },
+        { name: "Content Pack", category: "Marketing", price: "desde $199 créditos", desc: "Posts de blog, newsletters y contenido social" },
+        { name: "Social Pack", category: "Diseño", price: "desde $249 créditos", desc: "30 días de gráficos de redes sociales con marca" },
+        { name: "SEO Foundation", category: "Web", price: "desde $399 créditos", desc: "Configuración técnica SEO y optimización de contenido" },
+        { name: "Promo Campaign", category: "Marketing", price: "desde $599 créditos", desc: "Gestión integral de campañas promocionales" },
       ],
     },
     process: {
@@ -226,89 +193,42 @@ const content = {
       title: "Por qué existe N.O.D.E.",
       para: "N.O.D.E. nace de Nouvos Solutions — una empresa de tecnología logística que lleva años construyendo sistemas para la cadena de suministro global. Sabemos lo que significa operar con equipos distribuidos, gestionar entregas con deadlines reales, y escalar operaciones sin perder calidad. Aplicamos exactamente esa mentalidad a los servicios creativos: procesos claros, entregas predecibles, tecnología que amplifica al talento humano.",
     },
-    quote:
-      "En un mundo lleno de ruido genérico, ayudamos a negocios a construir su presencia digital con un equipo real, procesos probados, y tecnología que acelera todo.",
+    quote: "En un mundo lleno de ruido genérico, ayudamos a negocios a construir su presencia digital con un equipo real, procesos probados, y tecnología que acelera todo.",
     pricing: {
       title: "Precios Simples",
-      subtitle: "Una cuota mensual. Entregables reales.",
+      subtitle: "Una cuota mensual. Solicitudes ilimitadas.",
       plans: [
-        {
-          name: "Member",
-          price: "$100",
-          period: "/mes",
-          features: ["5 créditos al mes", "1 request activo", "Turnaround 72h", "Diseño + contenido", "Soporte por email"],
-          featured: false,
-        },
-        {
-          name: "Growth",
-          price: "$190",
-          period: "/mes",
-          features: ["12 créditos al mes", "2 requests activos", "Turnaround 48h", "Diseño + web + contenido", "Soporte prioritario", "Brand strategy session"],
-          featured: true,
-        },
-        {
-          name: "Pro",
-          price: "$330",
-          period: "/mes",
-          features: ["25 créditos al mes", "3 requests activos", "Turnaround 24-48h", "Diseño + web + marketing", "Slack dedicado", "Monthly strategy call", "Rollover de créditos"],
-          featured: false,
-        },
+        { name: "Member", price: "$299", period: "/mes", features: ["5 solicitudes por mes", "Entrega 48-72h", "Revisiones ilimitadas", "Diseño y web básico"], featured: false },
+        { name: "Growth", price: "$599", period: "/mes", features: ["15 solicitudes por mes", "Entrega prioritaria 24-48h", "Revisiones ilimitadas", "Diseño y dev avanzado", "SEO incluido"], featured: true },
+        { name: "Pro", price: "$999", period: "/mes", features: ["Solicitudes ilimitadas", "Entrega mismo día", "PM dedicado", "Marketing full stack", "Integraciones custom"], featured: false },
       ],
     },
     waitlist: {
       title: "Sé de los primeros",
-      subtitle: "Los primeros 100 miembros reciben créditos extra.",
+      subtitle: "Únete a la lista de espera para acceso temprano y precios exclusivos.",
       cta: "Unirse a Waitlist",
       placeholder: "Ingresa tu email",
+      sending: "Enviando...",
       success: "¡Estás en la lista! Te contactaremos pronto.",
       duplicate: "Este email ya está registrado.",
       error: "Algo salió mal. Intenta de nuevo.",
-      sending: "Enviando...",
     },
     footer: {
-      rights: "© 2026 Nouvos Solutions LLC. Todos los derechos reservados.",
+      rights: "© 2026 Nouvos Solutions LLC",
     },
   },
 };
 
-/* ═══════════════════════════════════════════════════════════
-   HELPERS
-   ═══════════════════════════════════════════════════════════ */
-
-const catMap: Record<string, string> = { Diseño: "Design", Todos: "All" };
-const normCat = (c: string) => catMap[c] || c;
-
-/* ═══════════════════════════════════════════════════════════
-   PAGE
-   ═══════════════════════════════════════════════════════════ */
-
 export default function Home() {
-  const [lang, setLang] = useState<"en" | "es">("es");
+  const [lang, setLang] = useState<"en" | "es">("en");
   const [scrolled, setScrolled] = useState(false);
   const [filter, setFilter] = useState("All");
-  const [menuOpen, setMenuOpen] = useState(false);
-
   const [wlEmail, setWlEmail] = useState("");
-  const [wlStatus, setWlStatus] = useState<
-    "idle" | "loading" | "success" | "error" | "duplicate"
-  >("idle");
-
+  const [wlStatus, setWlStatus] = useState<"idle" | "loading" | "success" | "error" | "duplicate">("idle");
   const t = content[lang];
 
-  /* ── LocalStorage language ── */
+  // Scroll reveal observer
   useEffect(() => {
-    const saved = localStorage.getItem("node-locale");
-    if (saved === "en" || saved === "es") setLang(saved);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("node-locale", lang);
-  }, [lang]);
-
-  /* ── Scroll reveal (re-runs on filter to catch new elements) ── */
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -320,33 +240,36 @@ export default function Home() {
       { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
     );
 
-    const timeout = setTimeout(() => {
-      document
-        .querySelectorAll(".reveal:not(.active)")
-        .forEach((el) => observer.observe(el));
-    }, 60);
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-    return () => {
-      clearTimeout(timeout);
-      observer.disconnect();
-    };
-  }, [filter]);
-
-  /* ── Nav scroll ── */
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 50);
-    fn();
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
+    return () => observer.disconnect();
   }, []);
 
-  /* ── Filtered services ── */
-  const filteredServices =
-    filter === "All"
-      ? t.services.items
-      : t.services.items.filter((s) => normCat(s.category) === filter);
+  // Nav scroll effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  /* ── Waitlist submit ── */
+  const getCategory = (cat: string) => {
+    if (lang === "es") {
+      const map: Record<string, string> = {
+        "Design": "Diseño",
+        "Web": "Web",
+        "Marketing": "Marketing",
+        "All": "Todos",
+      };
+      return map[cat] || cat;
+    }
+    return cat;
+  };
+
+  const filteredServices = filter === "All" || filter === "Todos"
+    ? t.services.items
+    : t.services.items.filter(item => item.category === getCategory(filter));
+
+  // Waitlist submit → POST /api/waitlist
   const handleWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!wlEmail) return;
@@ -357,10 +280,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: wlEmail, language: lang }),
       });
-      if (res.status === 409) {
-        setWlStatus("duplicate");
-        return;
-      }
+      if (res.status === 409) { setWlStatus("duplicate"); return; }
       if (!res.ok) throw new Error();
       setWlStatus("success");
     } catch {
@@ -370,54 +290,33 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#130A06]">
-      {/* ── Language Selector ── */}
+      {/* Language Selector */}
       <div className="fixed top-6 right-6 z-50 flex gap-3">
-        <button
-          onClick={() => setLang("es")}
-          className={`lang-flag text-2xl ${lang === "es" ? "active" : ""}`}
-        >
-          🇲🇽
-        </button>
         <button
           onClick={() => setLang("en")}
           className={`lang-flag text-2xl ${lang === "en" ? "active" : ""}`}
         >
           🇺🇸
         </button>
+        <button
+          onClick={() => setLang("es")}
+          className={`lang-flag text-2xl ${lang === "es" ? "active" : ""}`}
+        >
+          🇲🇽
+        </button>
       </div>
 
-      {/* ── Navigation ── */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-40 px-6 md:px-12 py-6 flex justify-between items-center transition-all duration-500 ${
-          scrolled ? "nav-blur" : "bg-transparent"
-        }`}
-      >
-        <a
-          href="#"
-          className="font-[family-name:var(--font-lexend)] font-black text-xl tracking-tight text-[#F5F6FC]"
-        >
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-40 px-6 md:px-12 py-6 flex justify-between items-center transition-all duration-500 ${scrolled ? "nav-blur" : "bg-transparent"}`}>
+        <div className="font-[family-name:var(--font-lexend)] font-black text-xl tracking-tight text-[#F5F6FC]">
           N.O.D.E.
-        </a>
+        </div>
         <div className="flex items-center gap-6">
-          <a
-            href="#waitlist"
-            className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-sm uppercase tracking-widest border border-[#F5F6FC] px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all"
-          >
+          <button className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-sm uppercase tracking-widest border border-[#F5F6FC] px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">
             {t.nav.join}
-          </a>
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="text-[#F5F6FC]"
-            aria-label="Menu"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+          </button>
+          <button className="font-[family-name:var(--font-lexend)] text-[#F5F6FC]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="6" x2="21" y2="6" />
               <line x1="3" y1="12" x2="21" y2="12" />
               <line x1="3" y1="18" x2="21" y2="18" />
@@ -426,46 +325,13 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ── Full-screen menu overlay ── */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60] bg-[#130A06] flex flex-col items-center justify-center gap-8">
-          <button
-            onClick={() => setMenuOpen(false)}
-            className="absolute top-6 right-6 text-[#F5F6FC]/70 hover:text-[#F5F6FC] transition-colors"
-            aria-label="Close"
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-          {t.nav.links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="font-[family-name:var(--font-lexend)] font-bold text-3xl md:text-5xl text-[#F5F6FC]/80 hover:text-[#FFC919] transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════
-         HERO
-         ══════════════════════════════════════════ */}
+      {/* HERO - Brandin Style */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image Placeholder */}
         <div className="absolute inset-0 img-placeholder opacity-30">
           Hero visual — creative/tech imagery, dark mood
         </div>
+
         <div className="absolute inset-0 bg-[#130A06]/80" />
 
         <div className="relative z-10 text-center px-6">
@@ -484,26 +350,16 @@ export default function Home() {
           </h1>
         </div>
 
+        {/* Bottom Info Bar - Brandin Style */}
         <div className="absolute bottom-8 left-0 right-0 px-6 md:px-12 flex justify-between items-end text-[0.75rem] font-[family-name:var(--font-lexend)] uppercase tracking-widest text-[rgba(245,246,252,0.6)]">
-          <span className="reveal" style={{ transitionDelay: "0.8s" }}>
-            {t.hero.powered}
-          </span>
-          <span
-            className="reveal hidden md:block"
-            style={{ transitionDelay: "1s" }}
-          >
-            {t.hero.services}
-          </span>
-          <span className="reveal" style={{ transitionDelay: "1.2s" }}>
-            {t.hero.est}
-          </span>
+          <span className="reveal" style={{ transitionDelay: "0.8s" }}>{t.hero.powered}</span>
+          <span className="reveal hidden md:block" style={{ transitionDelay: "1s" }}>{t.hero.services}</span>
+          <span className="reveal" style={{ transitionDelay: "1.2s" }}>{t.hero.est}</span>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         SERVICES
-         ══════════════════════════════════════════ */}
-      <section id="services" className="py-32 px-6 md:px-12 bg-[#130A06]">
+      {/* SERVICES - Brandin Portfolio Grid Style */}
+      <section className="py-32 px-6 md:px-12 bg-[#130A06]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 reveal">
             <div>
@@ -515,14 +371,13 @@ export default function Home() {
               </p>
             </div>
 
+            {/* Filter Tabs */}
             <div className="flex gap-8 mt-8 md:mt-0 font-[family-name:var(--font-lexend)] text-sm uppercase tracking-widest">
               {t.services.filters.map((f) => (
                 <button
                   key={f}
-                  onClick={() => setFilter(normCat(f))}
-                  className={`filter-tab ${
-                    filter === normCat(f) ? "active" : ""
-                  }`}
+                  onClick={() => setFilter(f)}
+                  className={`filter-tab ${filter === f ? "active" : ""}`}
                 >
                   {f}
                 </button>
@@ -530,6 +385,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredServices.map((service, idx) => (
               <div
@@ -537,7 +393,7 @@ export default function Home() {
                 className="service-card reveal"
                 style={{ transitionDelay: `${idx * 0.1}s` }}
               >
-                <div className="img-placeholder aspect-video">
+                <div className="img-placeholder aspect-video mb-0">
                   {service.name}
                 </div>
                 <div className="overlay">
@@ -559,27 +415,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         PROCESS
-         ══════════════════════════════════════════ */}
-      <section id="process" className="bg-[#130A06]">
+      {/* PROCESS - Brandin Expertise Style (4 Full Blocks) */}
+      <section className="bg-[#130A06]">
         {t.process.blocks.map((block, idx) => (
-          <div
-            key={block.num}
-            className="min-h-[90vh] flex items-center relative"
-          >
+          <div key={block.num} className="min-h-[90vh] flex items-center relative">
             <div className="w-full px-6 md:px-12 py-24">
               <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-24 items-end">
+
+                {/* Left: Giant Number */}
                 <div className="lg:w-[40%] flex items-end reveal">
                   <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(8rem,20vw,18rem)] leading-[0.8] number-stroke">
                     {block.num}
                   </span>
                 </div>
 
-                <div
-                  className="lg:w-[60%] reveal"
-                  style={{ transitionDelay: "0.2s" }}
-                >
+                {/* Right: Content */}
+                <div className="lg:w-[60%] reveal" style={{ transitionDelay: "0.2s" }}>
                   <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.3em] text-[#FFC919] mb-4">
                     {block.label}
                   </p>
@@ -590,16 +441,12 @@ export default function Home() {
                     {block.para}
                   </p>
 
+                  {/* List Items */}
                   <div className="border-t border-[rgba(245,246,252,0.1)]">
                     {block.list.map((item) => (
-                      <div
-                        key={item.name}
-                        className="list-item font-[family-name:var(--font-atkinson)]"
-                      >
+                      <div key={item.name} className="list-item font-[family-name:var(--font-atkinson)]">
                         <span className="text-[#F5F6FC]">{item.name}</span>
-                        <span className="text-[rgba(245,246,252,0.4)] text-sm">
-                          {item.num}
-                        </span>
+                        <span className="text-[rgba(245,246,252,0.4)] text-sm">{item.num}</span>
                       </div>
                     ))}
                   </div>
@@ -607,6 +454,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Separator */}
             {idx < t.process.blocks.length - 1 && (
               <div className="absolute bottom-0 left-0 right-0 process-separator" />
             )}
@@ -614,10 +462,8 @@ export default function Home() {
         ))}
       </section>
 
-      {/* ══════════════════════════════════════════
-         ABOUT
-         ══════════════════════════════════════════ */}
-      <section id="about" className="py-32 px-6 md:px-12 bg-[#000741]">
+      {/* ABOUT - Brandin Experience Style */}
+      <section className="py-32 px-6 md:px-12 bg-[#000741]">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="reveal">
@@ -630,24 +476,17 @@ export default function Home() {
               </p>
             </div>
 
-            <div
-              className="reveal img-placeholder aspect-[4/3]"
-              style={{ transitionDelay: "0.2s" }}
-            >
+            <div className="reveal img-placeholder aspect-[4/3]" style={{ transitionDelay: "0.2s" }}>
               Team/tech visual — abstract or workspace
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         QUOTE
-         ══════════════════════════════════════════ */}
+      {/* QUOTE - Brandin Quote Block Style */}
       <section className="py-32 px-6 md:px-12 bg-[#130A06] relative overflow-hidden">
         <div className="max-w-5xl mx-auto relative">
-          <div className="absolute -left-8 -top-8 quote-mark" aria-hidden="true">
-            &ldquo;
-          </div>
+          <div className="absolute -left-8 -top-8 quote-mark">&ldquo;</div>
 
           <div className="relative z-10 border-l-4 border-[#FFC919] pl-8 md:pl-16 reveal">
             <blockquote className="font-[family-name:var(--font-atkinson)] font-bold italic text-2xl md:text-3xl text-[#F5F6FC] leading-[1.6]">
@@ -655,19 +494,12 @@ export default function Home() {
             </blockquote>
           </div>
 
-          <div
-            className="absolute -right-4 bottom-0 quote-mark rotate-180"
-            aria-hidden="true"
-          >
-            &rdquo;
-          </div>
+          <div className="absolute -right-4 bottom-0 quote-mark rotate-180">&rdquo;</div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         PRICING
-         ══════════════════════════════════════════ */}
-      <section id="pricing" className="py-32 px-6 md:px-12 bg-[#130A06]">
+      {/* PRICING */}
+      <section className="py-32 px-6 md:px-12 bg-[#130A06]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 reveal">
             <h2 className="font-[family-name:var(--font-lexend)] font-bold text-4xl md:text-5xl text-[#F5F6FC] mb-4">
@@ -682,16 +514,9 @@ export default function Home() {
             {t.pricing.plans.map((plan, idx) => (
               <div
                 key={plan.name}
-                className={`pricing-card p-8 reveal ${
-                  plan.featured ? "featured" : ""
-                }`}
+                className={`pricing-card p-8 reveal ${plan.featured ? "featured" : ""}`}
                 style={{ transitionDelay: `${idx * 0.15}s` }}
               >
-                {plan.featured && (
-                  <span className="inline-block bg-[#FFC919] text-[#130A06] font-[family-name:var(--font-lexend)] font-bold text-xs uppercase tracking-widest px-4 py-1.5 mb-6">
-                    {lang === "es" ? "MÁS POPULAR" : "MOST POPULAR"}
-                  </span>
-                )}
                 <h3 className="font-[family-name:var(--font-lexend)] font-bold text-xl text-[#F5F6FC] uppercase tracking-widest mb-4">
                   {plan.name}
                 </h3>
@@ -706,36 +531,24 @@ export default function Home() {
 
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="font-[family-name:var(--font-atkinson)] text-[rgba(245,246,252,0.8)] flex items-start gap-3"
-                    >
-                      <span className="text-[#FFC919] mt-0.5">→</span>
+                    <li key={feature} className="font-[family-name:var(--font-atkinson)] text-[rgba(245,246,252,0.8)] flex items-start gap-3">
+                      <span className="text-[#FFC919] mt-1">→</span>
                       {feature}
                     </li>
                   ))}
                 </ul>
 
-                <a
-                  href="#waitlist"
-                  className={`block w-full text-center font-[family-name:var(--font-lexend)] font-bold text-sm uppercase tracking-widest py-4 transition-all ${
-                    plan.featured
-                      ? "bg-[#FFC919] text-[#130A06] hover:bg-[#F5F6FC]"
-                      : "border border-[#F5F6FC] text-[#F5F6FC] hover:bg-[#F5F6FC] hover:text-[#130A06]"
-                  }`}
-                >
+                <button className={`w-full font-[family-name:var(--font-lexend)] font-bold text-sm uppercase tracking-widest py-4 transition-all ${plan.featured ? "bg-[#FFC919] text-[#130A06] hover:bg-[#F5F6FC]" : "border border-[#F5F6FC] text-[#F5F6FC] hover:bg-[#F5F6FC] hover:text-[#130A06]"}`}>
                   {t.nav.join}
-                </a>
+                </button>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         WAITLIST
-         ══════════════════════════════════════════ */}
-      <section id="waitlist" className="py-32 px-6 md:px-12 bg-[#000741]">
+      {/* WAITLIST / CTA */}
+      <section className="py-32 px-6 md:px-12 bg-[#000741]">
         <div className="max-w-3xl mx-auto text-center reveal">
           <h2 className="font-[family-name:var(--font-lexend)] font-bold text-4xl md:text-6xl text-[#F5F6FC] mb-6">
             {t.waitlist.title}
@@ -750,17 +563,14 @@ export default function Home() {
             </p>
           ) : (
             <>
-              <form
-                onSubmit={handleWaitlist}
-                className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto"
-              >
+              <form onSubmit={handleWaitlist} className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
                 <input
                   type="email"
                   required
                   value={wlEmail}
                   onChange={(e) => setWlEmail(e.target.value)}
                   placeholder={t.waitlist.placeholder}
-                  className="form-input flex-1 font-[family-name:var(--font-atkinson)]"
+                  className="form-input flex-1"
                 />
                 <button
                   type="submit"
@@ -771,51 +581,27 @@ export default function Home() {
                 </button>
               </form>
               {wlStatus === "duplicate" && (
-                <p className="mt-4 text-[#FFC919] text-sm">
-                  {t.waitlist.duplicate}
-                </p>
+                <p className="mt-4 text-[#FFC919] text-sm">{t.waitlist.duplicate}</p>
               )}
               {wlStatus === "error" && (
-                <p className="mt-4 text-red-400 text-sm">
-                  {t.waitlist.error}
-                </p>
+                <p className="mt-4 text-red-400 text-sm">{t.waitlist.error}</p>
               )}
             </>
           )}
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-         FOOTER
-         ══════════════════════════════════════════ */}
+      {/* FOOTER */}
       <footer className="py-16 px-6 md:px-12 bg-[#0a0504] border-t border-[rgba(245,246,252,0.1)]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="font-[family-name:var(--font-lexend)] font-black text-2xl text-[#F5F6FC]">
-            N.O.D.E.{" "}
-            <span className="text-[rgba(245,246,252,0.5)] font-normal text-sm">
-              by Nouvos
-            </span>
+            N.O.D.E. <span className="text-[rgba(245,246,252,0.5)] font-normal text-sm">by Nouvos</span>
           </div>
 
           <div className="flex gap-8 font-[family-name:var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.6)]">
-            <a
-              href="#services"
-              className="hover:text-[#FFC919] transition-colors"
-            >
-              {lang === "es" ? "Servicios" : "Services"}
-            </a>
-            <a
-              href="#pricing"
-              className="hover:text-[#FFC919] transition-colors"
-            >
-              {lang === "es" ? "Planes" : "Plans"}
-            </a>
-            <a
-              href="mailto:hola@nouvos.one"
-              className="hover:text-[#FFC919] transition-colors"
-            >
-              hola@nouvos.one
-            </a>
+            <a href="#" className="hover:text-[#FFC919] transition-colors">Twitter</a>
+            <a href="#" className="hover:text-[#FFC919] transition-colors">LinkedIn</a>
+            <a href="#" className="hover:text-[#FFC919] transition-colors">Instagram</a>
           </div>
 
           <p className="font-[family-name:var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.4)]">
