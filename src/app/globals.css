@@ -9,7 +9,7 @@
   --gold-bar: #FFC919;
 }
 
-html { scroll-behavior: smooth; }
+/* Lenis handles smooth scroll — no scroll-behavior: smooth */
 
 /* Hide default cursor — custom cursor rendered in React */
 * { cursor: none !important; }
@@ -43,11 +43,17 @@ button, input, img, div, section, a { border-radius: 0 !important; }
   overflow: hidden;
 }
 
-/* Number stroke */
+/* Number stroke — starts as dim outline, fills gold on scroll */
 .number-stroke {
-  -webkit-text-stroke: 2px var(--ice-white);
+  -webkit-text-stroke: 2px rgba(245, 246, 252, 0.3);
   -webkit-text-fill-color: transparent;
   color: transparent;
+  transition: -webkit-text-fill-color 1.2s cubic-bezier(0.23, 1, 0.32, 1),
+              -webkit-text-stroke-color 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.number-filled {
+  -webkit-text-stroke: 2px var(--gold-bar);
+  -webkit-text-fill-color: var(--gold-bar);
 }
 
 /* Nav blur */

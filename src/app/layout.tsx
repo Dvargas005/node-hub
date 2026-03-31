@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
+import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 const lexend = Lexend({
@@ -39,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lexend.variable} ${atkinson.variable}`}>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden cursor-none">
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );
