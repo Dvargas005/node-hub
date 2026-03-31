@@ -10,6 +10,7 @@ import {
   useSpring,
   AnimatePresence,
 } from "framer-motion";
+import Image from "next/image";
 import { MixIcon, CodeIcon, RocketIcon, PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 
 /* ═══════════════════════════════════════════
@@ -142,9 +143,8 @@ const C = {
     },
     pricing: {
       lenBtn: "LEN Members",
-      lenTip: "Latino Entrepreneurial Network — Exclusive member pricing",
+      lenPara: ["We proudly support the ", "Latino Entrepreneurial Network", " with exclusive pricing for their members."],
       lenLabel: "LEN Member Exclusive Rate",
-      earlyLabel: "EARLY ADOPTER OFFER — Lock this rate. First 100 members.",
       setup: "Setup",
       oneTime: "one-time",
       plans: [
@@ -194,9 +194,8 @@ const C = {
     },
     pricing: {
       lenBtn: "Miembros LEN",
-      lenTip: "Latino Entrepreneurial Network — Precios exclusivos para miembros",
+      lenPara: ["Apoyamos con orgullo a la ", "Latino Entrepreneurial Network", " con precios exclusivos para sus miembros."],
       lenLabel: "Tarifa Exclusiva Miembros LEN",
-      earlyLabel: "OFERTA EARLY ADOPTER — Asegura esta tarifa. Primeros 100 miembros.",
       setup: "Configuración",
       oneTime: "única vez",
       plans: [
@@ -452,7 +451,6 @@ export default function Home() {
   const [wlSt, setWlSt] = useState<"idle" | "loading" | "ok" | "dup" | "err">("idle");
   const [latency, setLatency] = useState<number | null>(null);
   const [alliance, setAlliance] = useState<string | null>(null);
-  const [showTip, setShowTip] = useState(false);
   const discount = alliance === "LEN" ? 0.7 : 1;
   const t = C[lang];
 
@@ -522,6 +520,8 @@ export default function Home() {
 
       {/* ═══ 1. HERO ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,201,25,0.08) 0%, rgba(255,140,0,0.04) 30%, #130A06 70%)" }}>
+        {/* Hero background image */}
+        <Image src="/img/hero.png" alt="" fill priority className="object-cover opacity-25 pointer-events-none" />
         {/* Noise overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         <div className="relative z-10 text-center px-6">
@@ -597,7 +597,7 @@ export default function Home() {
             <RevealLine delay={0.1}><h2 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,4vw,3rem)] leading-tight">{t.about.title}</h2></RevealLine>
             <FadeUp delay={0.2}><p className="mt-8 font-[family-name:var(--font-atkinson)] text-[1.2rem] text-[#F5F6FC]/70 leading-[1.8]">{t.about.para}</p></FadeUp>
           </div>
-          <FadeUp delay={0.3}><ParaEl speed={0.1}><Img desc="Team/workspace visual" ratio="4/3" /></ParaEl></FadeUp>
+          <FadeUp delay={0.3}><ParaEl speed={0.1}><div className="relative aspect-[4/3] w-full"><Image src="/img/about.png" alt="N.O.D.E. team workspace" fill className="object-cover" /></div></ParaEl></FadeUp>
         </div>
       </section>
 
@@ -608,77 +608,46 @@ export default function Home() {
       <section id="pricing" className="relative bg-[#FFC919] overflow-hidden">
         <div className="absolute inset-0 opacity-[0.12] mix-blend-multiply pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16">
-          {/* Alliance filter pills */}
+          {/* Alliance filter + LEN paragraph */}
           <FadeUp>
-            <div className="flex gap-3 pb-10 relative">
-              <div className="relative" onMouseEnter={() => setShowTip(true)} onMouseLeave={() => setShowTip(false)}>
-                <button
-                  onClick={() => setAlliance(alliance === "LEN" ? null : "LEN")}
-                  className={`font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.12em] px-5 py-2.5 transition-all ${alliance === "LEN" ? "bg-[#130A06] text-[#FFC919] border border-[#130A06]" : "bg-transparent text-[#130A06] border border-[#130A06]/30 hover:border-[#130A06]"}`}
-                >
-                  {t.pricing.lenBtn}
-                </button>
-                <AnimatePresence>
-                  {showTip && alliance !== "LEN" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      className="absolute bottom-full left-0 mb-2 bg-[#130A06] text-[#F5F6FC] text-[0.75rem] px-4 py-2 whitespace-nowrap z-10"
-                    >
-                      {t.pricing.lenTip}
-                      <div className="absolute top-full left-4 w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent border-t-[#130A06]" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-4 pb-10">
+              <button
+                onClick={() => setAlliance(alliance === "LEN" ? null : "LEN")}
+                className={`shrink-0 font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.12em] px-5 py-2.5 transition-all ${alliance === "LEN" ? "bg-[#130A06] text-[#FFC919] border border-[#130A06]" : "bg-transparent text-[#130A06] border border-[#130A06]/30 hover:border-[#130A06]"}`}
+              >
+                {t.pricing.lenBtn}
+              </button>
+              <p className="font-[family-name:var(--font-atkinson)] text-[0.85rem] text-[#130A06]/60">
+                {t.pricing.lenPara[0]}
+                <a href="https://latinoentrepreneurialnetwork.org" target="_blank" rel="noopener noreferrer" className="text-[#130A06] underline decoration-[#130A06]/30 hover:decoration-[#130A06] transition-all font-bold">{t.pricing.lenPara[1]}</a>
+                {t.pricing.lenPara[2]}
+              </p>
             </div>
           </FadeUp>
 
           {t.pricing.plans.map((pl, i) => {
-            const frontPrice = Math.round(pl.front * discount);
-            const frontSetup = Math.round(pl.setup * discount);
-            const realPrice = Math.round(pl.real * discount);
-            const realSetup = Math.round(pl.realSetup * discount);
+            const price = Math.round(pl.front * discount);
+            const setup = Math.round(pl.setup * discount);
 
             return (
               <FadeUp key={pl.name} delay={i * 0.1}>
-                <div className={`group price-row relative py-12 md:py-16 ${i < t.pricing.plans.length - 1 ? "border-b border-[#130A06]/15" : ""}`}>
-                  {/* FRONT (default view) */}
-                  <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-16 transition-opacity duration-300 group-hover:opacity-0">
-                    <div className="md:w-[45%]">
-                      <div className="flex items-baseline gap-1">
-                        <AnimatedPrice value={frontPrice} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]" />
-                        <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.5rem,3vw,2.7rem)] text-[#130A06] align-super">+</span>
-                        <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
-                      </div>
-                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
-                        {t.pricing.setup}: <AnimatedSetup value={frontSetup} className="inline" /> {t.pricing.oneTime}
-                      </p>
-                      {alliance === "LEN" && (
-                        <p className="mt-1 font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] text-[#130A06]/70">{t.pricing.lenLabel}</p>
-                      )}
+                <div className={`price-row flex flex-col md:flex-row md:items-center gap-6 md:gap-16 py-12 md:py-16 ${i < t.pricing.plans.length - 1 ? "border-b border-[#130A06]/15" : ""}`}>
+                  <div className="md:w-[45%]">
+                    <div className="flex items-baseline gap-1">
+                      <AnimatedPrice value={price} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]" />
+                      <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.5rem,3vw,2.7rem)] text-[#130A06] align-super">+</span>
+                      <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
                     </div>
-                    <div className="md:w-[55%]">
-                      <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
-                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[1rem] text-[#130A06]/60">{pl.desc}</p>
-                    </div>
+                    <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
+                      {t.pricing.setup}: <AnimatedSetup value={setup} className="inline" /> {t.pricing.oneTime}
+                    </p>
+                    {alliance === "LEN" && (
+                      <p className="mt-1 font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] text-[#130A06]/70">{t.pricing.lenLabel}</p>
+                    )}
                   </div>
-                  {/* FLIP (hover reveal — real prices) */}
-                  <div className="absolute inset-0 flex flex-col md:flex-row md:items-center gap-6 md:gap-16 py-12 md:py-16 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <div className="md:w-[45%]">
-                      <div className="flex items-baseline gap-1">
-                        <AnimatedPrice value={realPrice} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]" />
-                        <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
-                      </div>
-                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
-                        {t.pricing.setup}: <AnimatedSetup value={realSetup} className="inline" /> {t.pricing.oneTime}
-                      </p>
-                    </div>
-                    <div className="md:w-[55%]">
-                      <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
-                      <p className="mt-2 font-[family-name:var(--font-lexend)] font-bold text-[0.85rem] text-[#130A06]">{t.pricing.earlyLabel}</p>
-                    </div>
+                  <div className="md:w-[55%]">
+                    <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
+                    <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[1rem] text-[#130A06]/60">{pl.desc}</p>
                   </div>
                 </div>
               </FadeUp>
