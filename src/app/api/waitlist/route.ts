@@ -80,13 +80,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, businessName, allianceCode, language } = body;
 
-    // Validation
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Name is required" },
-        { status: 400 }
-      );
-    }
+    // Name is optional — derive from email if not provided
+    const resolvedName =
+      name && typeof name === "string" && name.trim().length > 0
+        ? name
+        : email?.split("@")[0] || "Subscriber";
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
@@ -99,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     // Try Vercel KV first
     if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-      const kvResult = await handleKV(name, email, businessName, allianceCode, lang);
+      const kvResult = await handleKV(resolvedName, email, businessName, allianceCode, lang);
       if (kvResult) return kvResult;
     }
 
@@ -115,7 +113,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const entry = buildEntry(name, email, businessName, allianceCode, lang);
+    const entry = buildEntry(resolvedName, email, businessName, allianceCode, lang);
     entries.push(entry);
     await writeEntries(entries);
 

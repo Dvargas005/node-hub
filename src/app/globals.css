@@ -2,64 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
+:root {
+  --ice-white: #F5F6FC;
+  --asphalt-black: #130A06;
+  --midnight-express: #000741;
+  --gold-bar: #FFC919;
 }
 
-/* Scrollbar */
+/* Scrollbar custom */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #130A06;
+  background: var(--asphalt-black);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #FFC919;
+  background: var(--gold-bar);
+  border-radius: 0;
 }
 
-/* Selection */
 ::selection {
-  background: #FFC919;
-  color: #130A06;
+  background: var(--gold-bar);
+  color: var(--asphalt-black);
 }
 
-@layer base {
-  body {
-    @apply bg-asphalt-black text-white antialiased;
-  }
-}
-
-@layer components {
-  .container-w {
-    @apply mx-auto w-full max-w-[1400px] px-[5%] md:px-[8%];
-  }
-}
-
-/* ─── Hero fade-in ─── */
-@keyframes heroFadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.hero-fade { animation: heroFadeIn 1s ease-out both; }
-.hero-fade-d1 { animation: heroFadeIn 0.8s ease-out 0.3s both; }
-.hero-fade-d2 { animation: heroFadeIn 0.8s ease-out 0.6s both; }
-.hero-fade-d3 { animation: heroFadeIn 0.8s ease-out 0.9s both; }
-
-/* ─── Scroll Reveal ─── */
+/* Reveal animation base */
 .reveal {
   opacity: 0;
   transform: translateY(60px);
-  transition: opacity 1s ease-out, transform 1s ease-out;
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ─── Text stroke for giant numbers ─── */
-.text-stroke {
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.9);
+/* Number stroke effect */
+.number-stroke {
+  -webkit-text-stroke: 2px var(--ice-white);
+  -webkit-text-fill-color: transparent;
   color: transparent;
+}
+
+/* Sharp corners everywhere */
+button, input, img, div {
+  border-radius: 0 !important;
+}
+
+/* Language selector flags */
+.lang-flag {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.lang-flag:hover,
+.lang-flag.active {
+  opacity: 1;
+}
+
+/* Gold accent line */
+.gold-line {
+  width: 60px;
+  height: 3px;
+  background: var(--gold-bar);
+}
+
+/* Nav blur */
+.nav-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(19, 10, 6, 0.8);
+}
+
+/* Image placeholder */
+.img-placeholder {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.875rem;
+}
+
+/* Filter tabs */
+.filter-tab {
+  position: relative;
+  cursor: pointer;
+  color: rgba(245, 246, 252, 0.5);
+  transition: color 0.3s ease;
+}
+
+.filter-tab.active,
+.filter-tab:hover {
+  color: var(--ice-white);
+}
+
+.filter-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gold-bar);
+  transition: width 0.3s ease;
+}
+
+.filter-tab.active::after,
+.filter-tab:hover::after {
+  width: 100%;
+}
+
+/* Service card hover */
+.service-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.service-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(19, 10, 6, 0.9);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+}
+
+.service-card:hover .overlay {
+  opacity: 1;
+}
+
+.service-card:hover .img-placeholder {
+  transform: translateY(-10px);
+  transition: transform 0.4s ease;
+}
+
+/* Process block separator */
+.process-separator {
+  width: 100%;
+  height: 1px;
+  background: rgba(245, 246, 252, 0.1);
+  margin: 0;
+}
+
+/* List item separator */
+.list-item {
+  border-bottom: 1px solid rgba(245, 246, 252, 0.1);
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* Quote decoration */
+.quote-mark {
+  font-family: var(--font-lexend);
+  font-size: 8rem;
+  color: var(--gold-bar);
+  line-height: 0.5;
+  opacity: 0.3;
+}
+
+/* Pricing card */
+.pricing-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(245, 246, 252, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+}
+
+.pricing-card.featured {
+  border: 2px solid var(--gold-bar);
+}
+
+.pricing-card.featured:hover {
+  box-shadow: 0 20px 50px rgba(255, 201, 25, 0.1);
+}
+
+/* Form inputs */
+.form-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(245, 246, 252, 0.2);
+  color: var(--ice-white);
+  padding: 1rem;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.form-input::placeholder {
+  color: rgba(245, 246, 252, 0.3);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--gold-bar);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -67,13 +224,5 @@ html {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-  .hero-fade,
-  .hero-fade-d1,
-  .hero-fade-d2,
-  .hero-fade-d3 {
-    animation: none;
-    opacity: 1;
-    transform: none;
   }
 }
