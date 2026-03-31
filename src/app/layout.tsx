@@ -19,11 +19,11 @@ const atkinson = Atkinson_Hyperlegible({
 export const metadata: Metadata = {
   title: "N.O.D.E. — Network Organized Delivery Engine",
   description:
-    "Creative design, web development & marketing powered by Nouvos",
+    "Design, web development & marketing by subscription. Powered by Nouvos.",
   openGraph: {
     title: "N.O.D.E. — Network Organized Delivery Engine",
     description:
-      "Creative design, web development & marketing powered by Nouvos",
+      "Design, web development & marketing by subscription. Powered by Nouvos.",
     url: "https://node.nouvos.one",
     siteName: "N.O.D.E. by Nouvos",
     locale: "es_MX",
@@ -38,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${lexend.variable} ${atkinson.variable}`}>
-      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
+      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden cursor-none">
         {children}
       </body>
     </html>
