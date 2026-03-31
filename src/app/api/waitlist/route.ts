@@ -1,68 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 
-interface WaitlistEntry {
-  name: string;
-  email: string;
-  language: "es" | "en";
-  createdAt: string;
+function getRedis() {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  return new Redis({ url, token });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, email, language } = body;
+    const body = await req.json();
+    const { email, name, businessName, allianceCode, language } = body;
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
-      return NextResponse.json(
-        { error: "Valid email is required" },
-        { status: 400 }
-      );
+    if (!email || !email.includes("@")) {
+      return NextResponse.json({ success: false, error: "Valid email is required" }, { status: 400 });
     }
 
-    const resolvedName =
-      name && typeof name === "string" && name.trim().length > 0
-        ? name.trim()
-        : email.split("@")[0];
-
-    const lang: "es" | "en" = language === "en" ? "en" : "es";
-
-    const entry: WaitlistEntry = {
-      name: resolvedName,
+    const entry = {
       email: email.toLowerCase().trim(),
-      language: lang,
+      name: name || "",
+      businessName: businessName || "",
+      allianceCode: allianceCode || "",
+      language: language || "en",
       createdAt: new Date().toISOString(),
     };
 
-    // Try Vercel KV if env vars are set
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-      try {
-        const { kv } = await import("@vercel/kv");
-
-        const existing = await kv.get(`waitlist:${entry.email}`);
-        if (existing) {
-          return NextResponse.json(
-            { error: "Email already registered" },
-            { status: 409 }
-          );
-        }
-
-        await kv.set(`waitlist:${entry.email}`, JSON.stringify(entry));
-        await kv.lpush("waitlist:emails", entry.email);
-
-        return NextResponse.json({ success: true });
-      } catch (kvErr) {
-        console.error("[waitlist] KV error, falling back to log:", kvErr);
+    const redis = getRedis();
+    if (redis) {
+      const exists = await redis.get(`waitlist:${entry.email}`);
+      if (exists) {
+        return NextResponse.json({ success: false, error: "Email already registered" }, { status: 409 });
       }
+      await redis.set(`waitlist:${entry.email}`, JSON.stringify(entry));
+      await redis.sadd("waitlist:all_emails", entry.email);
+      const count = await redis.scard("waitlist:all_emails");
+      console.log(`[WAITLIST] #${count} — ${entry.email}`);
+    } else {
+      console.log("[WAITLIST_ENTRY]", JSON.stringify(entry));
     }
 
-    // Fallback: log to stdout (visible in Vercel function logs)
-    console.log("[waitlist] New entry:", JSON.stringify(entry));
-
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, message: "Added to waitlist" });
+  } catch (error) {
+    console.error("[WAITLIST_ERROR]", error);
+    return NextResponse.json({ success: false, error: "Something went wrong" }, { status: 500 });
   }
 }
