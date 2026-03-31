@@ -106,7 +106,7 @@ function Img({ desc, ratio = "16/9" }: { desc: string; ratio?: string }) {
 const C = {
   en: {
     nav: { join: "Join Waitlist" },
-    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", bl: "POWERED BY NOUVOS", bc: "DESIGN · WEB · MARKETING", br: "EST. 2026" },
+    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "SYSTEM_STATUS: OPERATIONAL // LATENCY: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
     svc: {
       label: "WHAT WE DELIVER",
       title: "Three service lines. Real deliverables.",
@@ -152,7 +152,7 @@ const C = {
   },
   es: {
     nav: { join: "Unirse a Waitlist" },
-    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", bl: "POWERED BY NOUVOS", bc: "DISEÑO · WEB · MARKETING", br: "EST. 2026" },
+    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "ESTADO_SISTEMA: OPERATIVO // LATENCIA: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
     svc: {
       label: "LO QUE ENTREGAMOS",
       title: "Tres líneas de servicio. Entregables reales.",
@@ -218,12 +218,25 @@ function ParallaxBg({ desc }: { desc: string }) {
    ═══════════════════════════════════════════ */
 
 function ParallaxNum({ num }: { num: string }) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-30%", "30%"]);
+  const [filled, setFilled] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setFilled(true); },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div ref={ref} className="lg:w-[40%] flex items-end">
-      <motion.span style={{ y }} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(8rem,20vw,18rem)] leading-[0.8] number-stroke select-none">
+      <motion.span style={{ y }} className={`font-[family-name:var(--font-lexend)] font-black text-[clamp(8rem,20vw,18rem)] leading-[0.8] number-stroke select-none ${filled ? "number-filled" : ""}`}>
         {num}
       </motion.span>
     </div>
@@ -413,11 +426,21 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [wlEmail, setWlEmail] = useState("");
   const [wlSt, setWlSt] = useState<"idle" | "loading" | "ok" | "dup" | "err">("idle");
+  const [latency, setLatency] = useState<number | null>(null);
   const t = C[lang];
 
   useEffect(() => { const s = localStorage.getItem("node-locale"); if (s === "en" || s === "es") setLang(s); }, []);
   useEffect(() => { localStorage.setItem("node-locale", lang); }, [lang]);
   useEffect(() => { const fn = () => setScrolled(window.scrollY > 50); fn(); window.addEventListener("scroll", fn, { passive: true }); return () => window.removeEventListener("scroll", fn); }, []);
+  useEffect(() => {
+    const measure = async () => {
+      const start = performance.now();
+      try { await fetch("/api/ping"); setLatency(Math.round(performance.now() - start)); } catch { setLatency(null); }
+    };
+    measure();
+    const iv = setInterval(measure, 10000);
+    return () => clearInterval(iv);
+  }, []);
 
   const handleWl = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -471,15 +494,23 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ═══ 1. HERO ═══ */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <ParallaxBg desc="Hero visual — futuristic/tech dark mood" />
-        <div className="absolute inset-0 bg-[#130A06]/75" />
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,201,25,0.08) 0%, rgba(255,140,0,0.04) 30%, #130A06 70%)" }}>
+        {/* Noise overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         <div className="relative z-10 text-center px-6">
           <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6">{t.hero.label}</p></RevealLine>
-          <RevealLine delay={0.4}><h1 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(6rem,15vw,12rem)] leading-[0.85] tracking-[-0.03em] text-[#F5F6FC]">N.O.D.E.</h1></RevealLine>
+          <RevealLine delay={0.4}>
+            <motion.h1
+              style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
+              className="font-[family-name:var(--font-lexend)] font-black text-[clamp(6rem,15vw,12rem)] leading-[0.85] tracking-[-0.03em] text-[#F5F6FC]"
+            >
+              N.O.D.E.
+            </motion.h1>
+          </RevealLine>
         </div>
-        <div className="absolute bottom-8 left-0 right-0 px-6 md:px-12 flex justify-between text-[0.75rem] font-[family-name:var(--font-lexend)] uppercase tracking-[0.2em] text-[rgba(245,246,252,0.5)]">
-          <FadeUp delay={0.8}><span>{t.hero.bl}</span></FadeUp>
+        {/* HUD bottom bar */}
+        <div className="absolute bottom-8 left-0 right-0 px-6 md:px-8 flex justify-between font-[family-name:var(--font-atkinson)] text-[10px] uppercase tracking-[0.2em] text-[rgba(245,246,252,0.35)]" style={{ fontVariantNumeric: "tabular-nums" }}>
+          <FadeUp delay={0.8}><span>{t.hero.blPre}{latency ?? "---"}MS</span></FadeUp>
           <FadeUp delay={1.0} className="hidden md:block"><span>{t.hero.bc}</span></FadeUp>
           <FadeUp delay={1.2}><span>{t.hero.br}</span></FadeUp>
         </div>
