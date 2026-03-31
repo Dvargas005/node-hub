@@ -17,13 +17,13 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "N.O.D.E. — Tu equipo digital. Una suscripción.",
+  title: "N.O.D.E. — Network Organized Delivery Engine",
   description:
-    "Diseño, desarrollo web y marketing digital por suscripción mensual. Sin contratos, sin sorpresas. Powered by Nouvos.",
+    "Creative design, web development & marketing powered by Nouvos",
   openGraph: {
-    title: "N.O.D.E. — Tu equipo digital. Una suscripción.",
+    title: "N.O.D.E. — Network Organized Delivery Engine",
     description:
-      "Diseño, desarrollo web y marketing digital por suscripción mensual.",
+      "Creative design, web development & marketing powered by Nouvos",
     url: "https://node.nouvos.one",
     siteName: "N.O.D.E. by Nouvos",
     locale: "es_MX",
@@ -37,8 +37,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${lexend.variable} ${atkinson.variable}`}>
-      <body className={atkinson.className}>{children}</body>
+    <html lang="en" className={`${lexend.variable} ${atkinson.variable}`}>
+      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
+        {children}
+      </body>
     </html>
   );
 }
