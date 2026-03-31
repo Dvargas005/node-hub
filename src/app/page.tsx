@@ -141,10 +141,16 @@ const C = {
       reveal: "N.O.D.E.",
     },
     pricing: {
+      lenBtn: "LEN Members",
+      lenTip: "Latino Entrepreneurial Network — Exclusive member pricing",
+      lenLabel: "LEN Member Exclusive Rate",
+      earlyLabel: "EARLY ADOPTER OFFER — Lock this rate. First 100 members.",
+      setup: "Setup",
+      oneTime: "one-time",
       plans: [
-        { name: "Member", price: "$100", per: "/mo", desc: "$140 in credits · 1 active request · 5-day turnaround" },
-        { name: "Growth", price: "$190", per: "/mo", desc: "$350 in credits · 2 active requests · 3-day turnaround", ft: true },
-        { name: "Pro", price: "$330", per: "/mo", desc: "$650 in credits · Unlimited queue · 24-48h turnaround" },
+        { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
+        { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
+        { name: "Pro", front: 429, setup: 1300, real: 330, realSetup: 1000, per: "/mo", desc: "Unlimited scale. All services, dedicated PM, fastest turnaround.", ft: false },
       ],
     },
     wl: { title: "Be among the first", sub: "The first 100 members get bonus credits.", cta: "Join Waitlist", ph: "Enter your email", sending: "Sending...", ok: "You're on the list!", dup: "Already registered.", err: "Something went wrong." },
@@ -187,10 +193,16 @@ const C = {
       reveal: "N.O.D.E.",
     },
     pricing: {
+      lenBtn: "Miembros LEN",
+      lenTip: "Latino Entrepreneurial Network — Precios exclusivos para miembros",
+      lenLabel: "Tarifa Exclusiva Miembros LEN",
+      earlyLabel: "OFERTA EARLY ADOPTER — Asegura esta tarifa. Primeros 100 miembros.",
+      setup: "Configuración",
+      oneTime: "única vez",
       plans: [
-        { name: "Member", price: "$100", per: "/mes", desc: "$140 en créditos · 1 request activo · Turnaround 5 días" },
-        { name: "Growth", price: "$190", per: "/mes", desc: "$350 en créditos · 2 requests activos · Turnaround 3 días", ft: true },
-        { name: "Pro", price: "$330", per: "/mes", desc: "$650 en créditos · Cola ilimitada · Turnaround 24-48h" },
+        { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
+        { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
+        { name: "Pro", front: 429, setup: 1300, real: 330, realSetup: 1000, per: "/mes", desc: "Escala ilimitada. Todos los servicios, PM dedicado, turnaround más rápido.", ft: false },
       ],
     },
     wl: { title: "Sé de los primeros", sub: "Los primeros 100 miembros reciben créditos extra.", cta: "Unirse a Waitlist", ph: "Ingresa tu email", sending: "Enviando...", ok: "¡Estás en la lista!", dup: "Email ya registrado.", err: "Algo salió mal." },
@@ -365,15 +377,9 @@ function ManifestoSection({ lang }: { lang: "en" | "es" }) {
                     const isGlitch = w === m.lastWordPre;
 
                     if (isFade) {
+                      /* "UNTIL" stays visible — never fades. Result reads "UNTIL N.O.D.E." */
                       return (
-                        <motion.span
-                          key={`${li}-${w}`}
-                          className="inline-block mr-[0.3em]"
-                          animate={{ opacity: phase === "scroll" ? undefined : 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <ScrollWord word={w} progress={scrollYProgress} start={start} end={end} gold />
-                        </motion.span>
+                        <ScrollWord key={`${li}-${w}`} word={w} progress={scrollYProgress} start={start} end={end} gold />
                       );
                     }
 
@@ -420,6 +426,24 @@ function ManifestoSection({ lang }: { lang: "en" | "es" }) {
   );
 }
 
+/* ═══════════════════════════════════════════
+   ANIMATED PRICE (counter up/down)
+   ═══════════════════════════════════════════ */
+
+function AnimatedPrice({ value, className }: { value: number; className?: string }) {
+  const spring = useSpring(value, { damping: 30, stiffness: 120 });
+  const display = useTransform(spring, (v) => `$${Math.round(v)}`);
+  useEffect(() => { spring.set(value); }, [value, spring]);
+  return <motion.span className={className}>{display}</motion.span>;
+}
+
+function AnimatedSetup({ value, className }: { value: number; className?: string }) {
+  const spring = useSpring(value, { damping: 30, stiffness: 120 });
+  const display = useTransform(spring, (v) => `$${Math.round(v).toLocaleString()}`);
+  useEffect(() => { spring.set(value); }, [value, spring]);
+  return <motion.span className={className}>{display}</motion.span>;
+}
+
 export default function Home() {
   const [lang, setLang] = useState<"en" | "es">("en");
   const [scrolled, setScrolled] = useState(false);
@@ -427,6 +451,9 @@ export default function Home() {
   const [wlEmail, setWlEmail] = useState("");
   const [wlSt, setWlSt] = useState<"idle" | "loading" | "ok" | "dup" | "err">("idle");
   const [latency, setLatency] = useState<number | null>(null);
+  const [alliance, setAlliance] = useState<string | null>(null);
+  const [showTip, setShowTip] = useState(false);
+  const discount = alliance === "LEN" ? 0.7 : 1;
   const t = C[lang];
 
   useEffect(() => { const s = localStorage.getItem("node-locale"); if (s === "en" || s === "es") setLang(s); }, []);
@@ -577,26 +604,86 @@ export default function Home() {
       {/* ═══ 5. MANIFESTO — Scroll Fill + Glitch Reveal ═══ */}
       <ManifestoSection lang={lang} />
 
-      {/* ═══ 6. PRICING — Gold Bar stats rows (FIX 5) ═══ */}
+      {/* ═══ 6. PRICING — Gold Bar stats rows + LEN filter ═══ */}
       <section id="pricing" className="relative bg-[#FFC919] overflow-hidden">
-        {/* Grain overlay on gold */}
         <div className="absolute inset-0 opacity-[0.12] mix-blend-multiply pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
-          {t.pricing.plans.map((pl, i) => (
-            <FadeUp key={pl.name} delay={i * 0.1}>
-              <div className={`price-row flex flex-col md:flex-row md:items-center gap-6 md:gap-16 py-12 md:py-16 ${i < t.pricing.plans.length - 1 ? "border-b border-[#130A06]/15" : ""}`}>
-                <div className="flex items-baseline gap-1 md:w-[45%]">
-                  <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]">{pl.price}</span>
-                  <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.5rem,3vw,2.7rem)] text-[#130A06] align-super">+</span>
-                  <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
-                </div>
-                <div className="md:w-[55%]">
-                  <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
-                  <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[1rem] text-[#130A06]/60">{pl.desc}</p>
-                </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16">
+          {/* Alliance filter pills */}
+          <FadeUp>
+            <div className="flex gap-3 pb-10 relative">
+              <div className="relative" onMouseEnter={() => setShowTip(true)} onMouseLeave={() => setShowTip(false)}>
+                <button
+                  onClick={() => setAlliance(alliance === "LEN" ? null : "LEN")}
+                  className={`font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.12em] px-5 py-2.5 transition-all ${alliance === "LEN" ? "bg-[#130A06] text-[#FFC919] border border-[#130A06]" : "bg-transparent text-[#130A06] border border-[#130A06]/30 hover:border-[#130A06]"}`}
+                >
+                  {t.pricing.lenBtn}
+                </button>
+                <AnimatePresence>
+                  {showTip && alliance !== "LEN" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      className="absolute bottom-full left-0 mb-2 bg-[#130A06] text-[#F5F6FC] text-[0.75rem] px-4 py-2 whitespace-nowrap z-10"
+                    >
+                      {t.pricing.lenTip}
+                      <div className="absolute top-full left-4 w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent border-t-[#130A06]" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </FadeUp>
-          ))}
+            </div>
+          </FadeUp>
+
+          {t.pricing.plans.map((pl, i) => {
+            const frontPrice = Math.round(pl.front * discount);
+            const frontSetup = Math.round(pl.setup * discount);
+            const realPrice = Math.round(pl.real * discount);
+            const realSetup = Math.round(pl.realSetup * discount);
+
+            return (
+              <FadeUp key={pl.name} delay={i * 0.1}>
+                <div className={`group price-row relative py-12 md:py-16 ${i < t.pricing.plans.length - 1 ? "border-b border-[#130A06]/15" : ""}`}>
+                  {/* FRONT (default view) */}
+                  <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-16 transition-opacity duration-300 group-hover:opacity-0">
+                    <div className="md:w-[45%]">
+                      <div className="flex items-baseline gap-1">
+                        <AnimatedPrice value={frontPrice} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]" />
+                        <span className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.5rem,3vw,2.7rem)] text-[#130A06] align-super">+</span>
+                        <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
+                      </div>
+                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
+                        {t.pricing.setup}: <AnimatedSetup value={frontSetup} className="inline" /> {t.pricing.oneTime}
+                      </p>
+                      {alliance === "LEN" && (
+                        <p className="mt-1 font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] text-[#130A06]/70">{t.pricing.lenLabel}</p>
+                      )}
+                    </div>
+                    <div className="md:w-[55%]">
+                      <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
+                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[1rem] text-[#130A06]/60">{pl.desc}</p>
+                    </div>
+                  </div>
+                  {/* FLIP (hover reveal — real prices) */}
+                  <div className="absolute inset-0 flex flex-col md:flex-row md:items-center gap-6 md:gap-16 py-12 md:py-16 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <div className="md:w-[45%]">
+                      <div className="flex items-baseline gap-1">
+                        <AnimatedPrice value={realPrice} className="font-[family-name:var(--font-lexend)] font-black text-[clamp(5rem,12vw,9rem)] leading-none text-[#130A06]" />
+                        <span className="font-[family-name:var(--font-atkinson)] text-[#130A06]/50 text-lg ml-1">{pl.per}</span>
+                      </div>
+                      <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
+                        {t.pricing.setup}: <AnimatedSetup value={realSetup} className="inline" /> {t.pricing.oneTime}
+                      </p>
+                    </div>
+                    <div className="md:w-[55%]">
+                      <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>
+                      <p className="mt-2 font-[family-name:var(--font-lexend)] font-bold text-[0.85rem] text-[#130A06]">{t.pricing.earlyLabel}</p>
+                    </div>
+                  </div>
+                </div>
+              </FadeUp>
+            );
+          })}
         </div>
       </section>
 
