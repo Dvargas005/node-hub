@@ -149,7 +149,7 @@ export function TicketsClient({
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] px-3 text-sm text-[var(--ice-white)]"
+              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
               {statusOptions.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -160,7 +160,7 @@ export function TicketsClient({
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] px-3 text-sm text-[var(--ice-white)]"
+              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
               <option value="">Toda prioridad</option>
               <option value="LOW">Baja</option>
@@ -171,7 +171,7 @@ export function TicketsClient({
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] px-3 text-sm text-[var(--ice-white)]"
+              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
               {categoryOptions.map((o) => (
                 <option key={o.value} value={o.value}>

@@ -107,8 +107,7 @@
 /* Selection */
 ::selection { background: var(--gold-bar); color: var(--asphalt-black); }
 
-/* Sharp corners — zero radius everywhere */
-button, input, img, div, section, a { border-radius: 0 !important; }
+/* Sharp corners via --radius: 0rem in :root (shadcn respects this) */
 
 /* Film grain overlay */
 .grain::after {

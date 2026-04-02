@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Palette, Code, Megaphone, ArrowRight } from "lucide-react";
+import { Palette, Monitor, Megaphone, ArrowRight } from "lucide-react";
 
 const categories = [
-  { key: "DESIGN", label: "Diseño & Branding", icon: Palette, emoji: "🎨" },
-  { key: "WEB", label: "Desarrollo Web", icon: Code, emoji: "💻" },
-  { key: "MARKETING", label: "Marketing Digital", icon: Megaphone, emoji: "📱" },
+  { key: "DESIGN", label: "Diseño & Branding", icon: Palette },
+  { key: "WEB", label: "Desarrollo Web", icon: Monitor },
+  { key: "MARKETING", label: "Marketing Digital", icon: Megaphone },
 ];
 
 export function CategorySelector({
@@ -45,7 +45,7 @@ export function CategorySelector({
             onClick={() => onSelect(cat.key)}
             className="flex items-center gap-4 rounded-none border border-[rgba(245,246,252,0.15)] bg-[rgba(255,255,255,0.03)] px-6 py-5 text-left transition-all hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.05)] group"
           >
-            <span className="text-2xl">{cat.emoji}</span>
+            <cat.icon className="h-6 w-6 text-[var(--gold-bar)]" />
             <span className="font-[var(--font-lexend)] text-[var(--ice-white)] font-semibold group-hover:text-[var(--gold-bar)]">
               {cat.label}
             </span>
