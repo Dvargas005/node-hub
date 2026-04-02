@@ -6,10 +6,11 @@ const validRoles = ["GRAPHIC_DESIGNER", "AI_DEVELOPER", "COMMUNITY_MANAGER"];
 const validAvailability = ["AVAILABLE", "BUSY", "ON_LEAVE", "INACTIVE"];
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireApiRole(["ADMIN", "PM"]);
-  if (error) return error;
+  const { error, session } = await requireApiRole(["ADMIN", "PM"]);
+  if (error || !session) return error;
 
   try {
+    const userRole = (session.user as Record<string, unknown>).role as string;
     const url = req.nextUrl.searchParams;
     const role = url.get("role");
     const availability = url.get("availability");
@@ -36,8 +37,12 @@ export async function GET(req: NextRequest) {
       db.freelancer.count({ where }),
     ]);
 
+    const sanitized = userRole === "ADMIN"
+      ? freelancers
+      : freelancers.map(({ monthlySalary: _, ...rest }) => rest);
+
     return NextResponse.json({
-      freelancers,
+      freelancers: sanitized,
       total,
       page,
       totalPages: Math.ceil(total / perPage),

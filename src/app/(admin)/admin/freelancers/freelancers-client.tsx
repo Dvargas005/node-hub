@@ -25,7 +25,7 @@ interface FreelancerRow {
   role: string;
   skills: string[];
   skillTags: string[];
-  monthlySalary: number;
+  monthlySalary: number | null;
   currentLoad: number;
   clientCapacity: number;
   availability: string;
@@ -34,8 +34,10 @@ interface FreelancerRow {
 
 export function FreelancersClient({
   freelancers,
+  showSalary,
 }: {
   freelancers: FreelancerRow[];
+  showSalary: boolean;
 }) {
   const [filterRole, setFilterRole] = useState("");
   const [filterAvailability, setFilterAvailability] = useState("");
@@ -100,7 +102,7 @@ export function FreelancersClient({
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Rol</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Skills</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Salario</TableHead>
+                  {showSalary && <TableHead className="text-[rgba(245,246,252,0.5)]">Salario</TableHead>}
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Carga</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Disponibilidad</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
@@ -110,7 +112,7 @@ export function FreelancersClient({
                 {filtered.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={showSalary ? 8 : 7}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
                       No hay freelancers
@@ -153,9 +155,11 @@ export function FreelancersClient({
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      ${(f.monthlySalary / 100).toLocaleString()}
-                    </TableCell>
+                    {showSalary && (
+                      <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                        ${((f.monthlySalary ?? 0) / 100).toLocaleString()}
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="w-20">
                         <div className="flex justify-between text-xs text-[rgba(245,246,252,0.4)] mb-1">

@@ -5,7 +5,9 @@ import { FreelancersClient } from "./freelancers-client";
 export const dynamic = "force-dynamic";
 
 export default async function AdminFreelancersPage() {
-  await requireRole(["ADMIN", "PM"]);
+  const session = await requireRole(["ADMIN", "PM"]);
+  const userRole = (session.user as Record<string, unknown>).role as string;
+  const isAdmin = userRole === "ADMIN";
 
   const freelancers = await db.freelancer.findMany({
     include: { pm: { select: { name: true } } },
@@ -14,6 +16,7 @@ export default async function AdminFreelancersPage() {
 
   return (
     <FreelancersClient
+      showSalary={isAdmin}
       freelancers={freelancers.map((f) => ({
         id: f.id,
         name: f.name,
@@ -21,7 +24,7 @@ export default async function AdminFreelancersPage() {
         role: f.role,
         skills: f.skills,
         skillTags: f.skillTags,
-        monthlySalary: f.monthlySalary,
+        monthlySalary: isAdmin ? f.monthlySalary : null,
         currentLoad: f.currentLoad,
         clientCapacity: f.clientCapacity,
         availability: f.availability,
