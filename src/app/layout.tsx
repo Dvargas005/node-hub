@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Lexend, Atkinson_Hyperlegible, Geist } from "next/font/google";
+import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -41,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn(lexend.variable, atkinson.variable, "font-sans", geist.variable)}>
+    <html lang="en" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden cursor-none">
         <SmoothScroll>{children}</SmoothScroll>
       </body>
