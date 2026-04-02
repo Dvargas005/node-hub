@@ -1,18 +1,27 @@
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/session";
+import { RequestClient } from "./request-client";
 
 export const dynamic = "force-dynamic";
 
 export default async function RequestPage() {
-  await requireAuth();
+  const session = await requireAuth();
+
+  const subscription = await db.subscription.findUnique({
+    where: { userId: session.user.id },
+    include: { plan: true },
+  });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--ice-white)]">
-        Nueva Solicitud
-      </h1>
-      <p className="text-[rgba(245,246,252,0.5)]">
-        Wizard de solicitud — próximamente.
-      </p>
-    </div>
+    <RequestClient
+      subscription={
+        subscription
+          ? {
+              creditsRemaining: subscription.creditsRemaining,
+              planName: subscription.plan.name,
+            }
+          : null
+      }
+    />
   );
 }
