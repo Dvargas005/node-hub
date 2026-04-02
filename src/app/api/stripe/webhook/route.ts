@@ -41,7 +41,12 @@ export async function POST(req: NextRequest) {
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
 
-        if (userId && planSlug) {
+        if (!userId || !planSlug) {
+          console.warn("[STRIPE] checkout.session.completed missing metadata:", { userId, planSlug });
+          break;
+        }
+
+        {
           const plan = await db.plan.findUnique({
             where: { slug: planSlug },
           });
@@ -103,7 +108,7 @@ export async function POST(req: NextRequest) {
                 status: "ACTIVE",
                 currentPeriodStart: now,
                 currentPeriodEnd: periodEnd,
-                creditsRemaining: sub.plan.monthlyCredits,
+                creditsRemaining: sub.plan.monthlyCredits + sub.plan.bonusCredits,
               },
             });
 

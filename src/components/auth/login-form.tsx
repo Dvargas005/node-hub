@@ -29,20 +29,25 @@ export function LoginForm() {
     setLoading(true);
     setError("");
 
-    const result = await signIn.email({ email, password });
+    try {
+      const result = await signIn.email({ email, password });
 
-    if (result.error) {
-      setError("Email o contraseña incorrectos");
+      if (result.error) {
+        setError("Email o contraseña incorrectos");
+        return;
+      }
+
+      // Redirect based on role
+      const role = (result.data?.user as Record<string, unknown>)?.role as string;
+      if (role === "ADMIN" || role === "PM") {
+        router.push("/admin/overview");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch {
+      setError("Error de conexión");
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    // Redirect based on role
-    const role = (result.data?.user as Record<string, unknown>)?.role as string;
-    if (role === "ADMIN" || role === "PM") {
-      router.push("/admin/overview");
-    } else {
-      router.push("/dashboard");
     }
   };
 

@@ -146,9 +146,11 @@ export function DashboardClient({
                   className="h-full rounded-full bg-[var(--gold-bar)]"
                   style={{
                     width: `${Math.min(
-                      (subscription.creditsRemaining /
-                        subscription.monthlyCredits) *
-                        100,
+                      (subscription.monthlyCredits > 0
+                        ? (subscription.creditsRemaining /
+                            subscription.monthlyCredits) *
+                          100
+                        : 0),
                       100
                     )}%`,
                   }}

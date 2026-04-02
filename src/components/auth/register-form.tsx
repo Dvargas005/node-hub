@@ -75,13 +75,13 @@ export function RegisterForm() {
 
       if (!res.ok) {
         setError(data.error || "Error al crear cuenta");
-        setLoading(false);
         return;
       }
 
       router.push("/dashboard");
     } catch {
       setError("Error de conexión");
+    } finally {
       setLoading(false);
     }
   };

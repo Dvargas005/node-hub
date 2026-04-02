@@ -168,7 +168,7 @@ export function FreelancersClient({
                             className="h-full rounded-full bg-[var(--gold-bar)]"
                             style={{
                               width: `${Math.min(
-                                (f.currentLoad / f.clientCapacity) * 100,
+                                (f.clientCapacity > 0 ? (f.currentLoad / f.clientCapacity) * 100 : 0),
                                 100
                               )}%`,
                             }}

@@ -1,4 +1,10 @@
-export default function TicketsPage() {
+import { requireAuth } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+
+export default async function TicketsPage() {
+  await requireAuth();
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-[var(--ice-white)]">

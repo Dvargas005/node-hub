@@ -1,9 +1,15 @@
-export default function AdminMetricsPage() {
+import { requireRole } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminMetricsPage() {
+  await requireRole(["ADMIN", "PM"]);
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-[var(--ice-white)]">Métricas</h1>
       <p className="text-[rgba(245,246,252,0.5)]">
-        KPIs, ingresos y métricas de rendimiento.
+        KPIs, ingresos y métricas de rendimiento — próximamente.
       </p>
     </div>
   );
