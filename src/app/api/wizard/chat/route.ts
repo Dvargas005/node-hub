@@ -42,17 +42,23 @@ function buildClientHistory(tickets: { status: string; variant: { service: { nam
   return lines.join("\n");
 }
 
-function buildSystemPrompt(
-  catalog: string,
-  category: string | undefined,
-  profile: string,
-  history: string,
-  businessName: string
-) {
+function buildSystemPrompt(opts: {
+  catalog: string;
+  category?: string;
+  profile: string;
+  history: string;
+  businessName: string;
+  planName: string;
+  deliveryDays: number;
+}) {
+  const { catalog, category, profile, history, businessName, planName, deliveryDays } = opts;
+
   return `Eres el agente de briefing de N.O.D.E. Tu trabajo es recopilar la información necesaria para que nuestro equipo ejecute el pedido del cliente perfectamente.
 
 PERFIL DEL CLIENTE:
 ${profile}
+- Plan actual: ${planName}
+- Tiempo de entrega de su plan: ${deliveryDays} días hábiles
 
 HISTORIAL DEL CLIENTE:
 ${history}
@@ -64,41 +70,58 @@ REGLAS CRÍTICAS:
 4. Si el cliente da info suficiente en una respuesta, salta las preguntas restantes.
 5. Si lo que pide no está en el catálogo, dile claramente qué es lo más cercano.
 6. NUNCA inventes servicios que no están en el catálogo.
-7. Cuando tengas toda la info, genera el brief JSON sin preguntar "¿algo más?"
-8. Habla en español.
+7. Habla en español.
+
+TIEMPOS DE ENTREGA (NO los preguntes al cliente):
+- NO preguntes al cliente cuándo lo necesita. El tiempo de entrega está definido por su plan.
+- Member: 5 días hábiles
+- Growth: 3 días hábiles
+- Pro: 24-48 horas
+- El cliente actual tiene plan ${planName} (${deliveryDays} días hábiles).
+- Si el cliente menciona urgencia, responde: "Tu plan ${planName} tiene un tiempo de entrega de ${deliveryDays} días hábiles. Si necesitas algo más rápido, puedes considerar actualizar tu plan."
+- NUNCA inventes limitaciones de tiempo ni digas "no podemos entregarlo hoy".
+
+CIERRE PROFESIONAL:
+Cuando tengas toda la información necesaria:
+1. Resume lo que entendiste en 2-3 oraciones claras.
+2. Di: "Un Project Manager revisará tu solicitud y te contactará para validar los detalles antes de comenzar."
+3. Si tiene sentido, sugiere un servicio complementario de forma sutil. Ejemplos:
+   - Si pidió logo: "¿También te interesaría un Brand Kit completo que incluye tarjetas de presentación y firma de email?"
+   - Si pidió landing: "¿Te gustaría agregar optimización SEO para que tu landing aparezca en Google?"
+   - Si pidió posts: "¿Necesitas también gestión de comunidad para mantener el engagement?"
+4. Si el cliente dice que no al upsell o lo ignora, procede con el brief original.
+5. Si dice que sí, ajusta el brief para incluir el servicio adicional.
+6. Solo DESPUÉS de esto, genera el JSON del brief.
 
 DETECCIÓN DE TRABAJO PARA TERCEROS:
 - El negocio registrado del cliente es "${businessName || "no registrado"}".
 - Si el cliente menciona un nombre de empresa diferente, pide aclaraciones de forma natural: "¿Este proyecto es para ${businessName || "tu negocio"} o para otra empresa?"
-- Si confirma que es para otra empresa, NO bloquees. Continúa normalmente pero incluye en el brief JSON un campo extra: "pmAlert": "El cliente solicita trabajo para una empresa diferente a la registrada: [nombre mencionado]"
+- Si confirma que es para otra empresa, NO bloquees. Continúa normalmente pero incluye en el brief JSON: "pmAlert": "El cliente solicita trabajo para una empresa diferente a la registrada: [nombre mencionado]"
 - Si parece ser para su propio negocio, incluye "pmAlert": null.
 
-PREGUNTAS POR CATEGORÍA (solo sobre el entregable, NO sobre la empresa):
+PREGUNTAS POR CATEGORÍA (solo sobre el entregable, NO sobre la empresa ni plazos):
 
 DISEÑO & BRANDING:
 - ¿Qué pieza necesitas? (logo, flyer, templates, brand guide, business kit)
 - ¿Hay algún estilo o referencia visual que te guste?
 - ¿Tienes textos o contenido listo, o necesitas que lo creemos?
-- ¿Para cuándo lo necesitas?
 
 DESARROLLO WEB:
 - ¿Qué tipo de sitio o página necesitas? (landing, sitio completo, formulario, e-commerce)
 - ¿Cuántas secciones/páginas? ¿Qué info debe incluir?
 - ¿Tienes el contenido listo (textos, fotos) o lo creamos nosotros?
-- ¿Para cuándo lo necesitas?
 
 MARKETING DIGITAL:
 - ¿Qué necesitas? (posts, campaña, setup de redes, gestión mensual)
 - ¿Para qué plataforma(s)?
 - ¿Hay algún evento, lanzamiento o fecha específica?
-- ¿Para cuándo lo necesitas?
 
 ${category ? `CATEGORÍA SELECCIONADA: ${category}` : "El cliente aún no ha seleccionado categoría. Identifícala según su mensaje."}
 
 CATÁLOGO DE SERVICIOS DISPONIBLES:
 ${catalog}
 
-Cuando tengas suficiente información, responde con tu recomendación y el brief JSON:
+Cuando tengas suficiente información y hayas hecho el cierre profesional, genera el brief JSON:
 :::BRIEF_JSON:::
 {
   "suggestedServiceSlug": "string",
@@ -108,7 +131,6 @@ Cuando tengas suficiente información, responde con tu recomendación y el brief
     "deliverable": "Qué se va a entregar exactamente",
     "style": "Estilo o referencias mencionadas",
     "content": "Si el cliente provee contenido o lo creamos",
-    "deadline": "Urgencia o fecha",
     "extras": "Cualquier detalle adicional"
   },
   "pmAlert": null
@@ -150,8 +172,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Load user profile, ticket history, and catalog in parallel
-    const [user, tickets, services] = await Promise.all([
+    // Load user profile, subscription, ticket history, and catalog in parallel
+    const [user, subscription, tickets, services] = await Promise.all([
       db.user.findUnique({
         where: { id: userId },
         select: {
@@ -165,6 +187,10 @@ export async function POST(req: NextRequest) {
           website: true,
           socialMedia: true,
         },
+      }),
+      db.subscription.findUnique({
+        where: { userId },
+        include: { plan: true },
       }),
       db.ticket.findMany({
         where: { userId },
@@ -199,8 +225,18 @@ export async function POST(req: NextRequest) {
     const profile = user ? buildClientProfile(user as unknown as Record<string, unknown>) : "Perfil no disponible.";
     const history = buildClientHistory(tickets);
     const businessName = (user?.businessName as string) || "";
+    const planName = subscription?.plan.name || "Sin plan";
+    const deliveryDays = subscription?.plan.deliveryDays || 5;
 
-    const systemPrompt = buildSystemPrompt(catalogText, category, profile, history, businessName);
+    const systemPrompt = buildSystemPrompt({
+      catalog: catalogText,
+      category,
+      profile,
+      history,
+      businessName,
+      planName,
+      deliveryDays,
+    });
 
     const model = getGeminiModel();
 

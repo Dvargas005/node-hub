@@ -12,7 +12,6 @@ interface BriefDetails {
   deliverable: string;
   style: string;
   content: string;
-  deadline: string;
   extras: string;
 }
 
@@ -134,7 +133,7 @@ export function BriefConfirmation({
                   {detailEntries.map(([key, value]) => (
                     <div key={key}>
                       <span className="text-[rgba(245,246,252,0.4)] capitalize">
-                        {{ deliverable: "Entregable", style: "Estilo", content: "Contenido", deadline: "Plazo", extras: "Notas adicionales" }[key] || key}
+                        {{ deliverable: "Entregable", style: "Estilo", content: "Contenido", extras: "Notas adicionales" }[key] || key}
                         :{" "}
                       </span>
                       <span className="text-[rgba(245,246,252,0.7)]">{value}</span>

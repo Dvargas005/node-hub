@@ -18,7 +18,6 @@ interface BriefData {
     deliverable: string;
     style: string;
     content: string;
-    deadline: string;
     extras: string;
   };
   pmAlert?: string | null;
