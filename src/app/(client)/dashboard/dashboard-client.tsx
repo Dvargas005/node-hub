@@ -23,6 +23,7 @@ import {
 
 interface DashboardClientProps {
   userName: string;
+  freeCredits: number;
   subscription: {
     planName: string;
     creditsRemaining: number;
@@ -43,10 +44,12 @@ interface DashboardClientProps {
 
 export function DashboardClient({
   userName,
+  freeCredits,
   subscription,
   activeTickets,
   lastTicket,
 }: DashboardClientProps) {
+  const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -58,6 +61,18 @@ export function DashboardClient({
           Bienvenido a tu panel de N.O.D.E.
         </p>
       </div>
+
+      {/* Free credits banner (no plan) */}
+      {!subscription && freeCredits > 0 && (
+        <Card className="border-[var(--gold-bar)] bg-[rgba(255,201,25,0.05)]">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-[rgba(245,246,252,0.5)]">Créditos de bienvenida</p>
+              <span className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--gold-bar)]">{freeCredits}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* No subscription CTA */}
       {!subscription && (
@@ -117,12 +132,17 @@ export function DashboardClient({
             <CardContent>
               <div className="flex items-baseline gap-1">
                 <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--gold-bar)]">
-                  {subscription.creditsRemaining}
+                  {totalCredits}
                 </span>
                 <span className="text-sm text-[rgba(245,246,252,0.4)]">
-                  / {subscription.monthlyCredits}
+                  disponibles
                 </span>
               </div>
+              {freeCredits > 0 && (
+                <p className="text-xs text-[rgba(245,246,252,0.3)] mt-1">
+                  {freeCredits} gratis + {subscription.creditsRemaining} del plan
+                </p>
+              )}
               <div className="mt-2 h-1.5 rounded-full bg-[rgba(255,255,255,0.1)]">
                 <div
                   className="h-full rounded-full bg-[var(--gold-bar)]"

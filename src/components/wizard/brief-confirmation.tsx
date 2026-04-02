@@ -35,6 +35,7 @@ interface VariantInfo {
 interface SubscriptionInfo {
   creditsRemaining: number;
   planName: string;
+  freeCredits?: number;
 }
 
 export function BriefConfirmation({
@@ -54,10 +55,10 @@ export function BriefConfirmation({
   const [confirming, setConfirming] = useState(false);
 
   const hasSubscription = !!subscription;
+  const freeCredits = subscription?.freeCredits || 0;
+  const totalAvailable = freeCredits + (subscription?.creditsRemaining || 0);
   const hasEnoughCredits =
-    hasSubscription &&
-    variant &&
-    subscription.creditsRemaining >= variant.creditCost;
+    variant ? totalAvailable >= variant.creditCost : false;
 
   const handleConfirm = async () => {
     setConfirming(true);
@@ -147,15 +148,20 @@ export function BriefConfirmation({
       </Card>
 
       {/* Credits info */}
-      {hasSubscription && variant && (
+      {variant && totalAvailable > 0 && (
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-[rgba(245,246,252,0.5)]">Tus créditos</span>
               <span className="text-[var(--ice-white)]">
-                {subscription.creditsRemaining} disponibles
+                {totalAvailable} disponibles
               </span>
             </div>
+            {freeCredits > 0 && (
+              <p className="text-xs text-[rgba(245,246,252,0.3)] text-right">
+                {freeCredits} gratis + {subscription?.creditsRemaining || 0} del plan
+              </p>
+            )}
             <div className="flex items-center justify-between text-sm mt-1">
               <span className="text-[rgba(245,246,252,0.5)]">Costo</span>
               <span className="text-[var(--gold-bar)] font-bold">
@@ -166,7 +172,7 @@ export function BriefConfirmation({
             <div className="flex items-center justify-between text-sm">
               <span className="text-[rgba(245,246,252,0.5)]">Después</span>
               <span className="text-[var(--ice-white)] font-bold">
-                {subscription.creditsRemaining - variant.creditCost} créditos
+                {totalAvailable - variant.creditCost} créditos
               </span>
             </div>
           </CardContent>
@@ -200,7 +206,7 @@ export function BriefConfirmation({
             </p>
             <p className="text-xs text-[rgba(245,246,252,0.5)]">
               Necesitas {variant.creditCost}, tienes{" "}
-              {subscription.creditsRemaining}.
+              {totalAvailable}.
             </p>
             <Link
               href="/billing"

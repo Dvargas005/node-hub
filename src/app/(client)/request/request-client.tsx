@@ -48,7 +48,7 @@ type Step = "category" | "chat" | "confirm" | "success";
 export function RequestClient({
   subscription,
 }: {
-  subscription: { creditsRemaining: number; planName: string } | null;
+  subscription: { creditsRemaining: number; planName: string; freeCredits?: number } | null;
 }) {
   const [step, setStep] = useState<Step>("category");
   const [category, setCategory] = useState<string | undefined>();

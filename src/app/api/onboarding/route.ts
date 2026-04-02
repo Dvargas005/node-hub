@@ -41,6 +41,13 @@ export async function POST(req: NextRequest) {
       website = "https://" + website;
     }
 
+    // Check if this is the first onboarding (grant welcome credits only once)
+    const currentUser = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { onboardingCompleted: true },
+    });
+    const isFirstTime = !currentUser?.onboardingCompleted;
+
     await db.user.update({
       where: { id: session.user.id },
       data: {
@@ -54,10 +61,11 @@ export async function POST(req: NextRequest) {
         website: website || undefined,
         socialMedia: socialMedia || undefined,
         onboardingCompleted: true,
+        ...(isFirstTime ? { freeCredits: 10 } : {}),
       },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, welcomeCredits: isFirstTime ? 10 : 0 });
   } catch (err) {
     console.error("[ONBOARDING]", err);
     return NextResponse.json(

@@ -6,11 +6,18 @@ export const dynamic = "force-dynamic";
 
 export default async function RequestPage() {
   const session = await requireAuth();
+  const userId = session.user.id;
 
-  const subscription = await db.subscription.findUnique({
-    where: { userId: session.user.id },
-    include: { plan: true },
-  });
+  const [user, subscription] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      select: { freeCredits: true },
+    }),
+    db.subscription.findUnique({
+      where: { userId },
+      include: { plan: true },
+    }),
+  ]);
 
   return (
     <RequestClient
@@ -19,8 +26,15 @@ export default async function RequestPage() {
           ? {
               creditsRemaining: subscription.creditsRemaining,
               planName: subscription.plan.name,
+              freeCredits: user?.freeCredits || 0,
             }
-          : null
+          : user?.freeCredits
+            ? {
+                creditsRemaining: 0,
+                planName: "Sin plan",
+                freeCredits: user.freeCredits,
+              }
+            : null
       }
     />
   );

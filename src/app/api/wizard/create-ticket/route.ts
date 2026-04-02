@@ -31,30 +31,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate subscription and credits
+    // Validate credits (freeCredits + subscription)
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { freeCredits: true },
+    });
     const subscription = await db.subscription.findUnique({
       where: { userId },
       include: { plan: true },
     });
 
-    if (!subscription || subscription.status !== "ACTIVE") {
-      return NextResponse.json(
-        { error: "Necesitas un plan activo para crear solicitudes" },
-        { status: 400 }
-      );
-    }
+    const freeCredits = user?.freeCredits || 0;
+    const planCredits = subscription?.creditsRemaining || 0;
+    const totalCredits = freeCredits + planCredits;
 
-    if (subscription.creditsRemaining < variant.creditCost) {
+    if (totalCredits < variant.creditCost) {
       return NextResponse.json(
         {
-          error: `No tienes suficientes créditos. Necesitas ${variant.creditCost}, tienes ${subscription.creditsRemaining}.`,
+          error: `No tienes suficientes créditos. Necesitas ${variant.creditCost}, tienes ${totalCredits}.`,
         },
         { status: 400 }
       );
     }
 
-    // Check min plan
-    if (variant.minPlan) {
+    // Check min plan (only if variant requires one)
+    if (variant.minPlan && subscription) {
       const planOrder = ["member", "growth", "pro"];
       const userPlanIndex = planOrder.indexOf(subscription.plan.slug);
       const minPlanIndex = planOrder.indexOf(variant.minPlan);
@@ -68,11 +69,24 @@ export async function POST(req: NextRequest) {
 
     // Atomic transaction: create ticket + deduct credits + save conversation
     const ticket = await db.$transaction(async (tx) => {
-      // Deduct credits
-      await tx.subscription.update({
-        where: { id: subscription.id },
-        data: { creditsRemaining: { decrement: variant.creditCost } },
-      });
+      // Deduct credits: free first, then plan
+      let remaining = variant.creditCost;
+
+      if (freeCredits > 0) {
+        const fromFree = Math.min(freeCredits, remaining);
+        await tx.user.update({
+          where: { id: userId },
+          data: { freeCredits: { decrement: fromFree } },
+        });
+        remaining -= fromFree;
+      }
+
+      if (remaining > 0 && subscription) {
+        await tx.subscription.update({
+          where: { id: subscription.id },
+          data: { creditsRemaining: { decrement: remaining } },
+        });
+      }
 
       // Extract pmAlert if present (invisible to client)
       const pmAlert = briefStructured?.pmAlert || null;

@@ -8,7 +8,11 @@ export default async function DashboardPage() {
   const session = await requireAuth();
   const userId = session.user.id;
 
-  const [subscription, ticketCount, lastTicket] = await Promise.all([
+  const [user, subscription, ticketCount, lastTicket] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      select: { freeCredits: true },
+    }),
     db.subscription.findUnique({
       where: { userId },
       include: { plan: true },
@@ -16,9 +20,7 @@ export default async function DashboardPage() {
     db.ticket.count({
       where: {
         userId,
-        status: {
-          notIn: ["COMPLETED", "CANCELED"],
-        },
+        status: { notIn: ["COMPLETED", "CANCELED"] },
       },
     }),
     db.ticket.findFirst({
@@ -31,6 +33,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       userName={session.user.name}
+      freeCredits={user?.freeCredits || 0}
       subscription={
         subscription
           ? {
