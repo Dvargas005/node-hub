@@ -16,28 +16,10 @@ import {
   Ticket,
   ArrowRight,
 } from "lucide-react";
-
-const statusLabels: Record<string, string> = {
-  NEW: "Nuevo",
-  REVIEWING: "En revisión",
-  ASSIGNED: "Asignado",
-  IN_PROGRESS: "En progreso",
-  DELIVERED: "Entregado",
-  REVISION: "Revisión",
-  COMPLETED: "Completado",
-  CANCELED: "Cancelado",
-};
-
-const statusColors: Record<string, string> = {
-  NEW: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  REVIEWING: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  ASSIGNED: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  IN_PROGRESS: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  DELIVERED: "bg-green-500/20 text-green-400 border-green-500/30",
-  REVISION: "bg-red-500/20 text-red-400 border-red-500/30",
-  COMPLETED: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  CANCELED: "bg-gray-500/20 text-gray-400 border-gray-500/30",
-};
+import {
+  ticketStatusLabels as statusLabels,
+  ticketStatusColors as statusColors,
+} from "@/lib/status-labels";
 
 interface DashboardClientProps {
   userName: string;

@@ -106,9 +106,12 @@ export function TicketsClient({
     );
   }, [assignTicket, availableFreelancers]);
 
+  const [assignError, setAssignError] = useState("");
+
   const handleAssign = async (freelancerId: string) => {
     if (!assignTicket) return;
     setAssigning(true);
+    setAssignError("");
     try {
       const res = await fetch(
         `/api/admin/tickets/${assignTicket.id}/assign`,
@@ -121,6 +124,9 @@ export function TicketsClient({
       if (res.ok) {
         setAssignTicket(null);
         router.refresh();
+      } else {
+        const data = await res.json();
+        setAssignError(data.error || "Error al asignar");
       }
     } finally {
       setAssigning(false);
@@ -321,6 +327,12 @@ export function TicketsClient({
                 assignTicket?.serviceCategory}
             </Badge>
           </p>
+
+          {assignError && (
+            <div className="text-sm text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-md p-2">
+              {assignError}
+            </div>
+          )}
 
           {/* Freelancer list */}
           <div className="space-y-2 max-h-64 overflow-y-auto">

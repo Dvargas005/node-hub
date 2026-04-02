@@ -17,6 +17,7 @@ export default async function AdminTicketsPage() {
         freelancer: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
+      take: 200,
     }),
     db.freelancer.findMany({
       where: { availability: "AVAILABLE" },

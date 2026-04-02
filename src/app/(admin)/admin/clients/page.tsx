@@ -22,6 +22,7 @@ export default async function AdminClientsPage() {
         },
       },
       orderBy: { createdAt: "desc" },
+      take: 200,
     }),
     db.plan.findMany({ where: { isActive: true }, orderBy: { priceMonthly: "asc" } }),
   ]);

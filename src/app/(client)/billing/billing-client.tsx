@@ -74,11 +74,13 @@ export function BillingClient({
 }) {
   const router = useRouter();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [billingError, setBillingError] = useState("");
 
   const hasStripe = plans.some((p) => p.stripePriceId);
 
   const handleSubscribe = async (planSlug: string) => {
     setLoadingPlan(planSlug);
+    setBillingError("");
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -88,23 +90,28 @@ export function BillingClient({
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        setBillingError(data.error || "No se pudo iniciar el pago");
       }
     } catch {
-      // Stripe not available
+      setBillingError("Error de conexión con Stripe");
     } finally {
       setLoadingPlan(null);
     }
   };
 
   const handlePortal = async () => {
+    setBillingError("");
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        setBillingError(data.error || "No se pudo abrir el portal");
       }
     } catch {
-      // Stripe not available
+      setBillingError("Error de conexión con Stripe");
     }
   };
 
@@ -118,6 +125,12 @@ export function BillingClient({
           Gestiona tu suscripción y créditos
         </p>
       </div>
+
+      {billingError && (
+        <div className="text-sm text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-md p-3">
+          {billingError}
+        </div>
+      )}
 
       {/* Current subscription */}
       {subscription && (
