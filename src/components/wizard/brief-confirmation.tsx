@@ -134,13 +134,17 @@ export function BriefConfirmation({
                           ? "Objetivo"
                           : key === "audience"
                             ? "Audiencia"
-                            : key === "style"
-                              ? "Estilo"
-                              : key === "references"
-                                ? "Referencias"
-                                : key === "deadline"
-                                  ? "Plazo"
-                                  : "Extra"}
+                            : key === "deliverable"
+                              ? "Entregable"
+                              : key === "content"
+                                ? "Contenido"
+                                : key === "style"
+                                  ? "Estilo"
+                                  : key === "references"
+                                    ? "Referencias"
+                                    : key === "deadline"
+                                      ? "Plazo"
+                                      : "Extra"}
                         :{" "}
                       </span>
                       <span className="text-[rgba(245,246,252,0.7)]">{value}</span>

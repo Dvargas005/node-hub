@@ -50,6 +50,7 @@ export default async function AdminTicketsPage() {
         freelancerId: t.freelancerId,
         clientNotes: t.clientNotes,
         briefStructured: t.briefStructured as Record<string, unknown> | null,
+        pmNotes: t.pmNotes,
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
       }))}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Sparkles } from "lucide-react";
 
 interface TicketInfo {
   id: string;
@@ -13,7 +13,104 @@ interface TicketInfo {
   creditsCharged: number;
 }
 
-export function TicketSuccess({ ticket }: { ticket: TicketInfo }) {
+interface Suggestion {
+  title: string;
+  description: string;
+  category: string;
+}
+
+const crossSellMap: Record<string, Suggestion[]> = {
+  "logo-design": [
+    {
+      title: "Templates para redes sociales",
+      description: "Usa tu nueva marca en posts y stories profesionales",
+      category: "DESIGN",
+    },
+    {
+      title: "Tarjetas de presentación",
+      description: "Lleva tu marca a lo físico con tarjetas profesionales",
+      category: "DESIGN",
+    },
+  ],
+  "brand-identity": [
+    {
+      title: "Diseño para redes sociales",
+      description: "Aplica tu identidad en contenido para Instagram y Facebook",
+      category: "DESIGN",
+    },
+    {
+      title: "Landing Page",
+      description: "Crea una presencia web con tu nueva identidad de marca",
+      category: "WEB",
+    },
+  ],
+  "landing-page": [
+    {
+      title: "Optimización SEO",
+      description: "Potencia tu landing para que aparezca en Google",
+      category: "MARKETING",
+    },
+    {
+      title: "Publicidad Digital",
+      description: "Lleva tráfico calificado a tu nueva landing",
+      category: "MARKETING",
+    },
+  ],
+  "website-development": [
+    {
+      title: "Optimización SEO",
+      description: "Posiciona tu sitio web en los buscadores",
+      category: "MARKETING",
+    },
+    {
+      title: "Content Pack",
+      description: "Contenido profesional para alimentar tu sitio",
+      category: "MARKETING",
+    },
+  ],
+  "social-media-design": [
+    {
+      title: "Community Management",
+      description: "Deja que gestionemos tus redes con tu nuevo contenido",
+      category: "MARKETING",
+    },
+  ],
+  "social-media-management": [
+    {
+      title: "Publicidad Digital",
+      description: "Amplifica el alcance de tu contenido con ads",
+      category: "MARKETING",
+    },
+  ],
+  "content-marketing": [
+    {
+      title: "Optimización SEO",
+      description: "Que tu contenido aparezca en los primeros resultados",
+      category: "MARKETING",
+    },
+  ],
+  "email-marketing": [
+    {
+      title: "Landing Page",
+      description: "Crea una landing para captar leads de tus campañas",
+      category: "WEB",
+    },
+  ],
+};
+
+function getSuggestions(serviceSlug: string): Suggestion[] {
+  return (crossSellMap[serviceSlug] || []).slice(0, 2);
+}
+
+export function TicketSuccess({
+  ticket,
+  serviceSlug,
+}: {
+  ticket: TicketInfo;
+  serviceSlug?: string;
+}) {
+  const suggestions = serviceSlug ? getSuggestions(serviceSlug) : [];
+
   return (
     <div className="flex flex-col items-center py-12 max-w-md mx-auto">
       <div className="h-16 w-16 flex items-center justify-center bg-[rgba(255,201,25,0.1)] mb-6">
@@ -68,6 +165,34 @@ export function TicketSuccess({ ticket }: { ticket: TicketInfo }) {
           </Button>
         </Link>
       </div>
+
+      {/* Cross-sell suggestions */}
+      {suggestions.length > 0 && (
+        <div className="mt-8 w-full">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4 text-[var(--gold-bar)]" />
+            <p className="text-sm font-medium text-[rgba(245,246,252,0.5)]">
+              También te puede interesar
+            </p>
+          </div>
+          <div className="space-y-2">
+            {suggestions.map((s) => (
+              <Link key={s.title} href={`/request?category=${s.category}`}>
+                <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.03)] transition-all cursor-pointer">
+                  <CardContent className="py-3">
+                    <p className="text-sm font-medium text-[var(--ice-white)]">
+                      {s.title}
+                    </p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">
+                      {s.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

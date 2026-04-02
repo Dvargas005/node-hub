@@ -40,6 +40,7 @@ interface TicketInfo {
   serviceName: string;
   variantName: string;
   creditsCharged: number;
+  serviceSlug?: string;
 }
 
 type Step = "category" | "chat" | "confirm" | "success";
@@ -196,7 +197,9 @@ export function RequestClient({
         />
       )}
 
-      {step === "success" && ticket && <TicketSuccess ticket={ticket} />}
+      {step === "success" && ticket && (
+        <TicketSuccess ticket={ticket} serviceSlug={ticket.serviceSlug} />
+      )}
     </div>
   );
 }

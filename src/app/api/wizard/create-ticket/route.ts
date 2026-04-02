@@ -74,6 +74,9 @@ export async function POST(req: NextRequest) {
         data: { creditsRemaining: { decrement: variant.creditCost } },
       });
 
+      // Extract pmAlert if present (invisible to client)
+      const pmAlert = briefStructured?.pmAlert || null;
+
       // Create ticket
       const newTicket = await tx.ticket.create({
         data: {
@@ -84,6 +87,7 @@ export async function POST(req: NextRequest) {
           briefRaw: conversationMessages || [],
           briefStructured,
           creditsCharged: variant.creditCost,
+          pmNotes: pmAlert,
         },
       });
 
@@ -109,6 +113,7 @@ export async function POST(req: NextRequest) {
         serviceName: variant.service.name,
         variantName: variant.name,
         creditsCharged: ticket.creditsCharged,
+        serviceSlug: variant.service.slug,
       },
     });
   } catch (err) {

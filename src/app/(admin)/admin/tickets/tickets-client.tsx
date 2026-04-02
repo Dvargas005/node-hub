@@ -44,6 +44,7 @@ interface TicketRow {
   freelancerId: string | null;
   clientNotes: string | null;
   briefStructured: Record<string, unknown> | null;
+  pmNotes: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -306,6 +307,14 @@ export function TicketsClient({
               {assignTicket?.serviceName} — {assignTicket?.variantName}
             </DialogDescription>
           </DialogHeader>
+
+          {/* PM Alert */}
+          {assignTicket?.pmNotes && (
+            <div className="flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/20 p-3 text-sm text-yellow-400">
+              <span>⚠️</span>
+              <span>Nota del sistema: {assignTicket.pmNotes}</span>
+            </div>
+          )}
 
           {/* Brief */}
           {(assignTicket?.briefStructured || assignTicket?.clientNotes) && (
