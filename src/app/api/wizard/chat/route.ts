@@ -183,7 +183,10 @@ export async function POST(req: NextRequest) {
 
     const model = getGeminiModel();
 
-    const geminiHistory = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
+    // Limit to last 10 messages + the new one to avoid token overflow
+    const recentMessages = messages.slice(-11);
+
+    const geminiHistory = recentMessages.slice(0, -1).map((m: { role: string; content: string }) => ({
       role: m.role === "user" ? "user" : "model",
       parts: [{ text: m.content }],
     }));
@@ -196,7 +199,7 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage = recentMessages[recentMessages.length - 1];
     const result = await chat.sendMessage(lastMessage.content);
     const response = result.response.text();
 

@@ -107,7 +107,7 @@ export function OnboardingClient({
         return;
       }
 
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch {
       setError("Error de conexión");
     } finally {

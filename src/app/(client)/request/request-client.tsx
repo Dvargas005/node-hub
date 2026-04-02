@@ -11,13 +11,13 @@ interface BriefData {
   suggestedVariantId: string;
   summary: string;
   details: {
-    objective: string;
-    audience: string;
+    deliverable: string;
     style: string;
-    references: string;
+    content: string;
     deadline: string;
     extras: string;
   };
+  pmAlert?: string | null;
 }
 
 interface ChatMessage {
@@ -100,7 +100,9 @@ export function RequestClient({
         }
       }
     } catch {
-      // Continue without variant info
+      setError("No se pudo cargar el catálogo. Intenta de nuevo.");
+      setStep("category");
+      return;
     }
 
     setStep("confirm");

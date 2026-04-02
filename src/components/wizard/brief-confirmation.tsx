@@ -9,10 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { Check, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 
 interface BriefDetails {
-  objective: string;
-  audience: string;
+  deliverable: string;
   style: string;
-  references: string;
+  content: string;
   deadline: string;
   extras: string;
 }
@@ -66,7 +65,7 @@ export function BriefConfirmation({
   };
 
   const detailEntries = brief.details
-    ? Object.entries(brief.details).filter(([, v]) => v && v !== "No mencionado" && v !== "N/A")
+    ? Object.entries(brief.details).filter(([k, v]) => k !== "pmAlert" && v && v !== "No mencionado" && v !== "N/A")
     : [];
 
   return (
@@ -130,21 +129,7 @@ export function BriefConfirmation({
                   {detailEntries.map(([key, value]) => (
                     <div key={key}>
                       <span className="text-[rgba(245,246,252,0.4)] capitalize">
-                        {key === "objective"
-                          ? "Objetivo"
-                          : key === "audience"
-                            ? "Audiencia"
-                            : key === "deliverable"
-                              ? "Entregable"
-                              : key === "content"
-                                ? "Contenido"
-                                : key === "style"
-                                  ? "Estilo"
-                                  : key === "references"
-                                    ? "Referencias"
-                                    : key === "deadline"
-                                      ? "Plazo"
-                                      : "Extra"}
+                        {{ deliverable: "Entregable", style: "Estilo", content: "Contenido", deadline: "Plazo", extras: "Notas adicionales" }[key] || key}
                         :{" "}
                       </span>
                       <span className="text-[rgba(245,246,252,0.7)]">{value}</span>

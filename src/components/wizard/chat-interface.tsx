@@ -15,20 +15,22 @@ interface BriefData {
   suggestedVariantId: string;
   summary: string;
   details: {
-    objective: string;
-    audience: string;
+    deliverable: string;
     style: string;
-    references: string;
+    content: string;
     deadline: string;
     extras: string;
   };
+  pmAlert?: string | null;
 }
 
 function parseBrief(text: string): BriefData | null {
   const match = text.match(/:::BRIEF_JSON:::([\s\S]*?):::END_BRIEF:::/);
   if (!match) return null;
   try {
-    return JSON.parse(match[1].trim());
+    const parsed = JSON.parse(match[1].trim());
+    if (!parsed.suggestedServiceSlug || !parsed.summary) return null;
+    return parsed;
   } catch {
     return null;
   }
