@@ -1,12 +1,32 @@
-export default function AdminFreelancersPage() {
+import { db } from "@/lib/db";
+import { requireRole } from "@/lib/session";
+import { FreelancersClient } from "./freelancers-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminFreelancersPage() {
+  await requireRole(["ADMIN", "PM"]);
+
+  const freelancers = await db.freelancer.findMany({
+    include: { pm: { select: { name: true } } },
+    orderBy: { name: "asc" },
+  });
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--ice-white)]">
-        Freelancers
-      </h1>
-      <p className="text-[rgba(245,246,252,0.5)]">
-        Equipo de freelancers, capacidad y asignaciones.
-      </p>
-    </div>
+    <FreelancersClient
+      freelancers={freelancers.map((f) => ({
+        id: f.id,
+        name: f.name,
+        email: f.email,
+        role: f.role,
+        skills: f.skills,
+        skillTags: f.skillTags,
+        monthlySalary: f.monthlySalary,
+        currentLoad: f.currentLoad,
+        clientCapacity: f.clientCapacity,
+        availability: f.availability,
+        pmName: f.pm.name,
+      }))}
+    />
   );
 }

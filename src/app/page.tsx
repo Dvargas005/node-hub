@@ -482,7 +482,7 @@ export default function Home() {
   };
 
   return (
-    <main className="grain">
+    <main className="grain landing-cursor-none">
       <CustomCursor />
 
       {/* ── Nav (FIX 1: flags inside nav) ── */}

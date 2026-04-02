@@ -13,13 +13,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 
 export function RegisterForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [allianceCode, setAllianceCode] = useState("");
   const [allianceValid, setAllianceValid] = useState<boolean | null>(null);
@@ -135,16 +136,25 @@ export function RegisterForm() {
             <Label htmlFor="password" className="text-[var(--ice-white)]">
               Contraseña
             </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 8 caracteres"
-              required
-              minLength={8}
-              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 8 caracteres"
+                required
+                minLength={8}
+                className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -176,7 +186,7 @@ export function RegisterForm() {
                   setAllianceCode(e.target.value.toUpperCase());
                   validateAllianceCode(e.target.value);
                 }}
-                placeholder="Ej: LEN2026"
+                placeholder="Código de referido (opcional)"
                 className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
               />
               {allianceValid === true && (

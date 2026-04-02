@@ -95,8 +95,8 @@
 
 /* Lenis handles smooth scroll — no scroll-behavior: smooth */
 
-/* Hide default cursor — custom cursor rendered in React */
-* { cursor: none !important; }
+/* Hide default cursor — only on the landing page (custom cursor rendered in React) */
+.landing-cursor-none, .landing-cursor-none * { cursor: none !important; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }

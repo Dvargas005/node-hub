@@ -39,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
-      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden cursor-none">
+      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

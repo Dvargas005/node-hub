@@ -1,10 +1,84 @@
-export default function AdminOverviewPage() {
+import { db } from "@/lib/db";
+import { requireRole } from "@/lib/session";
+import { OverviewClient } from "./overview-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminOverviewPage() {
+  await requireRole(["ADMIN", "PM"]);
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [
+    activeClients,
+    openTickets,
+    deliveredThisMonth,
+    creditsAgg,
+    recentTickets,
+    freelancers,
+  ] = await Promise.all([
+    db.subscription.count({ where: { status: "ACTIVE" } }),
+    db.ticket.count({
+      where: { status: { notIn: ["COMPLETED", "CANCELED"] } },
+    }),
+    db.ticket.count({
+      where: { status: "DELIVERED", deliveredAt: { gte: startOfMonth } },
+    }),
+    db.ticket.aggregate({
+      where: { status: "COMPLETED", completedAt: { gte: startOfMonth } },
+      _sum: { creditsCharged: true },
+    }),
+    db.ticket.findMany({
+      take: 10,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: { select: { name: true, businessName: true } },
+        variant: { include: { service: { select: { name: true } } } },
+        freelancer: { select: { name: true } },
+      },
+    }),
+    db.freelancer.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        availability: true,
+        currentLoad: true,
+        clientCapacity: true,
+      },
+    }),
+  ]);
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--ice-white)]">Overview</h1>
-      <p className="text-[rgba(245,246,252,0.5)]">
-        Panel general de administración N.O.D.E.
-      </p>
-    </div>
+    <OverviewClient
+      metrics={{
+        activeClients,
+        openTickets,
+        deliveredThisMonth,
+        creditsConsumed: creditsAgg._sum.creditsCharged || 0,
+      }}
+      recentTickets={recentTickets.map((t) => ({
+        id: t.id,
+        number: t.number,
+        clientName: t.user.name,
+        clientBusiness: t.user.businessName,
+        serviceName: t.variant.service.name,
+        variantName: t.variant.name,
+        status: t.status,
+        priority: t.priority,
+        freelancerName: t.freelancer?.name || null,
+        createdAt: t.createdAt.toISOString(),
+      }))}
+      freelancers={freelancers.map((f) => ({
+        id: f.id,
+        name: f.name,
+        role: f.role,
+        availability: f.availability,
+        currentLoad: f.currentLoad,
+        clientCapacity: f.clientCapacity,
+      }))}
+    />
   );
 }

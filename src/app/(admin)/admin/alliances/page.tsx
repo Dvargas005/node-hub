@@ -1,10 +1,33 @@
-export default function AdminAlliancesPage() {
+import { db } from "@/lib/db";
+import { requireRole } from "@/lib/session";
+import { AlliancesClient } from "./alliances-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminAlliancesPage() {
+  await requireRole(["ADMIN", "PM"]);
+
+  const alliances = await db.alliance.findMany({
+    include: {
+      _count: { select: { referredClients: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--ice-white)]">Alianzas</h1>
-      <p className="text-[rgba(245,246,252,0.5)]">
-        Programas de alianzas y referidos.
-      </p>
-    </div>
+    <AlliancesClient
+      alliances={alliances.map((a) => ({
+        id: a.id,
+        name: a.name,
+        code: a.code,
+        discountPercent: a.discountPercent,
+        bonusCredits: a.bonusCredits,
+        revenueShare: a.revenueShare,
+        referredCount: a._count.referredClients,
+        isActive: a.isActive,
+        contactName: a.contactName,
+        contactEmail: a.contactEmail,
+      }))}
+    />
   );
 }
