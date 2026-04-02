@@ -3,12 +3,12 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 
 export async function POST(req: NextRequest) {
-  const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
+  const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
   try {
     const body = await req.json();
-    const {
+    let {
       businessName,
       businessIndustry,
       businessDescription,
@@ -20,19 +20,32 @@ export async function POST(req: NextRequest) {
       socialMedia,
     } = body;
 
-    // Step 1 is required
-    if (!businessDescription) {
+    // Step 1 required fields
+    if (!businessName || !businessIndustry || !businessDescription) {
       return NextResponse.json(
-        { error: "La descripción de tu negocio es requerida" },
+        { error: "Nombre, giro y descripción del negocio son requeridos" },
         { status: 400 }
       );
+    }
+
+    // Validate socialMedia size
+    if (socialMedia && JSON.stringify(socialMedia).length > 2000) {
+      return NextResponse.json(
+        { error: "Datos de redes sociales demasiado largos" },
+        { status: 400 }
+      );
+    }
+
+    // Auto-prefix URL
+    if (website && !website.match(/^https?:\/\//)) {
+      website = "https://" + website;
     }
 
     await db.user.update({
       where: { id: session.user.id },
       data: {
-        businessName: businessName || undefined,
-        businessIndustry: businessIndustry || undefined,
+        businessName,
+        businessIndustry,
         businessDescription,
         targetAudience: targetAudience || undefined,
         hasBranding: hasBranding ?? undefined,

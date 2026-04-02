@@ -25,7 +25,7 @@ function buildClientHistory(tickets: { status: string; variant: { service: { nam
 
   const serviceCount: Record<string, { total: number; completed: number; inProgress: number }> = {};
   for (const t of tickets) {
-    const name = t.variant.service.name;
+    const name = t.variant?.service?.name || "Servicio desconocido";
     if (!serviceCount[name]) serviceCount[name] = { total: 0, completed: 0, inProgress: 0 };
     serviceCount[name].total++;
     if (t.status === "COMPLETED") serviceCount[name].completed++;
@@ -128,6 +128,27 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = session.user.id;
+    const userRole = (session.user as Record<string, unknown>).role as string;
+
+    // Verify onboarding completed
+    const userCheck = await db.user.findUnique({
+      where: { id: userId },
+      select: { onboardingCompleted: true },
+    });
+    if (!userCheck?.onboardingCompleted) {
+      return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 403 });
+    }
+
+    // Verify active subscription for CLIENTs
+    if (userRole === "CLIENT") {
+      const sub = await db.subscription.findUnique({
+        where: { userId },
+        select: { status: true },
+      });
+      if (!sub || sub.status !== "ACTIVE") {
+        return NextResponse.json({ error: "Necesitas un plan activo para hacer solicitudes" }, { status: 403 });
+      }
+    }
 
     // Load user profile, ticket history, and catalog in parallel
     const [user, tickets, services] = await Promise.all([

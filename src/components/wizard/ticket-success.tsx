@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,90 +18,39 @@ interface Suggestion {
   title: string;
   description: string;
   category: string;
+  slug: string;
 }
 
 const crossSellMap: Record<string, Suggestion[]> = {
   "logo-design": [
-    {
-      title: "Templates para redes sociales",
-      description: "Usa tu nueva marca en posts y stories profesionales",
-      category: "DESIGN",
-    },
-    {
-      title: "Tarjetas de presentación",
-      description: "Lleva tu marca a lo físico con tarjetas profesionales",
-      category: "DESIGN",
-    },
+    { slug: "social-media-design", title: "Templates para redes sociales", description: "Usa tu nueva marca en posts y stories profesionales", category: "DESIGN" },
+    { slug: "print-design", title: "Tarjetas de presentación", description: "Lleva tu marca a lo físico con tarjetas profesionales", category: "DESIGN" },
   ],
   "brand-identity": [
-    {
-      title: "Diseño para redes sociales",
-      description: "Aplica tu identidad en contenido para Instagram y Facebook",
-      category: "DESIGN",
-    },
-    {
-      title: "Landing Page",
-      description: "Crea una presencia web con tu nueva identidad de marca",
-      category: "WEB",
-    },
+    { slug: "social-media-design", title: "Diseño para redes sociales", description: "Aplica tu identidad en contenido para Instagram y Facebook", category: "DESIGN" },
+    { slug: "landing-page", title: "Landing Page", description: "Crea una presencia web con tu nueva identidad de marca", category: "WEB" },
   ],
   "landing-page": [
-    {
-      title: "Optimización SEO",
-      description: "Potencia tu landing para que aparezca en Google",
-      category: "MARKETING",
-    },
-    {
-      title: "Publicidad Digital",
-      description: "Lleva tráfico calificado a tu nueva landing",
-      category: "MARKETING",
-    },
+    { slug: "seo-optimization", title: "Optimización SEO", description: "Potencia tu landing para que aparezca en Google", category: "MARKETING" },
+    { slug: "paid-advertising", title: "Publicidad Digital", description: "Lleva tráfico calificado a tu nueva landing", category: "MARKETING" },
   ],
   "website-development": [
-    {
-      title: "Optimización SEO",
-      description: "Posiciona tu sitio web en los buscadores",
-      category: "MARKETING",
-    },
-    {
-      title: "Content Pack",
-      description: "Contenido profesional para alimentar tu sitio",
-      category: "MARKETING",
-    },
+    { slug: "seo-optimization", title: "Optimización SEO", description: "Posiciona tu sitio web en los buscadores", category: "MARKETING" },
+    { slug: "content-marketing", title: "Marketing de Contenido", description: "Contenido profesional para alimentar tu sitio", category: "MARKETING" },
   ],
   "social-media-design": [
-    {
-      title: "Community Management",
-      description: "Deja que gestionemos tus redes con tu nuevo contenido",
-      category: "MARKETING",
-    },
+    { slug: "social-media-management", title: "Community Management", description: "Deja que gestionemos tus redes con tu nuevo contenido", category: "MARKETING" },
   ],
   "social-media-management": [
-    {
-      title: "Publicidad Digital",
-      description: "Amplifica el alcance de tu contenido con ads",
-      category: "MARKETING",
-    },
+    { slug: "paid-advertising", title: "Publicidad Digital", description: "Amplifica el alcance de tu contenido con ads", category: "MARKETING" },
   ],
   "content-marketing": [
-    {
-      title: "Optimización SEO",
-      description: "Que tu contenido aparezca en los primeros resultados",
-      category: "MARKETING",
-    },
+    { slug: "seo-optimization", title: "Optimización SEO", description: "Que tu contenido aparezca en los primeros resultados", category: "MARKETING" },
   ],
   "email-marketing": [
-    {
-      title: "Landing Page",
-      description: "Crea una landing para captar leads de tus campañas",
-      category: "WEB",
-    },
+    { slug: "landing-page", title: "Landing Page", description: "Crea una landing para captar leads de tus campañas", category: "WEB" },
   ],
 };
-
-function getSuggestions(serviceSlug: string): Suggestion[] {
-  return (crossSellMap[serviceSlug] || []).slice(0, 2);
-}
 
 export function TicketSuccess({
   ticket,
@@ -109,7 +59,22 @@ export function TicketSuccess({
   ticket: TicketInfo;
   serviceSlug?: string;
 }) {
-  const suggestions = serviceSlug ? getSuggestions(serviceSlug) : [];
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+
+  useEffect(() => {
+    if (!serviceSlug) return;
+    const candidates = (crossSellMap[serviceSlug] || []).slice(0, 2);
+    if (candidates.length === 0) return;
+
+    fetch("/api/wizard/catalog")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.services) return;
+        const slugs = new Set(data.services.map((s: { slug: string }) => s.slug));
+        setSuggestions(candidates.filter((c) => slugs.has(c.slug)));
+      })
+      .catch(() => {});
+  }, [serviceSlug]);
 
   return (
     <div className="flex flex-col items-center py-12 max-w-md mx-auto">

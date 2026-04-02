@@ -68,7 +68,7 @@ export function OnboardingClient({
     );
   };
 
-  const canProceedStep1 = businessDescription.trim().length > 0;
+  const canProceedStep1 = businessName.trim().length > 0 && businessIndustry.trim().length > 0 && businessDescription.trim().length > 0;
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -319,6 +319,7 @@ export function OnboardingClient({
                 </Button>
                 <Button
                   onClick={() => setStep(3)}
+                  disabled={hasBranding === null}
                   className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
                 >
                   Siguiente

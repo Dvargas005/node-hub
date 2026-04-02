@@ -47,7 +47,7 @@ export function BriefConfirmation({
   brief: BriefData;
   variant: VariantInfo | null;
   subscription: SubscriptionInfo | null;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   onAdjust: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -59,9 +59,13 @@ export function BriefConfirmation({
     variant &&
     subscription.creditsRemaining >= variant.creditCost;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setConfirming(true);
-    onConfirm();
+    try {
+      await onConfirm();
+    } catch {
+      setConfirming(false);
+    }
   };
 
   const detailEntries = brief.details
