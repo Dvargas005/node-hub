@@ -13,7 +13,7 @@ import {
 import type { NavItem } from "@/components/layout/sidebar";
 
 const adminNav: NavItem[] = [
-  { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
+  { label: "Panel General", href: "/admin/overview", icon: LayoutDashboard },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Clientes", href: "/admin/clients", icon: Users },
   { label: "Freelancers", href: "/admin/freelancers", icon: UserCog },

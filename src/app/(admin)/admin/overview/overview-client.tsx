@@ -85,7 +85,7 @@ export function OverviewClient({
   return (
     <div className="space-y-8">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Overview
+        Panel General
       </h1>
 
       {/* Metrics */}

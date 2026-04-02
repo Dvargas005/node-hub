@@ -17,6 +17,9 @@ export function Topbar() {
   const { data: session } = useSession();
   const user = session?.user;
 
+  const role = (user as Record<string, unknown> | undefined)?.role as string | undefined;
+  const isAdmin = role === "ADMIN" || role === "PM";
+
   const initials = user?.name
     ? user.name
         .split(" ")
@@ -49,13 +52,13 @@ export function Topbar() {
             <p className="text-xs text-muted-foreground">{user?.email}</p>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/settings")}>
+          <DropdownMenuItem onClick={() => router.push(isAdmin ? "/admin/overview" : "/settings")}>
             <Settings className="mr-2 h-4 w-4" />
-            Configuración
+            {isAdmin ? "Panel Admin" : "Configuración"}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+          <DropdownMenuItem onClick={() => router.push(isAdmin ? "/admin/overview" : "/dashboard")}>
             <User className="mr-2 h-4 w-4" />
-            Mi Perfil
+            {isAdmin ? "Overview" : "Mi Perfil"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>

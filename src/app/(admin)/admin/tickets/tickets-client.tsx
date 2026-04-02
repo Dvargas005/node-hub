@@ -66,6 +66,8 @@ const statusOptions = [
   { value: "IN_PROGRESS", label: "En progreso" },
   { value: "DELIVERED", label: "Entregado" },
   { value: "REVISION", label: "Revisión" },
+  { value: "COMPLETED", label: "Completado" },
+  { value: "CANCELED", label: "Cancelado" },
 ];
 
 const categoryOptions = [

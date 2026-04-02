@@ -20,11 +20,11 @@ const atkinson = Atkinson_Hyperlegible({
 export const metadata: Metadata = {
   title: "N.O.D.E. — Network Organized Delivery Engine",
   description:
-    "Design, web development & marketing by subscription. Powered by Nouvos.",
+    "Diseño, desarrollo web y marketing por suscripción. Powered by Nouvos.",
   openGraph: {
     title: "N.O.D.E. — Network Organized Delivery Engine",
     description:
-      "Design, web development & marketing by subscription. Powered by Nouvos.",
+      "Diseño, desarrollo web y marketing por suscripción. Powered by Nouvos.",
     url: "https://node.nouvos.one",
     siteName: "N.O.D.E. by Nouvos",
     locale: "es_MX",
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
+    <html lang="es" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
         <SmoothScroll>{children}</SmoothScroll>
       </body>

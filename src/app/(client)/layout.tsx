@@ -11,7 +11,7 @@ import {
 import type { NavItem } from "@/components/layout/sidebar";
 
 const clientNav: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Panel", href: "/dashboard", icon: LayoutDashboard },
   { label: "Nueva Solicitud", href: "/request", icon: Plus },
   { label: "Mis Tickets", href: "/tickets", icon: Ticket },
   { label: "Facturación", href: "/billing", icon: CreditCard },

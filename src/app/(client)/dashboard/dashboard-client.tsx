@@ -52,7 +52,7 @@ export function DashboardClient({
       {/* Header */}
       <div>
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          Hola, {userName.split(" ")[0]}
+          Hola, {userName?.split(" ")[0] || "usuario"}
         </h1>
         <p className="mt-1 font-[var(--font-atkinson)] text-[rgba(245,246,252,0.5)]">
           Bienvenido a tu panel de N.O.D.E.
