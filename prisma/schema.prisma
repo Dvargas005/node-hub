@@ -1,0 +1,423 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── USUARIOS ───────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String
+  phone         String?
+  image         String?
+  language      String    @default("es")
+  role          Role      @default(CLIENT)
+  businessName  String?
+  businessType  String?
+  timezone      String    @default("America/Chicago")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  subscription  Subscription?
+  tickets       Ticket[]
+  referredBy    Alliance?   @relation("referredClients", fields: [allianceId], references: [id])
+  allianceId    String?
+  assignedPmId  String?
+  assignedPm    User?       @relation("pmClients", fields: [assignedPmId], references: [id])
+  pmClients     User[]      @relation("pmClients")
+  managedFreelancers Freelancer[] @relation("pmFreelancers")
+  sessions      Session[]
+  accounts      Account[]
+  ticketMessages TicketMessage[]
+
+  @@map("users")
+}
+
+enum Role {
+  CLIENT
+  PM
+  ADMIN
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// ─── SUSCRIPCIONES & CRÉDITOS ───────────────────────
+
+model Plan {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  priceMonthly    Int       // centavos: 10000 = $100
+  setupFee        Int
+  monthlyCredits  Int
+  bonusCredits    Int       @default(0)
+  maxActiveReqs   Int
+  deliveryDays    Int
+  stripePriceId   String?   // null hasta que tengamos Stripe keys
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  subscriptions   Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  planId               String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               SubStatus @default(ACTIVE)
+  currentPeriodStart   DateTime  @default(now())
+  currentPeriodEnd     DateTime
+  creditsRemaining     Int
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user    User  @relation(fields: [userId], references: [id])
+  plan    Plan  @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+enum SubStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+model CreditPack {
+  id              String  @id @default(cuid())
+  name            String
+  credits         Int
+  priceInCents    Int
+  stripePriceId   String?
+  isActive        Boolean @default(true)
+
+  @@map("credit_packs")
+}
+
+// ─── CATÁLOGO DE SERVICIOS ──────────────────────────
+
+model Service {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  category        Category
+  description     String
+  longDescription String?
+  icon            String?
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  tags            String[]
+  createdAt       DateTime  @default(now())
+
+  variants        ServiceVariant[]
+
+  @@map("services")
+}
+
+model ServiceVariant {
+  id            String    @id @default(cuid())
+  serviceId     String
+  name          String
+  creditCost    Int
+  description   String
+  estimatedDays Int
+  minPlan       String?
+  isPopular     Boolean   @default(false)
+  isNew         Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  service       Service   @relation(fields: [serviceId], references: [id])
+  tickets       Ticket[]
+
+  @@map("service_variants")
+}
+
+enum Category {
+  DESIGN
+  WEB
+  MARKETING
+}
+
+// ─── TICKETS / SOLICITUDES ──────────────────────────
+
+model Ticket {
+  id              String       @id @default(cuid())
+  number          Int          @default(autoincrement())
+  userId          String
+  variantId       String
+  status          TicketStatus @default(NEW)
+  priority        Priority     @default(NORMAL)
+  briefRaw        Json?
+  briefStructured Json?
+  clientNotes     String?
+  freelancerId    String?
+  pmNotes         String?
+  creditsCharged  Int
+  assignedAt      DateTime?
+  startedAt       DateTime?
+  deliveredAt     DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user        User            @relation(fields: [userId], references: [id])
+  variant     ServiceVariant  @relation(fields: [variantId], references: [id])
+  freelancer  Freelancer?     @relation(fields: [freelancerId], references: [id])
+  messages    TicketMessage[]
+  files       TicketFile[]
+  deliveries  Delivery[]
+
+  @@map("tickets")
+}
+
+enum TicketStatus {
+  NEW
+  REVIEWING
+  ASSIGNED
+  IN_PROGRESS
+  DELIVERED
+  REVISION
+  COMPLETED
+  CANCELED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model TicketMessage {
+  id          String    @id @default(cuid())
+  ticketId    String
+  senderId    String
+  senderRole  Role
+  content     String
+  isInternal  Boolean   @default(false)
+  readAt      DateTime?
+  emailSent   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  ticket      Ticket    @relation(fields: [ticketId], references: [id])
+  sender      User      @relation(fields: [senderId], references: [id])
+  attachments TicketMessageFile[]
+
+  @@map("ticket_messages")
+}
+
+model TicketMessageFile {
+  id          String    @id @default(cuid())
+  messageId   String
+  name        String
+  url         String
+  createdAt   DateTime  @default(now())
+
+  message     TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_message_files")
+}
+
+model TicketFile {
+  id          String    @id @default(cuid())
+  ticketId    String
+  name        String
+  url         String
+  type        String
+  uploadedBy  String
+  createdAt   DateTime  @default(now())
+
+  ticket      Ticket    @relation(fields: [ticketId], references: [id])
+
+  @@map("ticket_files")
+}
+
+// ─── ENTREGAS ───────────────────────────────────────
+
+model Delivery {
+  id          String    @id @default(cuid())
+  ticketId    String
+  round       Int       @default(1)
+  notes       String?
+  fileUrl     String?
+  fileName    String?
+  status      DeliveryStatus @default(PENDING_REVIEW)
+  pmApproved  Boolean   @default(false)
+  clientApproved Boolean @default(false)
+  pmFeedback  String?
+  clientFeedback String?
+  createdAt   DateTime  @default(now())
+
+  ticket      Ticket    @relation(fields: [ticketId], references: [id])
+
+  @@map("deliveries")
+}
+
+enum DeliveryStatus {
+  PENDING_REVIEW
+  PM_APPROVED
+  SENT_TO_CLIENT
+  CLIENT_APPROVED
+  REVISION_REQUESTED
+}
+
+// ─── FREELANCERS ────────────────────────────────────
+
+model Freelancer {
+  id              String         @id @default(cuid())
+  name            String
+  email           String         @unique
+  phone           String?
+  telegramId      String?
+  discordId       String?
+  role            FreelancerRole
+  skills          Category[]
+  skillTags       String[]
+  monthlySalary   Int
+  clientCapacity  Int
+  currentLoad     Int            @default(0)
+  availability    Availability   @default(AVAILABLE)
+  bio             String?
+  portfolioUrl    String?
+  timezone        String         @default("America/Caracas")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  pmId            String
+  pm              User           @relation("pmFreelancers", fields: [pmId], references: [id])
+  tickets         Ticket[]
+
+  @@map("freelancers")
+}
+
+enum FreelancerRole {
+  GRAPHIC_DESIGNER
+  AI_DEVELOPER
+  COMMUNITY_MANAGER
+}
+
+enum Availability {
+  AVAILABLE
+  BUSY
+  ON_LEAVE
+  INACTIVE
+}
+
+// ─── ALIANZAS / REFERIDOS ───────────────────────────
+
+model Alliance {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  code            String    @unique
+  contactName     String?
+  contactEmail    String?
+  discountPercent Int       @default(0)
+  bonusCredits    Int       @default(0)
+  revenueShare    Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  referredClients User[]    @relation("referredClients")
+
+  @@map("alliances")
+}
+
+// ─── PROMOS ─────────────────────────────────────────
+
+model PromoCode {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  type            PromoType
+  value           Int
+  maxUses         Int?
+  currentUses     Int       @default(0)
+  validFrom       DateTime  @default(now())
+  validUntil      DateTime?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  @@map("promo_codes")
+}
+
+enum PromoType {
+  PERCENT_OFF
+  FIXED_CREDITS
+  FREE_MONTH
+}
+
+// ─── WIZARD CONVERSATIONS ───────────────────────────
+
+model WizardConversation {
+  id            String    @id @default(cuid())
+  userId        String
+  messages      Json[]
+  suggestedService String?
+  suggestedVariant String?
+  briefGenerated Json?
+  status        WizardStatus @default(IN_PROGRESS)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("wizard_conversations")
+}
+
+enum WizardStatus {
+  IN_PROGRESS
+  BRIEF_GENERATED
+  TICKET_CREATED
+  ABANDONED
+}
