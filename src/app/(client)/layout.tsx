@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { OnboardingGuard } from "@/components/layout/onboarding-guard";
 import {
   LayoutDashboard,
   Plus,
@@ -23,5 +24,9 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell navItems={clientNav}>{children}</AppShell>;
+  return (
+    <AppShell navItems={clientNav}>
+      <OnboardingGuard>{children}</OnboardingGuard>
+    </AppShell>
+  );
 }

@@ -54,6 +54,12 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
+      onboardingCompleted: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
     },
   },
   databaseHooks: {

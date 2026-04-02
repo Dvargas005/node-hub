@@ -20,6 +20,18 @@ model User {
   businessName  String?
   businessType  String?
   timezone      String    @default("America/Chicago")
+
+  // --- Perfil de Empresa (onboarding) ---
+  businessDescription String?
+  businessIndustry    String?
+  targetAudience      String?
+  hasBranding         Boolean?
+  brandColors         String?
+  brandStyle          String?
+  website             String?
+  socialMedia         Json?
+  onboardingCompleted Boolean   @default(false)
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
