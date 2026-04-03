@@ -49,7 +49,7 @@ export async function POST() {
     // Check if user already has pending options (don't charge again)
     const existingUser = await db.user.findUnique({
       where: { id: userId },
-      select: { companyAnalysis: true },
+      select: { companyAnalysis: true, companyAnalysisAt: true },
     });
     const existing = existingUser?.companyAnalysis as Record<string, unknown> | null;
     if (existing?.status === "pending_selection" && existing?.options) {
@@ -62,26 +62,37 @@ export async function POST() {
         freeCredits: true, businessName: true, businessDescription: true,
         businessIndustry: true, targetAudience: true, hasBranding: true,
         brandColors: true, brandStyle: true, website: true, socialMedia: true,
+        companyAnalysisAt: true,
       },
     });
 
     const subscription = await db.subscription.findUnique({
       where: { userId },
-      select: { id: true, creditsRemaining: true },
+      select: { id: true, creditsRemaining: true, currentPeriodStart: true },
     });
+
+    // Free renewal: if subscription renewed after last analysis
+    const isFreeRenewal = !!(
+      user?.companyAnalysisAt &&
+      subscription?.currentPeriodStart &&
+      new Date(subscription.currentPeriodStart) > new Date(user.companyAnalysisAt)
+    );
 
     const freeCredits = user?.freeCredits || 0;
     const planCredits = subscription?.creditsRemaining || 0;
-    if (freeCredits + planCredits < ANALYSIS_COST) {
+    if (!isFreeRenewal && freeCredits + planCredits < ANALYSIS_COST) {
       return NextResponse.json(
         { error: `Necesitas ${ANALYSIS_COST} créditos. Tienes ${freeCredits + planCredits}.` },
         { status: 400 }
       );
     }
 
-    // Deduct credits
-    let deductRemaining = ANALYSIS_COST;
-    await db.$transaction(async (tx) => {
+    // Deduct credits (skip if free renewal)
+    if (isFreeRenewal) {
+      console.log("[ANALYSIS_OPTIONS] Free renewal for user:", userId);
+    }
+    let deductRemaining = isFreeRenewal ? 0 : ANALYSIS_COST;
+    if (deductRemaining > 0) await db.$transaction(async (tx) => {
       if (freeCredits > 0) {
         const fromFree = Math.min(freeCredits, deductRemaining);
         await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: fromFree } } });

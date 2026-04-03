@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   CreditCard, Plus, Ticket, ArrowRight, Search, Globe, Instagram,
-  Facebook, User, Mail, Pencil, Loader2, Star,
-  ShieldCheck, TrendingUp, AlertTriangle, Target,
+  Facebook, User, Mail, Pencil, Loader2, Star, ChevronDown, ChevronUp,
+  ShieldCheck, TrendingUp, AlertTriangle, Target, Palette, Monitor, Megaphone, RefreshCw,
 } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors } from "@/lib/status-labels";
 
@@ -39,6 +39,8 @@ interface Props {
   } | null;
   profile: Profile;
   companyAnalysis: Record<string, unknown> | null;
+  companyAnalysisAt: string | null;
+  subscriptionRenewedAt: string | null;
   activeTickets: TicketRow[];
   latestTicket: { number: number; status: string; serviceName: string } | null;
   pm: { name: string; email: string } | null;
@@ -74,7 +76,7 @@ const swotConfig = [
 
 // ─── Component ──────────────────────────────────────
 export function DashboardClient({
-  userName, freeCredits, subscription, profile, companyAnalysis, activeTickets, latestTicket, pm,
+  userName, freeCredits, subscription, profile, companyAnalysis, companyAnalysisAt, subscriptionRenewedAt, activeTickets, latestTicket, pm,
 }: Props) {
   const router = useRouter();
   const firstName = userName?.split(" ")[0] || "usuario";
@@ -86,6 +88,15 @@ export function DashboardClient({
   const selectedProfile = analysisData?.selected as Record<string, unknown> | undefined;
   const analysisOptions = analysisData?.options as { optionA?: Record<string, unknown>; optionB?: Record<string, unknown> } | undefined;
   const hasPendingOptions = analysisData?.status === "pending_selection" && !!analysisOptions;
+
+  const [analysisExpanded, setAnalysisExpanded] = useState(false);
+
+  // Renewal check: analysis > 30 days old AND subscription renewed after it
+  const isStaleAnalysis = !!(
+    hasAnalysis && companyAnalysisAt && subscriptionRenewedAt &&
+    new Date(subscriptionRenewedAt) > new Date(companyAnalysisAt) &&
+    Date.now() - new Date(companyAnalysisAt).getTime() > 30 * 24 * 60 * 60 * 1000
+  );
 
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState("");
@@ -286,63 +297,117 @@ export function DashboardClient({
         </div>
       )}
 
-      {/* Selected analysis display */}
+      {/* Stale analysis renewal banner */}
+      {isStaleAnalysis && (
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardContent className="py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4 text-blue-400" />
+              <p className="text-sm text-blue-400">Tu análisis tiene más de un mes. Puedes actualizarlo gratis con tu renovación.</p>
+            </div>
+            <Button onClick={handleGenerate} disabled={generating} size="sm" className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 text-xs">
+              {generating ? <Loader2 className="h-3 w-3 animate-spin" /> : "Actualizar"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Selected analysis display — collapsable */}
       {hasAnalysis && selectedProfile && (
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-          <CardHeader>
-            <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">Análisis de tu empresa</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.description as string}</p>
-            <div className="bg-[rgba(255,201,25,0.05)] border border-[var(--gold-bar)]/20 p-3">
-              <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Propuesta de valor</p>
-              <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.valueProposition as string}</p>
-            </div>
+          <CardContent className="py-4">
+            {/* Collapsed header — always visible */}
+            <button
+              onClick={() => setAnalysisExpanded(!analysisExpanded)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">
+                    Análisis de tu empresa
+                  </p>
+                  {selectedProfile.tone ? (
+                    <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.1)] text-[10px]">
+                      {String(selectedProfile.tone)}
+                    </Badge>
+                  ) : null}
+                </div>
+                <p className="text-sm text-[rgba(245,246,252,0.5)] truncate">
+                  {selectedProfile.valueProposition as string}
+                </p>
+              </div>
+              {analysisExpanded ? (
+                <ChevronUp className="h-5 w-5 text-[rgba(245,246,252,0.4)] shrink-0 ml-3" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-[rgba(245,246,252,0.4)] shrink-0 ml-3" />
+              )}
+            </button>
 
-            {/* SWOT */}
-            <div className="grid grid-cols-2 gap-3">
-              {swotConfig.map((s) => {
-                const swot = selectedProfile.swot as Record<string, string[]> | undefined;
-                const items = swot?.[s.key] || [];
-                return (
-                  <div key={s.key} className={`border p-3 ${s.bg}`}>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <s.icon className={`h-4 w-4 ${s.color}`} />
-                      <p className={`text-xs font-medium ${s.color}`}>{s.label}</p>
+            {/* Expanded content */}
+            {analysisExpanded && (
+              <div className="mt-4 space-y-4 border-t border-[rgba(245,246,252,0.06)] pt-4">
+                <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.description as string}</p>
+                <div className="bg-[rgba(255,201,25,0.05)] border border-[var(--gold-bar)]/20 p-3">
+                  <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Propuesta de valor</p>
+                  <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.valueProposition as string}</p>
+                </div>
+
+                {/* SWOT */}
+                <div className="grid grid-cols-2 gap-3">
+                  {swotConfig.map((s) => {
+                    const swot = selectedProfile.swot as Record<string, string[]> | undefined;
+                    const items = swot?.[s.key] || [];
+                    return (
+                      <div key={s.key} className={`border p-3 ${s.bg}`}>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <s.icon className={`h-4 w-4 ${s.color}`} />
+                          <p className={`text-xs font-medium ${s.color}`}>{s.label}</p>
+                        </div>
+                        <ul className="space-y-1">
+                          {items.map((item, i) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)]">• {item}</li>)}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Competitors */}
+                {(selectedProfile.competitors as string[] | undefined)?.length ? (
+                  <div>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Competidores identificados</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(selectedProfile.competitors as string[]).map((c, i) => (
+                        <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{c}</Badge>
+                      ))}
                     </div>
-                    <ul className="space-y-1">
-                      {items.map((item, i) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)]">• {item}</li>)}
-                    </ul>
                   </div>
-                );
-              })}
-            </div>
+                ) : null}
 
-            {/* Competitors */}
-            {(selectedProfile.competitors as string[] | undefined)?.length ? (
-              <div>
-                <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Competidores identificados</p>
-                <div className="flex flex-wrap gap-2">
-                  {(selectedProfile.competitors as string[]).map((c, i) => (
-                    <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{c}</Badge>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {/* Recommendations */}
-            {(selectedProfile.recommendations as string[] | undefined)?.length ? (
-              <div>
-                <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recomendaciones</p>
-                <div className="space-y-2">
-                  {(selectedProfile.recommendations as string[]).map((r, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-[rgba(245,246,252,0.7)]">
-                      <span className="text-[var(--gold-bar)] font-bold">{i + 1}.</span> {r}
+                {/* Actionable recommendations */}
+                {(selectedProfile.recommendations as string[] | undefined)?.length ? (
+                  <div>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recomendaciones</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(selectedProfile.recommendations as string[]).map((r, i) => {
+                        const lower = r.toLowerCase();
+                        let cat = "DESIGN";
+                        let Icon = Palette;
+                        if (/web|landing|sitio|seo|página/.test(lower)) { cat = "WEB"; Icon = Monitor; }
+                        else if (/redes|marketing|contenido|campaña|social|email/.test(lower)) { cat = "MARKETING"; Icon = Megaphone; }
+                        return (
+                          <Link key={i} href={`/request?category=${cat}`}>
+                            <button className="flex items-center gap-2 px-3 py-2 text-xs border border-[var(--gold-bar)]/30 bg-transparent text-[rgba(245,246,252,0.7)] hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.05)] hover:text-[var(--gold-bar)] transition-all">
+                              <Icon className="h-3 w-3 text-[var(--gold-bar)]" />
+                              <span className="text-left">{r}</span>
+                            </button>
+                          </Link>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
+            )}
           </CardContent>
         </Card>
       )}
