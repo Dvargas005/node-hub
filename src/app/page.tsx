@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import SmoothScroll from "@/components/SmoothScroll";
 import {
   motion,
   useScroll,
@@ -482,6 +483,7 @@ export default function Home() {
   };
 
   return (
+    <SmoothScroll>
     <main className="grain landing-cursor-none">
       <CustomCursor />
 
@@ -695,5 +697,6 @@ export default function Home() {
         </div>
       </footer>
     </main>
+    </SmoothScroll>
   );
 }
