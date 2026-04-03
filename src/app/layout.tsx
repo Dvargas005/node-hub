@@ -43,7 +43,7 @@ export default function RootLayout({
         {/* Inline fallback — guarantees dark bg even if CSS fails to load */}
         <style dangerouslySetInnerHTML={{ __html: "body{background:#130A06;color:#F5F6FC}" }} />
       </head>
-      <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
+      <body className="bg-[#130A06] text-[#F5F6FC] antialiased">
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

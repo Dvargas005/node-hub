@@ -104,7 +104,7 @@ GENERA DOS OPCIONES de perfil de empresa. Cada opción incluye:
 OPCIÓN A: Enfoque conservador/profesional
 OPCIÓN B: Enfoque moderno/atrevido
 
-Responde SOLO con JSON válido:
+IMPORTANTE: Responde ÚNICAMENTE con el JSON. Sin explicación, sin markdown, sin backticks, sin texto antes ni después. Solo el JSON puro.
 {
   "optionA": {
     "label": "Perfil Profesional",
@@ -130,12 +130,29 @@ Responde SOLO con JSON válido:
 
     let analysis;
     try {
-      const model = getGeminiModel();
+      const { GoogleGenerativeAI } = await import("@google/generative-ai");
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
+      });
+
       const result = await model.generateContent(prompt);
       const text = result.response.text();
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON in response");
-      analysis = JSON.parse(jsonMatch[0]);
+      console.log("[COMPANY_ANALYSIS] Raw response:", text.substring(0, 500));
+
+      // Strip markdown code blocks, then parse
+      const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+      try {
+        analysis = JSON.parse(cleaned);
+      } catch {
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          console.error("[COMPANY_ANALYSIS] Could not parse:", cleaned.substring(0, 200));
+          throw new Error("No JSON in response");
+        }
+        analysis = JSON.parse(jsonMatch[0]);
+      }
     } catch (aiErr) {
       console.error("[COMPANY_ANALYSIS] Gemini failed, refunding credits:", aiErr);
       // Refund credits

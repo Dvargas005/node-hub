@@ -11,7 +11,7 @@ export function AppShell({ children, navItems, title }: AppShellProps) {
   return (
     <div className="flex h-screen bg-[var(--asphalt-black)]">
       <Sidebar items={navItems} title={title} />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col min-h-0">
         <Topbar />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
