@@ -16,12 +16,14 @@ const authPaths = ["/login", "/register"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // NEVER intercept static assets — this is the definitive check.
-  // No matcher regex — we handle everything here.
+  // NEVER intercept static assets.
   if (pathname.startsWith("/_next")) return NextResponse.next();
   if (pathname.startsWith("/favicon")) return NextResponse.next();
   if (pathname.startsWith("/img")) return NextResponse.next();
   if (pathname.includes(".")) return NextResponse.next();
+
+  // API routes — pass through (auth checked in route handlers)
+  if (pathname.startsWith("/api/")) return NextResponse.next();
 
   // Allow public paths
   if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {

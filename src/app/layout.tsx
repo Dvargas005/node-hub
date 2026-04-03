@@ -39,6 +39,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
+      <head>
+        {/* Inline fallback — guarantees dark bg even if CSS fails to load */}
+        <style dangerouslySetInnerHTML={{ __html: "body{background:#130A06;color:#F5F6FC}" }} />
+      </head>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased overflow-x-hidden">
         <SmoothScroll>{children}</SmoothScroll>
       </body>
