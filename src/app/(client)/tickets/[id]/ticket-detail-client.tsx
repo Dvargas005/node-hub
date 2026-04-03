@@ -192,7 +192,7 @@ export function TicketDetailClient({
             <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
               <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Entregas</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                {deliveries.map((d) => (
+                {deliveries.map((d: any) => (
                   <div key={d.id} className="border border-[rgba(245,246,252,0.06)] p-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-[var(--ice-white)]">Ronda #{d.round}</span>
@@ -271,7 +271,7 @@ export function TicketDetailClient({
                     Tu PM se pondrá en contacto pronto.
                   </p>
                 )}
-                {messages.map((m) => (
+                {messages.map((m: any) => (
                   <div key={m.id} className={`flex ${m.senderRole === "CLIENT" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[80%] px-3 py-2 text-sm ${
                       m.senderRole === "CLIENT"
@@ -282,7 +282,7 @@ export function TicketDetailClient({
                       <p className={`text-[10px] mt-1 ${m.senderRole === "CLIENT" ? "text-[rgba(19,10,6,0.5)]" : "text-[rgba(245,246,252,0.3)]"}`}>
                         {new Date(m.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
-                      {m.attachments.map((a) => (
+                      {m.attachments.map((a: any) => (
                         <a key={a.url} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs mt-1 underline">
                           <FileText className="h-3 w-3" /> {a.name}
                         </a>

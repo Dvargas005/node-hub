@@ -215,7 +215,7 @@ export function DashboardClient({
             {profile.businessDescription && <p className="text-sm text-[rgba(245,246,252,0.6)]">{profile.businessDescription}</p>}
             {profile.targetAudience && (
               <div className="flex flex-wrap gap-1">
-                {profile.targetAudience.split(",").map((t) => (
+                {profile.targetAudience.split(",").map((t: any) => (
                   <Badge key={t} className="text-xs bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.08)]">{t.trim()}</Badge>
                 ))}
               </div>
@@ -355,7 +355,7 @@ export function DashboardClient({
 
                 {/* SWOT */}
                 <div className="grid grid-cols-2 gap-3">
-                  {swotConfig.map((s) => {
+                  {swotConfig.map((s: any) => {
                     const swot = selectedProfile.swot as Record<string, string[]> | undefined;
                     const items = swot?.[s.key] || [];
                     return (
@@ -365,7 +365,7 @@ export function DashboardClient({
                           <p className={`text-xs font-medium ${s.color}`}>{s.label}</p>
                         </div>
                         <ul className="space-y-1">
-                          {items.map((item, i) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)]">• {item}</li>)}
+                          {items.map((item: any, i: number) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)]">• {item}</li>)}
                         </ul>
                       </div>
                     );
@@ -377,7 +377,7 @@ export function DashboardClient({
                   <div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Competidores identificados</p>
                     <div className="flex flex-wrap gap-2">
-                      {(selectedProfile.competitors as string[]).map((c, i) => (
+                      {(selectedProfile.competitors as string[]).map((c: any, i: number) => (
                         <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{c}</Badge>
                       ))}
                     </div>
@@ -389,7 +389,7 @@ export function DashboardClient({
                   <div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recomendaciones</p>
                     <div className="flex flex-wrap gap-2">
-                      {(selectedProfile.recommendations as string[]).map((r, i) => {
+                      {(selectedProfile.recommendations as string[]).map((r: any, i: number) => {
                         const lower = r.toLowerCase();
                         let cat = "DESIGN";
                         let Icon = Palette;
@@ -428,7 +428,7 @@ export function DashboardClient({
           </Card>
         ) : (
           <div className="space-y-2">
-            {activeTickets.map((t) => (
+            {activeTickets.map((t: any) => (
               <Card key={t.id} className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
                 <CardContent className="py-3 flex items-center justify-between">
                   <div>

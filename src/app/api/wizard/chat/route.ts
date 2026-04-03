@@ -59,7 +59,7 @@ function buildSystemPrompt(opts: {
   const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory } = opts;
 
   const recsBlock = recommendations.length > 0
-    ? `\nRECOMENDACIONES PENDIENTES DEL ANÁLISIS AI:\n${recommendations.map((r, i) => `${i + 1}. "${r}"`).join("\n")}\nSi lo que el cliente pide se relaciona con alguna, menciónalo: "Esto se alinea con la recomendación de tu análisis de empresa."\n`
+    ? `\nRECOMENDACIONES PENDIENTES DEL ANÁLISIS AI:\n${recommendations.map((r: any, i: number) => `${i + 1}. "${r}"`).join("\n")}\nSi lo que el cliente pide se relaciona con alguna, menciónalo: "Esto se alinea con la recomendación de tu análisis de empresa."\n`
     : "";
 
   const creditWarning = cheapestInCategory !== null && totalCredits < cheapestInCategory

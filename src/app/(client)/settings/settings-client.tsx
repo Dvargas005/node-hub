@@ -205,7 +205,7 @@ export function SettingsClient({
                 <Label className="text-[var(--ice-white)]">Giro / Industria</Label>
                 <select value={businessIndustry} onChange={(e) => setBusinessIndustry(e.target.value)} className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]">
                   <option value="">Selecciona...</option>
-                  {industries.map((i) => <option key={i} value={i}>{i}</option>)}
+                  {industries.map((i: any) => <option key={i} value={i}>{i}</option>)}
                 </select>
               </div>
               <div className="space-y-2">

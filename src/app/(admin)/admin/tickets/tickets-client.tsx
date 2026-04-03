@@ -93,7 +93,7 @@ export function TicketsClient({
   const [assigning, setAssigning] = useState(false);
 
   const filtered = useMemo(() => {
-    return tickets.filter((t) => {
+    return tickets.filter((t: any) => {
       if (filterStatus && t.status !== filterStatus) return false;
       if (filterPriority && t.priority !== filterPriority) return false;
       if (filterCategory && t.serviceCategory !== filterCategory) return false;
@@ -151,7 +151,7 @@ export function TicketsClient({
               onChange={(e) => setFilterStatus(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              {statusOptions.map((o) => (
+              {statusOptions.map((o: any) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -173,7 +173,7 @@ export function TicketsClient({
               onChange={(e) => setFilterCategory(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              {categoryOptions.map((o) => (
+              {categoryOptions.map((o: any) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -216,7 +216,7 @@ export function TicketsClient({
                     </TableCell>
                   </TableRow>
                 )}
-                {filtered.map((t) => (
+                {filtered.map((t: any) => (
                   <TableRow
                     key={t.id}
                     className={`border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] ${
@@ -352,7 +352,7 @@ export function TicketsClient({
                 No hay freelancers disponibles para esta categoría
               </p>
             ) : (
-              matchingFreelancers.map((f) => (
+              matchingFreelancers.map((f: any) => (
                 <div
                   key={f.id}
                   className="flex items-center justify-between rounded-md border border-[rgba(245,246,252,0.1)] p-3 hover:bg-[rgba(255,255,255,0.03)]"
@@ -367,7 +367,7 @@ export function TicketsClient({
                     </p>
                     {f.skillTags.length > 0 && (
                       <div className="flex gap-1 mt-1 flex-wrap">
-                        {f.skillTags.map((tag) => (
+                        {f.skillTags.map((tag: any) => (
                           <span
                             key={tag}
                             className="text-[10px] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] px-1.5 py-0.5 rounded"

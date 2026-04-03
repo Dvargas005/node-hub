@@ -47,7 +47,7 @@ export function ClientsClient({
   const [filterAlliance, setFilterAlliance] = useState(false);
 
   const filtered = useMemo(() => {
-    return clients.filter((c) => {
+    return clients.filter((c: any) => {
       if (search) {
         const q = search.toLowerCase();
         if (
@@ -88,7 +88,7 @@ export function ClientsClient({
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
               <option value="">Todos los planes</option>
-              {plans.map((p) => (
+              {plans.map((p: any) => (
                 <option key={p.slug} value={p.slug}>
                   {p.name}
                 </option>
@@ -142,7 +142,7 @@ export function ClientsClient({
                     </TableCell>
                   </TableRow>
                 )}
-                {filtered.map((c) => (
+                {filtered.map((c: any) => (
                   <TableRow
                     key={c.id}
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"

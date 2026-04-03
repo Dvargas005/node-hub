@@ -43,7 +43,7 @@ export function FreelancersClient({
   const [filterAvailability, setFilterAvailability] = useState("");
 
   const filtered = useMemo(() => {
-    return freelancers.filter((f) => {
+    return freelancers.filter((f: any) => {
       if (filterRole && f.role !== filterRole) return false;
       if (filterAvailability && f.availability !== filterAvailability)
         return false;
@@ -119,7 +119,7 @@ export function FreelancersClient({
                     </TableCell>
                   </TableRow>
                 )}
-                {filtered.map((f) => (
+                {filtered.map((f: any) => (
                   <TableRow
                     key={f.id}
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"
@@ -137,7 +137,7 @@ export function FreelancersClient({
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1 flex-wrap">
-                        {f.skills.map((s) => (
+                        {f.skills.map((s: any) => (
                           <Badge
                             key={s}
                             className="text-[10px] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.1)]"
@@ -145,7 +145,7 @@ export function FreelancersClient({
                             {categoryLabels[s] || s}
                           </Badge>
                         ))}
-                        {f.skillTags.map((t) => (
+                        {f.skillTags.map((t: any) => (
                           <span
                             key={t}
                             className="text-[10px] bg-[rgba(255,255,255,0.03)] text-[rgba(245,246,252,0.4)] px-1.5 py-0.5 rounded"

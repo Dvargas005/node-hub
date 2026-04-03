@@ -40,9 +40,9 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
   const [activeTab, setActiveTab] = useState("all");
 
   const filtered = useMemo(() => {
-    const tab = tabs.find((t) => t.key === activeTab);
+    const tab = tabs.find((t: any) => t.key === activeTab);
     if (!tab || !tab.statuses) return tickets;
-    return tickets.filter((t) => tab.statuses!.includes(t.status));
+    return tickets.filter((t: any) => tab.statuses!.includes(t.status));
   }, [tickets, activeTab]);
 
   if (tickets.length === 0) {
@@ -77,9 +77,9 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
 
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
-        {tabs.map((tab) => {
+        {tabs.map((tab: any) => {
           const count = tab.statuses
-            ? tickets.filter((t) => tab.statuses!.includes(t.status)).length
+            ? tickets.filter((t: any) => tab.statuses!.includes(t.status)).length
             : tickets.length;
           return (
             <button
@@ -103,7 +103,7 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
 
       {/* Ticket cards */}
       <div className="space-y-3">
-        {filtered.map((t) => (
+        {filtered.map((t: any) => (
           <Link key={t.id} href={`/tickets/${t.id}`}>
             <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.02)] transition-all cursor-pointer mb-3">
               <CardContent className="py-4">

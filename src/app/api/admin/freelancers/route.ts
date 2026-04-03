@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     const sanitized = userRole === "ADMIN"
       ? freelancers
-      : freelancers.map(({ monthlySalary: _, ...rest }) => rest);
+      : freelancers.map(({ monthlySalary: _, ...rest }: any) => rest);
 
     return NextResponse.json({
       freelancers: sanitized,

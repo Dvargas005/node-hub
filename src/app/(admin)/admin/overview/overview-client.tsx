@@ -90,7 +90,7 @@ export function OverviewClient({
 
       {/* Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {metricCards.map((m) => (
+        {metricCards.map((m: any) => (
           <Card
             key={m.label}
             className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]"
@@ -142,7 +142,7 @@ export function OverviewClient({
                     </TableCell>
                   </TableRow>
                 )}
-                {recentTickets.map((t) => (
+                {recentTickets.map((t: any) => (
                   <TableRow
                     key={t.id}
                     className={`border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] ${
@@ -208,7 +208,7 @@ export function OverviewClient({
           </p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {freelancers.map((f) => (
+            {freelancers.map((f: any) => (
               <Card
                 key={f.id}
                 className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]"

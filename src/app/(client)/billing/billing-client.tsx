@@ -173,7 +173,7 @@ export function BillingClient({
             {isCanceled ? "Reactiva tu plan" : "Elige tu plan"}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => {
+            {plans.map((plan: any) => {
               const Icon = planIcons[plan.slug] || CreditCard;
               const features = planFeatures[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
@@ -203,7 +203,7 @@ export function BillingClient({
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 mb-6">
-                      {features.map((f) => (
+                      {features.map((f: any) => (
                         <li key={f} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
                           <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {f}
                         </li>
@@ -241,7 +241,7 @@ export function BillingClient({
             Créditos extra
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            {creditPacks.map((pack) => (
+            {creditPacks.map((pack: any) => (
               <Card key={pack.id} className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
                 <CardContent className="py-4 text-center space-y-2">
                   <Package className="h-6 w-6 text-[var(--gold-bar)] mx-auto" />

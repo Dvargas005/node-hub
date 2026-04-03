@@ -66,7 +66,7 @@ export function AlliancesClient({
                     </TableCell>
                   </TableRow>
                 )}
-                {alliances.map((a) => (
+                {alliances.map((a: any) => (
                   <TableRow
                     key={a.id}
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"

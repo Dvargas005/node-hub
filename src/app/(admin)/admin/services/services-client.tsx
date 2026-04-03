@@ -33,8 +33,8 @@ export function ServicesClient({ services }: { services: ServiceData[] }) {
         Catálogo de Servicios
       </h1>
 
-      {categories.map((cat) => {
-        const catServices = services.filter((s) => s.category === cat);
+      {categories.map((cat: any) => {
+        const catServices = services.filter((s: any) => s.category === cat);
         if (catServices.length === 0) return null;
 
         return (
@@ -49,7 +49,7 @@ export function ServicesClient({ services }: { services: ServiceData[] }) {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {catServices.map((service) => (
+              {catServices.map((service: any) => (
                 <Card
                   key={service.id}
                   className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]"
@@ -63,7 +63,7 @@ export function ServicesClient({ services }: { services: ServiceData[] }) {
                     </p>
                     {service.tags.length > 0 && (
                       <div className="flex gap-1 flex-wrap mt-1">
-                        {service.tags.map((tag) => (
+                        {service.tags.map((tag: any) => (
                           <span
                             key={tag}
                             className="text-[10px] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.4)] px-1.5 py-0.5 rounded"
@@ -75,7 +75,7 @@ export function ServicesClient({ services }: { services: ServiceData[] }) {
                     )}
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {service.variants.map((v) => (
+                    {service.variants.map((v: any) => (
                       <div
                         key={v.id}
                         className="flex items-start justify-between border-t border-[rgba(245,246,252,0.06)] pt-2"
