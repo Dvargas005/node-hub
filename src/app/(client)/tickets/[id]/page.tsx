@@ -50,14 +50,14 @@ export default async function TicketDetailPage({
         createdAt: ticket.createdAt.toISOString(),
         updatedAt: ticket.updatedAt.toISOString(),
       }}
-      messages={ticket.messages.map((m) => ({
+      messages={ticket.messages.map((m: any) => ({
         id: m.id,
         senderRole: m.senderRole,
         content: m.content,
         createdAt: m.createdAt.toISOString(),
-        attachments: m.attachments.map((a) => ({ name: a.name, url: a.url })),
+        attachments: m.attachments.map((a: any) => ({ name: a.name, url: a.url })),
       }))}
-      deliveries={ticket.deliveries.map((d) => ({
+      deliveries={ticket.deliveries.map((d: any) => ({
         id: d.id,
         round: d.round,
         status: d.status,

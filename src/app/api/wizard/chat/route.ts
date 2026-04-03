@@ -238,10 +238,10 @@ export async function POST(req: NextRequest) {
     ]);
 
     const catalogText = services
-      .map((s) => {
+      .map((s: any) => {
         const variants = s.variants
           .map(
-            (v) =>
+            (v: any) =>
               `  - ${v.name} (ID: ${v.id}): ${v.creditCost} créditos, ~${v.estimatedDays} días. ${v.description}${v.minPlan ? ` (Plan mínimo: ${v.minPlan})` : ""}`
           )
           .join("\n");
@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
     // Find cheapest service in category
     let cheapestInCategory: number | null = null;
     if (category) {
-      const catServices = services.filter((s) => s.category === category);
+      const catServices = services.filter((s: any) => s.category === category);
       for (const s of catServices) {
         for (const v of s.variants) {
           if (cheapestInCategory === null || v.creditCost < cheapestInCategory) {
