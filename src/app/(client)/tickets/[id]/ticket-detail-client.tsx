@@ -47,6 +47,14 @@ const deliveryStatusLabels: Record<string, string> = {
   REVISION_REQUESTED: "Revisión solicitada",
 };
 
+const deliveryStatusColors: Record<string, string> = {
+  PENDING_REVIEW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  PM_APPROVED: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  SENT_TO_CLIENT: "bg-green-500/20 text-green-400 border-green-500/30",
+  CLIENT_APPROVED: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  REVISION_REQUESTED: "bg-red-500/20 text-red-400 border-red-500/30",
+};
+
 export function TicketDetailClient({
   ticket, messages: initialMessages, deliveries,
 }: {
@@ -87,16 +95,18 @@ export function TicketDetailClient({
         }]);
         setNewMessage("");
       }
-    } catch {} finally { setSending(false); }
+    } catch { setError("No se pudo enviar el mensaje"); } finally { setSending(false); }
   };
+
+  const [confirmApprove, setConfirmApprove] = useState(false);
 
   const handleApprove = async () => {
     setActing(true); setError("");
     try {
       const res = await fetch(`/api/tickets/${ticket.id}/approve`, { method: "POST" });
-      if (res.ok) router.refresh();
+      if (res.ok) window.location.reload();
       else { const d = await res.json(); setError(d.error); }
-    } catch { setError("Error de conexión"); } finally { setActing(false); }
+    } catch { setError("Error de conexión"); } finally { setActing(false); setConfirmApprove(false); }
   };
 
   const handleRevision = async () => {
@@ -108,7 +118,7 @@ export function TicketDetailClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ feedback: revisionFeedback.trim() }),
       });
-      if (res.ok) { setShowRevision(false); router.refresh(); }
+      if (res.ok) { setShowRevision(false); window.location.reload(); }
       else { const d = await res.json(); setError(d.error); }
     } catch { setError("Error de conexión"); } finally { setActing(false); }
   };
@@ -117,14 +127,13 @@ export function TicketDetailClient({
     setActing(true); setError("");
     try {
       const res = await fetch(`/api/tickets/${ticket.id}/cancel`, { method: "POST" });
-      if (res.ok) router.refresh();
+      if (res.ok) window.location.reload();
       else { const d = await res.json(); setError(d.error); }
     } catch { setError("Error de conexión"); } finally { setActing(false); setShowCancel(false); }
   };
 
-  const canApprove = deliveries.some((d) =>
-    ["SENT_TO_CLIENT", "PM_APPROVED", "PENDING_REVIEW"].includes(d.status)
-  );
+  // I5: only SENT_TO_CLIENT is approvable by client
+  const canApprove = ticket.status === "DELIVERED" && deliveries.some((d) => d.status === "SENT_TO_CLIENT");
   const canCancel = ["NEW", "REVIEWING"].includes(ticket.status);
 
   return (
@@ -187,7 +196,7 @@ export function TicketDetailClient({
                   <div key={d.id} className="border border-[rgba(245,246,252,0.06)] p-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-[var(--ice-white)]">Ronda #{d.round}</span>
-                      <Badge className="text-xs bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">
+                      <Badge className={`text-xs ${deliveryStatusColors[d.status] || "bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]"}`}>
                         {deliveryStatusLabels[d.status] || d.status}
                       </Badge>
                     </div>
@@ -206,14 +215,27 @@ export function TicketDetailClient({
                 ))}
 
                 {/* Approval actions */}
-                {canApprove && !showRevision && (
+                {canApprove && !showRevision && !confirmApprove && (
                   <div className="flex gap-2">
-                    <Button onClick={handleApprove} disabled={acting} className="bg-green-600 text-white hover:bg-green-700 font-bold text-sm flex-1 disabled:opacity-50">
-                      {acting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Aprobar entrega</>}
+                    <Button onClick={() => setConfirmApprove(true)} className="bg-green-600 text-white hover:bg-green-700 font-bold text-sm flex-1">
+                      <Check className="h-4 w-4 mr-1" /> Aprobar entrega
                     </Button>
                     <Button onClick={() => setShowRevision(true)} variant="outline" className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm flex-1">
                       <Pencil className="h-4 w-4 mr-1" /> Pedir revisión
                     </Button>
+                  </div>
+                )}
+                {confirmApprove && (
+                  <div className="bg-green-500/10 border border-green-500/20 p-3 space-y-2">
+                    <p className="text-xs text-green-400">¿Confirmas que apruebas esta entrega? El ticket se marcará como completado.</p>
+                    <div className="flex gap-2">
+                      <Button onClick={handleApprove} disabled={acting} className="flex-1 bg-green-600 text-white hover:bg-green-700 text-sm disabled:opacity-50">
+                        {acting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Sí, aprobar"}
+                      </Button>
+                      <Button onClick={() => setConfirmApprove(false)} variant="outline" className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm">
+                        Cancelar
+                      </Button>
+                    </div>
                   </div>
                 )}
                 {showRevision && (

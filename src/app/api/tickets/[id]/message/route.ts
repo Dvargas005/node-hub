@@ -21,6 +21,9 @@ export async function POST(
     if (!ticket) {
       return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
     }
+    if (["COMPLETED", "CANCELED"].includes(ticket.status)) {
+      return NextResponse.json({ error: "No se pueden enviar mensajes a tickets cerrados" }, { status: 400 });
+    }
 
     const message = await db.ticketMessage.create({
       data: {

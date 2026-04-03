@@ -11,6 +11,7 @@ import {
   ticketStatusColors,
   freelancerRoleLabels,
   categoryColors,
+  categoryLabels,
 } from "@/lib/status-labels";
 
 interface TicketRow {
@@ -113,7 +114,7 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
                       #{String(t.number).padStart(3, "0")}
                     </span>
                     <Badge className={categoryColors[t.serviceCategory] || ""}>
-                      {t.serviceCategory}
+                      {categoryLabels[t.serviceCategory] || t.serviceCategory}
                     </Badge>
                   </div>
                   <Badge className={ticketStatusColors[t.status] || ""}>
