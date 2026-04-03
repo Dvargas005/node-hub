@@ -115,8 +115,9 @@ model Plan {
   bonusCredits    Int       @default(0)
   maxActiveReqs   Int
   deliveryDays    Int
-  stripePriceId   String?   // null hasta que tengamos Stripe keys
-  isActive        Boolean   @default(true)
+  stripePriceId          String?
+  setupFeeStripePriceId  String?
+  isActive               Boolean   @default(true)
   createdAt       DateTime  @default(now())
 
   subscriptions   Subscription[]
