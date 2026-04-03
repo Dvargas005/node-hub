@@ -62,6 +62,7 @@ function getGreeting(firstName: string, latestTicket: Props["latestTicket"], ana
     DELIVERED: `🎉 ¡Tu solicitud #${latestTicket.number} tiene una entrega lista para revisar!`,
     REVISION: `Tu solicitud #${latestTicket.number} está en revisión con los ajustes que pediste.`,
     COMPLETED: `Tu última solicitud #${latestTicket.number} fue completada. ¿Listo para la siguiente?`,
+    CANCELED: `Tu solicitud #${latestTicket.number} fue cancelada.`,
   };
   return { title: `¡Hola, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Bienvenido de vuelta." };
 }

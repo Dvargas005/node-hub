@@ -247,6 +247,12 @@
 .lang-flag { opacity: 0.5; transition: opacity 0.3s; }
 .lang-flag:hover, .lang-flag.active { opacity: 1; }
 
+/* Typing indicator pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
 /* Glitch effect */
 @keyframes glitch {
   0% { transform: translate(0); }
@@ -295,7 +301,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @layer base {

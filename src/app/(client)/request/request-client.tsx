@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { CategorySelector } from "@/components/wizard/category-selector";
 import { ChatInterface } from "@/components/wizard/chat-interface";
 import { BriefConfirmation } from "@/components/wizard/brief-confirmation";
@@ -49,8 +50,10 @@ export function RequestClient({
 }: {
   subscription: { creditsRemaining: number; planName: string; freeCredits?: number } | null;
 }) {
-  const [step, setStep] = useState<Step>("category");
-  const [category, setCategory] = useState<string | undefined>();
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category");
+  const [step, setStep] = useState<Step>(initialCategory ? "chat" : "category");
+  const [category, setCategory] = useState<string | undefined>(initialCategory || undefined);
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

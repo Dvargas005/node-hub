@@ -59,6 +59,11 @@ const industries = [
   "🏠 Bienes Raíces",
   "🚗 Automotriz",
   "🧹 Limpieza y Mantenimiento",
+  "💇 Belleza y Peluquería",
+  "💪 Fitness y Gym",
+  "⚖️ Legal",
+  "✈️ Turismo y Hotelería",
+  "🌾 Agricultura",
   "🔧 Otro",
 ];
 
@@ -75,6 +80,11 @@ const industrySubcategories: Record<string, string[]> = {
   "Bienes Raíces": ["Agente inmobiliario", "Constructora", "Property management", "Otro"],
   "Automotriz": ["Taller mecánico", "Venta de autopartes", "Car wash", "Detailing", "Otro"],
   "Limpieza y Mantenimiento": ["Limpieza residencial", "Limpieza comercial", "Jardinería", "Otro"],
+  "Belleza y Peluquería": ["Salón de belleza", "Barbería", "Estética", "Uñas", "Maquillaje", "Otro"],
+  "Fitness y Gym": ["Gimnasio", "Entrenador personal", "Yoga / Pilates", "CrossFit", "Otro"],
+  "Legal": ["Abogado general", "Inmigración", "Laboral", "Penal", "Otro"],
+  "Turismo y Hotelería": ["Hotel", "Agencia de viajes", "Tour operador", "Restaurante turístico", "Otro"],
+  "Agricultura": ["Cultivo", "Ganadería", "Agroindustria", "Vivero", "Otro"],
 };
 
 const audienceChips = [
