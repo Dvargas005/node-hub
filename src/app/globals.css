@@ -54,45 +54,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --ice-white: #F5F6FC;
-  --asphalt-black: #130A06;
-  --midnight-express: #000741;
-  --gold-bar: #FFC919;
-  /* shadcn tokens — dark by default (N.O.D.E. is a dark-themed app) */
-  --background: oklch(0.1 0.01 50);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.14 0.01 50);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.14 0.01 50);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.86 0.17 90);
-  --primary-foreground: oklch(0.1 0.01 50);
-  --secondary: oklch(0.2 0.005 50);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.2 0.005 50);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.2 0.005 50);
-  --accent-foreground: oklch(0.96 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.86 0.17 90);
-  --chart-1: oklch(0.86 0.17 90);
-  --chart-2: oklch(0.6 0 0);
-  --chart-3: oklch(0.45 0 0);
-  --chart-4: oklch(0.35 0 0);
-  --chart-5: oklch(0.25 0 0);
-  --radius: 0rem;
-  --sidebar: oklch(0.1 0.01 50);
-  --sidebar-foreground: oklch(0.96 0 0);
-  --sidebar-primary: oklch(0.86 0.17 90);
-  --sidebar-primary-foreground: oklch(0.1 0.01 50);
-  --sidebar-accent: oklch(0.2 0.005 50);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.86 0.17 90);
-}
+/* Theme values are in theme.css (imported after this file) */
 
 /* Lenis handles smooth scroll — no scroll-behavior: smooth */
 
@@ -296,10 +258,6 @@
     border-color: var(--border);
     outline-color: var(--ring);
   }
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-  }
 }
 
-/* N.O.D.E. is always dark — no .dark class needed */
+/* Body colors and dark theme defined in theme.css */
