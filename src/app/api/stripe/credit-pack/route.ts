@@ -13,15 +13,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Stripe no disponible" }, { status: 503 });
     }
 
-    const { planSlug } = await req.json();
+    const { packId } = await req.json();
     const userId = session.user.id;
 
-    const plan = await db.plan.findUnique({ where: { slug: planSlug } });
-    if (!plan || !plan.stripePriceId) {
-      return NextResponse.json({ error: "Plan no encontrado o sin precio configurado" }, { status: 404 });
+    const pack = await db.creditPack.findUnique({ where: { id: packId } });
+    if (!pack || !pack.stripePriceId || !pack.isActive) {
+      return NextResponse.json({ error: "Pack no encontrado" }, { status: 404 });
     }
 
-    // Find or create Stripe customer
+    // Find or create customer
     const existingSub = await db.subscription.findUnique({
       where: { userId },
       select: { stripeCustomerId: true },
@@ -37,33 +37,20 @@ export async function POST(req: NextRequest) {
       customerId = customer.id;
     }
 
-    // Build line items
-    const lineItems: { price: string; quantity: number }[] = [
-      { price: plan.stripePriceId, quantity: 1 },
-    ];
-
-    // Add setup fee as one-time line item
-    if (plan.setupFeeStripePriceId) {
-      lineItems.push({ price: plan.setupFeeStripePriceId, quantity: 1 });
-    }
-
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode: "payment",
       customer: customerId,
-      line_items: lineItems,
-      success_url: `${baseUrl}/dashboard?checkout=success`,
-      cancel_url: `${baseUrl}/billing?checkout=canceled`,
-      metadata: { userId, planSlug },
-      subscription_data: {
-        metadata: { userId, planSlug },
-      },
+      line_items: [{ price: pack.stripePriceId, quantity: 1 }],
+      success_url: `${baseUrl}/dashboard?pack=success`,
+      cancel_url: `${baseUrl}/billing`,
+      metadata: { userId, packId: pack.id, credits: String(pack.credits), type: "credit_pack" },
     });
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
-    console.error("[STRIPE_CHECKOUT]", err);
+    console.error("[STRIPE_CREDIT_PACK]", err);
     return NextResponse.json({ error: "Error al crear sesión de pago" }, { status: 500 });
   }
 }
