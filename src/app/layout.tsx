@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
-import "./theme.css"; // NUNCA TOCAR — branding N.O.D.E.
 
 const lexend = Lexend({
   subsets: ["latin"],
