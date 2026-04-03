@@ -50,18 +50,36 @@ function buildSystemPrompt(opts: {
   businessName: string;
   planName: string;
   deliveryDays: number;
+  totalCredits: number;
+  activeTickets: number;
+  maxActiveReqs: number;
+  recommendations: string[];
+  cheapestInCategory: number | null;
 }) {
-  const { catalog, category, profile, history, businessName, planName, deliveryDays } = opts;
+  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory } = opts;
+
+  const recsBlock = recommendations.length > 0
+    ? `\nRECOMENDACIONES PENDIENTES DEL ANÁLISIS AI:\n${recommendations.map((r, i) => `${i + 1}. "${r}"`).join("\n")}\nSi lo que el cliente pide se relaciona con alguna, menciónalo: "Esto se alinea con la recomendación de tu análisis de empresa."\n`
+    : "";
+
+  const creditWarning = cheapestInCategory !== null && totalCredits < cheapestInCategory
+    ? `\nATENCIÓN: El cliente tiene ${totalCredits} créditos y los servicios de esta categoría empiezan en ${cheapestInCategory} créditos. Infórmale al inicio que necesitará más créditos o un pack adicional.`
+    : "";
 
   return `Eres el agente de briefing de N.O.D.E. Tu trabajo es recopilar la información necesaria para que nuestro equipo ejecute el pedido del cliente perfectamente.
 
 PERFIL DEL CLIENTE:
 ${profile}
-- Plan actual: ${planName}
-- Tiempo de entrega de su plan: ${deliveryDays} días hábiles
+
+PLAN DEL CLIENTE: ${planName}
+- Créditos disponibles: ${totalCredits}
+- Requests activos: ${activeTickets}/${maxActiveReqs === 999 ? "ilimitados" : maxActiveReqs}
+- Tiempo de entrega: ${deliveryDays} días hábiles
+${creditWarning}
 
 HISTORIAL DEL CLIENTE:
 ${history}
+${recsBlock}
 
 REGLAS CRÍTICAS:
 1. Ya conoces al cliente y su negocio (ver PERFIL arriba). NO le preguntes nombre del negocio, giro, público ni marca — ya lo tienes.
@@ -118,6 +136,11 @@ MARKETING DIGITAL:
 
 ${category ? `CATEGORÍA SELECCIONADA: ${category}` : "El cliente aún no ha seleccionado categoría. Identifícala según su mensaje."}
 
+PRIMER MENSAJE:
+- Si el cliente tiene recomendaciones pendientes relacionadas con la categoría, empieza con: "¡Hola! Veo que tu análisis recomienda [recomendación relevante]. ¿Es eso lo que quieres trabajar, o tienes otra necesidad?"
+- Si no tiene recomendaciones, empieza directo con la primera pregunta de la categoría.
+- NO repitas info que ya sabes del perfil.
+
 CATÁLOGO DE SERVICIOS DISPONIBLES:
 ${catalog}
 
@@ -161,19 +184,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 403 });
     }
 
-    // Verify active subscription for CLIENTs
+    // Verify client has credits (plan OR free)
     if (userRole === "CLIENT") {
-      const sub = await db.subscription.findUnique({
-        where: { userId },
-        select: { status: true },
-      });
-      if (!sub || sub.status !== "ACTIVE") {
-        return NextResponse.json({ error: "Necesitas un plan activo para hacer solicitudes" }, { status: 403 });
+      const creditCheck = await db.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
+      const subCheck = await db.subscription.findUnique({ where: { userId }, select: { status: true, creditsRemaining: true } });
+      const total = (creditCheck?.freeCredits || 0) + (subCheck?.status === "ACTIVE" ? subCheck.creditsRemaining : 0);
+      if (total <= 0) {
+        return NextResponse.json({ error: "No tienes créditos disponibles. Elige un plan o compra un pack." }, { status: 403 });
       }
     }
 
     // Load user profile, subscription, ticket history, and catalog in parallel
-    const [user, subscription, tickets, services] = await Promise.all([
+    const [user, subscription, tickets, activeTicketCount, services] = await Promise.all([
       db.user.findUnique({
         where: { id: userId },
         select: {
@@ -186,6 +208,8 @@ export async function POST(req: NextRequest) {
           brandStyle: true,
           website: true,
           socialMedia: true,
+          freeCredits: true,
+          companyAnalysis: true,
         },
       }),
       db.subscription.findUnique({
@@ -200,6 +224,9 @@ export async function POST(req: NextRequest) {
           status: true,
           variant: { select: { service: { select: { name: true } } } },
         },
+      }),
+      db.ticket.count({
+        where: { userId, status: { notIn: ["COMPLETED", "CANCELED"] } },
       }),
       db.service.findMany({
         where: { isActive: true },
@@ -227,6 +254,28 @@ export async function POST(req: NextRequest) {
     const businessName = (user?.businessName as string) || "";
     const planName = subscription?.plan.name || "Sin plan";
     const deliveryDays = subscription?.plan.deliveryDays || 5;
+    const freeCredits = user?.freeCredits || 0;
+    const planCredits = subscription?.creditsRemaining || 0;
+    const totalCredits = freeCredits + planCredits;
+    const maxActiveReqs = subscription?.plan.maxActiveReqs || 0;
+
+    // Extract recommendations from company analysis
+    const analysis = user?.companyAnalysis as Record<string, unknown> | null;
+    const selectedAnalysis = analysis?.selected as Record<string, unknown> | undefined;
+    const recommendations = (selectedAnalysis?.recommendations as string[]) || [];
+
+    // Find cheapest service in category
+    let cheapestInCategory: number | null = null;
+    if (category) {
+      const catServices = services.filter((s) => s.category === category);
+      for (const s of catServices) {
+        for (const v of s.variants) {
+          if (cheapestInCategory === null || v.creditCost < cheapestInCategory) {
+            cheapestInCategory = v.creditCost;
+          }
+        }
+      }
+    }
 
     const systemPrompt = buildSystemPrompt({
       catalog: catalogText,
@@ -236,6 +285,11 @@ export async function POST(req: NextRequest) {
       businessName,
       planName,
       deliveryDays,
+      totalCredits,
+      activeTickets: activeTicketCount,
+      maxActiveReqs,
+      recommendations,
+      cheapestInCategory,
     });
 
     const model = getGeminiModel();
