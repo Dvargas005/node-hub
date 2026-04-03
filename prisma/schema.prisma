@@ -32,6 +32,7 @@ model User {
   socialMedia         Json?
   onboardingCompleted Boolean   @default(false)
   freeCredits     Int       @default(0)
+  priorities      Json?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

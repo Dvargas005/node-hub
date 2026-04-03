@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       brandStyle,
       website,
       socialMedia,
+      priorities,
     } = body;
 
     // Step 1 required fields
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
         brandStyle: brandStyle || undefined,
         website: website || undefined,
         socialMedia: socialMedia || undefined,
+        priorities: priorities || undefined,
         onboardingCompleted: true,
         ...(isFirstTime ? { freeCredits: 10 } : {}),
       },

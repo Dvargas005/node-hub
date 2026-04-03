@@ -21,8 +21,6 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <OnboardingClient
-      initialBusinessName={user?.businessName || ""}
-    />
+    <OnboardingClient initialBusinessName={user?.businessName || ""} />
   );
 }
