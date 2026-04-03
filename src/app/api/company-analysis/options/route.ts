@@ -88,20 +88,22 @@ export async function POST() {
     }
 
     // Deduct credits (skip if free renewal)
+    let freeDeducted = 0;
+    let planDeducted = 0;
     if (isFreeRenewal) {
       console.log("[ANALYSIS_OPTIONS] Free renewal for user:", userId);
+    } else {
+      freeDeducted = Math.min(freeCredits, ANALYSIS_COST);
+      planDeducted = ANALYSIS_COST - freeDeducted;
+      await db.$transaction(async (tx) => {
+        if (freeDeducted > 0) {
+          await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: freeDeducted } } });
+        }
+        if (planDeducted > 0 && subscription) {
+          await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { decrement: planDeducted } } });
+        }
+      });
     }
-    let deductRemaining = isFreeRenewal ? 0 : ANALYSIS_COST;
-    if (deductRemaining > 0) await db.$transaction(async (tx) => {
-      if (freeCredits > 0) {
-        const fromFree = Math.min(freeCredits, deductRemaining);
-        await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: fromFree } } });
-        deductRemaining -= fromFree;
-      }
-      if (deductRemaining > 0 && subscription) {
-        await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { decrement: deductRemaining } } });
-      }
-    });
 
     const webContent = user?.website ? await fetchWebContent(user.website as string) : "";
     const context = buildBusinessContext(user as unknown as Record<string, unknown>, webContent);
@@ -143,18 +145,17 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
     }
 
     if (!options) {
-      // Refund
-      let refund = ANALYSIS_COST;
-      await db.$transaction(async (tx) => {
-        if (freeCredits > 0) {
-          const r = Math.min(ANALYSIS_COST, ANALYSIS_COST);
-          await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: Math.min(r, ANALYSIS_COST - (user?.freeCredits || 0) + freeCredits) } } });
-          refund = 0;
-        }
-        if (refund > 0 && subscription) {
-          await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { increment: refund } } });
-        }
-      });
+      // Refund exact amounts to original sources
+      if (!isFreeRenewal && (freeDeducted > 0 || planDeducted > 0)) {
+        await db.$transaction(async (tx) => {
+          if (freeDeducted > 0) {
+            await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: freeDeducted } } });
+          }
+          if (planDeducted > 0 && subscription) {
+            await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { increment: planDeducted } } });
+          }
+        });
+      }
       return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
     }
 

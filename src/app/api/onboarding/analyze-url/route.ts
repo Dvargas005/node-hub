@@ -15,6 +15,23 @@ export async function POST(req: NextRequest) {
 
     const fullUrl = url.match(/^https?:\/\//) ? url : `https://${url}`;
 
+    // S1: SSRF protection
+    try {
+      const parsed = new URL(fullUrl);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        return NextResponse.json({ error: "URL inválida", partial: true });
+      }
+      const blocked = ["localhost", "127.0.0.1", "0.0.0.0", "169.254.169.254", "[::1]"];
+      if (blocked.some((b) => parsed.hostname.includes(b))) {
+        return NextResponse.json({ error: "URL no permitida", partial: true });
+      }
+      if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(parsed.hostname)) {
+        return NextResponse.json({ error: "URL no permitida", partial: true });
+      }
+    } catch {
+      return NextResponse.json({ error: "URL inválida", partial: true });
+    }
+
     // Fetch website content
     let html: string;
     try {
@@ -26,7 +43,8 @@ export async function POST(req: NextRequest) {
         signal: AbortSignal.timeout(10000),
         redirect: "follow",
       });
-      html = await res.text();
+      const rawText = await res.text();
+      html = rawText.substring(0, 50000);
     } catch (fetchErr) {
       console.error("[ANALYZE_URL] Fetch failed:", fetchErr);
       return NextResponse.json({

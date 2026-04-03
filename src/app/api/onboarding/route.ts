@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
         socialMedia: socialMedia || undefined,
         priorities: priorities || undefined,
         onboardingCompleted: true,
-        ...(isFirstTime ? { freeCredits: 10 } : {}),
+        ...(isFirstTime ? { freeCredits: { increment: 10 } } : {}),
       },
     });
 

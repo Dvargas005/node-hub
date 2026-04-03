@@ -263,7 +263,7 @@ export function OnboardingClient({
           );
           break;
         case 10:
-          handleSubmit();
+          submitOnboarding(profile);
           break;
       }
     },
@@ -513,14 +513,15 @@ export function OnboardingClient({
         .join(", ")
     );
     markAnswered();
-    setProfile((p) => ({ ...p, priorities: ratings }));
+    const finalProfile = { ...profile, priorities: ratings };
+    setProfile(finalProfile);
     await pushBot(getPriorityAck(ratings));
     setStep(10);
-    handleSubmit();
+    submitOnboarding(finalProfile);
   };
 
   // ─── Submit ─────────────────────────────────────
-  const handleSubmit = async () => {
+  const submitOnboarding = async (finalProfile: OnboardingProfile) => {
     setSaving(true);
     await pushBot("Guardando tu perfil... 🎉");
 
@@ -529,19 +530,19 @@ export function OnboardingClient({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          businessName: profile.businessName,
-          businessIndustry: profile.businessIndustry,
-          businessDescription: profile.businessDescription,
-          targetAudience: profile.targetAudience,
-          hasBranding: profile.hasBranding,
-          brandColors: profile.brandColors || null,
-          brandStyle: profile.brandStyle || null,
-          website: profile.website || null,
+          businessName: finalProfile.businessName,
+          businessIndustry: finalProfile.businessIndustry,
+          businessDescription: finalProfile.businessDescription,
+          targetAudience: finalProfile.targetAudience,
+          hasBranding: finalProfile.hasBranding,
+          brandColors: finalProfile.brandColors || null,
+          brandStyle: finalProfile.brandStyle || null,
+          website: finalProfile.website || null,
           socialMedia:
-            profile.socialMedia && Object.keys(profile.socialMedia).length > 0
-              ? profile.socialMedia
+            finalProfile.socialMedia && Object.keys(finalProfile.socialMedia).length > 0
+              ? finalProfile.socialMedia
               : null,
-          priorities: profile.priorities || null,
+          priorities: finalProfile.priorities || null,
         }),
       });
 

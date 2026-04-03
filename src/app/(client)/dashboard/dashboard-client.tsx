@@ -476,9 +476,9 @@ export function DashboardClient({
         <CardContent>
           {pm ? (
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold text-lg">{pm.name.charAt(0)}</div>
+              <div className="flex h-12 w-12 items-center justify-center bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold text-lg">{pm?.name?.charAt(0) || "PM"}</div>
               <div>
-                <p className="font-medium text-[var(--ice-white)]">{pm.name}</p>
+                <p className="font-medium text-[var(--ice-white)]">{pm?.name || "Project Manager"}</p>
                 <a href={`mailto:${pm.email}`} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] flex items-center gap-1"><Mail className="h-3 w-3" />{pm.email}</a>
               </div>
             </div>
