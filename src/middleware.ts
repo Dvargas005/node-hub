@@ -16,24 +16,12 @@ const authPaths = ["/login", "/register"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // NEVER intercept static assets or Next.js internals
-  if (
-    pathname.startsWith("/_next/") ||
-    pathname.startsWith("/favicon") ||
-    pathname.startsWith("/img/") ||
-    pathname.startsWith("/api/auth") ||
-    pathname.endsWith(".css") ||
-    pathname.endsWith(".js") ||
-    pathname.endsWith(".map") ||
-    pathname.endsWith(".png") ||
-    pathname.endsWith(".jpg") ||
-    pathname.endsWith(".svg") ||
-    pathname.endsWith(".ico") ||
-    pathname.endsWith(".woff") ||
-    pathname.endsWith(".woff2")
-  ) {
-    return NextResponse.next();
-  }
+  // NEVER intercept static assets — this is the definitive check.
+  // No matcher regex — we handle everything here.
+  if (pathname.startsWith("/_next")) return NextResponse.next();
+  if (pathname.startsWith("/favicon")) return NextResponse.next();
+  if (pathname.startsWith("/img")) return NextResponse.next();
+  if (pathname.includes(".")) return NextResponse.next();
 
   // Allow public paths
   if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
@@ -60,13 +48,6 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: [
-    /*
-     * Only run middleware on page routes, not static assets.
-     * Matches: /dashboard, /login, /admin/overview, etc.
-     * Skips: /_next/*, /favicon.ico, /img/*, any file with extension
-     */
-    "/((?!_next|favicon\\.ico|img|api/auth).*)",
-  ],
-};
+// No matcher — middleware runs on ALL requests.
+// Filtering is done in the function body above.
+// This avoids Next.js 14 regex matcher bugs that cause 404s on static assets.
