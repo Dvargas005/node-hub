@@ -81,39 +81,47 @@ export function DashboardClient({
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const greeting = getGreeting(firstName, latestTicket, companyAnalysis);
 
-  const analysisData = companyAnalysis as { options?: Record<string, unknown>; selected?: Record<string, unknown>; selectedOption?: string } | null;
-  const hasAnalysis = !!analysisData?.selected;
+  const analysisData = companyAnalysis as { status?: string; options?: Record<string, unknown>; selected?: Record<string, unknown> } | null;
+  const hasAnalysis = analysisData?.status === "complete" && !!analysisData?.selected;
   const selectedProfile = analysisData?.selected as Record<string, unknown> | undefined;
   const analysisOptions = analysisData?.options as { optionA?: Record<string, unknown>; optionB?: Record<string, unknown> } | undefined;
-  const hasPendingOptions = !!analysisOptions && !analysisData?.selected;
+  const hasPendingOptions = analysisData?.status === "pending_selection" && !!analysisOptions;
 
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState("");
   const [showOptions, setShowOptions] = useState(hasPendingOptions);
-  const [selecting, setSelecting] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [feedbackA, setFeedbackA] = useState("");
+  const [feedbackB, setFeedbackB] = useState("");
+  const [localOptions, setLocalOptions] = useState(analysisOptions);
 
   const handleGenerate = async () => {
     setGenerating(true);
     setGenError("");
     try {
-      const res = await fetch("/api/company-analysis", { method: "POST" });
+      const res = await fetch("/api/company-analysis/options", { method: "POST" });
       const data = await res.json();
       if (!res.ok) { setGenError(data.error || "Error al generar"); return; }
+      setLocalOptions(data.options);
       setShowOptions(true);
-      router.refresh();
     } catch { setGenError("Error de conexión"); } finally { setGenerating(false); }
   };
 
   const handleSelect = async (option: "A" | "B") => {
-    setSelecting(true);
+    setCompleting(true);
+    setGenError("");
     try {
-      const res = await fetch("/api/company-analysis/select", {
+      const feedback = option === "A" ? feedbackA : feedbackB;
+      const res = await fetch("/api/company-analysis/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ option }),
+        body: JSON.stringify({ option, feedback: feedback || undefined }),
       });
-      if (res.ok) { setShowOptions(false); router.refresh(); }
-    } catch {} finally { setSelecting(false); }
+      const data = await res.json();
+      if (!res.ok) { setGenError(data.error || "Error al completar"); return; }
+      setShowOptions(false);
+      router.refresh();
+    } catch { setGenError("Error de conexión"); } finally { setCompleting(false); }
   };
 
   return (
@@ -238,14 +246,17 @@ export function DashboardClient({
       )}
 
       {/* Option selection */}
-      {showOptions && analysisOptions && !hasAnalysis && (
+      {showOptions && localOptions && !hasAnalysis && (
         <div className="space-y-4">
           <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Elige tu perfil de empresa</h2>
+          {genError && <p className="text-sm text-red-400">{genError}</p>}
           <div className="grid gap-4 md:grid-cols-2">
             {(["optionA", "optionB"] as const).map((key) => {
-              const opt = analysisOptions[key] as Record<string, unknown> | undefined;
+              const opt = localOptions[key] as Record<string, unknown> | undefined;
               if (!opt) return null;
               const isA = key === "optionA";
+              const fb = isA ? feedbackA : feedbackB;
+              const setFb = isA ? setFeedbackA : setFeedbackB;
               return (
                 <Card key={key} className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[var(--gold-bar)] transition-colors">
                   <CardHeader>
@@ -257,8 +268,15 @@ export function DashboardClient({
                     <Separator className="bg-[rgba(245,246,252,0.06)]" />
                     <p className="text-xs text-[rgba(245,246,252,0.4)]">Propuesta de valor:</p>
                     <p className="text-sm text-[rgba(245,246,252,0.7)]">{opt.valueProposition as string}</p>
-                    <Button onClick={() => handleSelect(isA ? "A" : "B")} disabled={selecting} className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50">
-                      {selecting ? "Guardando..." : "Elegir este perfil"}
+                    <textarea
+                      value={fb}
+                      onChange={(e) => setFb(e.target.value)}
+                      placeholder="¿Quieres ajustar algo? (opcional)"
+                      rows={2}
+                      className="w-full rounded-md border border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] resize-none"
+                    />
+                    <Button onClick={() => handleSelect(isA ? "A" : "B")} disabled={completing} className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50">
+                      {completing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Generando análisis...</> : "Elegir este perfil"}
                     </Button>
                   </CardContent>
                 </Card>
