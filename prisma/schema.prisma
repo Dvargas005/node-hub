@@ -33,6 +33,8 @@ model User {
   onboardingCompleted Boolean   @default(false)
   freeCredits     Int       @default(0)
   priorities      Json?
+  companyAnalysis    Json?
+  companyAnalysisAt  DateTime?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
