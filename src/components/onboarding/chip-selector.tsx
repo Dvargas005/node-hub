@@ -15,17 +15,14 @@ export function ChipSelector({
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (opt: string) => {
-    if (multiSelect) {
-      setSelected((prev) =>
-        prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]
-      );
-    } else {
-      setSelected([opt]);
+    if (!multiSelect) {
+      // Single select: confirm immediately on click
+      onConfirm([opt]);
+      return;
     }
-  };
-
-  const handleConfirm = () => {
-    if (selected.length > 0) onConfirm(selected);
+    setSelected((prev) =>
+      prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]
+    );
   };
 
   return (
@@ -45,12 +42,12 @@ export function ChipSelector({
           </button>
         ))}
       </div>
-      {selected.length > 0 && (
+      {multiSelect && selected.length > 0 && (
         <Button
-          onClick={handleConfirm}
+          onClick={() => onConfirm(selected)}
           className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4"
         >
-          Confirmar
+          Confirmar selección
         </Button>
       )}
     </div>

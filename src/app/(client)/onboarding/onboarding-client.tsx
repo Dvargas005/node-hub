@@ -195,6 +195,15 @@ export function OnboardingClient({
 
       switch (nextStep) {
         case 1:
+          if (profile.businessName) {
+            // Already have name from registration — skip to industry
+            await pushBot(
+              `¡Hola! 👋 Veo que tu negocio es ${profile.businessName}. Vamos a configurar tu perfil en menos de 2 minutos.`
+            );
+            await pushBot("¿En qué giro está tu negocio?", "chips", { options: industries });
+            setStep(2);
+            return;
+          }
           await pushBot(
             "¡Hola! 👋 Soy el asistente de N.O.D.E. Vamos a configurar tu perfil en menos de 2 minutos."
           );

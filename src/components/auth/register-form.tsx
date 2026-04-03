@@ -210,7 +210,7 @@ export function RegisterForm() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+            className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creando cuenta..." : "Crear Cuenta"}
           </Button>

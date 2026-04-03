@@ -18,15 +18,17 @@ export async function POST(req: NextRequest) {
     // Fetch website content
     let html: string;
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(fullUrl, {
-        signal: controller.signal,
-        headers: { "User-Agent": "Mozilla/5.0 NODE-Bot/1.0" },
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; NODEBot/1.0; +https://node.nouvos.one)",
+          "Accept": "text/html,application/xhtml+xml",
+        },
+        signal: AbortSignal.timeout(10000),
+        redirect: "follow",
       });
-      clearTimeout(timeout);
       html = await res.text();
-    } catch {
+    } catch (fetchErr) {
+      console.error("[ANALYZE_URL] Fetch failed:", fetchErr);
       return NextResponse.json({
         error: "No pude acceder a esa URL",
         partial: true,
