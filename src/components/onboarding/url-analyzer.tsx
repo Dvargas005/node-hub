@@ -7,19 +7,19 @@ import { Globe, Loader2 } from "lucide-react";
 
 export function UrlAnalyzer({
   onResult,
+  onFail,
   onSkip,
 }: {
   onResult: (data: Record<string, string>, url: string) => void;
+  onFail: (url: string) => void;
   onSkip: () => void;
 }) {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleAnalyze = async () => {
     if (!url.trim()) return;
     setLoading(true);
-    setError("");
 
     try {
       const res = await fetch("/api/onboarding/analyze-url", {
@@ -30,12 +30,12 @@ export function UrlAnalyzer({
       const data = await res.json();
 
       if (data.data) {
-        onResult(data.data, data.url || url);
+        onResult(data.data, data.url || url.trim());
       } else {
-        setError(data.error || "No pude analizar esa URL, pero no te preocupes.");
+        onFail(url.trim());
       }
     } catch {
-      setError("Error de conexión");
+      onFail(url.trim());
     } finally {
       setLoading(false);
     }
@@ -63,11 +63,9 @@ export function UrlAnalyzer({
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Analizar"}
         </Button>
       </div>
-      {error && (
-        <p className="text-xs text-yellow-400">{error}</p>
-      )}
       <button
         onClick={onSkip}
+        disabled={loading}
         className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]"
       >
         No tengo sitio web →

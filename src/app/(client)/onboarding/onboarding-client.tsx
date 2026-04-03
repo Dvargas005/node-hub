@@ -33,8 +33,7 @@ type MsgType =
   | "input"
   | "url"
   | "social-inputs"
-  | "stars"
-  | "analysis-result";
+  | "stars";
 
 interface ChatMsg {
   id: string;
@@ -46,29 +45,70 @@ interface ChatMsg {
   answered?: boolean;
 }
 
-// ─── Step definitions ───────────────────────────────
+// ─── Static data ────────────────────────────────────
 const industries = [
-  "🍽️ Restaurante",
-  "🛍️ Tienda / Retail",
-  "💼 Servicios profesionales",
-  "🏥 Salud / Bienestar",
+  "🍽️ Alimentos y Panadería",
+  "🛍️ Retail / Tienda",
+  "💼 Servicios Profesionales",
+  "🏥 Salud y Terapia",
   "💻 Tecnología",
   "📚 Educación",
   "🎉 Eventos",
   "🏗️ Construcción",
   "🚚 Transporte",
+  "🏠 Bienes Raíces",
+  "🚗 Automotriz",
+  "🧹 Limpieza y Mantenimiento",
   "🔧 Otro",
 ];
 
-const brandStyles = [
-  "Minimalista",
-  "Bold / Atrevido",
-  "Elegante",
-  "Moderno",
-  "Clásico",
-  "Divertido",
-  "Corporativo",
+const industrySubcategories: Record<string, string[]> = {
+  "Alimentos y Panadería": ["Panadería artesanal", "Restaurante", "Food truck", "Catering", "Pastelería", "Cafetería", "Otro"],
+  "Retail / Tienda": ["Boutique", "Tienda en línea", "Abarrotes", "Ferretería", "Joyería", "Otro"],
+  "Servicios Profesionales": ["Abogado", "Contador", "Consultor", "Notaría", "Agencia", "Otro"],
+  "Salud y Terapia": ["Consultorio médico", "Terapia física", "Nutrición", "Estética", "Dentista", "Otro"],
+  "Tecnología": ["Desarrollo de software", "Soporte técnico", "SaaS", "E-commerce", "Otro"],
+  "Educación": ["Academia", "Tutorías", "Cursos online", "Capacitación", "Otro"],
+  "Eventos": ["Organizador de eventos", "Fotógrafo", "DJ / Música", "Banquetes", "Otro"],
+  "Construcción": ["Contratista general", "Plomería", "Electricidad", "Pintura", "Arquitectura", "Otro"],
+  "Transporte": ["Mudanzas", "Logística", "Paquetería", "Otro"],
+  "Bienes Raíces": ["Agente inmobiliario", "Constructora", "Property management", "Otro"],
+  "Automotriz": ["Taller mecánico", "Venta de autopartes", "Car wash", "Detailing", "Otro"],
+  "Limpieza y Mantenimiento": ["Limpieza residencial", "Limpieza comercial", "Jardinería", "Otro"],
+};
+
+const audienceChips = [
+  "👤 Consumidor final (B2C)",
+  "🏢 Empresas (B2B)",
+  "👥 Ambos",
+  "👨‍👩‍👧‍👦 Familias",
+  "👩‍💼 Profesionistas",
+  "🌎 Comunidad local",
+  "📱 Online / E-commerce",
 ];
+
+const brandStyles = [
+  "Minimalista", "Bold / Atrevido", "Elegante", "Moderno",
+  "Clásico", "Divertido", "Corporativo",
+];
+
+// ─── Helpers ────────────────────────────────────────
+function randDelay() {
+  return 800 + Math.random() * 400;
+}
+
+function getPriorityAck(ratings: Record<string, number>): string {
+  const max = Object.entries(ratings).sort(([, a], [, b]) => b - a)[0];
+  const labels: Record<string, string> = {
+    design: "el diseño es tu prioridad",
+    web: "la presencia web es clave para ti",
+    marketing: "el marketing es lo que más necesitas",
+  };
+  if (max && max[1] >= 4) {
+    return `¡Veo que ${labels[max[0]] || max[0]}! Tenemos servicios perfectos para eso.`;
+  }
+  return "¡Buena combinación de prioridades!";
+}
 
 // ─── Component ──────────────────────────────────────
 export function OnboardingClient({
@@ -86,97 +126,117 @@ export function OnboardingClient({
   const [saving, setSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = () =>
-    setTimeout(
-      () =>
-        scrollRef.current?.scrollTo({
-          top: scrollRef.current.scrollHeight,
-          behavior: "smooth",
-        }),
-      50
-    );
+  const scroll = useCallback(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 80);
+  }, []);
 
-  const addBot = useCallback(
+  // ─── Message helpers with typing delay ──────────
+  const pushBot = useCallback(
     (content: string, type: MsgType = "text", opts?: Partial<ChatMsg>) => {
-      setTyping(true);
-      scroll();
-      setTimeout(() => {
-        setTyping(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `b-${Date.now()}`,
-            role: "bot",
-            content,
-            type,
-            ...opts,
-          },
-        ]);
+      return new Promise<void>((resolve) => {
+        setTyping(true);
         scroll();
-      }, 600);
+        setTimeout(() => {
+          setTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            { id: `b-${Date.now()}-${Math.random()}`, role: "bot", content, type, ...opts },
+          ]);
+          scroll();
+          resolve();
+        }, randDelay());
+      });
     },
-    []
+    [scroll]
   );
 
-  const addUser = (content: string) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: `u-${Date.now()}`, role: "user", content, type: "text" },
-    ]);
-    scroll();
-  };
+  const pushUser = useCallback(
+    (content: string) => {
+      setMessages((prev) => [
+        ...prev,
+        { id: `u-${Date.now()}`, role: "user", content, type: "text" },
+      ]);
+      scroll();
+    },
+    [scroll]
+  );
 
-  // Mark the last interactive message as answered
-  const markAnswered = () => {
+  const markAnswered = useCallback(() => {
     setMessages((prev) => {
-      const last = [...prev];
-      for (let i = last.length - 1; i >= 0; i--) {
-        if (last[i].role === "bot" && !last[i].answered) {
-          last[i] = { ...last[i], answered: true };
+      const copy = [...prev];
+      for (let i = copy.length - 1; i >= 0; i--) {
+        if (copy[i].role === "bot" && !copy[i].answered) {
+          copy[i] = { ...copy[i], answered: true };
           break;
         }
       }
-      return last;
+      return copy;
     });
-  };
+  }, []);
 
-  // ─── Step machine ───────────────────────────────
+  // ─── Sequenced bot messages (ack + question) ───
+  const ackThenAsk = useCallback(
+    async (ack: string, question: string, type: MsgType = "text", opts?: Partial<ChatMsg>) => {
+      await pushBot(ack);
+      await pushBot(question, type, opts);
+    },
+    [pushBot]
+  );
+
+  // ─── Step machine ─────────────────────────────────
   const advance = useCallback(
-    (nextStep: number) => {
+    async (nextStep: number) => {
       setStep(nextStep);
 
       switch (nextStep) {
         case 1:
-          addBot(
-            "¡Hola! 👋 Soy el asistente de N.O.D.E. Vamos a configurar tu perfil en menos de 2 minutos.\n\n¿Cómo se llama tu negocio?",
-            "input"
+          await pushBot(
+            "¡Hola! 👋 Soy el asistente de N.O.D.E. Vamos a configurar tu perfil en menos de 2 minutos."
           );
+          await pushBot("¿Cómo se llama tu negocio?", "input");
           break;
         case 2:
-          addBot("¿En qué giro está tu negocio?", "chips", {
-            options: industries,
-          });
+          await pushBot("¿En qué giro está tu negocio?", "chips", { options: industries });
           break;
-        case 3:
-          addBot(
-            "Cuéntame en una oración: ¿qué hace tu negocio?",
-            "input"
+        case 3: {
+          const subs = industrySubcategories[profile.businessIndustry || ""];
+          if (subs) {
+            await pushBot(
+              "¿Cuál describe mejor tu negocio?",
+              "chips",
+              { options: subs }
+            );
+          } else {
+            await pushBot("Cuéntame en una oración: ¿qué hace tu negocio?", "input");
+          }
+          break;
+        }
+        case 4:
+          await pushBot(
+            "¿Quién es tu cliente ideal?",
+            "chips",
+            { options: audienceChips, multiSelect: true }
           );
           break;
-        case 4:
-          addBot("¿A quién le vendes? ¿Quién es tu cliente ideal?", "input");
-          break;
         case 5:
-          addBot("¿Tienes un sitio web? Puedo analizarlo para ahorrar tiempo.", "url");
+          await pushBot(
+            "¿Tienes un sitio web? Puedo analizarlo para ahorrar tiempo.",
+            "url"
+          );
           break;
         case 6:
-          addBot("¿Ya tienes logo o identidad visual?", "chips", {
+          await pushBot("¿Ya tienes logo o identidad visual?", "chips", {
             options: ["✅ Sí", "❌ No", "🔨 Algo básico"],
           });
           break;
         case 7:
           if (profile.hasBranding !== false) {
-            addBot("¿Cómo describirías el estilo de tu marca?", "chips", {
+            await pushBot("¿Cómo describirías el estilo de tu marca?", "chips", {
               options: brandStyles,
               multiSelect: true,
             });
@@ -185,10 +245,10 @@ export function OnboardingClient({
           }
           break;
         case 8:
-          addBot("¿Tienes redes sociales? Compárteme tus handles.", "social-inputs");
+          await pushBot("¿Tienes redes sociales? Compárteme tus handles.", "social-inputs");
           break;
         case 9:
-          addBot(
+          await pushBot(
             "Último paso: ¿qué tan importante es cada servicio para ti ahora mismo?",
             "stars"
           );
@@ -199,16 +259,15 @@ export function OnboardingClient({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addBot, profile.hasBranding]
+    [pushBot, profile.businessIndustry, profile.hasBranding]
   );
 
-  // Start on mount
   useEffect(() => {
     if (step === 0) advance(1);
   }, [step, advance]);
 
-  // ─── Handlers ───────────────────────────────────
-  const handleTextSubmit = (e?: React.FormEvent) => {
+  // ─── Handlers ─────────────────────────────────────
+  const handleTextSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!textInput.trim()) return;
     const val = textInput.trim();
@@ -216,56 +275,140 @@ export function OnboardingClient({
 
     switch (step) {
       case 1:
-        addUser(val);
+        pushUser(val);
         markAnswered();
         setProfile((p) => ({ ...p, businessName: val }));
-        advance(2);
+        await ackThenAsk(
+          `¡Genial, ${val}! 🎯`,
+          "¿En qué giro está tu negocio?",
+          "chips",
+          { options: industries }
+        );
+        setStep(2);
         break;
       case 3:
-        addUser(val);
+        pushUser(val);
         markAnswered();
         setProfile((p) => ({ ...p, businessDescription: val }));
-        advance(4);
-        break;
-      case 4:
-        addUser(val);
-        markAnswered();
-        setProfile((p) => ({ ...p, targetAudience: val }));
-        advance(5);
+        await ackThenAsk(
+          "Entendido. 👌",
+          "¿Quién es tu cliente ideal?",
+          "chips",
+          { options: audienceChips, multiSelect: true }
+        );
+        setStep(4);
         break;
     }
   };
 
-  const handleChips = (selected: string[], stepNum: number) => {
-    addUser(selected.join(", "));
+  const handleChips = async (selected: string[], stepNum: number) => {
+    pushUser(selected.join(", "));
     markAnswered();
 
     switch (stepNum) {
       case 2: {
         const cleaned = selected[0].replace(/^[^\s]+\s/, "");
         setProfile((p) => ({ ...p, businessIndustry: cleaned }));
-        advance(3);
+        const subs = industrySubcategories[cleaned];
+        if (subs) {
+          await ackThenAsk(
+            `Perfecto, conozco bien el sector de ${cleaned}. 💪`,
+            "¿Cuál describe mejor tu negocio?",
+            "chips",
+            { options: subs }
+          );
+        } else {
+          await ackThenAsk(
+            `Perfecto, conozco bien el sector de ${cleaned}. 💪`,
+            "Cuéntame en una oración: ¿qué hace tu negocio?",
+            "input"
+          );
+        }
+        setStep(3);
+        break;
+      }
+      case 3: {
+        const val = selected[0];
+        if (val === "Otro") {
+          await pushBot("Cuéntame en una oración: ¿qué hace tu negocio?", "input");
+          // Stay on step 3 but now expecting text input
+        } else {
+          setProfile((p) => ({ ...p, businessDescription: val }));
+          await ackThenAsk(
+            "Entendido. 👌",
+            "¿Quién es tu cliente ideal?",
+            "chips",
+            { options: audienceChips, multiSelect: true }
+          );
+          setStep(4);
+        }
+        break;
+      }
+      case 4: {
+        const cleaned = selected.map((s) => s.replace(/^[^\s]+\s/, "")).join(", ");
+        setProfile((p) => ({ ...p, targetAudience: cleaned }));
+        await ackThenAsk(
+          `Claro, ${cleaned}. 🎯`,
+          "¿Tienes un sitio web? Puedo analizarlo para ahorrar tiempo.",
+          "url"
+        );
+        setStep(5);
+        break;
+      }
+      case 5.5: {
+        // Analysis confirmation
+        if (selected[0].includes("Correcto")) {
+          await ackThenAsk(
+            "¡Perfecto! Ya tengo buena info de tu sitio. 🚀",
+            "¿Tienes redes sociales? Compárteme tus handles.",
+            "social-inputs"
+          );
+          setStep(8);
+        } else {
+          await pushBot("Ok, sigamos paso a paso para ajustar.");
+          advance(6);
+        }
         break;
       }
       case 6: {
         const val = selected[0];
         const hasBranding = val.includes("Sí") ? true : val.includes("No") ? false : null;
         setProfile((p) => ({ ...p, hasBranding }));
-        advance(7);
+        if (hasBranding === false) {
+          await ackThenAsk(
+            "No te preocupes, podemos crear tu marca desde cero. 🎨",
+            "¿Tienes redes sociales? Compárteme tus handles.",
+            "social-inputs"
+          );
+          setStep(8);
+        } else {
+          const ack = hasBranding ? "Buena base. 👍" : "Algo es mejor que nada. 😉";
+          await ackThenAsk(
+            ack,
+            "¿Cómo describirías el estilo de tu marca?",
+            "chips",
+            { options: brandStyles, multiSelect: true }
+          );
+          setStep(7);
+        }
         break;
       }
       case 7:
         setProfile((p) => ({ ...p, brandStyle: selected.join(", ") }));
-        advance(8);
+        await ackThenAsk(
+          `${selected.join(" + ")} — buena combinación. ✨`,
+          "¿Tienes redes sociales? Compárteme tus handles.",
+          "social-inputs"
+        );
+        setStep(8);
         break;
     }
   };
 
-  const handleUrlResult = (
-    data: Record<string, string>,
-    url: string
-  ) => {
+  const handleUrlResult = async (data: Record<string, string>, url: string) => {
     markAnswered();
+    pushUser(url);
+
     setProfile((p) => ({
       ...p,
       website: url,
@@ -280,82 +423,97 @@ export function OnboardingClient({
       hasBranding: true,
     }));
 
-    const found: string[] = [];
-    if (data.businessDescription) found.push(`📝 ${data.businessDescription}`);
-    if (data.businessIndustry) found.push(`🏷️ ${data.businessIndustry}`);
-    if (data.brandColors) found.push(`🎨 Colores: ${data.brandColors}`);
-    if (data.brandStyle) found.push(`✨ Estilo: ${data.brandStyle}`);
-
-    addUser(url);
-    if (found.length > 0) {
-      addBot(
-        `¡Encontré esta info de tu sitio!\n\n${found.join("\n")}\n\n¿Es correcta?`,
+    const desc = data.businessDescription || "";
+    if (desc) {
+      await pushBot(
+        `Vi que tu negocio se trata de: "${desc}"\n\n¿Es correcto?`,
         "chips",
         { options: ["✅ Correcto", "✏️ Quiero ajustar algo"] }
       );
       setStep(5.5 as number);
     } else {
-      addBot("No encontré mucha info, pero no te preocupes. Sigamos.");
-      advance(6);
+      await ackThenAsk(
+        "Guardé tu sitio web. Sigamos con unas preguntas rápidas. 👍",
+        "¿Ya tienes logo o identidad visual?",
+        "chips",
+        { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+      );
+      setStep(6);
     }
   };
 
-  const handleUrlSkip = () => {
-    addUser("No tengo sitio web");
+  const handleUrlFail = async (url: string) => {
+    markAnswered();
+    pushUser(url);
+    const fullUrl = url.match(/^https?:\/\//) ? url : `https://${url}`;
+    setProfile((p) => ({ ...p, website: fullUrl }));
+    await ackThenAsk(
+      "Guardé tu sitio web. Sigamos con unas preguntas rápidas. 👍",
+      "¿Ya tienes logo o identidad visual?",
+      "chips",
+      { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+    );
+    setStep(6);
+  };
+
+  const handleUrlSkip = async () => {
+    pushUser("No tengo sitio web");
     markAnswered();
     setProfile((p) => ({ ...p, website: undefined }));
-    advance(6);
+    await ackThenAsk(
+      "Sin problema. 👍",
+      "¿Ya tienes logo o identidad visual?",
+      "chips",
+      { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+    );
+    setStep(6);
   };
 
-  const handleAnalysisConfirm = (selected: string[]) => {
-    addUser(selected.join(", "));
-    markAnswered();
-    if (selected[0].includes("Correcto")) {
-      addBot("¡Perfecto! Seguimos con un par de preguntas más.");
-      advance(8); // Skip branding questions since URL gave us that info
-    } else {
-      addBot("Ok, sigamos paso a paso para ajustar.");
-      advance(6);
-    }
-  };
-
-  const handleSocial = (data: Record<string, string>) => {
-    addUser(
-      Object.entries(data)
-        .filter(([, v]) => v)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join(", ") || "Sin redes por ahora"
+  const handleSocial = async (data: Record<string, string>) => {
+    const filled = Object.entries(data).filter(([, v]) => v);
+    pushUser(
+      filled.length > 0
+        ? filled.map(([k, v]) => `${k}: ${v}`).join(", ")
+        : "Sin redes por ahora"
     );
     markAnswered();
     setProfile((p) => ({
       ...p,
-      socialMedia: Object.fromEntries(
-        Object.entries(data).filter(([, v]) => v)
-      ),
+      socialMedia: Object.fromEntries(filled),
     }));
-    advance(9);
+    const ack = filled.length > 0
+      ? "Anotado. 📱"
+      : "Las redes son clave, te podemos ayudar con eso. 📱";
+    await ackThenAsk(
+      ack,
+      "Último paso: ¿qué tan importante es cada servicio para ti ahora mismo?",
+      "stars"
+    );
+    setStep(9);
   };
 
-  const handleStars = (ratings: Record<string, number>) => {
+  const handleStars = async (ratings: Record<string, number>) => {
     const labels: Record<string, string> = {
       design: "Diseño",
       web: "Web",
       marketing: "Marketing",
     };
-    addUser(
+    pushUser(
       Object.entries(ratings)
         .map(([k, v]) => `${labels[k] || k}: ${"⭐".repeat(v)}`)
         .join(", ")
     );
     markAnswered();
     setProfile((p) => ({ ...p, priorities: ratings }));
-    advance(10);
+    await pushBot(getPriorityAck(ratings));
+    setStep(10);
+    handleSubmit();
   };
 
   // ─── Submit ─────────────────────────────────────
   const handleSubmit = async () => {
     setSaving(true);
-    addBot("¡Guardando tu perfil... 🎉");
+    await pushBot("Guardando tu perfil... 🎉");
 
     try {
       const res = await fetch("/api/onboarding", {
@@ -380,29 +538,27 @@ export function OnboardingClient({
 
       const data = await res.json();
       if (!res.ok) {
-        addBot(`Hubo un error: ${data.error}. Intenta de nuevo.`);
+        await pushBot(`Hubo un error: ${data.error}. Intenta de nuevo.`);
         setSaving(false);
         return;
       }
 
+      await pushBot(
+        data.welcomeCredits
+          ? `✅ ¡Listo! Tu perfil está configurado.\n\n🎁 Te regalamos ${data.welcomeCredits} créditos de bienvenida.\n\nRedirigiendo a tu panel...`
+          : "✅ ¡Listo! Tu perfil está configurado.\n\nRedirigiendo a tu panel..."
+      );
       setTimeout(() => {
-        addBot(
-          data.welcomeCredits
-            ? `✅ ¡Listo! Tu perfil está configurado. Te regalamos ${data.welcomeCredits} créditos de bienvenida. 🎁\n\nRedirigiendo a tu panel...`
-            : "✅ ¡Listo! Tu perfil está configurado. Redirigiendo a tu panel..."
-        );
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 2000);
-      }, 600);
+        window.location.href = "/dashboard";
+      }, 2000);
     } catch {
-      addBot("Error de conexión. Intenta de nuevo.");
+      await pushBot("Error de conexión. Intenta de nuevo.");
       setSaving(false);
     }
   };
 
-  // ─── Render helpers ─────────────────────────────
-  const isCurrentInputStep = [1, 3, 4].includes(step);
+  // ─── Render ───────────────────────────────────────
+  const isTextStep = step === 1 || (step === 3 && !industrySubcategories[profile.businessIndustry || ""]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)] max-w-lg mx-auto">
@@ -412,29 +568,28 @@ export function OnboardingClient({
           <div
             key={s}
             className={`h-1 flex-1 transition-colors ${
-              s <= step ? "bg-[var(--gold-bar)]" : "bg-[rgba(245,246,252,0.1)]"
+              s <= Math.floor(step) ? "bg-[var(--gold-bar)]" : "bg-[rgba(245,246,252,0.1)]"
             }`}
           />
         ))}
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 px-4 py-4">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto space-y-4 px-4 pt-4 pb-8"
+      >
         {messages.map((msg) => {
           if (msg.role === "user") {
-            return (
-              <UserBubble key={msg.id}>{msg.content}</UserBubble>
-            );
+            return <UserBubble key={msg.id}>{msg.content}</UserBubble>;
           }
 
-          // Bot messages
           return (
             <div key={msg.id} className="space-y-2">
               <BotBubble>
                 <p className="whitespace-pre-wrap">{msg.content}</p>
               </BotBubble>
 
-              {/* Interactive elements (only if not answered) */}
               {!msg.answered && (
                 <>
                   {msg.type === "chips" && msg.options && (
@@ -442,30 +597,27 @@ export function OnboardingClient({
                       <ChipSelector
                         options={msg.options}
                         multiSelect={msg.multiSelect}
-                        onConfirm={(sel) =>
-                          step === 5.5
-                            ? handleAnalysisConfirm(sel)
-                            : handleChips(sel, Math.floor(step))
-                        }
+                        onConfirm={(sel) => {
+                          const s = step === 5.5 ? 5.5 : Math.floor(step);
+                          handleChips(sel, s);
+                        }}
                       />
                     </div>
                   )}
-
                   {msg.type === "url" && (
                     <div className="ml-11">
                       <UrlAnalyzer
                         onResult={handleUrlResult}
+                        onFail={handleUrlFail}
                         onSkip={handleUrlSkip}
                       />
                     </div>
                   )}
-
                   {msg.type === "social-inputs" && (
                     <div className="ml-11">
                       <SocialInputs onConfirm={handleSocial} />
                     </div>
                   )}
-
                   {msg.type === "stars" && (
                     <div className="ml-11">
                       <StarRating
@@ -486,8 +638,8 @@ export function OnboardingClient({
         {typing && <TypingIndicator />}
       </div>
 
-      {/* Text input */}
-      {isCurrentInputStep && !typing && (
+      {/* Text input (only for free-text steps) */}
+      {isTextStep && !typing && (
         <form
           onSubmit={handleTextSubmit}
           className="border-t border-[rgba(245,246,252,0.1)] p-4"
@@ -515,7 +667,7 @@ export function OnboardingClient({
   );
 }
 
-// ─── Social inputs sub-component ──────────────────
+// ─── Social inputs ────────────────────────────────
 function SocialInputs({
   onConfirm,
 }: {
@@ -527,39 +679,12 @@ function SocialInputs({
 
   return (
     <div className="space-y-2">
-      <Input
-        value={instagram}
-        onChange={(e) => setInstagram(e.target.value)}
-        placeholder="Instagram: @tuhandle"
-        className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm"
-      />
-      <Input
-        value={facebook}
-        onChange={(e) => setFacebook(e.target.value)}
-        placeholder="Facebook: Tu Página"
-        className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm"
-      />
-      <Input
-        value={tiktok}
-        onChange={(e) => setTiktok(e.target.value)}
-        placeholder="TikTok: @tuhandle"
-        className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm"
-      />
+      <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Instagram: @tuhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
+      <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="Facebook: Tu Página" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
+      <Input value={tiktok} onChange={(e) => setTiktok(e.target.value)} placeholder="TikTok: @tuhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
       <div className="flex gap-2">
-        <Button
-          onClick={() =>
-            onConfirm({ instagram, facebook, tiktok })
-          }
-          className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4"
-        >
-          Confirmar
-        </Button>
-        <button
-          onClick={() => onConfirm({})}
-          className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]"
-        >
-          Sin redes →
-        </button>
+        <Button onClick={() => onConfirm({ instagram, facebook, tiktok })} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4">Confirmar</Button>
+        <button onClick={() => onConfirm({})} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]">Sin redes →</button>
       </div>
     </div>
   );
