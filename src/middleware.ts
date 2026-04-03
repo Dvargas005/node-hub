@@ -8,6 +8,7 @@ const publicPaths = [
   "/api/waitlist",
   "/api/alliance",
   "/api/register",
+  "/api/onboarding",
 ];
 
 const authPaths = ["/login", "/register"];
@@ -15,11 +16,21 @@ const authPaths = ["/login", "/register"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Allow static files and Next.js internals
+  // NEVER intercept static assets or Next.js internals
   if (
-    pathname.startsWith("/_next") ||
+    pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon") ||
-    pathname.includes(".")
+    pathname.startsWith("/img/") ||
+    pathname.startsWith("/api/auth") ||
+    pathname.endsWith(".css") ||
+    pathname.endsWith(".js") ||
+    pathname.endsWith(".map") ||
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".jpg") ||
+    pathname.endsWith(".svg") ||
+    pathname.endsWith(".ico") ||
+    pathname.endsWith(".woff") ||
+    pathname.endsWith(".woff2")
   ) {
     return NextResponse.next();
   }
@@ -46,13 +57,16 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Role-based access is enforced at the layout/page level
-  // since middleware can't decode the session without a DB call.
-  // The middleware just ensures a session cookie exists.
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    /*
+     * Only run middleware on page routes, not static assets.
+     * Matches: /dashboard, /login, /admin/overview, etc.
+     * Skips: /_next/*, /favicon.ico, /img/*, any file with extension
+     */
+    "/((?!_next|favicon\\.ico|img|api/auth).*)",
+  ],
 };
