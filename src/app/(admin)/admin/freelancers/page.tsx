@@ -17,7 +17,7 @@ export default async function AdminFreelancersPage() {
   return (
     <FreelancersClient
       showSalary={isAdmin}
-      freelancers={freelancers.map((f) => ({
+      freelancers={freelancers.map((f: any) => ({
         id: f.id,
         name: f.name,
         email: f.email,

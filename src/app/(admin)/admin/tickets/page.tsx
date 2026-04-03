@@ -36,7 +36,7 @@ export default async function AdminTicketsPage() {
 
   return (
     <TicketsClient
-      tickets={tickets.map((t) => ({
+      tickets={tickets.map((t: any) => ({
         id: t.id,
         number: t.number,
         clientName: t.user.name,
@@ -54,7 +54,7 @@ export default async function AdminTicketsPage() {
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
       }))}
-      availableFreelancers={freelancers.map((f) => ({
+      availableFreelancers={freelancers.map((f: any) => ({
         id: f.id,
         name: f.name,
         role: f.role,

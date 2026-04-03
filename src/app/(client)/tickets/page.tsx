@@ -18,7 +18,7 @@ export default async function TicketsPage() {
 
   return (
     <TicketsClient
-      tickets={tickets.map((t) => ({
+      tickets={tickets.map((t: any) => ({
         id: t.id,
         number: t.number,
         serviceName: t.variant.service.name,

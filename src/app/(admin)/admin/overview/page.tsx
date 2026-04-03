@@ -59,7 +59,7 @@ export default async function AdminOverviewPage() {
         deliveredThisMonth,
         creditsConsumed: creditsAgg._sum.creditsCharged || 0,
       }}
-      recentTickets={recentTickets.map((t) => ({
+      recentTickets={recentTickets.map((t: any) => ({
         id: t.id,
         number: t.number,
         clientName: t.user.name,
@@ -71,7 +71,7 @@ export default async function AdminOverviewPage() {
         freelancerName: t.freelancer?.name || null,
         createdAt: t.createdAt.toISOString(),
       }))}
-      freelancers={freelancers.map((f) => ({
+      freelancers={freelancers.map((f: any) => ({
         id: f.id,
         name: f.name,
         role: f.role,

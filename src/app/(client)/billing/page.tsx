@@ -39,7 +39,7 @@ export default async function BillingPage() {
 
   return (
     <BillingClient
-      plans={plans.map((p) => ({
+      plans={plans.map((p: any) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
@@ -64,7 +64,7 @@ export default async function BillingPage() {
             }
           : null
       }
-      creditPacks={creditPacks.map((p) => ({
+      creditPacks={creditPacks.map((p: any) => ({
         id: p.id,
         name: p.name,
         credits: p.credits,

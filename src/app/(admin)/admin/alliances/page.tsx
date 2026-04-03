@@ -16,7 +16,7 @@ export default async function AdminAlliancesPage() {
 
   return (
     <AlliancesClient
-      alliances={alliances.map((a) => ({
+      alliances={alliances.map((a: any) => ({
         id: a.id,
         name: a.name,
         code: a.code,

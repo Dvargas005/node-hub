@@ -29,7 +29,7 @@ export default async function AdminClientsPage() {
 
   return (
     <ClientsClient
-      clients={clients.map((c) => ({
+      clients={clients.map((c: any) => ({
         id: c.id,
         name: c.name,
         email: c.email,
@@ -43,7 +43,7 @@ export default async function AdminClientsPage() {
         allianceCode: c.referredBy?.code || null,
         createdAt: c.createdAt.toISOString(),
       }))}
-      plans={plans.map((p) => ({ slug: p.slug, name: p.name }))}
+      plans={plans.map((p: any) => ({ slug: p.slug, name: p.name }))}
     />
   );
 }

@@ -20,13 +20,13 @@ export default async function AdminServicesPage() {
 
   return (
     <ServicesClient
-      services={services.map((s) => ({
+      services={services.map((s: any) => ({
         id: s.id,
         name: s.name,
         category: s.category,
         description: s.description,
         tags: s.tags,
-        variants: s.variants.map((v) => ({
+        variants: s.variants.map((v: any) => ({
           id: v.id,
           name: v.name,
           creditCost: v.creditCost,

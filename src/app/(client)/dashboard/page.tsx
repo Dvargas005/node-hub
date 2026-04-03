@@ -86,7 +86,7 @@ export default async function DashboardPage() {
       companyAnalysis={user?.companyAnalysis as Record<string, unknown> | null}
       companyAnalysisAt={user?.companyAnalysisAt?.toISOString() || null}
       subscriptionRenewedAt={subscription?.currentPeriodStart?.toISOString() || null}
-      activeTickets={activeTickets.map((t) => ({
+      activeTickets={activeTickets.map((t: any) => ({
         id: t.id,
         number: t.number,
         serviceName: t.variant.service.name,
