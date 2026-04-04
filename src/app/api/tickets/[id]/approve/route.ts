@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketCompletedEmail } from "@/lib/email-templates";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(
   _req: NextRequest,
@@ -69,6 +70,12 @@ export async function POST(
       const bonus = brief?.firstRoundBonus as number | undefined;
       const tpl = ticketCompletedEmail(tktInfo.user.name, tktInfo.number, tktInfo.variant.service.name, bonus);
       sendEmail(tktInfo.user.email, tpl.subject, tpl.html);
+      createNotification(tktInfo.userId, {
+        title: "Solicitud completada",
+        message: `Tu solicitud #${tktInfo.number} ha sido completada`,
+        type: "ticket_update",
+        link: `/tickets/${params.id}`,
+      });
     }
 
     return NextResponse.json({ success: true });

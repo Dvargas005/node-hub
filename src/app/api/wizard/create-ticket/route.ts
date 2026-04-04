@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketCreatedEmail } from "@/lib/email-templates";
+import { createNotification } from "@/lib/notifications";
 
 const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
 
@@ -162,6 +163,12 @@ export async function POST(req: NextRequest) {
 
     const emailTpl = ticketCreatedEmail(session.user.name, ticket.number, variant.service.name);
     sendEmail(session.user.email, emailTpl.subject, emailTpl.html);
+    createNotification(userId, {
+      title: "Solicitud creada",
+      message: `Tu solicitud #${ticket.number} fue recibida`,
+      type: "ticket_update",
+      link: "/tickets",
+    });
 
     return NextResponse.json({
       ticket: {

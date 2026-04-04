@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { deliveryReadyEmail } from "@/lib/email-templates";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(
   req: NextRequest,
@@ -39,6 +40,7 @@ export async function POST(
       where: { id: ticketId },
       select: {
         number: true,
+        userId: true,
         user: { select: { name: true, email: true } },
         variant: { select: { service: { select: { name: true } } } },
       },
@@ -46,6 +48,12 @@ export async function POST(
     if (ticketInfo) {
       const tpl = deliveryReadyEmail(ticketInfo.user.name, ticketInfo.number, ticketInfo.variant.service.name);
       sendEmail(ticketInfo.user.email, tpl.subject, tpl.html);
+      createNotification(ticketInfo.userId, {
+        title: "Entrega lista",
+        message: `La entrega de #${ticketInfo.number} está lista`,
+        type: "delivery",
+        link: `/tickets/${ticketId}`,
+      });
     }
 
     return NextResponse.json({ success: true });

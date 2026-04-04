@@ -9,6 +9,7 @@ import {
   UserCog,
   Package,
   Handshake,
+  Gift,
   BarChart3,
   RefreshCw,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const baseNav: NavItem[] = [
   { label: "Equipo", href: "/admin/team", icon: UserCog },
   { label: "Servicios", href: "/admin/services", icon: Package },
   { label: "Alianzas", href: "/admin/alliances", icon: Handshake },
+  { label: "Promos", href: "/admin/promos", icon: Gift },
   { label: "Métricas", href: "/admin/metrics", icon: BarChart3 },
   { label: "Sync", href: "/admin/sync", icon: RefreshCw },
 ];

@@ -49,6 +49,7 @@ model User {
   pmClients     User[]      @relation("pmClients")
   managedFreelancers Freelancer[] @relation("pmFreelancers")
   freelancerProfile  Freelancer?  @relation("freelancerUser")
+  notifications Notification[]
   sessions      Session[]
   accounts      Account[]
   ticketMessages TicketMessage[]
@@ -481,4 +482,21 @@ model TicketSurcharge {
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
 
   @@map("ticket_surcharges")
+}
+
+// ─── NOTIFICATIONS ─────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
 }
