@@ -2,7 +2,10 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { getDb } from "./db";
 
+console.log("[AUTH] baseURL:", process.env.BETTER_AUTH_URL);
+
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   database: prismaAdapter(getDb(), {
     provider: "postgresql",
   }),
@@ -60,6 +63,17 @@ export const auth = betterAuth({
         defaultValue: false,
         input: false,
       },
+    },
+  },
+  advanced: {
+    cookiePrefix: "better-auth",
+    crossSubDomainCookies: {
+      enabled: false,
+    },
+    defaultCookieAttributes: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
+      path: "/",
     },
   },
   databaseHooks: {
