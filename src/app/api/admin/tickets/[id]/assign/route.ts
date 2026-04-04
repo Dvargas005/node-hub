@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { sendEmail } from "@/lib/email";
+import { ticketAssignedEmail, freelancerNewAssignmentEmail } from "@/lib/email-templates";
 
 export async function POST(
   req: NextRequest,
@@ -49,11 +51,20 @@ export async function POST(
     const updatedTicket = await db.ticket.findUnique({
       where: { id: ticketId },
       include: {
-        user: { select: { name: true } },
+        user: { select: { name: true, email: true } },
         variant: { include: { service: { select: { name: true } } } },
-        freelancer: { select: { name: true } },
+        freelancer: { select: { name: true, email: true } },
       },
     });
+
+    if (updatedTicket) {
+      const clientTpl = ticketAssignedEmail(updatedTicket.user.name, updatedTicket.number);
+      sendEmail(updatedTicket.user.email || "", clientTpl.subject, clientTpl.html);
+      if (updatedTicket.freelancer) {
+        const flTpl = freelancerNewAssignmentEmail(updatedTicket.freelancer.name, updatedTicket.number, updatedTicket.variant.service.name);
+        sendEmail(updatedTicket.freelancer.email || "", flTpl.subject, flTpl.html);
+      }
+    }
 
     return NextResponse.json(updatedTicket);
   } catch (err) {

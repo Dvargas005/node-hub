@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { subscriptionActiveEmail } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -139,6 +141,13 @@ export async function POST(req: NextRequest) {
 
         await db.processedWebhook.create({ data: { sessionId, type: "subscription" } });
         console.log(`[WEBHOOK] Subscription created: ${userId} → ${plan.name}`);
+
+        const subUser = await db.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
+        if (subUser) {
+          const tpl = subscriptionActiveEmail(subUser.name, plan.name, plan.monthlyCredits + plan.bonusCredits);
+          sendEmail(subUser.email, tpl.subject, tpl.html);
+        }
+
         break;
       }
 

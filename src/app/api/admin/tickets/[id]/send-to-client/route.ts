@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { sendEmail } from "@/lib/email";
+import { deliveryReadyEmail } from "@/lib/email-templates";
 
 export async function POST(
   req: NextRequest,
@@ -32,6 +34,19 @@ export async function POST(
       await tx.delivery.update({ where: { id: deliveryId }, data: { status: "SENT_TO_CLIENT", pmApproved: true } });
       await tx.ticket.update({ where: { id: ticketId }, data: { status: "DELIVERED", deliveredAt: new Date() } });
     });
+
+    const ticketInfo = await db.ticket.findUnique({
+      where: { id: ticketId },
+      select: {
+        number: true,
+        user: { select: { name: true, email: true } },
+        variant: { select: { service: { select: { name: true } } } },
+      },
+    });
+    if (ticketInfo) {
+      const tpl = deliveryReadyEmail(ticketInfo.user.name, ticketInfo.number, ticketInfo.variant.service.name);
+      sendEmail(ticketInfo.user.email, tpl.subject, tpl.html);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

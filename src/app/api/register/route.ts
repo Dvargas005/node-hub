@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { verifyRecaptcha } from "@/lib/recaptcha";
+import { sendEmail } from "@/lib/email";
+import { welcomeEmail } from "@/lib/email-templates";
 
 // S5: Simple in-memory rate limiting for registration
 const registerAttempts = new Map<string, number[]>();
@@ -122,6 +124,9 @@ export async function POST(req: NextRequest) {
     for (const cookie of authRes.headers.getSetCookie()) {
       response.headers.append("Set-Cookie", cookie);
     }
+
+    const welcome = welcomeEmail(name);
+    sendEmail(email, welcome.subject, welcome.html);
 
     return response;
   } catch (err) {

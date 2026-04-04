@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { sendEmail } from "@/lib/email";
+import { ticketCreatedEmail } from "@/lib/email-templates";
 
 const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
 
@@ -157,6 +159,9 @@ export async function POST(req: NextRequest) {
 
       return newTicket;
     });
+
+    const emailTpl = ticketCreatedEmail(session.user.name, ticket.number, variant.service.name);
+    sendEmail(session.user.email, emailTpl.subject, emailTpl.html);
 
     return NextResponse.json({
       ticket: {

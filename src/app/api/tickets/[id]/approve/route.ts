@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { sendEmail } from "@/lib/email";
+import { ticketCompletedEmail } from "@/lib/email-templates";
 
 export async function POST(
   _req: NextRequest,
@@ -51,6 +53,23 @@ export async function POST(
         }
       }
     });
+
+    const tktInfo = await db.ticket.findUnique({
+      where: { id: params.id },
+      select: {
+        number: true,
+        briefStructured: true,
+        userId: true,
+        user: { select: { name: true, email: true } },
+        variant: { select: { service: { select: { name: true } } } },
+      },
+    });
+    if (tktInfo) {
+      const brief = tktInfo.briefStructured as Record<string, unknown> | null;
+      const bonus = brief?.firstRoundBonus as number | undefined;
+      const tpl = ticketCompletedEmail(tktInfo.user.name, tktInfo.number, tktInfo.variant.service.name, bonus);
+      sendEmail(tktInfo.user.email, tpl.subject, tpl.html);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
