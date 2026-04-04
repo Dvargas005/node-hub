@@ -42,32 +42,57 @@ export async function POST(req: NextRequest) {
       website = "https://" + website;
     }
 
-    // Check if this is the first onboarding (grant welcome credits only once)
-    const currentUser = await db.user.findUnique({
-      where: { id: session.user.id },
-      select: { onboardingCompleted: true },
-    });
-    const isFirstTime = !currentUser?.onboardingCompleted;
+    const userId = session.user.id;
 
-    await db.user.update({
-      where: { id: session.user.id },
-      data: {
-        businessName,
-        businessIndustry,
-        businessDescription,
-        targetAudience: targetAudience || undefined,
-        hasBranding: hasBranding ?? undefined,
-        brandColors: brandColors || undefined,
-        brandStyle: brandStyle || undefined,
-        website: website || undefined,
-        socialMedia: socialMedia || undefined,
-        priorities: priorities || undefined,
-        onboardingCompleted: true,
-        ...(isFirstTime ? { freeCredits: { increment: 10 } } : {}),
-      },
+    // C7: Atomic transaction to prevent double-submit granting 20 credits
+    const result = await db.$transaction(async (tx: any) => {
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { onboardingCompleted: true },
+      });
+
+      if (user?.onboardingCompleted) {
+        // Already completed — update profile but don't grant credits
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            businessName,
+            businessIndustry,
+            businessDescription,
+            targetAudience: targetAudience || undefined,
+            hasBranding: hasBranding ?? undefined,
+            brandColors: brandColors || undefined,
+            brandStyle: brandStyle || undefined,
+            website: website || undefined,
+            socialMedia: socialMedia || undefined,
+            priorities: priorities || undefined,
+          },
+        });
+        return { welcomeCredits: 0 };
+      }
+
+      // First time: set onboardingCompleted + grant credits atomically
+      await tx.user.update({
+        where: { id: userId, onboardingCompleted: false },
+        data: {
+          businessName,
+          businessIndustry,
+          businessDescription,
+          targetAudience: targetAudience || undefined,
+          hasBranding: hasBranding ?? undefined,
+          brandColors: brandColors || undefined,
+          brandStyle: brandStyle || undefined,
+          website: website || undefined,
+          socialMedia: socialMedia || undefined,
+          priorities: priorities || undefined,
+          onboardingCompleted: true,
+          freeCredits: { increment: 10 },
+        },
+      });
+      return { welcomeCredits: 10 };
     });
 
-    return NextResponse.json({ success: true, welcomeCredits: isFirstTime ? 10 : 0 });
+    return NextResponse.json({ success: true, welcomeCredits: result.welcomeCredits });
   } catch (err) {
     console.error("[ONBOARDING]", err);
     return NextResponse.json(

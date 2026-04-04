@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 
+const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
+
 export async function POST(req: NextRequest) {
-  const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
+  // I6: Only CLIENT can create tickets from wizard
+  const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
   try {
@@ -18,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id;
 
-    // Validate variant exists and is active (C2 + I15)
+    // Validate variant exists and is active
     const variant = await db.serviceVariant.findUnique({
       where: { id: variantId, isActive: true },
       include: { service: true },
@@ -40,19 +43,36 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Atomic transaction: validate balance + deduct + create ticket
+    // Atomic transaction: validate balance + enforce limits + deduct + create ticket
     const ticket = await db.$transaction(async (tx: any) => {
       // Read fresh balances inside transaction
       const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
-      const subscription = await tx.subscription.findUnique({ where: { userId }, select: { id: true, creditsRemaining: true, status: true } });
+      const subscription = await tx.subscription.findUnique({ where: { userId }, select: { id: true, creditsRemaining: true, status: true, planId: true } });
 
-      // C6: only use plan credits if subscription is ACTIVE
+      // Only use plan credits if subscription is ACTIVE
       const freeCredits = user?.freeCredits || 0;
       const planCredits = (subscription?.status === "ACTIVE" ? subscription.creditsRemaining : 0);
       const totalCredits = freeCredits + planCredits;
 
       if (totalCredits < variant.creditCost) {
         throw new Error(`INSUFFICIENT_CREDITS:${variant.creditCost}:${totalCredits}`);
+      }
+
+      // C11: Enforce maxActiveReqs
+      const activeCount = await tx.ticket.count({
+        where: { userId, status: { in: ACTIVE_STATUSES } },
+      });
+
+      if (subscription) {
+        const plan = await tx.plan.findUnique({ where: { id: subscription.planId } });
+        if (plan && activeCount >= plan.maxActiveReqs) {
+          throw new Error(`MAX_ACTIVE:${plan.maxActiveReqs}`);
+        }
+      } else {
+        // No plan — allow max 1 active ticket with free credits
+        if (activeCount >= 1) {
+          throw new Error("MAX_ACTIVE_FREE");
+        }
       }
 
       // Deduct: free first, then plan
@@ -118,6 +138,13 @@ export async function POST(req: NextRequest) {
     if (msg.startsWith("INSUFFICIENT_CREDITS:")) {
       const [, needed, have] = msg.split(":");
       return NextResponse.json({ error: `No tienes suficientes créditos. Necesitas ${needed}, tienes ${have}.` }, { status: 400 });
+    }
+    if (msg.startsWith("MAX_ACTIVE:")) {
+      const max = msg.split(":")[1];
+      return NextResponse.json({ error: `Has alcanzado el límite de solicitudes activas de tu plan (${max})` }, { status: 400 });
+    }
+    if (msg === "MAX_ACTIVE_FREE") {
+      return NextResponse.json({ error: "Necesitas un plan para tener más de una solicitud activa" }, { status: 400 });
     }
     console.error("[WIZARD_CREATE_TICKET]", err);
     return NextResponse.json({ error: "Error al crear el ticket" }, { status: 500 });

@@ -17,6 +17,7 @@ export function StarRating({
   onConfirm: (ratings: Record<string, number>) => void;
 }) {
   const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [submitted, setSubmitted] = useState(false);
 
   const setRating = (key: string, value: number) => {
     setRatings((prev) => ({ ...prev, [key]: value }));
@@ -36,6 +37,7 @@ export function StarRating({
               <button
                 key={star}
                 onClick={() => setRating(row.key, star)}
+                disabled={submitted}
                 className="p-0.5"
               >
                 <Star
@@ -52,10 +54,11 @@ export function StarRating({
       ))}
       {allRated && (
         <Button
-          onClick={() => onConfirm(ratings)}
-          className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4 mt-2"
+          onClick={() => { setSubmitted(true); onConfirm(ratings); }}
+          disabled={submitted}
+          className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4 mt-2 disabled:opacity-50"
         >
-          Confirmar
+          {submitted ? "Guardando..." : "Confirmar"}
         </Button>
       )}
     </div>

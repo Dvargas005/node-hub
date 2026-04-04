@@ -10,27 +10,60 @@ export async function POST(
   if (error || !session) return error;
 
   try {
-    const ticket = await db.ticket.findUnique({
-      where: { id: params.id, userId: session.user.id },
+    const ticketId = params.id;
+    const userId = session.user.id;
+
+    // C12: Wrap in transaction for atomicity + refund
+    await db.$transaction(async (tx: any) => {
+      const ticket = await tx.ticket.findUnique({
+        where: { id: ticketId, userId },
+      });
+
+      if (!ticket) {
+        throw new Error("NOT_FOUND");
+      }
+
+      if (!["NEW", "REVIEWING"].includes(ticket.status)) {
+        throw new Error("INVALID_STATUS");
+      }
+
+      await tx.ticket.update({
+        where: { id: ticketId },
+        data: { status: "CANCELED" },
+      });
+
+      // I5: Refund credits if ticket is NEW (no work done yet)
+      if (ticket.status === "NEW" && ticket.creditsCharged > 0) {
+        const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
+        // Refund to free credits first (up to 10 cap), rest to plan
+        const maxFreeRefund = Math.max(0, 10 - (user?.freeCredits || 0));
+        const freeRefund = Math.min(ticket.creditsCharged, maxFreeRefund);
+        const planRefund = ticket.creditsCharged - freeRefund;
+
+        if (freeRefund > 0) {
+          await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: freeRefund } } });
+        }
+        if (planRefund > 0) {
+          const sub = await tx.subscription.findUnique({ where: { userId } });
+          if (sub) {
+            await tx.subscription.update({ where: { id: sub.id }, data: { creditsRemaining: { increment: planRefund } } });
+          }
+        }
+      }
     });
-    if (!ticket) {
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (msg === "NOT_FOUND") {
       return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
     }
-
-    if (!["NEW", "REVIEWING"].includes(ticket.status)) {
+    if (msg === "INVALID_STATUS") {
       return NextResponse.json(
         { error: "Solo puedes cancelar solicitudes que aún no están en producción" },
         { status: 400 }
       );
     }
-
-    await db.ticket.update({
-      where: { id: ticket.id },
-      data: { status: "CANCELED" },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (err) {
     console.error("[TICKET_CANCEL]", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }

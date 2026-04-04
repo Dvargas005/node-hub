@@ -179,29 +179,12 @@ export function BriefConfirmation({
       )}
 
       {/* Warnings */}
-      {!hasSubscription && (
-        <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-none p-4">
-          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm text-red-400 font-medium">
-              Necesitas un plan activo para hacer solicitudes
-            </p>
-            <Link
-              href="/billing"
-              className="text-xs text-[var(--gold-bar)] hover:underline"
-            >
-              Ver planes disponibles
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {hasSubscription && !hasEnoughCredits && variant && (
+      {!hasEnoughCredits && variant && (
         <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/20 rounded-none p-4">
           <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-yellow-400 font-medium">
-              No tienes suficientes créditos
+              Créditos insuficientes
             </p>
             <p className="text-xs text-[rgba(245,246,252,0.5)]">
               Necesitas {variant.creditCost}, tienes{" "}
@@ -211,7 +194,7 @@ export function BriefConfirmation({
               href="/billing"
               className="text-xs text-[var(--gold-bar)] hover:underline"
             >
-              Actualizar plan o comprar créditos
+              {hasSubscription ? "Comprar créditos extra" : "Ver planes disponibles"}
             </Link>
           </div>
         </div>

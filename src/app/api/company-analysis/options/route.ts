@@ -42,12 +42,28 @@ async function fetchWebContent(url: string): Promise<string> {
   }
 }
 
+async function refundCredits(userId: string, freeDeducted: number, planDeducted: number, subscriptionId?: string) {
+  await db.$transaction(async (tx: any) => {
+    if (freeDeducted > 0) {
+      await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: freeDeducted } } });
+    }
+    if (planDeducted > 0 && subscriptionId) {
+      await tx.subscription.update({ where: { id: subscriptionId }, data: { creditsRemaining: { increment: planDeducted } } });
+    }
+  });
+}
+
 export async function POST() {
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
+  const userId = session.user.id;
+  let creditsDeducted = false;
+  let freeDeducted = 0;
+  let planDeducted = 0;
+  let subscriptionId: string | undefined;
+
   try {
-    const userId = session.user.id;
     console.log("[ANALYSIS] Step 1: Auth check passed, userId:", userId);
 
     // Check if user already has pending options (don't charge again)
@@ -61,7 +77,8 @@ export async function POST() {
       return NextResponse.json({ options: existing.options });
     }
 
-    const user = await db.user.findUnique({
+    // Load user data for prompt
+    const userData = await db.user.findUnique({
       where: { id: userId },
       select: {
         freeCredits: true, businessName: true, businessDescription: true,
@@ -70,54 +87,54 @@ export async function POST() {
         companyAnalysisAt: true,
       },
     });
-    console.log("[ANALYSIS] Step 2: User loaded:", !!user);
+    console.log("[ANALYSIS] Step 2: User loaded:", !!userData);
 
     const subscription = await db.subscription.findUnique({
       where: { userId },
       select: { id: true, creditsRemaining: true, currentPeriodStart: true },
     });
+    subscriptionId = subscription?.id;
 
     // Free renewal: if subscription renewed after last analysis
     const isFreeRenewal = !!(
-      user?.companyAnalysisAt &&
+      userData?.companyAnalysisAt &&
       subscription?.currentPeriodStart &&
-      new Date(subscription.currentPeriodStart) > new Date(user.companyAnalysisAt)
+      new Date(subscription.currentPeriodStart) > new Date(userData.companyAnalysisAt)
     );
 
-    const freeCredits = user?.freeCredits || 0;
-    const planCredits = subscription?.creditsRemaining || 0;
-    console.log("[ANALYSIS] Step 3: Credits check — free:", freeCredits, "plan:", planCredits, "freeRenewal:", isFreeRenewal);
-    if (!isFreeRenewal && freeCredits + planCredits < ANALYSIS_COST) {
-      return NextResponse.json(
-        { error: `Necesitas ${ANALYSIS_COST} créditos. Tienes ${freeCredits + planCredits}.` },
-        { status: 400 }
-      );
-    }
+    console.log("[ANALYSIS] Step 3: Credits check, freeRenewal:", isFreeRenewal);
 
-    // Deduct credits (skip if free renewal)
-    console.log("[ANALYSIS] Step 4: Deducting credits...");
-    let freeDeducted = 0;
-    let planDeducted = 0;
-    if (isFreeRenewal) {
-      console.log("[ANALYSIS_OPTIONS] Free renewal for user:", userId);
-    } else {
-      freeDeducted = Math.min(freeCredits, ANALYSIS_COST);
-      planDeducted = ANALYSIS_COST - freeDeducted;
+    // C10: Atomic balance check + deduction inside transaction
+    if (!isFreeRenewal) {
       await db.$transaction(async (tx: any) => {
+        const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
+        const sub = await tx.subscription.findUnique({ where: { userId }, select: { id: true, creditsRemaining: true } });
+        const freeCredits = user?.freeCredits || 0;
+        const planCredits = sub?.creditsRemaining || 0;
+
+        if (freeCredits + planCredits < ANALYSIS_COST) {
+          throw new Error(`INSUFFICIENT:${freeCredits + planCredits}`);
+        }
+
+        freeDeducted = Math.min(freeCredits, ANALYSIS_COST);
+        planDeducted = ANALYSIS_COST - freeDeducted;
+
         if (freeDeducted > 0) {
           await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: freeDeducted } } });
         }
-        if (planDeducted > 0 && subscription) {
-          await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { decrement: planDeducted } } });
+        if (planDeducted > 0 && sub) {
+          await tx.subscription.update({ where: { id: sub.id }, data: { creditsRemaining: { decrement: planDeducted } } });
         }
       });
+      creditsDeducted = true;
+      console.log("[ANALYSIS] Step 4: Credits deducted — free:", freeDeducted, "plan:", planDeducted);
+    } else {
+      console.log("[ANALYSIS] Step 4: Free renewal, no deduction");
     }
 
-    console.log("[ANALYSIS] Step 5: Building prompt, hasWebsite:", !!user?.website);
-    console.log("[ANALYSIS] Step 6: Fetching website content...");
-    const webContent = user?.website ? await fetchWebContent(user.website as string) : "";
-    console.log("[ANALYSIS] Step 6 done: webContent length:", webContent.length);
-    const context = buildBusinessContext(user as unknown as Record<string, unknown>, webContent);
+    console.log("[ANALYSIS] Step 5: Building prompt, hasWebsite:", !!userData?.website);
+    const webContent = userData?.website ? await fetchWebContent(userData.website as string) : "";
+    const context = buildBusinessContext(userData as unknown as Record<string, unknown>, webContent);
 
     const prompt = `Eres un consultor de negocios experto en pequeñas empresas latinas en Estados Unidos.
 
@@ -148,10 +165,9 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
         });
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-        console.log(`[ANALYSIS] Step 8: Gemini response received, attempt ${attempt + 1}, length:`, text.length);
-        console.log("[ANALYSIS] Step 9: Parsing JSON...");
+        console.log(`[ANALYSIS] Step 8: Gemini response, attempt ${attempt + 1}, length:`, text.length);
         options = parseGeminiJSON(text);
-        console.log("[ANALYSIS] Step 9 result: parsed =", !!options);
+        console.log("[ANALYSIS] Step 9: parsed =", !!options);
         if (options) break;
       } catch (e) {
         console.error(`[ANALYSIS] Gemini attempt ${attempt + 1} failed:`, e);
@@ -159,16 +175,14 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
     }
 
     if (!options) {
-      // Refund exact amounts to original sources
-      if (!isFreeRenewal && (freeDeducted > 0 || planDeducted > 0)) {
-        await db.$transaction(async (tx: any) => {
-          if (freeDeducted > 0) {
-            await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: freeDeducted } } });
-          }
-          if (planDeducted > 0 && subscription) {
-            await tx.subscription.update({ where: { id: subscription.id }, data: { creditsRemaining: { increment: planDeducted } } });
-          }
-        });
+      // Refund credits since generation failed
+      if (creditsDeducted) {
+        try {
+          await refundCredits(userId, freeDeducted, planDeducted, subscriptionId);
+          console.log("[ANALYSIS] Credits refunded after Gemini failure");
+        } catch (refundErr) {
+          console.error("[ANALYSIS] CRITICAL: Refund failed!", refundErr);
+        }
       }
       return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
     }
@@ -185,7 +199,26 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
 
     return NextResponse.json({ options });
   } catch (err) {
+    // C9: Always attempt refund in outer catch if credits were deducted
+    if (creditsDeducted) {
+      try {
+        await refundCredits(userId, freeDeducted, planDeducted, subscriptionId);
+        console.log("[ANALYSIS] Credits refunded after error");
+      } catch (refundErr) {
+        console.error("[ANALYSIS] CRITICAL: Refund failed!", refundErr);
+      }
+    }
+
+    const msg = err instanceof Error ? err.message : "";
+    if (msg.startsWith("INSUFFICIENT:")) {
+      const total = msg.split(":")[1];
+      return NextResponse.json(
+        { error: `Necesitas ${ANALYSIS_COST} créditos. Tienes ${total}.` },
+        { status: 400 }
+      );
+    }
+
     console.error("[ANALYSIS_OPTIONS]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
   }
 }
