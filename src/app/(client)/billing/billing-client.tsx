@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -270,6 +271,9 @@ export function BillingClient({
         </div>
       )}
 
+      {/* Smart projection */}
+      {showPricing && <BillingProjection />}
+
       {/* Credit packs */}
       {isActive && creditPacks.length > 0 && (
         <div>
@@ -299,6 +303,114 @@ export function BillingClient({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Billing Projection ─────────────────────────────
+interface MonthData { month: number; suggestedServices: { name: string; credits: number; category: string }[]; totalCredits: number; remaining: number }
+interface Projection { planSlug: string; planName: string; priceMonthly: number; monthlyCredits: number; months: MonthData[]; verdict: string }
+
+const verdictColors: Record<string, string> = {
+  insuficiente: "bg-red-500/20 text-red-400 border-red-500/30",
+  justo: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  holgado: "bg-green-500/20 text-green-400 border-green-500/30",
+};
+const verdictLabels: Record<string, string> = { insuficiente: "Insuficiente", justo: "Justo", holgado: "Holgado" };
+const catEmoji: Record<string, string> = { DESIGN: "🎨", WEB: "💻", MARKETING: "📱" };
+
+function BillingProjection() {
+  const [data, setData] = useState<{ projections: Projection[]; recommended: string | null } | null>(null);
+  const [reason, setReason] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/billing/projection")
+      .then((r) => r.json())
+      .then((d: any) => {
+        if (d.projections) setData(d);
+        else if (d.reason) setReason(d.reason);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (reason === "no_priorities") {
+    return (
+      <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+        <CardContent className="py-6 text-center">
+          <p className="text-sm text-[rgba(245,246,252,0.5)]">
+            Completa tu perfil de empresa para ver una recomendación personalizada de plan.
+          </p>
+          <Link href="/dashboard" className="text-xs text-[var(--gold-bar)] hover:underline mt-2 inline-block">
+            Ir al dashboard
+          </Link>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data) return null;
+
+  return (
+    <div>
+      <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-2">
+        ¿Qué plan te conviene?
+      </h2>
+      <p className="text-xs text-[rgba(245,246,252,0.4)] mb-4">Estimación basada en las necesidades de tu negocio</p>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {data.projections.map((p: any) => {
+          const isRec = p.planSlug === data.recommended;
+          return (
+            <Card key={p.planSlug} className={`border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] ${isRec ? "border-[var(--gold-bar)] shadow-[0_0_20px_rgba(255,201,25,0.06)]" : ""}`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-sm">{p.planName}</CardTitle>
+                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recomendado</Badge>}
+                </div>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">${p.priceMonthly / 100}/mes — {p.monthlyCredits} créditos</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {p.months.map((m: any) => (
+                  <div key={m.month} className="space-y-1">
+                    <p className="text-[10px] font-medium text-[rgba(245,246,252,0.5)]">Mes {m.month}</p>
+                    {m.suggestedServices.length === 0 ? (
+                      <p className="text-[10px] text-[rgba(245,246,252,0.3)]">Sin servicios sugeridos</p>
+                    ) : (
+                      <div className="space-y-0.5">
+                        {m.suggestedServices.map((s: any, i: number) => (
+                          <div key={i} className="flex justify-between text-[10px]">
+                            <span className="text-[rgba(245,246,252,0.6)]">{catEmoji[s.category] || ""} {s.name}</span>
+                            <span className="text-[rgba(245,246,252,0.4)] font-mono">{s.credits}cr</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {/* Progress bar */}
+                    {m.totalCredits > 0 && (
+                      <div>
+                        <div className="h-1.5 rounded-full bg-[rgba(255,255,255,0.1)] overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${m.remaining >= 0 ? "bg-green-500" : "bg-red-500"}`}
+                            style={{ width: `${Math.min((m.totalCredits / p.monthlyCredits) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <p className={`text-[9px] mt-0.5 ${m.remaining >= 0 ? "text-green-400" : "text-red-400"}`}>
+                          {m.remaining >= 0 ? `+${m.remaining} sobran` : `${m.remaining} faltan`}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <Separator className="bg-[rgba(245,246,252,0.06)]" />
+                <div className="flex items-center justify-between">
+                  <Badge className={verdictColors[p.verdict] || ""}>{verdictLabels[p.verdict] || p.verdict}</Badge>
+                  <span className="text-[10px] text-[rgba(245,246,252,0.4)]">3 meses: ${p.priceMonthly * 3 / 100}</span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
