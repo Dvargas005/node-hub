@@ -42,6 +42,10 @@ export default function RootLayout({
       <head>
         {/* Inline fallback — guarantees dark bg even if CSS fails to load */}
         <style dangerouslySetInnerHTML={{ __html: "body{background:#130A06;color:#F5F6FC}" }} />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#FFC919" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased">
         {children}
