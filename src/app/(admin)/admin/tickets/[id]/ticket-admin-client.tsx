@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ArrowLeft, Send, Upload, ExternalLink, UserPlus, Save, Clock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Send, Upload, ExternalLink, UserPlus, Save, Clock, AlertTriangle, DollarSign } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors, priorityLabels, priorityColors, freelancerRoleLabels, categoryLabels } from "@/lib/status-labels";
 
 interface TicketData {
@@ -23,6 +23,7 @@ interface TicketData {
   messages: { id: string; content: string; senderRole: string; senderName: string; isInternal: boolean; createdAt: string }[];
   deliveries: { id: string; round: number; status: string; notes: string | null; fileUrl: string | null; fileName: string | null; pmApproved: boolean; clientApproved: boolean; pmFeedback: string | null; clientFeedback: string | null; createdAt: string }[];
   files: { id: string; name: string; url: string; type: string }[];
+  surcharges: { id: string; amount: number; reason: string; createdAt: string }[];
 }
 interface Freelancer { id: string; name: string; role: string; skills: string[]; skillTags: string[]; currentLoad: number; clientCapacity: number }
 
@@ -57,6 +58,9 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
   const [pmNotes, setPmNotes] = useState(t.pmNotes || "");
   const [showAssign, setShowAssign] = useState(false);
   const [assigning, setAssigning] = useState(false);
+  const [showSurcharge, setShowSurcharge] = useState<"recargo" | "reembolso" | null>(null);
+  const [surAmt, setSurAmt] = useState("");
+  const [surReason, setSurReason] = useState("");
 
   async function api(url: string, opts: RequestInit) {
     setError(""); setSaving(true);
@@ -90,6 +94,14 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
     const r = await api(`/api/admin/tickets/${t.id}/assign`, { method: "POST", body: JSON.stringify({ freelancerId }) });
     setAssigning(false);
     if (r) setShowAssign(false);
+  };
+
+  const submitSurcharge = async () => {
+    const amount = showSurcharge === "reembolso" ? -Math.abs(Number(surAmt)) : Math.abs(Number(surAmt));
+    if (!amount || !surReason.trim()) return;
+    const endpoint = showSurcharge === "reembolso" ? `/api/admin/tickets/${t.id}/refund` : `/api/admin/tickets/${t.id}/surcharge`;
+    const r = await api(endpoint, { method: "POST", body: JSON.stringify({ amount: Math.abs(Number(surAmt)), reason: surReason.trim() }) });
+    if (r) { setSurAmt(""); setSurReason(""); setShowSurcharge(null); }
   };
 
   const isPmAlert = t.pmNotes && (t.pmNotes.startsWith("[AUTO]") || t.pmNotes.startsWith("[SYSTEM]") || t.pmNotes.includes("alerta"));
@@ -256,6 +268,35 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
             <CardContent className="space-y-2">
               <textarea className={txa} value={pmNotes} onChange={(e) => setPmNotes(e.target.value)} placeholder="Notas internas del PM..." />
               <Button size="sm" variant="outline" disabled={saving} onClick={savePmNotes} className={`${outBtn} gap-1`}><Save className="h-3 w-3" /> Guardar</Button>
+            </CardContent>
+          </Card>
+
+          <Card className={crd}>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>Ajustes</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "recargo" ? null : "recargo")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Recargo</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "reembolso" ? null : "reembolso")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Reembolso</Button>
+              </div>
+              {showSurcharge && (
+                <div className="space-y-2 rounded-md border border-[rgba(245,246,252,0.1)] p-2">
+                  <label className={lbl}>{showSurcharge === "recargo" ? "Recargo" : "Reembolso"}</label>
+                  <input type="number" className={inp} placeholder="Monto (créditos)" value={surAmt} onChange={(e) => setSurAmt(e.target.value)} />
+                  <input className={inp} placeholder="Razón" value={surReason} onChange={(e) => setSurReason(e.target.value)} />
+                  <Button size="sm" disabled={saving || !surAmt || !surReason.trim()} onClick={submitSurcharge} className={goldBtn}>Aplicar</Button>
+                </div>
+              )}
+              {t.surcharges.length > 0 && (
+                <div className="space-y-1 pt-1">
+                  {t.surcharges.map((s: any) => (
+                    <div key={s.id} className="flex items-center justify-between text-xs">
+                      <span className={s.amount > 0 ? "text-red-400" : "text-green-400"}>{s.amount > 0 ? "+" : ""}{s.amount} cr</span>
+                      <span className="text-[rgba(245,246,252,0.5)] truncate max-w-[120px]" title={s.reason}>{s.reason}</span>
+                      <span className="text-[rgba(245,246,252,0.3)]">{fmtS(s.createdAt)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -250,6 +250,7 @@ model Ticket {
   messages    TicketMessage[]
   files       TicketFile[]
   deliveries  Delivery[]
+  surcharges  TicketSurcharge[]
 
   @@map("tickets")
 }
@@ -454,4 +455,30 @@ enum WizardStatus {
   BRIEF_GENERATED
   TICKET_CREATED
   ABANDONED
+}
+
+// ─── SYNC REPORTS ──────────────────────────────────
+
+model SyncReport {
+  id        String    @id @default(cuid())
+  data      Json
+  appliedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("sync_reports")
+}
+
+// ─── TICKET SURCHARGES ─────────────────────────────
+
+model TicketSurcharge {
+  id        String   @id @default(cuid())
+  ticketId  String
+  amount    Int
+  reason    String
+  addedBy   String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+
+  @@map("ticket_surcharges")
 }

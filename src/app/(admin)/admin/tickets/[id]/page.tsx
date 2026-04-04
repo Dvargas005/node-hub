@@ -33,6 +33,7 @@ export default async function AdminTicketDetailPage({
           include: { sender: { select: { name: true } } },
         },
         deliveries: { orderBy: { round: "asc" } },
+        surcharges: { orderBy: { createdAt: "desc" } },
         files: true,
       },
     }),
@@ -119,6 +120,12 @@ export default async function AdminTicketDetailPage({
       url: f.url,
       type: f.type,
     })),
+    surcharges: (ticket as any).surcharges?.map((s: any) => ({
+      id: s.id,
+      amount: s.amount,
+      reason: s.reason,
+      createdAt: s.createdAt.toISOString(),
+    })) || [],
   };
 
   return (

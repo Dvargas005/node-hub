@@ -10,6 +10,7 @@ import {
   Package,
   Handshake,
   BarChart3,
+  RefreshCw,
 } from "lucide-react";
 import type { NavItem } from "@/components/layout/sidebar";
 
@@ -22,6 +23,7 @@ const baseNav: NavItem[] = [
   { label: "Servicios", href: "/admin/services", icon: Package },
   { label: "Alianzas", href: "/admin/alliances", icon: Handshake },
   { label: "Métricas", href: "/admin/metrics", icon: BarChart3 },
+  { label: "Sync", href: "/admin/sync", icon: RefreshCw },
 ];
 
 export default function AdminLayout({
