@@ -219,7 +219,8 @@ export function TicketsClient({
                 {filtered.map((t: any) => (
                   <TableRow
                     key={t.id}
-                    className={`border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] ${
+                    onClick={() => router.push(`/admin/tickets/${t.id}`)}
+                    className={`border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer ${
                       t.status === "NEW"
                         ? "border-l-2 border-l-[var(--gold-bar)]"
                         : ""
@@ -271,7 +272,10 @@ export function TicketsClient({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setAssignTicket(t)}
+                          onClick={(e: any) => {
+                            e.stopPropagation();
+                            setAssignTicket(t);
+                          }}
                           className="h-7 gap-1 text-xs text-[var(--gold-bar)] hover:text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)]"
                         >
                           <UserPlus className="h-3 w-3" />

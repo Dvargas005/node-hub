@@ -1,7 +1,17 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -10,10 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Plus, Pencil } from "lucide-react";
 
 interface AllianceRow {
   id: string;
   name: string;
+  slug: string;
   code: string;
   discountPercent: number;
   bonusCredits: number;
@@ -24,16 +36,317 @@ interface AllianceRow {
   contactEmail: string | null;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const emptyForm = {
+  name: "",
+  slug: "",
+  code: "",
+  contactName: "",
+  contactEmail: "",
+  discountPercent: "",
+  bonusCredits: "",
+  revenueShare: "",
+};
+
 export function AlliancesClient({
   alliances,
+  isAdmin,
 }: {
   alliances: AllianceRow[];
+  isAdmin: boolean;
 }) {
+  const router = useRouter();
+
+  // Create dialog
+  const [showCreate, setShowCreate] = useState(false);
+  const [createForm, setCreateForm] = useState({ ...emptyForm });
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+
+  // Edit dialog
+  const [editTarget, setEditTarget] = useState<AllianceRow | null>(null);
+  const [editForm, setEditForm] = useState({ ...emptyForm });
+  const [editing, setEditing] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  // Toggle
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  /* ---------- Create ---------- */
+  const openCreate = () => {
+    setCreateForm({ ...emptyForm });
+    setCreateError("");
+    setShowCreate(true);
+  };
+
+  const updateCreateName = (name: string) => {
+    setCreateForm((prev: any) => ({
+      ...prev,
+      name,
+      slug: slugify(name),
+    }));
+  };
+
+  const handleCreate = async () => {
+    if (!createForm.name.trim()) {
+      setCreateError("El nombre es obligatorio");
+      return;
+    }
+    setCreating(true);
+    setCreateError("");
+    try {
+      const res = await fetch("/api/admin/alliances", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: createForm.name.trim(),
+          slug: createForm.slug || slugify(createForm.name),
+          code: createForm.code.toUpperCase().trim(),
+          contactName: createForm.contactName.trim() || undefined,
+          contactEmail: createForm.contactEmail.trim() || undefined,
+          discountPercent: createForm.discountPercent
+            ? Number(createForm.discountPercent)
+            : 0,
+          bonusCredits: createForm.bonusCredits
+            ? Number(createForm.bonusCredits)
+            : 0,
+          revenueShare: createForm.revenueShare
+            ? Number(createForm.revenueShare)
+            : 0,
+        }),
+      });
+      if (res.ok) {
+        setShowCreate(false);
+        router.refresh();
+      } else {
+        const data = await res.json();
+        setCreateError(data.error || "Error al crear alianza");
+      }
+    } catch {
+      setCreateError("Error de conexión");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  /* ---------- Edit ---------- */
+  const openEdit = (a: AllianceRow) => {
+    setEditTarget(a);
+    setEditForm({
+      name: a.name,
+      slug: a.slug,
+      code: a.code,
+      contactName: a.contactName || "",
+      contactEmail: a.contactEmail || "",
+      discountPercent: String(a.discountPercent),
+      bonusCredits: String(a.bonusCredits),
+      revenueShare: String(a.revenueShare),
+    });
+    setEditError("");
+  };
+
+  const handleEdit = async () => {
+    if (!editTarget) return;
+    if (!editForm.name.trim()) {
+      setEditError("El nombre es obligatorio");
+      return;
+    }
+    setEditing(true);
+    setEditError("");
+    try {
+      const res = await fetch(`/api/admin/alliances/${editTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          slug: editForm.slug || slugify(editForm.name),
+          code: editForm.code.toUpperCase().trim(),
+          contactName: editForm.contactName.trim() || undefined,
+          contactEmail: editForm.contactEmail.trim() || undefined,
+          discountPercent: editForm.discountPercent
+            ? Number(editForm.discountPercent)
+            : 0,
+          bonusCredits: editForm.bonusCredits
+            ? Number(editForm.bonusCredits)
+            : 0,
+          revenueShare: editForm.revenueShare
+            ? Number(editForm.revenueShare)
+            : 0,
+        }),
+      });
+      if (res.ok) {
+        setEditTarget(null);
+        router.refresh();
+      } else {
+        const data = await res.json();
+        setEditError(data.error || "Error al editar alianza");
+      }
+    } catch {
+      setEditError("Error de conexión");
+    } finally {
+      setEditing(false);
+    }
+  };
+
+  /* ---------- Toggle active ---------- */
+  const handleToggle = async (a: AllianceRow) => {
+    setTogglingId(a.id);
+    try {
+      const res = await fetch(`/api/admin/alliances/${a.id}/toggle`, {
+        method: "PATCH",
+      });
+      if (res.ok) router.refresh();
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  /* ---------- Shared form fields ---------- */
+  const renderFormFields = (
+    form: typeof emptyForm,
+    setForm: (v: typeof emptyForm) => void,
+    autoSlug: boolean
+  ) => (
+    <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+      {/* Name */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Nombre *
+        </label>
+        <input
+          value={form.name}
+          onChange={(e) => {
+            if (autoSlug) {
+              setForm({ ...form, name: e.target.value, slug: slugify(e.target.value) });
+            } else {
+              setForm({ ...form, name: e.target.value });
+            }
+          }}
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="Nombre de la alianza"
+        />
+      </div>
+      {/* Slug */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Slug
+        </label>
+        <input
+          value={form.slug}
+          onChange={(e) => setForm({ ...form, slug: e.target.value })}
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="auto-generado"
+        />
+      </div>
+      {/* Code */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Código (mayúsculas)
+        </label>
+        <input
+          value={form.code}
+          onChange={(e) =>
+            setForm({ ...form, code: e.target.value.toUpperCase() })
+          }
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)] uppercase"
+          placeholder="ALIANZA2024"
+        />
+      </div>
+      {/* Contact Name */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Nombre de contacto
+        </label>
+        <input
+          value={form.contactName}
+          onChange={(e) => setForm({ ...form, contactName: e.target.value })}
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="Nombre del contacto"
+        />
+      </div>
+      {/* Contact Email */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Email de contacto
+        </label>
+        <input
+          type="email"
+          value={form.contactEmail}
+          onChange={(e) => setForm({ ...form, contactEmail: e.target.value })}
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="contacto@alianza.com"
+        />
+      </div>
+      {/* Discount */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Descuento (%)
+        </label>
+        <input
+          type="number"
+          value={form.discountPercent}
+          onChange={(e) =>
+            setForm({ ...form, discountPercent: e.target.value })
+          }
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="10"
+        />
+      </div>
+      {/* Bonus Credits */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Créditos bonus
+        </label>
+        <input
+          type="number"
+          value={form.bonusCredits}
+          onChange={(e) =>
+            setForm({ ...form, bonusCredits: e.target.value })
+          }
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="0"
+        />
+      </div>
+      {/* Revenue Share */}
+      <div>
+        <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+          Revenue share
+        </label>
+        <input
+          type="number"
+          value={form.revenueShare}
+          onChange={(e) =>
+            setForm({ ...form, revenueShare: e.target.value })
+          }
+          className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
+          placeholder="0"
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Alianzas
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
+          Alianzas
+        </h1>
+        {isAdmin && (
+          <Button
+            onClick={openCreate}
+            className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            Crear alianza
+          </Button>
+        )}
+      </div>
 
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardHeader>
@@ -53,13 +366,14 @@ export function AlliancesClient({
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Revenue share</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Referidos</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Estado</TableHead>
+                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">Acciones</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {alliances.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={isAdmin ? 8 : 7}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
                       No hay alianzas
@@ -100,7 +414,23 @@ export function AlliancesClient({
                       {a.referredCount}
                     </TableCell>
                     <TableCell>
-                      {a.isActive ? (
+                      {isAdmin ? (
+                        <button
+                          onClick={() => handleToggle(a)}
+                          disabled={togglingId === a.id}
+                          className="cursor-pointer disabled:opacity-50"
+                        >
+                          {a.isActive ? (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              {togglingId === a.id ? "..." : "Activa"}
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                              {togglingId === a.id ? "..." : "Inactiva"}
+                            </Badge>
+                          )}
+                        </button>
+                      ) : a.isActive ? (
                         <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                           Activa
                         </Badge>
@@ -110,6 +440,19 @@ export function AlliancesClient({
                         </Badge>
                       )}
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEdit(a)}
+                          className="h-7 gap-1 text-xs text-[var(--gold-bar)] hover:text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)]"
+                        >
+                          <Pencil className="h-3 w-3" />
+                          Editar
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -117,6 +460,87 @@ export function AlliancesClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Create Dialog */}
+      <Dialog open={showCreate} onOpenChange={(open) => !open && setShowCreate(false)}>
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-[var(--font-lexend)]">
+              Crear Alianza
+            </DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]">
+              Completa los campos para registrar una nueva alianza.
+            </DialogDescription>
+          </DialogHeader>
+
+          {renderFormFields(createForm, setCreateForm, true)}
+
+          {createError && (
+            <div className="text-sm text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-md p-2">
+              {createError}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => setShowCreate(false)}
+              className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCreate}
+              disabled={creating}
+              className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+            >
+              {creating ? "Creando..." : "Crear"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog
+        open={!!editTarget}
+        onOpenChange={(open) => !open && setEditTarget(null)}
+      >
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-[var(--font-lexend)]">
+              Editar Alianza
+            </DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]">
+              Modifica los campos de la alianza.
+            </DialogDescription>
+          </DialogHeader>
+
+          {renderFormFields(editForm, setEditForm, false)}
+
+          {editError && (
+            <div className="text-sm text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-md p-2">
+              {editError}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => setEditTarget(null)}
+              className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleEdit}
+              disabled={editing}
+              className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+            >
+              {editing ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

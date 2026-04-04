@@ -9,6 +9,7 @@ export interface NavItem {
   label: string;
   href: string;
   icon: LucideIcon;
+  badge?: number;
 }
 
 interface SidebarProps {
@@ -60,6 +61,11 @@ export function Sidebar({ items, title = "N.O.D.E.", isOpen = false, onClose }: 
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
+                {item.badge ? (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                    {item.badge}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

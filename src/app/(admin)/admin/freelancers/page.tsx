@@ -17,6 +17,7 @@ export default async function AdminFreelancersPage() {
   return (
     <FreelancersClient
       showSalary={isAdmin}
+      isAdmin={isAdmin}
       freelancers={freelancers.map((f: any) => ({
         id: f.id,
         name: f.name,
@@ -29,6 +30,11 @@ export default async function AdminFreelancersPage() {
         clientCapacity: f.clientCapacity,
         availability: f.availability,
         pmName: f.pm.name,
+        phone: f.phone ?? undefined,
+        telegramId: f.telegramId ?? undefined,
+        bio: f.bio ?? undefined,
+        portfolioUrl: f.portfolioUrl ?? undefined,
+        timezone: f.timezone ?? undefined,
       }))}
     />
   );

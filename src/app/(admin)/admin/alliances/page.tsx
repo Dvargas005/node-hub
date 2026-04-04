@@ -5,7 +5,9 @@ import { AlliancesClient } from "./alliances-client";
 export const dynamic = "force-dynamic";
 
 export default async function AdminAlliancesPage() {
-  await requireRole(["ADMIN", "PM"]);
+  const session = await requireRole(["ADMIN", "PM"]);
+  const userRole = (session.user as Record<string, unknown>).role as string;
+  const isAdmin = userRole === "ADMIN";
 
   const alliances = await db.alliance.findMany({
     include: {
@@ -16,9 +18,11 @@ export default async function AdminAlliancesPage() {
 
   return (
     <AlliancesClient
+      isAdmin={isAdmin}
       alliances={alliances.map((a: any) => ({
         id: a.id,
         name: a.name,
+        slug: a.slug,
         code: a.code,
         discountPercent: a.discountPercent,
         bonusCredits: a.bonusCredits,

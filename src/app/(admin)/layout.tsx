@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   LayoutDashboard,
@@ -12,7 +13,7 @@ import {
 } from "lucide-react";
 import type { NavItem } from "@/components/layout/sidebar";
 
-const adminNav: NavItem[] = [
+const baseNav: NavItem[] = [
   { label: "Panel General", href: "/admin/overview", icon: LayoutDashboard },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Clientes", href: "/admin/clients", icon: Users },
@@ -27,6 +28,30 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [counts, setCounts] = useState<{
+    newTickets?: number;
+    pendingDeliveries?: number;
+  }>({});
+
+  useEffect(() => {
+    fetch("/api/admin/counts")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: any) => {
+        if (data) setCounts(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const adminNav: NavItem[] = baseNav.map((item: any) => {
+    if (item.href === "/admin/tickets" && counts.newTickets) {
+      return { ...item, badge: counts.newTickets };
+    }
+    if (item.href === "/admin/overview" && counts.pendingDeliveries) {
+      return { ...item, badge: counts.pendingDeliveries };
+    }
+    return item;
+  });
+
   return (
     <AppShell navItems={adminNav} title="N.O.D.E. Admin">
       {children}
