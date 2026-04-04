@@ -32,6 +32,14 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // If admin has view-as role cookie, allow access to all app routes
+  // (the actual role check is done in server components/API routes)
+  const viewAsRole = req.cookies.get("node-view-as-role")?.value;
+  if (viewAsRole && viewAsRole !== "ADMIN") {
+    // Admin impersonating — allow through to any app route
+    return NextResponse.next();
+  }
+
   return NextResponse.next();
 }
 
