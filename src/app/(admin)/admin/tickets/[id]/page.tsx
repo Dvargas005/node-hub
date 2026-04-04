@@ -52,13 +52,7 @@ export default async function AdminTicketDetailPage({
   ]);
 
   if (!ticket) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-[rgba(245,246,252,0.5)] text-lg">
-          Ticket no encontrado
-        </p>
-      </div>
-    );
+    notFound();
   }
 
   const serialized = {

@@ -22,11 +22,11 @@ export async function GET() {
         freelancerId: freelancer.id,
         status: { in: ["ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"] },
       },
-      include: {
+      select: {
+        id: true, number: true, status: true, priority: true, pmNotes: true,
+        assignedAt: true, startedAt: true, createdAt: true, updatedAt: true,
         user: { select: { name: true, businessName: true } },
-        variant: {
-          include: { service: { select: { name: true, category: true } } },
-        },
+        variant: { select: { name: true, service: { select: { name: true, category: true } } } },
       },
       orderBy: { updatedAt: "desc" },
     });
@@ -35,6 +35,8 @@ export async function GET() {
       ...t,
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
+      assignedAt: t.assignedAt?.toISOString() || null,
+      startedAt: t.startedAt?.toISOString() || null,
     }));
 
     return NextResponse.json(serialized);

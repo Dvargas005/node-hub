@@ -7,9 +7,12 @@ export async function GET() {
   if (error || !session) return error;
 
   try {
+    const role = (session.user as Record<string, unknown>).role as string;
+    const pmFilter = role === "PM" ? { user: { assignedPmId: session.user.id } } : {};
+
     const [newTickets, pendingDeliveries] = await Promise.all([
-      db.ticket.count({ where: { status: "NEW" } }),
-      db.delivery.count({ where: { status: "PENDING_REVIEW" } }),
+      db.ticket.count({ where: { status: "NEW", ...pmFilter } }),
+      db.delivery.count({ where: { status: "PENDING_REVIEW", ticket: pmFilter } }),
     ]);
 
     return NextResponse.json({ newTickets, pendingDeliveries });

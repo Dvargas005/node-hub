@@ -17,6 +17,11 @@ export async function PATCH(
       return NextResponse.json({ error: "pmId es requerido" }, { status: 400 });
     }
 
+    const client = await db.user.findUnique({ where: { id }, select: { role: true } });
+    if (!client || client.role !== "CLIENT") {
+      return NextResponse.json({ error: "Cliente no encontrado" }, { status: 404 });
+    }
+
     // Validate PM exists and has correct role
     const pm = await db.user.findUnique({
       where: { id: pmId },

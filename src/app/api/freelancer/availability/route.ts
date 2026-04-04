@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 
-const validAvailability = ["AVAILABLE", "BUSY", "ON_LEAVE", "INACTIVE"];
+const validAvailability = ["AVAILABLE", "BUSY", "ON_LEAVE"];
 
 export async function PATCH(req: NextRequest) {
   const { error, session } = await requireApiRole(["FREELANCER"]);
@@ -28,6 +28,10 @@ export async function PATCH(req: NextRequest) {
         { error: "Perfil de freelancer no encontrado" },
         { status: 404 }
       );
+    }
+
+    if (freelancer.availability === "INACTIVE") {
+      return NextResponse.json({ error: "Tu cuenta está desactivada. Contacta a tu PM." }, { status: 403 });
     }
 
     const updated = await db.freelancer.update({

@@ -17,7 +17,7 @@ export async function POST(
     await db.$transaction(async (tx: any) => {
       // Use updateMany with WHERE freelancerId IS NULL for atomicity
       const updated = await tx.ticket.updateMany({
-        where: { id: ticketId, freelancerId: null },
+        where: { id: ticketId, freelancerId: null, status: { in: ["NEW", "REVIEWING"] } },
         data: { freelancerId, status: "ASSIGNED", assignedAt: new Date() },
       });
 

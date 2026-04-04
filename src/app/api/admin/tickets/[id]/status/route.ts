@@ -6,7 +6,7 @@ const validTransitions: Record<string, string[]> = {
   NEW: ["REVIEWING", "CANCELED"],
   REVIEWING: ["ASSIGNED", "CANCELED"],
   ASSIGNED: ["IN_PROGRESS", "CANCELED"],
-  IN_PROGRESS: ["DELIVERED", "REVISION"],
+  IN_PROGRESS: ["DELIVERED", "REVISION", "CANCELED"],
   DELIVERED: ["COMPLETED", "REVISION"],
   REVISION: ["IN_PROGRESS"],
 };
@@ -37,10 +37,10 @@ export async function POST(
 
     const data: Record<string, unknown> = { status };
 
-    if (status === "IN_PROGRESS") {
+    if (status === "IN_PROGRESS" && !ticket.startedAt) {
       data.startedAt = new Date();
     }
-    if (status === "DELIVERED") {
+    if (status === "DELIVERED" && !ticket.deliveredAt) {
       data.deliveredAt = new Date();
     }
     if (status === "COMPLETED") {

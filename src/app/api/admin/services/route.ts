@@ -14,6 +14,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
+    const validCategories = ["DESIGN", "WEB", "MARKETING"];
+    if (!validCategories.includes(category)) {
+      return NextResponse.json({ error: "Categoría inválida" }, { status: 400 });
+    }
+
     const existing = await db.service.findUnique({ where: { slug } });
     if (existing) {
       return NextResponse.json({ error: "El slug ya existe" }, { status: 409 });

@@ -3,12 +3,10 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import crypto from "crypto";
 
-function generatePassword(length = 12): string {
-  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#";
-  let result = "";
-  for (let i = 0; i < length; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-  return result;
+function generatePassword(): string {
+  return crypto.randomBytes(9).toString("base64url").substring(0, 12);
 }
 
 export async function POST(req: NextRequest) {

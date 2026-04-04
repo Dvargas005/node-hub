@@ -18,6 +18,10 @@ export async function POST(
       return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
     }
 
+    if (!["IN_PROGRESS", "REVISION"].includes(ticket.status)) {
+      return NextResponse.json({ error: "Ticket no está en estado válido para subir entrega" }, { status: 400 });
+    }
+
     const lastDelivery = await db.delivery.findFirst({
       where: { ticketId },
       orderBy: { round: "desc" },

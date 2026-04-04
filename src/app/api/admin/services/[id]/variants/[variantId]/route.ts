@@ -15,7 +15,7 @@ export async function PATCH(
   if (error) return error;
 
   try {
-    const { variantId } = await params;
+    const { id, variantId } = await params;
     const body = await req.json();
 
     const data: Record<string, unknown> = {};
@@ -31,6 +31,9 @@ export async function PATCH(
 
     if (data.creditCost != null) data.creditCost = Number(data.creditCost);
     if (data.estimatedDays != null) data.estimatedDays = Number(data.estimatedDays);
+
+    const exists = await db.serviceVariant.findFirst({ where: { id: variantId, serviceId: id } });
+    if (!exists) return NextResponse.json({ error: "Variante no encontrada en este servicio" }, { status: 404 });
 
     const variant = await db.serviceVariant.update({
       where: { id: variantId },

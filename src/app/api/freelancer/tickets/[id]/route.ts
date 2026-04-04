@@ -22,14 +22,15 @@ export async function GET(
 
     const ticket = await db.ticket.findUnique({
       where: { id: params.id },
-      include: {
+      select: {
+        id: true, number: true, status: true, priority: true, pmNotes: true,
+        briefStructured: true, assignedAt: true, startedAt: true, deliveredAt: true,
+        createdAt: true, updatedAt: true, freelancerId: true,
         user: { select: { name: true, businessName: true } },
-        variant: {
-          include: { service: { select: { name: true, category: true } } },
-        },
-        messages: { where: { isInternal: true }, orderBy: { createdAt: "asc" } },
-        deliveries: { orderBy: { round: "desc" } },
-        files: true,
+        variant: { select: { name: true, service: { select: { name: true, category: true } } } },
+        messages: { where: { isInternal: true }, orderBy: { createdAt: "asc" }, select: { id: true, content: true, senderRole: true, senderId: true, isInternal: true, createdAt: true, sender: { select: { name: true } } } },
+        deliveries: { orderBy: { round: "desc" }, select: { id: true, round: true, status: true, notes: true, fileUrl: true, fileName: true, pmFeedback: true, clientFeedback: true, createdAt: true } },
+        files: { select: { id: true, name: true, url: true, type: true } },
       },
     });
 
@@ -51,6 +52,11 @@ export async function GET(
       ...ticket,
       createdAt: ticket.createdAt.toISOString(),
       updatedAt: ticket.updatedAt.toISOString(),
+      assignedAt: ticket.assignedAt?.toISOString() || null,
+      startedAt: ticket.startedAt?.toISOString() || null,
+      deliveredAt: ticket.deliveredAt?.toISOString() || null,
+      messages: ticket.messages.map((m: any) => ({ ...m, createdAt: m.createdAt.toISOString() })),
+      deliveries: ticket.deliveries.map((d: any) => ({ ...d, createdAt: d.createdAt.toISOString() })),
     });
   } catch (err) {
     console.error("[FREELANCER_TICKET_DETAIL]", err);

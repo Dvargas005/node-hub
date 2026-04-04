@@ -45,6 +45,10 @@ export async function POST(
       );
     }
 
+    if (["COMPLETED", "CANCELED"].includes(ticket.status)) {
+      return NextResponse.json({ error: "No se pueden enviar mensajes en tickets cerrados" }, { status: 400 });
+    }
+
     const message = await db.ticketMessage.create({
       data: {
         ticketId: ticket.id,

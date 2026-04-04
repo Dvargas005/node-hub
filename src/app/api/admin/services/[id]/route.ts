@@ -29,6 +29,11 @@ export async function PATCH(
       return NextResponse.json({ error: "Sin campos para actualizar" }, { status: 400 });
     }
 
+    if (data.slug) {
+      const existing = await db.service.findFirst({ where: { slug: data.slug as string, id: { not: id } } });
+      if (existing) return NextResponse.json({ error: "Slug ya existe" }, { status: 409 });
+    }
+
     const service = await db.service.update({
       where: { id },
       data,

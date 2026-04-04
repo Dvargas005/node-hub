@@ -17,30 +17,33 @@ export async function POST(
       return NextResponse.json({ error: "deliveryId es requerido" }, { status: 400 });
     }
 
-    const delivery = await db.delivery.findUnique({ where: { id: deliveryId } });
-    if (!delivery || delivery.ticketId !== ticketId) {
+    await db.$transaction(async (tx: any) => {
+      const ticket = await tx.ticket.findUnique({ where: { id: ticketId } });
+      if (!ticket || !["IN_PROGRESS", "REVISION"].includes(ticket.status)) {
+        throw new Error("INVALID_STATUS");
+      }
+      const delivery = await tx.delivery.findUnique({ where: { id: deliveryId } });
+      if (!delivery || delivery.ticketId !== ticketId) {
+        throw new Error("NOT_FOUND");
+      }
+      if (delivery.status !== "PENDING_REVIEW") {
+        throw new Error("DELIVERY_NOT_PENDING");
+      }
+      await tx.delivery.update({ where: { id: deliveryId }, data: { status: "SENT_TO_CLIENT", pmApproved: true } });
+      await tx.ticket.update({ where: { id: ticketId }, data: { status: "DELIVERED", deliveredAt: new Date() } });
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    if (err?.message === "INVALID_STATUS") {
+      return NextResponse.json({ error: "El ticket no está en estado válido para enviar" }, { status: 400 });
+    }
+    if (err?.message === "NOT_FOUND") {
       return NextResponse.json({ error: "Entrega no encontrada" }, { status: 404 });
     }
-
-    const [updatedDelivery, updatedTicket] = await Promise.all([
-      db.delivery.update({
-        where: { id: deliveryId },
-        data: {
-          status: "SENT_TO_CLIENT",
-          pmApproved: true,
-        },
-      }),
-      db.ticket.update({
-        where: { id: ticketId },
-        data: {
-          status: "DELIVERED",
-          deliveredAt: new Date(),
-        },
-      }),
-    ]);
-
-    return NextResponse.json({ delivery: updatedDelivery, ticket: updatedTicket });
-  } catch (err) {
+    if (err?.message === "DELIVERY_NOT_PENDING") {
+      return NextResponse.json({ error: "La entrega no está pendiente de revisión" }, { status: 400 });
+    }
     console.error("[SEND_TO_CLIENT]", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
