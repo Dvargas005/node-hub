@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +81,7 @@ export function DashboardClient({
   userName, freeCredits, subscription, profile, companyAnalysis, companyAnalysisAt, subscriptionRenewedAt, activeTickets, latestTicket, pm,
 }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const firstName = userName?.split(" ")[0] || "usuario";
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const greeting = getGreeting(firstName, latestTicket, companyAnalysis);
@@ -106,6 +108,30 @@ export function DashboardClient({
   const [feedbackA, setFeedbackA] = useState("");
   const [feedbackB, setFeedbackB] = useState("");
   const [localOptions, setLocalOptions] = useState(analysisOptions);
+
+  // Verify Stripe checkout session as webhook fallback
+  useEffect(() => {
+    const checkout = searchParams.get("checkout");
+    const sessionId = searchParams.get("session_id");
+    if (checkout !== "success" || !sessionId) return;
+
+    // Clean URL immediately
+    window.history.replaceState({}, "", "/dashboard");
+
+    fetch(`/api/stripe/verify-session?session_id=${sessionId}`)
+      .then((res) => res.json())
+      .then((data: any) => {
+        if (data.success) {
+          toast.success("¡Suscripción activada!");
+          router.refresh();
+        } else if (data.error) {
+          toast.error("Verificando tu pago... intenta recargar en unos segundos");
+        }
+      })
+      .catch(() => {
+        toast.error("Verificando tu pago... intenta recargar en unos segundos");
+      });
+  }, [searchParams, router]);
 
   const handleGenerate = async () => {
     setGenerating(true);
