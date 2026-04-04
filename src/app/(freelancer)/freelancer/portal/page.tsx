@@ -1,21 +1,25 @@
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/session";
+import { requireRole, getViewAsRole } from "@/lib/session";
 import { PortalClient } from "./portal-client";
 
 export const dynamic = "force-dynamic";
 
 export default async function FreelancerPortalPage() {
   const session = await requireRole(["FREELANCER"]);
+  const realRole = (session.user as Record<string, unknown>).role as string;
+  const viewAs = await getViewAsRole();
+  const isImpersonating = realRole === "ADMIN" && viewAs === "FREELANCER";
 
-  const freelancer = await db.freelancer.findUnique({
-    where: { userId: session.user.id },
-  });
+  // For impersonation, load first freelancer in DB; for real freelancers, load their own
+  const freelancer = isImpersonating
+    ? await db.freelancer.findFirst({ orderBy: { createdAt: "asc" } })
+    : await db.freelancer.findUnique({ where: { userId: session.user.id } });
 
   if (!freelancer) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <p className="text-[rgba(245,246,252,0.5)] text-lg">
-          Perfil de freelancer no encontrado. Contacta al administrador.
+          {isImpersonating ? "No hay freelancers en el sistema." : "Perfil de freelancer no encontrado. Contacta al administrador."}
         </p>
       </div>
     );

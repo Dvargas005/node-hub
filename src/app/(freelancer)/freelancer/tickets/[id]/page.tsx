@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/session";
+import { requireRole, getViewAsRole } from "@/lib/session";
 import { TicketFreelancerClient } from "./ticket-freelancer-client";
 
 export const dynamic = "force-dynamic";
@@ -10,10 +10,13 @@ export default async function FreelancerTicketDetailPage({
   params: { id: string };
 }) {
   const session = await requireRole(["FREELANCER"]);
+  const realRole = (session.user as Record<string, unknown>).role as string;
+  const viewAs = await getViewAsRole();
+  const isImpersonating = realRole === "ADMIN" && viewAs === "FREELANCER";
 
-  const freelancer = await db.freelancer.findUnique({
-    where: { userId: session.user.id },
-  });
+  const freelancer = isImpersonating
+    ? await db.freelancer.findFirst({ orderBy: { createdAt: "asc" } })
+    : await db.freelancer.findUnique({ where: { userId: session.user.id } });
 
   if (!freelancer) {
     return (
@@ -40,6 +43,7 @@ export default async function FreelancerTicketDetailPage({
     },
   });
 
+  // For impersonation, allow viewing any ticket assigned to the impersonated freelancer
   if (!ticket || ticket.freelancerId !== freelancer.id) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
