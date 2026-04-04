@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Stripe no disponible" }, { status: 503 });
     }
 
-    const { planSlug } = await req.json();
+    const { planSlug, promoCode } = await req.json();
     const userId = session.user.id;
 
     const plan = await db.plan.findUnique({ where: { slug: planSlug } });
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // I17: Find or create Stripe customer — check User.stripeCustomerId first, then Stripe, then create
     const userRecord = await db.user.findUnique({
       where: { id: userId },
-      select: { stripeCustomerId: true, email: true, name: true, allianceId: true },
+      select: { stripeCustomerId: true, email: true, name: true },
     });
 
     let customerId = userRecord?.stripeCustomerId || existingSub?.stripeCustomerId || undefined;
@@ -80,21 +80,6 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-    // I15 + REGLA 3: Alliance coupon mapping
-    let allianceCoupon: string | undefined;
-    if (userRecord?.allianceId) {
-      const alliance = await db.alliance.findUnique({
-        where: { id: userRecord.allianceId },
-        select: { code: true },
-      });
-      const couponMap: Record<string, string> = {
-        "LEN2026": "SOMOSLEN",
-      };
-      if (alliance?.code && couponMap[alliance.code]) {
-        allianceCoupon = couponMap[alliance.code];
-      }
-    }
-
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       customer: customerId,
@@ -107,10 +92,14 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    // Apply alliance coupon if found, otherwise allow manual promo codes
-    if (allianceCoupon) {
-      checkoutParams.discounts = [{ coupon: allianceCoupon }];
-    } else {
+    // Apply promo code if provided, otherwise allow manual entry in Stripe Checkout
+    if (promoCode) {
+      const promotionCodes = await stripe.promotionCodes.list({ code: promoCode, active: true, limit: 1 });
+      if (promotionCodes.data.length > 0) {
+        checkoutParams.discounts = [{ promotion_code: promotionCodes.data[0].id }];
+      }
+    }
+    if (!checkoutParams.discounts) {
       checkoutParams.allow_promotion_codes = true;
     }
 

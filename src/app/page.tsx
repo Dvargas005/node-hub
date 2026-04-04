@@ -107,7 +107,7 @@ function Img({ desc, ratio = "16/9" }: { desc: string; ratio?: string }) {
 
 const C = {
   en: {
-    nav: { join: "Join Waitlist" },
+    nav: { join: "Get Started" },
     hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "SYSTEM_STATUS: OPERATIONAL // LATENCY: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
     svc: {
       label: "WHAT WE DELIVER",
@@ -154,11 +154,11 @@ const C = {
         { name: "Pro", front: 429, setup: 1300, real: 330, realSetup: 1000, per: "/mo", desc: "Unlimited scale. All services, dedicated PM, fastest turnaround.", ft: false },
       ],
     },
-    wl: { title: "Be among the first", sub: "The first 100 members get bonus credits.", cta: "Join Waitlist", ph: "Enter your email", sending: "Sending...", ok: "You're on the list!", dup: "Already registered.", err: "Something went wrong." },
+    wl: { title: "Ready to start?", sub: "Sign up today and get 10 free credits to explore the platform.", cta: "Start for free", login: "Already have an account?" },
     footer: "© 2026 Nouvos Solutions LLC",
   },
   es: {
-    nav: { join: "Unirse a Waitlist" },
+    nav: { join: "Comenzar" },
     hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "ESTADO_SISTEMA: OPERATIVO // LATENCIA: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
     svc: {
       label: "LO QUE ENTREGAMOS",
@@ -205,7 +205,7 @@ const C = {
         { name: "Pro", front: 429, setup: 1300, real: 330, realSetup: 1000, per: "/mes", desc: "Escala ilimitada. Todos los servicios, PM dedicado, turnaround más rápido.", ft: false },
       ],
     },
-    wl: { title: "Sé de los primeros", sub: "Los primeros 100 miembros reciben créditos extra.", cta: "Unirse a Waitlist", ph: "Ingresa tu email", sending: "Enviando...", ok: "¡Estás en la lista!", dup: "Email ya registrado.", err: "Algo salió mal." },
+    wl: { title: "Listo para empezar?", sub: "Regístrate hoy y recibe 10 créditos gratis para explorar la plataforma.", cta: "Comenzar gratis", login: "¿Ya tienes cuenta?" },
     footer: "© 2026 Nouvos Solutions LLC",
   },
 };
@@ -496,7 +496,7 @@ export default function Home() {
             <button onClick={() => setLang("en")} className={`lang-flag text-lg ${lang === "en" ? "active" : ""}`}>🇺🇸</button>
             <button onClick={() => setLang("es")} className={`lang-flag text-lg ${lang === "es" ? "active" : ""}`}>🇲🇽</button>
           </div>
-          <a href="#waitlist" className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-5 py-2.5 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
+          <a href="/register" className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-5 py-2.5 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
           <button onClick={() => setMenuOpen(true)} aria-label="Menu">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
           </button>
@@ -510,7 +510,7 @@ export default function Home() {
             <button onClick={() => setMenuOpen(false)} className="absolute top-6 right-6" aria-label="Close">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
-            {[[lang === "es" ? "Servicios" : "Services", "#services"], [lang === "es" ? "Proceso" : "Process", "#process"], [lang === "es" ? "Planes" : "Plans", "#pricing"], [lang === "es" ? "Contacto" : "Contact", "#waitlist"]].map(([label, href]) => (
+            {[[lang === "es" ? "Servicios" : "Services", "#services"], [lang === "es" ? "Proceso" : "Process", "#process"], [lang === "es" ? "Planes" : "Plans", "#pricing"], [lang === "es" ? "Registrarse" : "Sign Up", "/register"]].map(([label, href]) => (
               <a key={href} href={href} onClick={() => setMenuOpen(false)} className="font-[family-name:var(--font-lexend)] font-bold text-4xl md:text-5xl text-[#F5F6FC]/80 hover:text-[#FFC919] transition-colors">{label}</a>
             ))}
             {/* Lang flags in mobile menu */}
@@ -557,7 +557,7 @@ export default function Home() {
             <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#FFC919] mb-4">{t.svc.label}</p>
             <h2 className="font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.8rem,3vw,2.5rem)] uppercase leading-tight">{t.svc.title}</h2>
             <p className="mt-6 font-[family-name:var(--font-atkinson)] text-[1.05rem] text-[#F5F6FC]/50 leading-[1.8]">{t.svc.para}</p>
-            <a href="#waitlist" className="inline-block mt-8 font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
+            <a href="/register" className="inline-block mt-8 font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
           </FadeUp>
           {/* Right column — accordions */}
           <FadeUp delay={0.15} className="lg:w-[60%]">
@@ -662,24 +662,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ 7. WAITLIST ═══ */}
-      <section id="waitlist" className="py-32 px-6 md:px-12 bg-[#000741]">
+      {/* ═══ 7. CTA ═══ */}
+      <section id="register" className="py-32 px-6 md:px-12 bg-[#000741]">
         <div className="max-w-3xl mx-auto text-center">
           <RevealLine><h2 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(2rem,5vw,3.5rem)]">{t.wl.title}</h2></RevealLine>
           <FadeUp delay={0.15}><p className="mt-4 font-[family-name:var(--font-atkinson)] text-lg text-[#F5F6FC]/50">{t.wl.sub}</p></FadeUp>
           <FadeUp delay={0.3}>
-            {wlSt === "ok" ? (
-              <p className="mt-12 font-[family-name:var(--font-atkinson)] text-xl text-[#FFC919]">{t.wl.ok}</p>
-            ) : (
-              <>
-                <form onSubmit={handleWl} className="mt-12 flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
-                  <input type="email" required value={wlEmail} onChange={(e) => setWlEmail(e.target.value)} placeholder={t.wl.ph} className="form-input flex-1 font-[family-name:var(--font-atkinson)]" />
-                  <button type="submit" disabled={wlSt === "loading"} className="bg-[#FFC919] text-[#130A06] font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.15em] px-8 py-4 hover:bg-[#F5F6FC] transition-all disabled:opacity-50">{wlSt === "loading" ? t.wl.sending : t.wl.cta}</button>
-                </form>
-                {wlSt === "dup" && <p className="mt-4 text-[#FFC919] text-sm">{t.wl.dup}</p>}
-                {wlSt === "err" && <p className="mt-4 text-red-400 text-sm">{t.wl.err}</p>}
-              </>
-            )}
+            <div className="mt-12 flex flex-col items-center gap-4">
+              <a href="/register" className="bg-[#FFC919] text-[#130A06] font-[family-name:var(--font-lexend)] font-bold text-[0.85rem] uppercase tracking-[0.15em] px-10 py-4 hover:bg-[#F5F6FC] transition-all inline-block">{t.wl.cta} →</a>
+              <a href="/login" className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/40 hover:text-[#FFC919] transition-colors">{t.wl.login}</a>
+            </div>
           </FadeUp>
         </div>
       </section>

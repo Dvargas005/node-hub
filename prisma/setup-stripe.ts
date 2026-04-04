@@ -125,12 +125,14 @@ async function main() {
   // Create promotion codes for manual entry in checkout
   for (const coupon of coupons) {
     try {
-      await stripe.promotionCodes.create({ coupon: coupon.id, code: coupon.id });
+      await stripe.promotionCodes.create({
+        coupon: coupon.id,
+        code: coupon.id,
+        restrictions: { first_time_transaction: true },
+      });
       console.log(`Promo code created: ${coupon.id}`);
     } catch (err: any) {
-      if (err.code === "resource_already_exists") {
-        console.log(`Promo code ${coupon.id} already exists, skipping.`);
-      } else throw err;
+      console.log(`Promo code ${coupon.id}: ${err.message}`);
     }
   }
 

@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import {
-  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package,
+  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag,
 } from "lucide-react";
 
 interface Plan {
@@ -45,6 +46,9 @@ export function BillingClient({
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoDiscount, setPromoDiscount] = useState(0);
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -58,7 +62,7 @@ export function BillingClient({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planSlug }),
+        body: JSON.stringify({ planSlug, promoCode: promoApplied ? promoCode : undefined }),
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
@@ -91,8 +95,9 @@ export function BillingClient({
     } catch { setError("Error de conexión"); } finally { setLoadingPack(null); }
   };
 
+  const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
   const applyDiscount = (cents: number) =>
-    allianceDiscount > 0 ? Math.round(cents * (1 - allianceDiscount / 100)) : cents;
+    effectiveDiscount > 0 ? Math.round(cents * (1 - effectiveDiscount / 100)) : cents;
 
   const showPricing = !isActive || isCanceled;
 
@@ -226,10 +231,41 @@ export function BillingClient({
               );
             })}
           </div>
-          {allianceDiscount > 0 && (
+          {effectiveDiscount > 0 && (
             <p className="mt-3 text-center text-xs text-[var(--gold-bar)]">
-              Descuento de alianza: {allianceDiscount}% aplicado
+              {promoApplied ? `Código ${promoCode}: ${promoDiscount}% descuento aplicado` : `Descuento de alianza: ${allianceDiscount}% aplicado`}
             </p>
+          )}
+
+          {/* Promo code input */}
+          {!promoApplied && (
+            <div className="mt-4 flex items-center gap-2 max-w-sm mx-auto">
+              <Tag className="h-4 w-4 text-[rgba(245,246,252,0.4)] shrink-0" />
+              <Input
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                placeholder="Código promocional"
+                className="flex-1 h-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] text-sm"
+              />
+              <Button
+                size="sm"
+                disabled={!promoCode.trim()}
+                onClick={async () => {
+                  // Validate by checking known codes client-side (Stripe validates at checkout)
+                  const knownCodes: Record<string, number> = { SOMOSLEN: 30, NOUVOSVIP: 7 };
+                  const discount = knownCodes[promoCode.trim()];
+                  if (discount) {
+                    setPromoApplied(true);
+                    setPromoDiscount(discount);
+                  } else {
+                    setError("Código no válido. Puedes ingresarlo directamente en el checkout.");
+                  }
+                }}
+                className="bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)] text-xs h-9"
+              >
+                Aplicar
+              </Button>
+            </div>
           )}
         </div>
       )}

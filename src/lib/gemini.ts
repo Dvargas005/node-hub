@@ -4,6 +4,7 @@ let _genAI: GoogleGenerativeAI | null = null;
 
 function getGenAI() {
   if (!_genAI) {
+    console.log("[GEMINI] API key present:", !!process.env.GEMINI_API_KEY, "length:", process.env.GEMINI_API_KEY?.length);
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY no configurada");
     }
