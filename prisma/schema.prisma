@@ -236,6 +236,7 @@ model Ticket {
   freelancerId    String?
   pmNotes         String?
   creditsCharged  Int
+  discountApplied   Json?
   assignedAt      DateTime?
   startedAt       DateTime?
   deliveredAt     DateTime?

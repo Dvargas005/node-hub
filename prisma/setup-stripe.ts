@@ -33,9 +33,10 @@ const plans = [
 ];
 
 const creditPacks = [
-  { name: "Pack Básico", credits: 100, price: 5000 },
-  { name: "Pack Plus", credits: 250, price: 10000 },
-  { name: "Pack Premium", credits: 500, price: 17500 },
+  { name: "20 Créditos", credits: 20, price: 2000 },
+  { name: "50 Créditos", credits: 50, price: 5000 },
+  { name: "100 Créditos", credits: 100, price: 10000 },
+  { name: "500 Créditos", credits: 500, price: 50000 },
 ];
 
 async function main() {

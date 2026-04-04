@@ -37,6 +37,19 @@ export async function POST(
         where: { id: ticket.id },
         data: { status: "COMPLETED", completedAt: new Date() },
       });
+
+      // First-round bonus: if approved on round 1 with no revisions
+      const brief = ticket.briefStructured as Record<string, unknown> | null;
+      const bonus = brief?.firstRoundBonus as number | undefined;
+      if (delivery.round === 1 && bonus && bonus > 0) {
+        const hadRevisions = await tx.delivery.findFirst({ where: { ticketId: ticket.id, status: "REVISION_REQUESTED" } });
+        if (!hadRevisions) {
+          await tx.user.update({ where: { id: ticket.userId }, data: { freeCredits: { increment: bonus } } });
+          await tx.ticketMessage.create({
+            data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: `🎉 ¡Bono de ${bonus} créditos por aprobar en primera ronda!`, isInternal: false },
+          });
+        }
+      }
     });
 
     return NextResponse.json({ success: true });

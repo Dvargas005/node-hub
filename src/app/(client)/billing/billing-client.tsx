@@ -282,6 +282,7 @@ export function BillingClient({
                 <CardContent className="py-4 text-center space-y-2">
                   <Package className="h-6 w-6 text-[var(--gold-bar)] mx-auto" />
                   <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">{pack.name}</p>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px]">1:1</Badge>
                   <p className="text-2xl font-bold text-[var(--gold-bar)]">{pack.credits} <span className="text-sm font-normal">créditos</span></p>
                   <p className="text-sm text-[rgba(245,246,252,0.5)]">${pack.priceInCents / 100} USD</p>
                   <Button

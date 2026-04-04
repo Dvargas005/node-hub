@@ -21,6 +21,9 @@ interface BriefData {
     extras: string;
   };
   pmAlert?: string | null;
+  discount?: { percent: number; extendedDays: number; originalDays: number } | null;
+  firstRoundBonus?: number;
+  insufficientCredits?: boolean;
 }
 
 function parseBrief(text: string): BriefData | null {
@@ -60,15 +63,18 @@ export function ChatInterface({
   category,
   initialMessage,
   onBriefGenerated,
+  variants,
 }: {
   category?: string;
   initialMessage?: string;
   onBriefGenerated: (brief: BriefData, messages: ChatMessage[]) => void;
+  variants?: Record<string, { name: string; creditCost: number }>;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
+  const [estimatedCost, setEstimatedCost] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,6 +131,10 @@ export function ChatInterface({
       // Check if brief was generated
       const brief = parseBrief(data.message);
       if (brief) {
+        if (brief && variants) {
+          const v = variants[brief.suggestedVariantId];
+          if (v) setEstimatedCost(v.creditCost);
+        }
         onBriefGenerated(brief, allMessages);
       }
     } catch {
@@ -146,6 +156,9 @@ export function ChatInterface({
 
   return (
     <div className="flex flex-col h-[calc(100vh-220px)] max-h-[600px]">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[rgba(245,246,252,0.06)] text-xs text-[rgba(245,246,252,0.5)]">
+        <span>Estimado: {estimatedCost ? `${estimatedCost} créditos` : "pendiente"}</span>
+      </div>
       {/* Chat messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 p-4">
         {messages.map((msg, i) => (
@@ -161,6 +174,11 @@ export function ChatInterface({
               }`}
             >
               {msg.role === "assistant" ? stripBriefJson(msg.content) : msg.content}
+              {msg.role === "assistant" && msg.content.includes("facturación") && (
+                <a href="/billing" className="inline-block mt-2 text-xs text-[var(--gold-bar)] hover:underline">
+                  Ir a facturación →
+                </a>
+              )}
             </div>
           </div>
         ))}

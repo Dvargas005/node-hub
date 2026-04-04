@@ -68,8 +68,13 @@ export async function POST(req: NextRequest) {
       const planCredits = (subscription?.status === "ACTIVE" ? subscription.creditsRemaining : 0);
       const totalCredits = freeCredits + planCredits;
 
-      if (totalCredits < variant.creditCost) {
-        throw new Error(`INSUFFICIENT_CREDITS:${variant.creditCost}:${totalCredits}`);
+      const discount = briefStructured?.discount;
+      const finalCost = discount?.percent
+        ? Math.round(variant.creditCost * (1 - discount.percent / 100))
+        : variant.creditCost;
+
+      if (totalCredits < finalCost) {
+        throw new Error(`INSUFFICIENT_CREDITS:${finalCost}:${totalCredits}`);
       }
 
       // C11: Enforce maxActiveReqs
@@ -90,7 +95,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Deduct: free first, then plan
-      let remaining = variant.creditCost;
+      let remaining = finalCost;
       if (freeCredits > 0) {
         const fromFree = Math.min(freeCredits, remaining);
         await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: fromFree } } });
@@ -117,7 +122,8 @@ export async function POST(req: NextRequest) {
           priority: "NORMAL",
           briefRaw: conversationMessages || [],
           briefStructured,
-          creditsCharged: variant.creditCost,
+          creditsCharged: finalCost,
+          discountApplied: discount || undefined,
           pmNotes: pmAlert,
         },
       });
