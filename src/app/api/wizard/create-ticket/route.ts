@@ -69,8 +69,9 @@ export async function POST(req: NextRequest) {
       const totalCredits = freeCredits + planCredits;
 
       const discount = briefStructured?.discount;
-      const finalCost = discount?.percent
-        ? Math.round(variant.creditCost * (1 - discount.percent / 100))
+      const cappedPercent = discount?.percent ? Math.min(discount.percent, 4.5) : 0;
+      const finalCost = cappedPercent > 0
+        ? Math.round(variant.creditCost * (1 - cappedPercent / 100))
         : variant.creditCost;
 
       if (totalCredits < finalCost) {
