@@ -51,9 +51,11 @@ export async function POST(req: NextRequest) {
       currentProfile.businessIndustry === businessIndustry &&
       currentProfile.businessDescription === businessDescription &&
       (currentProfile.targetAudience || "") === (targetAudience || "") &&
+      currentProfile.hasBranding === (hasBranding ?? currentProfile.hasBranding) &&
       (currentProfile.brandColors || "") === (brandColors || "") &&
       (currentProfile.brandStyle || "") === (brandStyle || "") &&
-      (currentProfile.website || "") === (website || "");
+      (currentProfile.website || "") === (website || "") &&
+      JSON.stringify(currentProfile.socialMedia || {}) === JSON.stringify(socialMedia || {});
     if (noChange) {
       return NextResponse.json({ success: true, message: "Sin cambios" });
     }

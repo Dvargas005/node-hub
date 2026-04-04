@@ -239,7 +239,18 @@ export function SettingsClient({
                 <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="Nombre de página" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]" />
               </div>
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" onClick={() => setEditing(false)} className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]">Cancelar</Button>
+                <Button variant="outline" onClick={() => {
+                  setEditing(false);
+                  setBusinessName(profile.businessName);
+                  setBusinessIndustry(profile.businessIndustry);
+                  setBusinessDescription(profile.businessDescription);
+                  setTargetAudience(profile.targetAudience);
+                  setBrandColors(profile.brandColors);
+                  setBrandStyle(profile.brandStyle);
+                  setWebsite(profile.website);
+                  setInstagram(profile.socialMedia?.instagram || "");
+                  setFacebook(profile.socialMedia?.facebook || "");
+                }} className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]">Cancelar</Button>
                 <Button onClick={handleSave} disabled={saving || !businessName || !businessIndustry || !businessDescription} className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold">
                   <Save className="mr-2 h-4 w-4" />
                   {saving ? "Guardando..." : "Guardar"}

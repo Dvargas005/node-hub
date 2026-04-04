@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +39,12 @@ export function LoginForm() {
         return;
       }
 
-      // Redirect based on role
+      // Redirect based on role or callbackUrl
       const role = (result.data?.user as Record<string, unknown>)?.role as string;
       if (role === "ADMIN" || role === "PM") {
-        router.push("/admin/overview");
+        window.location.href = "/admin/overview";
       } else {
-        router.push("/dashboard");
+        window.location.href = callbackUrl;
       }
     } catch {
       setError("Error de conexión");

@@ -1,16 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const publicPaths = [
-  "/",
-  "/api/auth",
-  "/api/stripe/webhook",
-  "/api/ping",
-  "/api/waitlist",
-  "/api/alliance",
-  "/api/register",
-  "/api/onboarding",
-];
-
 const authPaths = ["/login", "/register"];
 
 export function middleware(req: NextRequest) {
@@ -25,23 +14,16 @@ export function middleware(req: NextRequest) {
   // API routes — pass through (auth checked in route handlers)
   if (pathname.startsWith("/api/")) return NextResponse.next();
 
-  // Allow public paths
-  if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
-    return NextResponse.next();
-  }
+  // Landing page — always public
+  if (pathname === "/") return NextResponse.next();
+
+  // Auth pages — always allow (cookie may be expired)
+  if (authPaths.includes(pathname)) return NextResponse.next();
 
   // Production uses __Secure- prefix on HTTPS
   const sessionToken =
     req.cookies.get("better-auth.session_token")?.value ||
     req.cookies.get("__Secure-better-auth.session_token")?.value;
-
-  // Auth pages: redirect to dashboard if already authenticated
-  if (authPaths.includes(pathname)) {
-    if (sessionToken) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-    return NextResponse.next();
-  }
 
   // Protected routes: require auth
   if (!sessionToken) {

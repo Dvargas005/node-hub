@@ -57,7 +57,10 @@ export function ClientsClient({
         )
           return false;
       }
-      if (filterPlan && c.planSlug !== filterPlan) return false;
+      if (filterPlan) {
+        if (filterPlan === "__none") { if (c.planSlug !== null) return false; }
+        else if (c.planSlug !== filterPlan) return false;
+      }
       if (filterAlliance && !c.allianceName) return false;
       return true;
     });

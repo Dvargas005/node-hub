@@ -98,7 +98,7 @@ Responde SOLO con un JSON válido, sin texto adicional:
 {
   "businessName": "nombre del negocio si lo encuentras",
   "businessDescription": "descripción corta del negocio en 1 oración",
-  "businessIndustry": "industria (una de: Restaurante, Tienda / Retail, Servicios profesionales, Salud / Bienestar, Tecnología, Educación, Eventos, Construcción, Transporte, Otro)",
+  "businessIndustry": "industria (una de: Alimentos y Panadería, Retail / Tienda, Servicios Profesionales, Salud y Terapia, Tecnología, Educación, Eventos, Construcción, Transporte, Bienes Raíces, Automotriz, Limpieza y Mantenimiento, Belleza y Peluquería, Fitness y Gym, Legal, Turismo y Hotelería, Agricultura, Otro)",
   "targetAudience": "público objetivo si puedes inferirlo",
   "brandColors": "colores principales del sitio si son evidentes",
   "brandStyle": "estilo visual (Minimalista, Bold, Elegante, Moderno, Clásico, Divertido, Corporativo)"

@@ -134,6 +134,7 @@ export function OnboardingClient({
   const [typing, setTyping] = useState(false);
   const [textInput, setTextInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [awaitingTextInput, setAwaitingTextInput] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = useCallback(() => {
@@ -308,6 +309,7 @@ export function OnboardingClient({
       case 3:
         pushUser(val);
         markAnswered();
+        setAwaitingTextInput(false);
         setProfile((p) => ({ ...p, businessDescription: val }));
         await ackThenAsk(
           "Entendido. 👌",
@@ -349,6 +351,7 @@ export function OnboardingClient({
       case 3: {
         const val = selected[0];
         if (val === "Otro") {
+          setAwaitingTextInput(true);
           await pushBot("Cuéntame en una oración: ¿qué hace tu negocio?", "input");
           // Stay on step 3 but now expecting text input
         } else {
@@ -435,8 +438,8 @@ export function OnboardingClient({
       ...(data.businessDescription && !p.businessDescription
         ? { businessDescription: data.businessDescription }
         : {}),
-      ...(data.businessIndustry ? { businessIndustry: data.businessIndustry } : {}),
-      ...(data.targetAudience ? { targetAudience: data.targetAudience } : {}),
+      ...(data.businessIndustry && !p.businessIndustry ? { businessIndustry: data.businessIndustry } : {}),
+      ...(data.targetAudience && !p.targetAudience ? { targetAudience: data.targetAudience } : {}),
       ...(data.brandColors ? { brandColors: data.brandColors } : {}),
       ...(data.brandStyle ? { brandStyle: data.brandStyle } : {}),
       hasBranding: true,
@@ -578,7 +581,7 @@ export function OnboardingClient({
   };
 
   // ─── Render ───────────────────────────────────────
-  const isTextStep = step === 1 || (step === 3 && !industrySubcategories[profile.businessIndustry || ""]);
+  const isTextStep = step === 1 || (step === 3 && (!industrySubcategories[profile.businessIndustry || ""] || awaitingTextInput));
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)] max-w-lg mx-auto">
