@@ -50,10 +50,10 @@ interface Props {
 // ─── Greeting ───────────────────────────────────────
 function getGreeting(firstName: string, latestTicket: Props["latestTicket"], analysis: unknown) {
   if (!latestTicket && !analysis) {
-    return { title: `¡Hola, ${firstName}!`, subtitle: "Bienvenido a tu panel de N.O.D.E." };
+    return { title: `¡Hola, ${firstName}!`, subtitle: "Bienvenido a tu panel de N.O.D.E.", cta: "analysis" as const };
   }
   if (!latestTicket) {
-    return { title: `¡Hola, ${firstName}!`, subtitle: "Tu perfil de empresa está listo. ¡Es hora de crear tu primera solicitud!" };
+    return { title: `¡Hola, ${firstName}!`, subtitle: "Tu perfil de empresa está listo. ¡Es hora de crear tu primera solicitud!", cta: null };
   }
   const msgs: Record<string, string> = {
     NEW: `Tu solicitud #${latestTicket.number} fue recibida. Un PM la revisará pronto.`,
@@ -65,7 +65,7 @@ function getGreeting(firstName: string, latestTicket: Props["latestTicket"], ana
     COMPLETED: `Tu última solicitud #${latestTicket.number} fue completada. ¿Listo para la siguiente?`,
     CANCELED: `Tu solicitud #${latestTicket.number} fue cancelada.`,
   };
-  return { title: `¡Hola, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Bienvenido de vuelta." };
+  return { title: `¡Hola, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Bienvenido de vuelta.", cta: null };
 }
 
 // ─── SWOT colors ────────────────────────────────────
@@ -168,6 +168,14 @@ export function DashboardClient({
       <div>
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">{greeting.title}</h1>
         <p className="mt-1 text-[rgba(245,246,252,0.5)]">{greeting.subtitle}</p>
+        {greeting.cta === "analysis" && (
+          <button
+            onClick={() => document.getElementById("company-analysis")?.scrollIntoView({ behavior: "smooth" })}
+            className="mt-3 inline-block bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-[var(--font-lexend)] font-bold text-sm px-5 py-2.5 hover:opacity-90 transition-opacity"
+          >
+            Generar análisis gratuito →
+          </button>
+        )}
       </div>
 
       {/* Metrics bar */}
@@ -268,7 +276,7 @@ export function DashboardClient({
 
       {/* SECTION 3 — AI Analysis */}
       {!hasAnalysis && !showOptions && (
-        <Card className="border-[var(--gold-bar)] bg-[rgba(255,201,25,0.03)]">
+        <Card id="company-analysis" className="border-[var(--gold-bar)] bg-[rgba(255,201,25,0.03)]">
           <CardContent className="py-8 text-center space-y-4">
             <Search className="h-10 w-10 text-[var(--gold-bar)] mx-auto" />
             <div>
