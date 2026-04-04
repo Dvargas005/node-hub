@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -37,13 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${lexend.variable} ${atkinson.variable} font-sans`}>
+    <html lang="es" className={`dark ${lexend.variable} ${atkinson.variable} font-sans`}>
       <head>
         {/* Inline fallback — guarantees dark bg even if CSS fails to load */}
         <style dangerouslySetInnerHTML={{ __html: "body{background:#130A06;color:#F5F6FC}" }} />
       </head>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased">
         {children}
+        <Toaster theme="dark" />
       </body>
     </html>
   );

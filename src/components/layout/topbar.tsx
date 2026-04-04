@@ -10,9 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, Menu } from "lucide-react";
 
-export function Topbar() {
+interface TopbarProps {
+  onToggleSidebar?: () => void;
+}
+
+export function Topbar({ onToggleSidebar }: TopbarProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
@@ -35,7 +39,18 @@ export function Topbar() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-end border-b border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] px-6">
+    <header className="flex h-16 items-center justify-between border-b border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] px-4 md:px-6">
+      {/* Hamburger — mobile only */}
+      <button
+        className="p-2 text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)] md:hidden"
+        onClick={onToggleSidebar}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Spacer for desktop (pushes avatar right) */}
+      <div className="hidden md:block" />
+
       <DropdownMenu>
         <DropdownMenuTrigger
           className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.05)]"
