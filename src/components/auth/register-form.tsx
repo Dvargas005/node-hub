@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,25 @@ import {
 } from "@/components/ui/card";
 import { Check, Eye, EyeOff } from "lucide-react";
 
+const RECAPTCHA_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
 export function RegisterForm() {
+  if (RECAPTCHA_KEY) {
+    return (
+      <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_KEY}>
+        <RegisterFormWithCaptcha />
+      </GoogleReCaptchaProvider>
+    );
+  }
+  return <RegisterFormCore executeRecaptcha={null} />;
+}
+
+function RegisterFormWithCaptcha() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  return <RegisterFormCore executeRecaptcha={executeRecaptcha || null} />;
+}
+
+function RegisterFormCore({ executeRecaptcha }: { executeRecaptcha: ((action: string) => Promise<string>) | null }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -65,6 +84,12 @@ export function RegisterForm() {
     setError("");
 
     try {
+      // Get reCAPTCHA token if available
+      let recaptchaToken: string | undefined;
+      if (executeRecaptcha) {
+        try { recaptchaToken = await executeRecaptcha("register"); } catch {}
+      }
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,6 +99,7 @@ export function RegisterForm() {
           password,
           businessName: businessName || undefined,
           allianceCode: allianceCode || undefined,
+          recaptchaToken,
         }),
       });
 

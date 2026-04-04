@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 // S5: Simple in-memory rate limiting for registration
 const registerAttempts = new Map<string, number[]>();
@@ -21,7 +22,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, email, password, businessName, allianceCode } = body;
+    const { name, email, password, businessName, allianceCode, recaptchaToken } = body;
+
+    // reCAPTCHA verification (skipped if not configured)
+    if (process.env.RECAPTCHA_SECRET_KEY && recaptchaToken) {
+      const isHuman = await verifyRecaptcha(recaptchaToken);
+      if (!isHuman) {
+        return NextResponse.json({ error: "Verificación de seguridad fallida. Intenta de nuevo." }, { status: 400 });
+      }
+    }
 
     // Input validation
     if (!name || !email || !password) {
