@@ -30,7 +30,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const sessionToken = req.cookies.get("better-auth.session_token")?.value;
+  // Production uses __Secure- prefix on HTTPS
+  const sessionToken =
+    req.cookies.get("better-auth.session_token")?.value ||
+    req.cookies.get("__Secure-better-auth.session_token")?.value;
 
   // Auth pages: redirect to dashboard if already authenticated
   if (authPaths.includes(pathname)) {
