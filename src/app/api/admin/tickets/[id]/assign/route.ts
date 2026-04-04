@@ -43,7 +43,7 @@ export async function POST(
       );
     }
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: any) => {
       await tx.ticket.update({
         where: { id: ticketId },
         data: {

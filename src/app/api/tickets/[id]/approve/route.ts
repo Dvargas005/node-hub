@@ -11,7 +11,7 @@ export async function POST(
 
   try {
     // I9: all checks + updates inside transaction
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: any) => {
       const ticket = await tx.ticket.findUnique({
         where: { id: params.id, userId: session.user.id },
       });

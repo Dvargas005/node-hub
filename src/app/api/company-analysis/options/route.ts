@@ -95,7 +95,7 @@ export async function POST() {
     } else {
       freeDeducted = Math.min(freeCredits, ANALYSIS_COST);
       planDeducted = ANALYSIS_COST - freeDeducted;
-      await db.$transaction(async (tx) => {
+      await db.$transaction(async (tx: any) => {
         if (freeDeducted > 0) {
           await tx.user.update({ where: { id: userId }, data: { freeCredits: { decrement: freeDeducted } } });
         }
@@ -147,7 +147,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
     if (!options) {
       // Refund exact amounts to original sources
       if (!isFreeRenewal && (freeDeducted > 0 || planDeducted > 0)) {
-        await db.$transaction(async (tx) => {
+        await db.$transaction(async (tx: any) => {
           if (freeDeducted > 0) {
             await tx.user.update({ where: { id: userId }, data: { freeCredits: { increment: freeDeducted } } });
           }

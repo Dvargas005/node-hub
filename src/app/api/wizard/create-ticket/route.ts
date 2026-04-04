@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Atomic transaction: validate balance + deduct + create ticket
-    const ticket = await db.$transaction(async (tx) => {
+    const ticket = await db.$transaction(async (tx: any) => {
       // Read fresh balances inside transaction
       const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
       const subscription = await tx.subscription.findUnique({ where: { userId }, select: { id: true, creditsRemaining: true, status: true } });
