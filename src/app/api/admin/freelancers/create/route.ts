@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
         timezone: timezone || null,
         pmId: session.user.id,
         userId,
+        tempPassword: userId ? tempPassword : null,
       },
     });
 

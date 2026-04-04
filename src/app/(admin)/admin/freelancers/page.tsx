@@ -35,6 +35,7 @@ export default async function AdminFreelancersPage() {
         bio: f.bio ?? undefined,
         portfolioUrl: f.portfolioUrl ?? undefined,
         timezone: f.timezone ?? undefined,
+        tempPassword: isAdmin ? (f.tempPassword ?? null) : null,
       }))}
     />
   );

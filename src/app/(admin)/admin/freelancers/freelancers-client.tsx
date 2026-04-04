@@ -20,7 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Eye, EyeOff, Copy } from "lucide-react";
+import { toast } from "sonner";
 import {
   availabilityLabels,
   availabilityColors,
@@ -45,6 +46,7 @@ interface FreelancerRow {
   bio?: string;
   portfolioUrl?: string;
   timezone?: string;
+  tempPassword?: string | null;
 }
 
 const AVAILABILITY_OPTIONS = ["AVAILABLE", "BUSY", "ON_LEAVE", "INACTIVE"];
@@ -477,6 +479,7 @@ export function FreelancersClient({
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Carga</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Disponibilidad</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
+                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">Credenciales</TableHead>}
                   {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">Acciones</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -570,6 +573,11 @@ export function FreelancersClient({
                     <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
                       {f.pmName}
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <PasswordReveal password={f.tempPassword ?? null} />
+                      </TableCell>
+                    )}
                     {isAdmin && (
                       <TableCell>
                         <Button
@@ -671,6 +679,22 @@ export function FreelancersClient({
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function PasswordReveal({ password }: { password: string | null }) {
+  const [visible, setVisible] = useState(false);
+  if (!password) return <span className="text-[rgba(245,246,252,0.3)] text-xs">Activo</span>;
+  return (
+    <div className="flex items-center gap-1.5">
+      <code className="text-xs text-[rgba(245,246,252,0.6)]">{visible ? password : "••••••••••••"}</code>
+      <button onClick={() => setVisible(!visible)} className="text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]">
+        {visible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+      </button>
+      <button onClick={() => { navigator.clipboard.writeText(password); toast.success("Copiado"); }} className="text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]">
+        <Copy className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
