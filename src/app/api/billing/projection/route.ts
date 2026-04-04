@@ -2,30 +2,26 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 
-// Service suggestions per priority level per category
-// high = priority 4-5, medium = priority 3, low = 1-2 (nothing)
-const suggestions: Record<string, Record<string, { month: number; serviceSlug: string }[]>> = {
-  high: {
-    DESIGN: [
-      { month: 1, serviceSlug: "brand-starter" },
-      { month: 2, serviceSlug: "social-pack" },
-      { month: 3, serviceSlug: "flyer-promo" },
-    ],
-    WEB: [
-      { month: 1, serviceSlug: "landing-page" },
-      { month: 2, serviceSlug: "seo-foundation" },
-      { month: 3, serviceSlug: "contact-form" },
-    ],
-    MARKETING: [
-      { month: 1, serviceSlug: "profile-setup" },
-      { month: 2, serviceSlug: "content-pack" },
-      { month: 3, serviceSlug: "promo-campaign" },
-    ],
+// Ordered service pools per category — setup first, then recurring, then growth
+const servicePools: Record<string, string[]> = {
+  DESIGN: ["brand-starter", "social-pack", "flyer-promo", "business-kit"],
+  WEB: ["landing-page", "seo-foundation", "google-presence", "contact-form"],
+  MARKETING: ["profile-setup", "content-pack", "promo-campaign", "whatsapp-business"],
+};
+
+// Taglines per plan
+const planTaglines: Record<string, { fresh: string; returning: string }> = {
+  member: {
+    fresh: "Ideal para empezar con lo esencial",
+    returning: "Mantén tu presencia con lo básico",
   },
-  medium: {
-    DESIGN: [{ month: 2, serviceSlug: "social-pack" }],
-    WEB: [{ month: 2, serviceSlug: "google-presence" }],
-    MARKETING: [{ month: 2, serviceSlug: "content-pack" }],
+  growth: {
+    fresh: "La base digital completa de tu negocio",
+    returning: "Crece con servicios recurrentes",
+  },
+  pro: {
+    fresh: "Todo lo anterior, más rápido, y con extras",
+    returning: "Máxima velocidad y cobertura total",
   },
 };
 
@@ -43,7 +39,7 @@ export async function GET() {
   try {
     const userId = session.user.id;
 
-    const [user, plans, services] = await Promise.all([
+    const [user, plans, services, completedTickets] = await Promise.all([
       db.user.findUnique({
         where: { id: userId },
         select: { priorities: true, companyAnalysis: true },
@@ -53,99 +49,121 @@ export async function GET() {
         where: { isActive: true },
         include: { variants: { where: { isActive: true }, orderBy: { creditCost: "asc" } } },
       }),
+      db.ticket.findMany({
+        where: { userId, status: "COMPLETED" },
+        select: { variant: { select: { service: { select: { slug: true } } } } },
+      }),
     ]);
 
     const priorities = user?.priorities as Record<string, number> | null;
-
-    // If no priorities, return empty
     if (!priorities || Object.keys(priorities).length === 0) {
       return NextResponse.json({ projections: null, reason: "no_priorities" });
     }
 
-    // Map category to priority level
-    const catMap: Record<string, string> = { design: "DESIGN", web: "WEB", marketing: "MARKETING" };
-    const levels: Record<string, "high" | "medium" | "low"> = {};
-    for (const [key, cat] of Object.entries(catMap)) {
-      levels[cat] = getPriorityLevel(priorities[key]);
-    }
+    // Completed service slugs to exclude
+    const completedSlugs = new Set(completedTickets.map((t: any) => t.variant.service.slug));
+    const hasCompletedSetup = completedSlugs.size > 0;
 
-    // Build slug → cheapest variant lookup
-    const serviceBySlug: Record<string, { name: string; category: string; variantName: string; creditCost: number }> = {};
+    // Build slug → service info lookup
+    const serviceBySlug: Record<string, { name: string; category: string; creditCost: number }> = {};
     for (const svc of services) {
       if (svc.variants.length > 0) {
-        const v = svc.variants[0]; // cheapest (sorted by creditCost asc)
         serviceBySlug[svc.slug] = {
           name: svc.name,
           category: svc.category,
-          variantName: v.name,
-          creditCost: v.creditCost,
+          creditCost: svc.variants[0].creditCost,
         };
       }
     }
 
-    // Collect suggested services per month
-    const monthlyServices: Record<number, { name: string; credits: number; category: string }[]> = { 1: [], 2: [], 3: [] };
+    // Build priority-ordered list of services (excluding completed ones)
+    const catMap: Record<string, string> = { design: "DESIGN", web: "WEB", marketing: "MARKETING" };
+    const catPriorities: { cat: string; level: "high" | "medium" | "low"; priority: number }[] = [];
+    for (const [key, cat] of Object.entries(catMap)) {
+      const p = priorities[key] || 0;
+      catPriorities.push({ cat, level: getPriorityLevel(p), priority: p });
+    }
+    // Sort by priority descending so highest-priority categories get services first
+    catPriorities.sort((a: any, b: any) => b.priority - a.priority);
 
-    for (const [cat, level] of Object.entries(levels)) {
+    // Build a master pool of available services sorted by priority
+    const availableServices: { slug: string; name: string; credits: number; category: string; phase: number }[] = [];
+    for (const { cat, level } of catPriorities) {
       if (level === "low") continue;
-      const catSuggestions = suggestions[level]?.[cat] || [];
-      for (const s of catSuggestions) {
-        const svc = serviceBySlug[s.serviceSlug];
-        if (svc) {
-          monthlyServices[s.month]?.push({ name: svc.name, credits: svc.creditCost, category: svc.category });
-        }
+      const pool = servicePools[cat] || [];
+      const filtered = pool.filter((slug: any) => !completedSlugs.has(slug) && serviceBySlug[slug]);
+      let phase = 1; // month assignment: setup=1, recurring=2, growth=3
+      for (const slug of filtered) {
+        const svc = serviceBySlug[slug];
+        availableServices.push({ slug, name: svc.name, credits: svc.creditCost, category: svc.category, phase });
+        phase = Math.min(phase + 1, 3);
       }
     }
 
-    // Check company analysis recommendations for extra services
-    const analysis = user?.companyAnalysis as Record<string, unknown> | null;
-    const selected = analysis?.selected as Record<string, unknown> | undefined;
-    const recs = (selected?.recommendations as string[]) || [];
-    // Add one service from recommendations to month 3 if not already there
-    if (recs.length > 0) {
-      const recLower = recs[0].toLowerCase();
-      let recCat = "DESIGN";
-      if (/web|landing|seo|sitio/.test(recLower)) recCat = "WEB";
-      else if (/marketing|contenido|campaña|social|redes/.test(recLower)) recCat = "MARKETING";
-      // Find a service in that category not already suggested
-      const existingSlugs = new Set(
-        Object.values(monthlyServices).flat().map((s: any) => s.name)
-      );
-      for (const svc of services) {
-        if (svc.category === recCat && !existingSlugs.has(svc.name) && svc.variants.length > 0) {
-          monthlyServices[3].push({ name: svc.name, credits: svc.variants[0].creditCost, category: svc.category });
-          break;
-        }
+    // If completed setup, shift all phases down (recurring becomes month 1)
+    if (hasCompletedSetup) {
+      for (const s of availableServices) {
+        s.phase = Math.max(1, s.phase - 1);
       }
     }
 
-    // Generate projection for each plan
+    // For each plan, greedily fill months with what fits
     const projections = plans.map((plan: any) => {
       const mc = plan.monthlyCredits + (plan.bonusCredits || 0);
-      const months = [1, 2, 3].map((m: any) => {
-        const svcs = monthlyServices[m] || [];
-        const total = svcs.reduce((sum: any, s: any) => sum + s.credits, 0);
-        return { month: m, suggestedServices: svcs, totalCredits: total, remaining: mc - total };
-      });
+      const months: { month: number; suggestedServices: { name: string; credits: number; category: string }[]; totalCredits: number; remaining: number }[] = [];
+      const used = new Set<string>();
 
-      const shortfalls = months.filter((m: any) => m.remaining < 0).length;
-      const verdict = shortfalls >= 2 ? "insuficiente" : shortfalls === 1 ? "justo" : "holgado";
+      for (const m of [1, 2, 3]) {
+        const svcs: { name: string; credits: number; category: string }[] = [];
+        let budget = mc;
+
+        // First pass: add services in their natural phase
+        for (const s of availableServices) {
+          if (used.has(s.slug) || s.phase !== m) continue;
+          if (s.credits <= budget) {
+            svcs.push({ name: s.name, credits: s.credits, category: s.category });
+            budget -= s.credits;
+            used.add(s.slug);
+          }
+        }
+
+        // Second pass: fill remaining budget with any unused service
+        for (const s of availableServices) {
+          if (used.has(s.slug)) continue;
+          if (s.credits <= budget) {
+            svcs.push({ name: s.name, credits: s.credits, category: s.category });
+            budget -= s.credits;
+            used.add(s.slug);
+          }
+        }
+
+        const total = svcs.reduce((sum: any, s: any) => sum + s.credits, 0);
+        months.push({ month: m, suggestedServices: svcs, totalCredits: total, remaining: mc - total });
+      }
+
+      const totalServices = months.reduce((sum: any, m: any) => sum + m.suggestedServices.length, 0);
+      const allAvailable = availableServices.length;
+      const coverage = allAvailable > 0 ? totalServices / allAvailable : 1;
+
+      const verdict = coverage >= 0.8 ? "holgado" : coverage >= 0.5 ? "justo" : "insuficiente";
+
+      const tagline = planTaglines[plan.slug] || planTaglines.member;
 
       return {
         planSlug: plan.slug,
         planName: plan.name,
         priceMonthly: plan.priceMonthly,
         monthlyCredits: mc,
+        tagline: hasCompletedSetup ? tagline.returning : tagline.fresh,
         months,
         totalCost3Months: plan.priceMonthly * 3,
         verdict,
       };
     });
 
-    // Recommended = cheapest plan that isn't "insuficiente"
     const recommended = projections.find((p: any) => p.verdict !== "insuficiente")?.planSlug || null;
 
-    return NextResponse.json({ projections, recommended });
+    return NextResponse.json({ projections, recommended, hasCompletedSetup });
   } catch (err) {
     console.error("[BILLING_PROJECTION]", err);
     return NextResponse.json({ error: "Error al calcular proyección" }, { status: 500 });

@@ -309,7 +309,7 @@ export function BillingClient({
 
 // ─── Billing Projection ─────────────────────────────
 interface MonthData { month: number; suggestedServices: { name: string; credits: number; category: string }[]; totalCredits: number; remaining: number }
-interface Projection { planSlug: string; planName: string; priceMonthly: number; monthlyCredits: number; months: MonthData[]; verdict: string }
+interface Projection { planSlug: string; planName: string; priceMonthly: number; monthlyCredits: number; tagline: string; months: MonthData[]; verdict: string }
 
 const verdictColors: Record<string, string> = {
   insuficiente: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -365,9 +365,10 @@ function BillingProjection() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-sm">{p.planName}</CardTitle>
-                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recomendado</Badge>}
+                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recomendado para ti</Badge>}
                 </div>
                 <p className="text-xs text-[rgba(245,246,252,0.4)]">${p.priceMonthly / 100}/mes — {p.monthlyCredits} créditos</p>
+                <p className="text-[11px] text-[rgba(245,246,252,0.5)] italic mt-1">{p.tagline}</p>
               </CardHeader>
               <CardContent className="space-y-3">
                 {p.months.map((m: any) => (
