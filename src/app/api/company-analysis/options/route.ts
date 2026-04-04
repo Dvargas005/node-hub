@@ -21,11 +21,13 @@ ${webContent ? `- Contenido del sitio web: ${webContent}` : ""}`;
 
 async function fetchWebContent(url: string): Promise<string> {
   try {
+    console.log("[ANALYSIS] fetchWebContent: fetching", url);
     const res = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; NODEBot/1.0)", Accept: "text/html" },
       signal: AbortSignal.timeout(8000),
       redirect: "follow",
     });
+    console.log("[ANALYSIS] fetchWebContent: status", res.status);
     const html = await res.text();
     return html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
@@ -34,7 +36,8 @@ async function fetchWebContent(url: string): Promise<string> {
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, 2000);
-  } catch {
+  } catch (e) {
+    console.error("[ANALYSIS] fetchWebContent failed (non-blocking):", e);
     return "";
   }
 }
@@ -45,6 +48,7 @@ export async function POST() {
 
   try {
     const userId = session.user.id;
+    console.log("[ANALYSIS] Step 1: Auth check passed, userId:", userId);
 
     // Check if user already has pending options (don't charge again)
     const existingUser = await db.user.findUnique({
@@ -53,6 +57,7 @@ export async function POST() {
     });
     const existing = existingUser?.companyAnalysis as Record<string, unknown> | null;
     if (existing?.status === "pending_selection" && existing?.options) {
+      console.log("[ANALYSIS] Returning cached pending options");
       return NextResponse.json({ options: existing.options });
     }
 
@@ -65,6 +70,7 @@ export async function POST() {
         companyAnalysisAt: true,
       },
     });
+    console.log("[ANALYSIS] Step 2: User loaded:", !!user);
 
     const subscription = await db.subscription.findUnique({
       where: { userId },
@@ -80,6 +86,7 @@ export async function POST() {
 
     const freeCredits = user?.freeCredits || 0;
     const planCredits = subscription?.creditsRemaining || 0;
+    console.log("[ANALYSIS] Step 3: Credits check — free:", freeCredits, "plan:", planCredits, "freeRenewal:", isFreeRenewal);
     if (!isFreeRenewal && freeCredits + planCredits < ANALYSIS_COST) {
       return NextResponse.json(
         { error: `Necesitas ${ANALYSIS_COST} créditos. Tienes ${freeCredits + planCredits}.` },
@@ -88,6 +95,7 @@ export async function POST() {
     }
 
     // Deduct credits (skip if free renewal)
+    console.log("[ANALYSIS] Step 4: Deducting credits...");
     let freeDeducted = 0;
     let planDeducted = 0;
     if (isFreeRenewal) {
@@ -105,7 +113,10 @@ export async function POST() {
       });
     }
 
+    console.log("[ANALYSIS] Step 5: Building prompt, hasWebsite:", !!user?.website);
+    console.log("[ANALYSIS] Step 6: Fetching website content...");
     const webContent = user?.website ? await fetchWebContent(user.website as string) : "";
+    console.log("[ANALYSIS] Step 6 done: webContent length:", webContent.length);
     const context = buildBusinessContext(user as unknown as Record<string, unknown>, webContent);
 
     const prompt = `Eres un consultor de negocios experto en pequeñas empresas latinas en Estados Unidos.
@@ -125,6 +136,7 @@ OPCIÓN B: Enfoque moderno/atrevido
 IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin texto adicional.
 {"optionA":{"label":"...","description":"...","valueProposition":"...","tone":"..."},"optionB":{"label":"...","description":"...","valueProposition":"...","tone":"..."}}`;
 
+    console.log("[ANALYSIS] Step 7: Calling Gemini...", { hasApiKey: !!process.env.GEMINI_API_KEY });
     let options = null;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -136,11 +148,13 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
         });
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-        console.log(`[ANALYSIS_OPTIONS] Attempt ${attempt + 1}:`, text.substring(0, 300));
+        console.log(`[ANALYSIS] Step 8: Gemini response received, attempt ${attempt + 1}, length:`, text.length);
+        console.log("[ANALYSIS] Step 9: Parsing JSON...");
         options = parseGeminiJSON(text);
+        console.log("[ANALYSIS] Step 9 result: parsed =", !!options);
         if (options) break;
       } catch (e) {
-        console.error(`[ANALYSIS_OPTIONS] Attempt ${attempt + 1} failed:`, e);
+        console.error(`[ANALYSIS] Gemini attempt ${attempt + 1} failed:`, e);
       }
     }
 
@@ -159,6 +173,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
       return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
     }
 
+    console.log("[ANALYSIS] Step 10: Saving to DB...");
     await db.user.update({
       where: { id: userId },
       data: {
@@ -166,6 +181,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
         companyAnalysisAt: new Date(),
       },
     });
+    console.log("[ANALYSIS] Step 10 done: saved successfully");
 
     return NextResponse.json({ options });
   } catch (err) {
