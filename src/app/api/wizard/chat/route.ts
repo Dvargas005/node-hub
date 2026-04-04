@@ -292,7 +292,8 @@ export async function POST(req: NextRequest) {
       cheapestInCategory,
     });
 
-    const model = getGeminiModel();
+    // S1: Use native systemInstruction instead of injecting as user message
+    const model = getGeminiModel({ systemInstruction: systemPrompt, maxOutputTokens: 1024 });
 
     // Limit to last 10 messages + the new one to avoid token overflow
     const recentMessages = messages.slice(-11);
@@ -303,11 +304,7 @@ export async function POST(req: NextRequest) {
     }));
 
     const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: "Sistema: " + systemPrompt }] },
-        { role: "model", parts: [{ text: "Entendido. Conozco el perfil del cliente y estoy listo para ayudarle con su solicitud." }] },
-        ...geminiHistory,
-      ],
+      history: geminiHistory,
     });
 
     const lastMessage = recentMessages[recentMessages.length - 1];

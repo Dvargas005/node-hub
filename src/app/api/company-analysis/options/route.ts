@@ -5,16 +5,22 @@ import { parseGeminiJSON } from "@/lib/parse-gemini-json";
 
 const ANALYSIS_COST = 10;
 
+// S3: Sanitize user inputs before injecting into prompts
+function sanitize(str: unknown): string {
+  if (typeof str !== "string") return "";
+  return str.replace(/[<>{}]/g, "").substring(0, 500);
+}
+
 function buildBusinessContext(user: Record<string, unknown>, webContent: string) {
   const sm = user.socialMedia as Record<string, string> | null;
   const socialStr = sm ? Object.entries(sm).map(([k, v]) => `${k}: ${v}`).join(", ") : "No tiene";
 
-  return `- Nombre: ${user.businessName || "No especificado"}
-- Industria: ${user.businessIndustry || "No especificado"}
-- Descripción: ${user.businessDescription || "No especificado"}
-- Público: ${user.targetAudience || "No especificado"}
-- Marca existente: ${user.hasBranding ? "Sí" : "No"} / Colores: ${user.brandColors || "N/A"} / Estilo: ${user.brandStyle || "N/A"}
-- Sitio web: ${user.website || "No tiene"}
+  return `- Nombre: ${sanitize(user.businessName) || "No especificado"}
+- Industria: ${sanitize(user.businessIndustry) || "No especificado"}
+- Descripción: ${sanitize(user.businessDescription) || "No especificado"}
+- Público: ${sanitize(user.targetAudience) || "No especificado"}
+- Marca existente: ${user.hasBranding ? "Sí" : "No"} / Colores: ${sanitize(user.brandColors) || "N/A"} / Estilo: ${sanitize(user.brandStyle) || "N/A"}
+- Sitio web: ${sanitize(user.website) || "No tiene"}
 - Redes: ${socialStr}
 ${webContent ? `- Contenido del sitio web: ${webContent}` : ""}`;
 }

@@ -2,11 +2,13 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { getDb } from "./db";
 
-console.log("=== AUTH CONFIG ===", {
-  baseURL: process.env.BETTER_AUTH_URL,
-  nodeEnv: process.env.NODE_ENV,
-  hasDBUrl: !!process.env.DATABASE_URL,
-});
+if (process.env.NODE_ENV !== "production") {
+  console.log("=== AUTH CONFIG ===", {
+    baseURL: process.env.BETTER_AUTH_URL,
+    nodeEnv: process.env.NODE_ENV,
+    hasDBUrl: !!process.env.DATABASE_URL,
+  });
+}
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,

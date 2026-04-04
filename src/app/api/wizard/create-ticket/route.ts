@@ -10,13 +10,19 @@ export async function POST(req: NextRequest) {
   if (error || !session) return error;
 
   try {
-    const { briefStructured, conversationMessages, variantId } = await req.json();
+    let { briefStructured, conversationMessages, variantId } = await req.json();
 
+    // S9: Validate brief schema
     if (!variantId || !briefStructured) {
-      return NextResponse.json(
-        { error: "Datos del brief incompletos" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Datos del brief incompletos" }, { status: 400 });
+    }
+    if (!briefStructured?.summary || typeof briefStructured.summary !== "string") {
+      return NextResponse.json({ error: "Brief inválido" }, { status: 400 });
+    }
+
+    // S10: Limit conversation messages
+    if (Array.isArray(conversationMessages) && conversationMessages.length > 30) {
+      conversationMessages = conversationMessages.slice(-30);
     }
 
     const userId = session.user.id;
@@ -29,6 +35,14 @@ export async function POST(req: NextRequest) {
 
     if (!variant) {
       return NextResponse.json({ error: "Servicio no disponible" }, { status: 400 });
+    }
+
+    // S2: Log variant/service mismatch (possible manipulation)
+    if (briefStructured.suggestedServiceSlug && variant.service.slug !== briefStructured.suggestedServiceSlug) {
+      console.warn("[CREATE_TICKET] Variant/service mismatch — possible manipulation", {
+        variantService: variant.service.slug,
+        briefService: briefStructured.suggestedServiceSlug,
+      });
     }
 
     // Check min plan before transaction

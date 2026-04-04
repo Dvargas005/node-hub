@@ -12,12 +12,13 @@ function getGenAI() {
   return _genAI;
 }
 
-export function getGeminiModel() {
+export function getGeminiModel(opts?: { systemInstruction?: string; maxOutputTokens?: number }) {
   return getGenAI().getGenerativeModel({
     model: "gemini-2.5-flash",
+    ...(opts?.systemInstruction ? { systemInstruction: opts.systemInstruction } : {}),
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 1024,
+      maxOutputTokens: opts?.maxOutputTokens || 1024,
     },
   });
 }

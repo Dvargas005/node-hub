@@ -3,8 +3,23 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
+// S5: Simple in-memory rate limiting for registration
+const registerAttempts = new Map<string, number[]>();
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const attempts = (registerAttempts.get(ip) || []).filter((t) => now - t < 3600000);
+  attempts.push(now);
+  registerAttempts.set(ip, attempts);
+  return attempts.length > 5;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ error: "Demasiados intentos. Intenta en una hora." }, { status: 429 });
+    }
+
     const body = await req.json();
     const { name, email, password, businessName, allianceCode } = body;
 

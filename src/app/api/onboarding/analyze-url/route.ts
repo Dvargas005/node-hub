@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/api-auth";
 import { getGeminiModel } from "@/lib/gemini";
+import { lookup } from "dns/promises";
 
 export async function POST(req: NextRequest) {
   const { error } = await requireApiRole(["CLIENT"]);
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const fullUrl = url.match(/^https?:\/\//) ? url : `https://${url}`;
 
-    // S1: SSRF protection
+    // SSRF protection
     try {
       const parsed = new URL(fullUrl);
       if (!["http:", "https:"].includes(parsed.protocol)) {
@@ -27,6 +28,17 @@ export async function POST(req: NextRequest) {
       }
       if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(parsed.hostname)) {
         return NextResponse.json({ error: "URL no permitida", partial: true });
+      }
+      // S4: DNS rebinding protection — resolve hostname and check IP
+      try {
+        const { address } = await lookup(parsed.hostname);
+        const isPrivate = /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|0\.)/.test(address);
+        if (isPrivate) {
+          return NextResponse.json({ error: "URL no permitida", partial: true });
+        }
+      } catch {
+        // DNS resolution failed — hostname doesn't exist
+        return NextResponse.json({ error: "No se pudo resolver la URL", partial: true });
       }
     } catch {
       return NextResponse.json({ error: "URL inválida", partial: true });

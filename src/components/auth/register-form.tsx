@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,31 +27,37 @@ export function RegisterForm() {
   const [allianceName, setAllianceName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const validateAllianceCode = async (code: string) => {
+  // S13: Debounced alliance code validation
+  const validateAllianceCode = useCallback((code: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
     if (!code.trim()) {
       setAllianceValid(null);
       setAllianceName("");
       return;
     }
 
-    try {
-      const res = await fetch(
-        `/api/alliance?code=${encodeURIComponent(code)}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setAllianceValid(true);
-        setAllianceName(data.name);
-      } else {
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/alliance?code=${encodeURIComponent(code)}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setAllianceValid(true);
+          setAllianceName(data.name);
+        } else {
+          setAllianceValid(false);
+          setAllianceName("");
+        }
+      } catch {
         setAllianceValid(false);
         setAllianceName("");
       }
-    } catch {
-      setAllianceValid(false);
-      setAllianceName("");
-    }
-  };
+    }, 500);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
