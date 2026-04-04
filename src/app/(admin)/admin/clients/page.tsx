@@ -5,14 +5,17 @@ import { ClientsClient } from "./clients-client";
 export const dynamic = "force-dynamic";
 
 export default async function AdminClientsPage() {
-  await requireRole(["ADMIN", "PM"]);
+  const session = await requireRole(["ADMIN", "PM"]);
+  const userRole = (session.user as Record<string, unknown>).role as string;
+  const isAdmin = userRole === "ADMIN";
 
-  const [clients, plans] = await Promise.all([
+  const [clients, plans, pms] = await Promise.all([
     db.user.findMany({
       where: { role: "CLIENT" },
       include: {
         subscription: { include: { plan: true } },
         referredBy: { select: { name: true, code: true } },
+        assignedPm: { select: { name: true } },
         _count: {
           select: {
             tickets: {
@@ -25,10 +28,16 @@ export default async function AdminClientsPage() {
       take: 200,
     }),
     db.plan.findMany({ where: { isActive: true }, orderBy: { priceMonthly: "asc" } }),
+    db.user.findMany({
+      where: { role: { in: ["PM", "ADMIN"] } },
+      select: { id: true, name: true },
+    }),
   ]);
 
   return (
     <ClientsClient
+      isAdmin={isAdmin}
+      pms={pms.map((p: any) => ({ id: p.id, name: p.name }))}
       clients={clients.map((c: any) => ({
         id: c.id,
         name: c.name,
@@ -41,6 +50,8 @@ export default async function AdminClientsPage() {
         activeTickets: c._count.tickets,
         allianceName: c.referredBy?.name || null,
         allianceCode: c.referredBy?.code || null,
+        assignedPmId: c.assignedPmId || null,
+        assignedPmName: c.assignedPm?.name || null,
         createdAt: c.createdAt.toISOString(),
       }))}
       plans={plans.map((p: any) => ({ slug: p.slug, name: p.name }))}

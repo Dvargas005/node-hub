@@ -5,13 +5,13 @@ import { ServicesClient } from "./services-client";
 export const dynamic = "force-dynamic";
 
 export default async function AdminServicesPage() {
-  await requireRole(["ADMIN", "PM"]);
+  const session = await requireRole(["ADMIN", "PM"]);
+  const role = (session.user as Record<string, unknown>).role as string;
+  const isAdmin = role === "ADMIN";
 
   const services = await db.service.findMany({
-    where: { isActive: true },
     include: {
       variants: {
-        where: { isActive: true },
         orderBy: { sortOrder: "asc" },
       },
     },
@@ -20,12 +20,18 @@ export default async function AdminServicesPage() {
 
   return (
     <ServicesClient
+      isAdmin={isAdmin}
       services={services.map((s: any) => ({
         id: s.id,
         name: s.name,
+        slug: s.slug,
         category: s.category,
         description: s.description,
+        longDescription: s.longDescription,
+        icon: s.icon,
         tags: s.tags,
+        sortOrder: s.sortOrder,
+        isActive: s.isActive,
         variants: s.variants.map((v: any) => ({
           id: v.id,
           name: v.name,
@@ -35,6 +41,8 @@ export default async function AdminServicesPage() {
           minPlan: v.minPlan,
           isPopular: v.isPopular,
           isNew: v.isNew,
+          isActive: v.isActive,
+          sortOrder: v.sortOrder,
         })),
       }))}
     />

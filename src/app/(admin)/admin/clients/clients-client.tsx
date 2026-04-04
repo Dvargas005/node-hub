@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,8 @@ interface ClientRow {
   activeTickets: number;
   allianceName: string | null;
   allianceCode: string | null;
+  assignedPmId: string | null;
+  assignedPmName: string | null;
   createdAt: string;
 }
 
@@ -38,13 +41,33 @@ const planColors: Record<string, string> = {
 export function ClientsClient({
   clients,
   plans,
+  isAdmin,
+  pms,
 }: {
   clients: ClientRow[];
   plans: { slug: string; name: string }[];
+  isAdmin: boolean;
+  pms: { id: string; name: string }[];
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("");
   const [filterAlliance, setFilterAlliance] = useState(false);
+
+  const handleAssignPm = async (clientId: string, pmId: string) => {
+    try {
+      const res = await fetch(`/api/admin/clients/${clientId}/assign-pm`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pmId }),
+      });
+      if (res.ok) {
+        router.refresh();
+      }
+    } catch (err: any) {
+      console.error("Error assigning PM", err);
+    }
+  };
 
   const filtered = useMemo(() => {
     return clients.filter((c: any) => {
@@ -130,6 +153,7 @@ export function ClientsClient({
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Plan</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Créditos</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Tickets</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Alianza</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Registro</TableHead>
                 </TableRow>
@@ -138,7 +162,7 @@ export function ClientsClient({
                 {filtered.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
                       No se encontraron clientes
@@ -186,6 +210,28 @@ export function ClientsClient({
                     </TableCell>
                     <TableCell className="text-sm text-[var(--ice-white)]">
                       {c.activeTickets}
+                    </TableCell>
+                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                      {isAdmin ? (
+                        <select
+                          value={c.assignedPmId || ""}
+                          onChange={(e) => {
+                            if (e.target.value) handleAssignPm(c.id, e.target.value);
+                          }}
+                          className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
+                        >
+                          <option value="">Sin asignar</option>
+                          {pms.map((p: any) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        c.assignedPmName || (
+                          <span className="text-[rgba(245,246,252,0.3)]">—</span>
+                        )
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
                       {c.allianceName ? (

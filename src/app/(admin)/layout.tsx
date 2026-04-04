@@ -18,6 +18,7 @@ const baseNav: NavItem[] = [
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Clientes", href: "/admin/clients", icon: Users },
   { label: "Freelancers", href: "/admin/freelancers", icon: UserCog },
+  { label: "Equipo", href: "/admin/team", icon: UserCog },
   { label: "Servicios", href: "/admin/services", icon: Package },
   { label: "Alianzas", href: "/admin/alliances", icon: Handshake },
   { label: "Métricas", href: "/admin/metrics", icon: BarChart3 },

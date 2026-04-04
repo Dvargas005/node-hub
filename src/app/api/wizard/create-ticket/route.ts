@@ -134,6 +134,20 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // Auto-assign PM if client doesn't have one
+      const client = await tx.user.findUnique({ where: { id: userId }, select: { assignedPmId: true } });
+      if (!client?.assignedPmId) {
+        const pms = await tx.user.findMany({
+          where: { role: "PM" },
+          select: { id: true, _count: { select: { pmClients: true } } },
+          orderBy: { pmClients: { _count: "asc" } },
+          take: 1,
+        });
+        if (pms.length > 0) {
+          await tx.user.update({ where: { id: userId }, data: { assignedPmId: pms[0].id } });
+        }
+      }
+
       return newTicket;
     });
 
