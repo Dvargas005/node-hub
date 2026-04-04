@@ -32,6 +32,18 @@ export function LoginForm() {
     setError("");
 
     try {
+      // Check rate limit before attempting login
+      const rateCheck = await fetch("/api/auth/rate-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (rateCheck.status === 429) {
+        const data = await rateCheck.json();
+        setError(data.error || "Demasiados intentos.");
+        return;
+      }
+
       const result = await signIn.email({ email, password });
 
       if (result.error) {
