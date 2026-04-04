@@ -36,12 +36,20 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       // ─── Subscription checkout complete ─────────────
       case "checkout.session.completed": {
+        const sessionId = obj.id as string;
         const metadata = obj.metadata as Record<string, string> | undefined;
         const userId = metadata?.userId;
         const planSlug = metadata?.planSlug;
         const packId = metadata?.packId;
         const packCredits = metadata?.credits;
         const customerId = obj.customer as string;
+
+        // C6: Idempotency check — skip if already processed
+        const alreadyProcessed = await db.processedWebhook.findUnique({ where: { sessionId } });
+        if (alreadyProcessed) {
+          console.log(`[WEBHOOK] Already processed session ${sessionId}, skipping`);
+          break;
+        }
 
         // Credit pack purchase
         if (metadata?.type === "credit_pack" && packCredits) {
@@ -61,6 +69,8 @@ export async function POST(req: NextRequest) {
               data: { freeCredits: { increment: credits } },
             });
           }
+
+          await db.processedWebhook.create({ data: { sessionId, type: "credit_pack" } });
           console.log(`[WEBHOOK] Credit pack: +${credits} créditos (pack ${packId})`);
           break;
         }
@@ -77,11 +87,26 @@ export async function POST(req: NextRequest) {
           break;
         }
 
+        // I18: Read actual period dates from Stripe subscription
         const subscriptionId = obj.subscription as string;
-        const now = new Date();
-        const periodEnd = new Date(now);
+        let periodStart = new Date();
+        let periodEnd = new Date();
         periodEnd.setMonth(periodEnd.getMonth() + 1);
 
+        if (subscriptionId) {
+          try {
+            const stripeSub = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["items.data"] });
+            const item = stripeSub.items.data[0];
+            if (item) {
+              periodStart = new Date(item.current_period_start * 1000);
+              periodEnd = new Date(item.current_period_end * 1000);
+            }
+          } catch (e) {
+            console.warn("[WEBHOOK] Could not retrieve subscription dates:", e);
+          }
+        }
+
+        // C2: Credits always RESET to plan total (old credits are lost — business rule)
         await db.subscription.upsert({
           where: { userId },
           update: {
@@ -89,9 +114,10 @@ export async function POST(req: NextRequest) {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             status: "ACTIVE",
-            currentPeriodStart: now,
+            currentPeriodStart: periodStart,
             currentPeriodEnd: periodEnd,
             creditsRemaining: plan.monthlyCredits + plan.bonusCredits,
+            canceledAt: null,
           },
           create: {
             userId,
@@ -99,12 +125,19 @@ export async function POST(req: NextRequest) {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             status: "ACTIVE",
-            currentPeriodStart: now,
+            currentPeriodStart: periodStart,
             currentPeriodEnd: periodEnd,
             creditsRemaining: plan.monthlyCredits + plan.bonusCredits,
           },
         });
 
+        // Save stripeCustomerId on user too
+        await db.user.update({
+          where: { id: userId },
+          data: { stripeCustomerId: customerId },
+        });
+
+        await db.processedWebhook.create({ data: { sessionId, type: "subscription" } });
         console.log(`[WEBHOOK] Subscription created: ${userId} → ${plan.name}`);
         break;
       }
@@ -124,15 +157,28 @@ export async function POST(req: NextRequest) {
         });
 
         if (sub) {
-          const now = new Date();
-          const periodEnd = new Date(now);
+          // I18: Read actual period dates from Stripe
+          let periodStart = new Date();
+          let periodEnd = new Date();
           periodEnd.setMonth(periodEnd.getMonth() + 1);
 
+          try {
+            const stripeSub = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["items.data"] });
+            const item = stripeSub.items.data[0];
+            if (item) {
+              periodStart = new Date(item.current_period_start * 1000);
+              periodEnd = new Date(item.current_period_end * 1000);
+            }
+          } catch (e) {
+            console.warn("[WEBHOOK] Could not retrieve subscription dates:", e);
+          }
+
+          // C3 + REGLA 1: RESET credits (unused credits are lost each month — business rule)
           await db.subscription.update({
             where: { id: sub.id },
             data: {
               status: "ACTIVE",
-              currentPeriodStart: now,
+              currentPeriodStart: periodStart,
               currentPeriodEnd: periodEnd,
               creditsRemaining: sub.plan.monthlyCredits + sub.plan.bonusCredits,
             },
@@ -155,9 +201,13 @@ export async function POST(req: NextRequest) {
           null;
 
         if (mapped) {
+          const updateData: Record<string, unknown> = { status: mapped };
+          if (mapped === "CANCELED") {
+            updateData.canceledAt = new Date();
+          }
           await db.subscription.updateMany({
             where: { stripeSubscriptionId: subId },
-            data: { status: mapped },
+            data: updateData as any,
           });
           console.log(`[WEBHOOK] Subscription updated: ${subId} → ${mapped}`);
         }
@@ -169,7 +219,7 @@ export async function POST(req: NextRequest) {
         const subId = obj.id as string;
         await db.subscription.updateMany({
           where: { stripeSubscriptionId: subId },
-          data: { status: "CANCELED", creditsRemaining: 0 },
+          data: { status: "CANCELED", creditsRemaining: 0, canceledAt: new Date() },
         });
         console.log(`[WEBHOOK] Subscription canceled: ${subId}`);
         break;

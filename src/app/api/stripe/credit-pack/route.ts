@@ -21,20 +21,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Pack no encontrado" }, { status: 404 });
     }
 
-    // Find or create customer
+    // Find or create customer (check User first, then Subscription, then Stripe)
+    const userRecord = await db.user.findUnique({
+      where: { id: userId },
+      select: { stripeCustomerId: true, email: true, name: true },
+    });
     const existingSub = await db.subscription.findUnique({
       where: { userId },
       select: { stripeCustomerId: true },
     });
 
-    let customerId = existingSub?.stripeCustomerId;
+    let customerId = userRecord?.stripeCustomerId || existingSub?.stripeCustomerId || undefined;
     if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: session.user.email,
-        name: session.user.name,
-        metadata: { userId },
-      });
-      customerId = customer.id;
+      const existing = await stripe.customers.list({ email: userRecord!.email, limit: 1 });
+      if (existing.data.length > 0) {
+        customerId = existing.data[0].id;
+      } else {
+        const customer = await stripe.customers.create({
+          email: userRecord!.email,
+          name: userRecord!.name,
+          metadata: { userId },
+        });
+        customerId = customer.id;
+      }
+      await db.user.update({ where: { id: userId }, data: { stripeCustomerId: customerId } });
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

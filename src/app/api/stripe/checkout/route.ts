@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
@@ -21,20 +22,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plan no encontrado o sin precio configurado" }, { status: 404 });
     }
 
-    // Find or create Stripe customer
-    const existingSub = await db.subscription.findUnique({
-      where: { userId },
-      select: { stripeCustomerId: true },
+    // C1: If user already has ACTIVE subscription, redirect to portal
+    const existingSub = await db.subscription.findUnique({ where: { userId } });
+    if (existingSub?.status === "ACTIVE" && existingSub.stripeCustomerId) {
+      const portal = await stripe.billingPortal.sessions.create({
+        customer: existingSub.stripeCustomerId,
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/billing`,
+      });
+      return NextResponse.json({ url: portal.url });
+    }
+
+    // I17: Find or create Stripe customer — check User.stripeCustomerId first, then Stripe, then create
+    const userRecord = await db.user.findUnique({
+      where: { id: userId },
+      select: { stripeCustomerId: true, email: true, name: true, allianceId: true },
     });
 
-    let customerId = existingSub?.stripeCustomerId;
+    let customerId = userRecord?.stripeCustomerId || existingSub?.stripeCustomerId || undefined;
+
     if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: session.user.email,
-        name: session.user.name,
-        metadata: { userId },
-      });
-      customerId = customer.id;
+      // Search Stripe by email before creating
+      const existing = await stripe.customers.list({ email: userRecord!.email, limit: 1 });
+      if (existing.data.length > 0) {
+        customerId = existing.data[0].id;
+      } else {
+        const customer = await stripe.customers.create({
+          email: userRecord!.email,
+          name: userRecord!.name,
+          metadata: { userId },
+        });
+        customerId = customer.id;
+      }
+      // Save immediately
+      await db.user.update({ where: { id: userId }, data: { stripeCustomerId: customerId } });
     }
 
     // Build line items
@@ -42,14 +62,40 @@ export async function POST(req: NextRequest) {
       { price: plan.stripePriceId, quantity: 1 },
     ];
 
-    // Add setup fee as one-time line item
-    if (plan.setupFeeStripePriceId) {
+    // I16 + REGLA 2: Setup fee with 3-month reactivation logic
+    let chargeSetupFee = true;
+    if (existingSub) {
+      if (existingSub.status === "ACTIVE") {
+        chargeSetupFee = false;
+      } else if (existingSub.status === "CANCELED") {
+        const canceledAt = existingSub.canceledAt || existingSub.updatedAt;
+        const threeMonthsAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+        chargeSetupFee = canceledAt < threeMonthsAgo;
+      }
+    }
+
+    if (chargeSetupFee && plan.setupFeeStripePriceId) {
       lineItems.push({ price: plan.setupFeeStripePriceId, quantity: 1 });
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    // I15 + REGLA 3: Alliance coupon mapping
+    let allianceCoupon: string | undefined;
+    if (userRecord?.allianceId) {
+      const alliance = await db.alliance.findUnique({
+        where: { id: userRecord.allianceId },
+        select: { code: true },
+      });
+      const couponMap: Record<string, string> = {
+        "LEN2026": "SOMOSLEN",
+      };
+      if (alliance?.code && couponMap[alliance.code]) {
+        allianceCoupon = couponMap[alliance.code];
+      }
+    }
+
+    const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       customer: customerId,
       line_items: lineItems,
@@ -59,7 +105,16 @@ export async function POST(req: NextRequest) {
       subscription_data: {
         metadata: { userId, planSlug },
       },
-    });
+    };
+
+    // Apply alliance coupon if found, otherwise allow manual promo codes
+    if (allianceCoupon) {
+      checkoutParams.discounts = [{ coupon: allianceCoupon }];
+    } else {
+      checkoutParams.allow_promotion_codes = true;
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {

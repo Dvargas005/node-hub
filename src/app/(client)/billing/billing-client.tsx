@@ -18,7 +18,7 @@ interface Plan {
 interface Sub {
   id: string; status: string; planSlug: string; planName: string;
   creditsRemaining: number; monthlyCredits: number;
-  currentPeriodEnd: string; stripeCustomerId: string | null;
+  currentPeriodEnd: string; hasStripeCustomer: boolean;
 }
 
 interface CreditPack {
@@ -157,7 +157,7 @@ export function BillingClient({
                 Créditos bajos — compra un pack extra abajo
               </div>
             )}
-            {subscription.stripeCustomerId && (
+            {subscription.hasStripeCustomer && (
               <Button onClick={handlePortal} variant="outline" className="w-full border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]">
                 Gestionar suscripción en Stripe
               </Button>

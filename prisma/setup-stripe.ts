@@ -104,6 +104,36 @@ async function main() {
     });
   }
 
+  console.log("\n=== Creating Coupons ===\n");
+
+  const coupons = [
+    { id: "SOMOSLEN", percent_off: 30, duration: "forever" as const, name: "LEN Members 30% Off" },
+    { id: "NOUVOSVIP", percent_off: 7, duration: "forever" as const, name: "Nouvos VIP 7% Off" },
+  ];
+
+  for (const coupon of coupons) {
+    try {
+      await stripe.coupons.create(coupon);
+      console.log(`Coupon created: ${coupon.id} (${coupon.percent_off}% off)`);
+    } catch (err: any) {
+      if (err.code === "resource_already_exists") {
+        console.log(`Coupon ${coupon.id} already exists, skipping.`);
+      } else throw err;
+    }
+  }
+
+  // Create promotion codes for manual entry in checkout
+  for (const coupon of coupons) {
+    try {
+      await stripe.promotionCodes.create({ coupon: coupon.id, code: coupon.id });
+      console.log(`Promo code created: ${coupon.id}`);
+    } catch (err: any) {
+      if (err.code === "resource_already_exists") {
+        console.log(`Promo code ${coupon.id} already exists, skipping.`);
+      } else throw err;
+    }
+  }
+
   console.log("\n=== Done! ===");
   console.log("\nPara probar webhooks local:");
   console.log("  stripe listen --forward-to localhost:3000/api/stripe/webhook");

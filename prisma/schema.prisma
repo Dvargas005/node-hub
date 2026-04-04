@@ -35,6 +35,7 @@ model User {
   priorities      Json?
   companyAnalysis    Json?
   companyAnalysisAt  DateTime?
+  stripeCustomerId   String?   @unique
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -135,6 +136,7 @@ model Subscription {
   currentPeriodStart   DateTime  @default(now())
   currentPeriodEnd     DateTime
   creditsRemaining     Int
+  canceledAt           DateTime?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
@@ -160,6 +162,15 @@ model CreditPack {
   isActive        Boolean @default(true)
 
   @@map("credit_packs")
+}
+
+model ProcessedWebhook {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  type        String   // "subscription" | "credit_pack"
+  processedAt DateTime @default(now())
+
+  @@map("processed_webhooks")
 }
 
 // ─── CATÁLOGO DE SERVICIOS ──────────────────────────

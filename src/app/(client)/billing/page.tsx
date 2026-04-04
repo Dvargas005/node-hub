@@ -60,7 +60,7 @@ export default async function BillingPage() {
               creditsRemaining: subscription.creditsRemaining,
               monthlyCredits: subscription.plan.monthlyCredits,
               currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
-              stripeCustomerId: subscription.stripeCustomerId,
+              hasStripeCustomer: !!subscription.stripeCustomerId,
             }
           : null
       }
