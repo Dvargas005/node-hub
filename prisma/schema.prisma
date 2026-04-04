@@ -48,6 +48,7 @@ model User {
   assignedPm    User?       @relation("pmClients", fields: [assignedPmId], references: [id])
   pmClients     User[]      @relation("pmClients")
   managedFreelancers Freelancer[] @relation("pmFreelancers")
+  freelancerProfile  Freelancer?  @relation("freelancerUser")
   sessions      Session[]
   accounts      Account[]
   ticketMessages TicketMessage[]
@@ -59,6 +60,7 @@ enum Role {
   CLIENT
   PM
   ADMIN
+  FREELANCER
 }
 
 model Session {
@@ -366,6 +368,8 @@ model Freelancer {
 
   pmId            String
   pm              User           @relation("pmFreelancers", fields: [pmId], references: [id])
+  userId          String?        @unique
+  user            User?          @relation("freelancerUser", fields: [userId], references: [id])
   tickets         Ticket[]
 
   @@map("freelancers")

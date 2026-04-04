@@ -41,7 +41,7 @@ export const auth = betterAuth({
         input: true,
       },
       role: {
-        type: ["CLIENT", "PM", "ADMIN"] as const,
+        type: ["CLIENT", "PM", "ADMIN", "FREELANCER"] as const,
         required: false,
         defaultValue: "CLIENT",
         input: false,

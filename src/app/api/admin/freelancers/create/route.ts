@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import { requireApiRole } from "@/lib/api-auth";
+import { headers } from "next/headers";
+
+function generatePassword(length = 12): string {
+  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["ADMIN"]);
@@ -32,6 +43,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ya existe un freelancer con ese email" }, { status: 409 });
     }
 
+    // Auto-create a User with role FREELANCER
+    const tempPassword = generatePassword();
+    let userId: string | null = null;
+
+    try {
+      const authRes = await auth.api.signUpEmail({
+        body: { email, password: tempPassword, name },
+        headers: await headers(),
+        asResponse: true,
+      });
+
+      if (authRes.ok) {
+        const authData = await authRes.json();
+        userId = authData?.user?.id || null;
+
+        if (userId) {
+          // Set role to FREELANCER and mark onboarding complete
+          await db.user.update({
+            where: { id: userId },
+            data: { role: "FREELANCER", onboardingCompleted: true },
+          });
+        }
+      } else {
+        console.warn("[CREATE_FREELANCER] Could not create user account:", await authRes.text());
+      }
+    } catch (authErr) {
+      console.warn("[CREATE_FREELANCER] User creation failed (freelancer still created):", authErr);
+    }
+
     const freelancer = await db.freelancer.create({
       data: {
         name,
@@ -48,10 +88,15 @@ export async function POST(req: NextRequest) {
         portfolioUrl: portfolioUrl || null,
         timezone: timezone || null,
         pmId: session.user.id,
+        userId,
       },
     });
 
-    return NextResponse.json(freelancer, { status: 201 });
+    return NextResponse.json({
+      freelancer,
+      tempPassword: userId ? tempPassword : null,
+      userCreated: !!userId,
+    }, { status: 201 });
   } catch (err) {
     console.error("[CREATE_FREELANCER]", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });

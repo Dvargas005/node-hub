@@ -1,11 +1,12 @@
 "use client";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { Briefcase, Package } from "lucide-react";
+import { Briefcase, Package, ClipboardList } from "lucide-react";
 import type { NavItem } from "@/components/layout/sidebar";
 
 const freelancerNav: NavItem[] = [
   { label: "Portal", href: "/freelancer/portal", icon: Briefcase },
+  { label: "Mis Tickets", href: "/freelancer/portal", icon: ClipboardList },
   { label: "Entregas", href: "/freelancer/deliveries", icon: Package },
 ];
 

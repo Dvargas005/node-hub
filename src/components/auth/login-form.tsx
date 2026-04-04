@@ -43,6 +43,8 @@ export function LoginForm() {
       const role = (result.data?.user as Record<string, unknown>)?.role as string;
       if (role === "ADMIN" || role === "PM") {
         window.location.href = "/admin/overview";
+      } else if (role === "FREELANCER") {
+        window.location.href = "/freelancer/portal";
       } else {
         window.location.href = callbackUrl;
       }
