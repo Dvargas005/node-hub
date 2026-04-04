@@ -77,7 +77,6 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
         });
         const genResult = await model.generateContent(prompt);
         const text = genResult.response.text();
-        console.log(`[ANALYSIS_GENERATE] Attempt ${attempt + 1}:`, text.substring(0, 300));
         result = parseGeminiJSON(text);
         if (result) break;
       } catch (e) {

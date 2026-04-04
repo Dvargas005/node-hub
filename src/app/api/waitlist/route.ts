@@ -38,10 +38,6 @@ export async function POST(req: NextRequest) {
       }
       await redis.set("waitlist:" + entry.email, JSON.stringify(entry));
       await redis.sadd("waitlist:all_emails", entry.email);
-      const count = await redis.scard("waitlist:all_emails");
-      console.log("[WAITLIST] #" + count + " — " + entry.email);
-    } else {
-      console.log("[WAITLIST_ENTRY]", JSON.stringify(entry));
     }
 
     return NextResponse.json({ success: true, message: "Added to waitlist" });
