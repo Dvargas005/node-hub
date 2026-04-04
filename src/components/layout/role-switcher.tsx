@@ -40,7 +40,8 @@ export function RoleSwitcher({ userRole }: { userRole: string }) {
     localStorage.setItem("node-view-as-role", role);
     document.cookie = `node-view-as-role=${role};path=/;max-age=86400`;
     const target = roles.find((r: any) => r.key === role);
-    router.push(target?.path || "/admin/overview");
+    // Hard navigation so server components see the new cookie
+    window.location.href = target?.path || "/admin/overview";
   }
 
   const current = roles.find((r: any) => r.key === viewAs) || roles[0];
@@ -97,7 +98,7 @@ export function ViewAsBanner() {
     setViewAs(null);
     localStorage.removeItem("node-view-as-role");
     document.cookie = "node-view-as-role=;path=/;max-age=0";
-    router.push("/admin/overview");
+    window.location.href = "/admin/overview";
   }
 
   return (

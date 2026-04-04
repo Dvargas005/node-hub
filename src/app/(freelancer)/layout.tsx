@@ -1,23 +1,20 @@
-"use client";
+import { cookies } from "next/headers";
+import { requireAuth } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { FreelancerShell } from "./freelancer-shell";
 
-import { AppShell } from "@/components/layout/app-shell";
-import { Briefcase, Package, ClipboardList } from "lucide-react";
-import type { NavItem } from "@/components/layout/sidebar";
-
-const freelancerNav: NavItem[] = [
-  { label: "Portal", href: "/freelancer/portal", icon: Briefcase },
-  { label: "Mis Tickets", href: "/freelancer/portal", icon: ClipboardList },
-  { label: "Entregas", href: "/freelancer/deliveries", icon: Package },
-];
-
-export default function FreelancerLayout({
+export default async function FreelancerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AppShell navItems={freelancerNav} title="N.O.D.E. Freelancer">
-      {children}
-    </AppShell>
-  );
+  const session = await requireAuth();
+  const realRole = (session.user as Record<string, unknown>).role as string;
+  const cookieStore = await cookies();
+  const viewAs = cookieStore.get("node-view-as-role")?.value;
+
+  const canAccess = realRole === "FREELANCER" || (realRole === "ADMIN" && viewAs === "FREELANCER");
+  if (!canAccess) redirect("/dashboard");
+
+  return <FreelancerShell>{children}</FreelancerShell>;
 }

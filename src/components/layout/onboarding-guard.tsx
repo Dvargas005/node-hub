@@ -12,6 +12,7 @@ export function OnboardingGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!session?.user) return;
     const user = session.user as Record<string, unknown>;
+    // Only CLIENT role needs onboarding — ADMIN/PM/FREELANCER skip
     if (
       user.role === "CLIENT" &&
       user.onboardingCompleted === false &&
