@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { getGoogleDrivePreview } from "@/lib/file-preview";
 
 interface DeliveryRow {
   id: string;
@@ -113,16 +114,19 @@ export function DeliveriesClient({
                   {deliveryStatusLabels[d.status] || d.status}
                 </Badge>
                 {d.fileUrl && (
-                  <a
-                    href={d.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    {d.fileName || "Archivo"}
-                  </a>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <a
+                      href={d.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs"
+                    >
+                      <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                    </a>
+                    {getGoogleDrivePreview(d.fileUrl) && (
+                      <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
+                    )}
+                  </div>
                 )}
                 <span className="text-xs text-[rgba(245,246,252,0.3)]">
                   {fmt(d.createdAt)}

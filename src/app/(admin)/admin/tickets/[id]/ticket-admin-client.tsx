@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ArrowLeft, Send, Upload, ExternalLink, UserPlus, Save, Clock, AlertTriangle, DollarSign } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors, priorityLabels, priorityColors, freelancerRoleLabels, categoryLabels } from "@/lib/status-labels";
+import { getGoogleDrivePreview } from "@/lib/file-preview";
 
 interface TicketData {
   id: string; number: number; status: string; priority: string; creditsCharged: number;
@@ -203,7 +204,16 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
                     <Badge className={dlvColors[d.status] || ""}>{dlvLabels[d.status] || d.status}</Badge>
                     <span className="text-[10px] text-[rgba(245,246,252,0.4)] ml-auto">{fmt(d.createdAt)}</span>
                   </div>
-                  {d.fileUrl && <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-[var(--gold-bar)] hover:underline"><ExternalLink className="h-3 w-3" />{d.fileName || "Archivo"}</a>}
+                  {d.fileUrl && (
+                    <div>
+                      <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
+                        <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                      </a>
+                      {getGoogleDrivePreview(d.fileUrl) && (
+                        <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
+                      )}
+                    </div>
+                  )}
                   {d.notes && <p className="text-xs text-[rgba(245,246,252,0.7)]">{d.notes}</p>}
                   {d.pmFeedback && <p className="text-xs text-[rgba(245,246,252,0.5)]"><span className="font-medium">PM:</span> {d.pmFeedback}</p>}
                   {d.clientFeedback && <p className="text-xs text-[rgba(245,246,252,0.5)]"><span className="font-medium">Cliente:</span> {d.clientFeedback}</p>}

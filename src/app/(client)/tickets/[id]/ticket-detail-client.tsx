@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Send, Check, Pencil, X, CreditCard, Calendar,
-  User, Download, Loader2, FileText,
+  User, Download, Loader2, FileText, ExternalLink,
 } from "lucide-react";
 import {
   ticketStatusLabels, ticketStatusColors, freelancerRoleLabels, categoryColors,
 } from "@/lib/status-labels";
+import { getGoogleDrivePreview } from "@/lib/file-preview";
 
 interface TicketData {
   id: string; number: number; status: string;
@@ -202,9 +203,14 @@ export function TicketDetailClient({
                     </div>
                     {d.notes && <p className="text-xs text-[rgba(245,246,252,0.5)] mb-2">{d.notes}</p>}
                     {d.fileUrl && (
-                      <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-[var(--gold-bar)] hover:underline">
-                        <Download className="h-3 w-3" /> {d.fileName || "Descargar archivo"}
-                      </a>
+                      <div>
+                        <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
+                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                        </a>
+                        {getGoogleDrivePreview(d.fileUrl) && (
+                          <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
+                        )}
+                      </div>
                     )}
                     {d.clientFeedback && (
                       <div className="mt-2 bg-[rgba(255,255,255,0.02)] p-2 text-xs text-[rgba(245,246,252,0.5)]">

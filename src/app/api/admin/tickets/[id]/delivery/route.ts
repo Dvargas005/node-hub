@@ -11,6 +11,11 @@ export async function POST(
 
   try {
     const { notes, fileUrl, fileName } = await req.json();
+
+    if (fileUrl && typeof fileUrl === "string" && !fileUrl.startsWith("https://")) {
+      return NextResponse.json({ error: "El link debe empezar con https://" }, { status: 400 });
+    }
+
     const ticketId = params.id;
 
     const ticket = await db.ticket.findUnique({ where: { id: ticketId } });

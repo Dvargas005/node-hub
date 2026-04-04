@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Send, Upload, ExternalLink } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors, priorityLabels, priorityColors } from "@/lib/status-labels";
+import { getGoogleDrivePreview } from "@/lib/file-preview";
 
 interface Message { id: string; content: string; senderRole: string; senderName: string; createdAt: string }
 interface DeliveryRow { id: string; round: number; status: string; notes: string | null; fileUrl: string | null; fileName: string | null; pmFeedback: string | null; clientFeedback: string | null; createdAt: string }
@@ -144,7 +145,16 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
                       <span className="text-xs text-[rgba(245,246,252,0.3)] ml-auto">{fmt(d.createdAt)}</span>
                     </div>
                     {d.notes && <p className="text-xs text-[rgba(245,246,252,0.6)] mb-1">{d.notes}</p>}
-                    {d.fileUrl && <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:underline flex items-center gap-1"><ExternalLink className="w-3 h-3" />{d.fileName || "Archivo"}</a>}
+                    {d.fileUrl && (
+                      <div>
+                        <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
+                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                        </a>
+                        {getGoogleDrivePreview(d.fileUrl) && (
+                          <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
+                        )}
+                      </div>
+                    )}
                     {d.pmFeedback && <p className="text-xs text-blue-400 mt-1"><span className="font-medium">PM:</span> {d.pmFeedback}</p>}
                     {d.clientFeedback && <p className="text-xs text-purple-400 mt-1"><span className="font-medium">Cliente:</span> {d.clientFeedback}</p>}
                   </div>
@@ -153,7 +163,8 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
             )}
             <div className="border-t border-[rgba(245,246,252,0.1)] pt-4 space-y-2">
               <p className="text-xs font-medium text-[rgba(245,246,252,0.5)]">Subir entrega</p>
-              <input type="text" value={dlvUrl} onChange={(e) => setDlvUrl(e.target.value)} placeholder="URL del archivo" className={inp} />
+              <label className="text-xs text-[rgba(245,246,252,0.4)]">Link del recurso (Google Drive, Figma, Dropbox, etc.)</label>
+              <input type="text" value={dlvUrl} onChange={(e) => setDlvUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." className={inp} />
               <input type="text" value={dlvName} onChange={(e) => setDlvName(e.target.value)} placeholder="Nombre del archivo" className={inp} />
               <textarea value={dlvNotes} onChange={(e) => setDlvNotes(e.target.value)} placeholder="Notas (opcional)" className={txa} rows={2} />
               <Button onClick={submitDelivery} disabled={uploading || !dlvUrl.trim()} className={goldBtn} size="sm">
