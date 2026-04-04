@@ -163,7 +163,7 @@ export function DashboardClient({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 overflow-x-hidden">
       {/* SECTION 1 — Greeting */}
       <div>
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">{greeting.title}</h1>
@@ -372,7 +372,7 @@ export function DashboardClient({
 
             {/* Expanded content */}
             {analysisExpanded && (
-              <div className="mt-4 space-y-4 border-t border-[rgba(245,246,252,0.06)] pt-4">
+              <div className="mt-4 space-y-4 border-t border-[rgba(245,246,252,0.06)] pt-4 overflow-hidden">
                 <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.description as string}</p>
                 <div className="bg-[rgba(255,201,25,0.05)] border border-[var(--gold-bar)]/20 p-3">
                   <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Propuesta de valor</p>
@@ -380,18 +380,18 @@ export function DashboardClient({
                 </div>
 
                 {/* SWOT */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {swotConfig.map((s: any) => {
                     const swot = selectedProfile.swot as Record<string, string[]> | undefined;
                     const items = swot?.[s.key] || [];
                     return (
-                      <div key={s.key} className={`border p-3 ${s.bg}`}>
+                      <div key={s.key} className={`border p-3 ${s.bg} overflow-hidden`}>
                         <div className="flex items-center gap-1.5 mb-2">
-                          <s.icon className={`h-4 w-4 ${s.color}`} />
+                          <s.icon className={`h-4 w-4 shrink-0 ${s.color}`} />
                           <p className={`text-xs font-medium ${s.color}`}>{s.label}</p>
                         </div>
                         <ul className="space-y-1">
-                          {items.map((item: any, i: number) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)]">• {item}</li>)}
+                          {items.map((item: any, i: number) => <li key={i} className="text-xs text-[rgba(245,246,252,0.6)] break-words">• {item}</li>)}
                         </ul>
                       </div>
                     );
@@ -404,7 +404,7 @@ export function DashboardClient({
                     <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Competidores identificados</p>
                     <div className="flex flex-wrap gap-2">
                       {(selectedProfile.competitors as string[]).map((c: any, i: number) => (
-                        <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{c}</Badge>
+                        <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)] break-words">{c}</Badge>
                       ))}
                     </div>
                   </div>
@@ -424,8 +424,8 @@ export function DashboardClient({
                         return (
                           <Link key={i} href={`/request?category=${cat}`}>
                             <button className="flex items-center gap-2 px-3 py-2 text-xs border border-[var(--gold-bar)]/30 bg-transparent text-[rgba(245,246,252,0.7)] hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.05)] hover:text-[var(--gold-bar)] transition-all">
-                              <Icon className="h-3 w-3 text-[var(--gold-bar)]" />
-                              <span className="text-left">{r}</span>
+                              <Icon className="h-3 w-3 shrink-0 text-[var(--gold-bar)]" />
+                              <span className="text-left break-words">{r}</span>
                             </button>
                           </Link>
                         );
