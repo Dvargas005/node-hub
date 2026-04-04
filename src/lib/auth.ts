@@ -90,9 +90,9 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
-          console.log(
-            `[AUTH] New user created: ${user.email} (${user.role})`
-          );
+          if (process.env.NODE_ENV !== "production") {
+            console.log(`[AUTH] New user created: ${user.email} (${user.role})`);
+          }
         },
       },
     },

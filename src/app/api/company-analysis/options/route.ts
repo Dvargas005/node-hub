@@ -13,7 +13,7 @@ function sanitize(str: unknown): string {
 
 function buildBusinessContext(user: Record<string, unknown>, webContent: string) {
   const sm = user.socialMedia as Record<string, string> | null;
-  const socialStr = sm ? Object.entries(sm).map(([k, v]) => `${k}: ${v}`).join(", ") : "No tiene";
+  const socialStr = sm ? Object.entries(sm).map(([k, v]: [string, any]) => `${k}: ${sanitize(String(v))}`).join(", ") : "No tiene";
 
   return `- Nombre: ${sanitize(user.businessName) || "No especificado"}
 - Industria: ${sanitize(user.businessIndustry) || "No especificado"}
