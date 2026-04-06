@@ -47,59 +47,59 @@ interface ChatMsg {
 
 // ─── Static data ────────────────────────────────────
 const industries = [
-  "🍽️ Alimentos y Panadería",
-  "🛍️ Retail / Tienda",
-  "💼 Servicios Profesionales",
-  "🏥 Salud y Terapia",
-  "💻 Tecnología",
-  "📚 Educación",
-  "🎉 Eventos",
-  "🏗️ Construcción",
-  "🚚 Transporte",
-  "🏠 Bienes Raíces",
-  "🚗 Automotriz",
-  "🧹 Limpieza y Mantenimiento",
-  "💇 Belleza y Peluquería",
-  "💪 Fitness y Gym",
+  "🍽️ Food & Bakery",
+  "🛍️ Retail / Store",
+  "💼 Professional Services",
+  "🏥 Health & Therapy",
+  "💻 Technology",
+  "📚 Education",
+  "🎉 Events",
+  "🏗️ Construction",
+  "🚚 Transportation",
+  "🏠 Real Estate",
+  "🚗 Automotive",
+  "🧹 Cleaning & Maintenance",
+  "💇 Beauty & Hair",
+  "💪 Fitness & Gym",
   "⚖️ Legal",
-  "✈️ Turismo y Hotelería",
-  "🌾 Agricultura",
-  "🔧 Otro",
+  "✈️ Tourism & Hospitality",
+  "🌾 Agriculture",
+  "🔧 Other",
 ];
 
 const industrySubcategories: Record<string, string[]> = {
-  "Alimentos y Panadería": ["Panadería artesanal", "Restaurante", "Food truck", "Catering", "Pastelería", "Cafetería", "Otro"],
-  "Retail / Tienda": ["Boutique", "Tienda en línea", "Abarrotes", "Ferretería", "Joyería", "Otro"],
-  "Servicios Profesionales": ["Abogado", "Contador", "Consultor", "Notaría", "Agencia", "Otro"],
-  "Salud y Terapia": ["Consultorio médico", "Terapia física", "Nutrición", "Estética", "Dentista", "Otro"],
-  "Tecnología": ["Desarrollo de software", "Soporte técnico", "SaaS", "E-commerce", "Otro"],
-  "Educación": ["Academia", "Tutorías", "Cursos online", "Capacitación", "Otro"],
-  "Eventos": ["Organizador de eventos", "Fotógrafo", "DJ / Música", "Banquetes", "Otro"],
-  "Construcción": ["Contratista general", "Plomería", "Electricidad", "Pintura", "Arquitectura", "Otro"],
-  "Transporte": ["Mudanzas", "Logística", "Paquetería", "Otro"],
-  "Bienes Raíces": ["Agente inmobiliario", "Constructora", "Property management", "Otro"],
-  "Automotriz": ["Taller mecánico", "Venta de autopartes", "Car wash", "Detailing", "Otro"],
-  "Limpieza y Mantenimiento": ["Limpieza residencial", "Limpieza comercial", "Jardinería", "Otro"],
-  "Belleza y Peluquería": ["Salón de belleza", "Barbería", "Estética", "Uñas", "Maquillaje", "Otro"],
-  "Fitness y Gym": ["Gimnasio", "Entrenador personal", "Yoga / Pilates", "CrossFit", "Otro"],
-  "Legal": ["Abogado general", "Inmigración", "Laboral", "Penal", "Otro"],
-  "Turismo y Hotelería": ["Hotel", "Agencia de viajes", "Tour operador", "Restaurante turístico", "Otro"],
-  "Agricultura": ["Cultivo", "Ganadería", "Agroindustria", "Vivero", "Otro"],
+  "Food & Bakery": ["Artisan bakery", "Restaurant", "Food truck", "Catering", "Pastry shop", "Coffee shop", "Other"],
+  "Retail / Store": ["Boutique", "Online store", "Grocery", "Hardware store", "Jewelry", "Other"],
+  "Professional Services": ["Lawyer", "Accountant", "Consultant", "Notary", "Agency", "Other"],
+  "Health & Therapy": ["Medical office", "Physical therapy", "Nutrition", "Aesthetics", "Dentist", "Other"],
+  "Technology": ["Software development", "Tech support", "SaaS", "E-commerce", "Other"],
+  "Education": ["Academy", "Tutoring", "Online courses", "Training", "Other"],
+  "Events": ["Event planner", "Photographer", "DJ / Music", "Banquets", "Other"],
+  "Construction": ["General contractor", "Plumbing", "Electrical", "Painting", "Architecture", "Other"],
+  "Transportation": ["Moving", "Logistics", "Delivery", "Other"],
+  "Real Estate": ["Real estate agent", "Builder", "Property management", "Other"],
+  "Automotive": ["Mechanic shop", "Auto parts", "Car wash", "Detailing", "Other"],
+  "Cleaning & Maintenance": ["Residential cleaning", "Commercial cleaning", "Landscaping", "Other"],
+  "Beauty & Hair": ["Beauty salon", "Barber shop", "Aesthetics", "Nails", "Makeup", "Other"],
+  "Fitness & Gym": ["Gym", "Personal trainer", "Yoga / Pilates", "CrossFit", "Other"],
+  "Legal": ["General practice", "Immigration", "Employment", "Criminal", "Other"],
+  "Tourism & Hospitality": ["Hotel", "Travel agency", "Tour operator", "Tourist restaurant", "Other"],
+  "Agriculture": ["Farming", "Ranching", "Agroindustry", "Nursery", "Other"],
 };
 
 const audienceChips = [
-  "👤 Consumidor final (B2C)",
-  "🏢 Empresas (B2B)",
-  "👥 Ambos",
-  "👨‍👩‍👧‍👦 Familias",
-  "👩‍💼 Profesionistas",
-  "🌎 Comunidad local",
+  "👤 End consumer (B2C)",
+  "🏢 Businesses (B2B)",
+  "👥 Both",
+  "👨‍👩‍👧‍👦 Families",
+  "👩‍💼 Professionals",
+  "🌎 Local community",
   "📱 Online / E-commerce",
 ];
 
 const brandStyles = [
-  "Minimalista", "Bold / Atrevido", "Elegante", "Moderno",
-  "Clásico", "Divertido", "Corporativo",
+  "Minimalist", "Bold", "Elegant", "Modern",
+  "Classic", "Fun", "Corporate",
 ];
 
 // ─── Helpers ────────────────────────────────────────
@@ -110,14 +110,14 @@ function randDelay() {
 function getPriorityAck(ratings: Record<string, number>): string {
   const max = Object.entries(ratings).sort(([, a], [, b]) => b - a)[0];
   const labels: Record<string, string> = {
-    design: "el diseño es tu prioridad",
-    web: "la presencia web es clave para ti",
-    marketing: "el marketing es lo que más necesitas",
+    design: "design is your top priority",
+    web: "web presence is key for you",
+    marketing: "marketing is what you need most",
   };
   if (max && max[1] >= 4) {
-    return `¡Veo que ${labels[max[0]] || max[0]}! Tenemos servicios perfectos para eso.`;
+    return `I see that ${labels[max[0]] || max[0]}! We have perfect services for that.`;
   }
-  return "¡Buena combinación de prioridades!";
+  return "Great mix of priorities!";
 }
 
 // ─── Component ──────────────────────────────────────
@@ -209,54 +209,54 @@ export function OnboardingClient({
           if (profile.businessName) {
             // Already have name from registration — skip to industry
             await pushBot(
-              `¡Hola! 👋 Veo que tu negocio es ${profile.businessName}. Vamos a configurar tu perfil en menos de 2 minutos.`
+              `Hi! 👋 I see your business is ${profile.businessName}. Let's set up your profile in under 2 minutes.`
             );
-            await pushBot("¿En qué giro está tu negocio?", "chips", { options: industries });
+            await pushBot("What industry is your business in?", "chips", { options: industries });
             setStep(2);
             return;
           }
           await pushBot(
-            "¡Hola! 👋 Soy el asistente de N.O.D.E. Vamos a configurar tu perfil en menos de 2 minutos."
+            "Hi! 👋 I'm the N.O.D.E. assistant. Let's set up your profile in under 2 minutes."
           );
-          await pushBot("¿Cómo se llama tu negocio?", "input");
+          await pushBot("What's your business name?", "input");
           break;
         case 2:
-          await pushBot("¿En qué giro está tu negocio?", "chips", { options: industries });
+          await pushBot("What industry is your business in?", "chips", { options: industries });
           break;
         case 3: {
           const subs = industrySubcategories[profile.businessIndustry || ""];
           if (subs) {
             await pushBot(
-              "¿Cuál describe mejor tu negocio?",
+              "Which best describes your business?",
               "chips",
               { options: subs }
             );
           } else {
-            await pushBot("Cuéntame en una oración: ¿qué hace tu negocio?", "input");
+            await pushBot("Tell me in one sentence: what does your business do?", "input");
           }
           break;
         }
         case 4:
           await pushBot(
-            "¿Quién es tu cliente ideal?",
+            "Who's your ideal customer?",
             "chips",
             { options: audienceChips, multiSelect: true }
           );
           break;
         case 5:
           await pushBot(
-            "¿Tienes un sitio web? Puedo analizarlo para ahorrar tiempo.",
+            "Do you have a website? I can analyze it to save time.",
             "url"
           );
           break;
         case 6:
-          await pushBot("¿Ya tienes logo o identidad visual?", "chips", {
-            options: ["✅ Sí", "❌ No", "🔨 Algo básico"],
+          await pushBot("Do you have a logo or visual identity?", "chips", {
+            options: ["✅ Yes", "❌ No", "🔨 Something basic"],
           });
           break;
         case 7:
           if (profile.hasBranding !== false) {
-            await pushBot("¿Cómo describirías el estilo de tu marca?", "chips", {
+            await pushBot("How would you describe your brand style?", "chips", {
               options: brandStyles,
               multiSelect: true,
             });
@@ -265,11 +265,11 @@ export function OnboardingClient({
           }
           break;
         case 8:
-          await pushBot("¿Tienes redes sociales? Compárteme tus handles.", "social-inputs");
+          await pushBot("Do you have social media? Share your handles.", "social-inputs");
           break;
         case 9:
           await pushBot(
-            "Último paso: ¿qué tan importante es cada servicio para ti ahora mismo?",
+            "Last step: how important is each service to you right now?",
             "stars"
           );
           break;
@@ -299,8 +299,8 @@ export function OnboardingClient({
         markAnswered();
         setProfile((p) => ({ ...p, businessName: val }));
         await ackThenAsk(
-          `¡Genial, ${val}! 🎯`,
-          "¿En qué giro está tu negocio?",
+          `Great, ${val}! 🎯`,
+          "What industry is your business in?",
           "chips",
           { options: industries }
         );
@@ -312,8 +312,8 @@ export function OnboardingClient({
         setAwaitingTextInput(false);
         setProfile((p) => ({ ...p, businessDescription: val }));
         await ackThenAsk(
-          "Entendido. 👌",
-          "¿Quién es tu cliente ideal?",
+          "Got it. 👌",
+          "Who's your ideal customer?",
           "chips",
           { options: audienceChips, multiSelect: true }
         );
@@ -333,15 +333,15 @@ export function OnboardingClient({
         const subs = industrySubcategories[cleaned];
         if (subs) {
           await ackThenAsk(
-            `Perfecto, conozco bien el sector de ${cleaned}. 💪`,
-            "¿Cuál describe mejor tu negocio?",
+            `Great, I know the ${cleaned} sector well. 💪`,
+            "Which best describes your business?",
             "chips",
             { options: subs }
           );
         } else {
           await ackThenAsk(
-            `Perfecto, conozco bien el sector de ${cleaned}. 💪`,
-            "Cuéntame en una oración: ¿qué hace tu negocio?",
+            `Great, I know the ${cleaned} sector well. 💪`,
+            "Tell me in one sentence: what does your business do?",
             "input"
           );
         }
@@ -350,15 +350,15 @@ export function OnboardingClient({
       }
       case 3: {
         const val = selected[0];
-        if (val === "Otro") {
+        if (val === "Other") {
           setAwaitingTextInput(true);
-          await pushBot("Cuéntame en una oración: ¿qué hace tu negocio?", "input");
+          await pushBot("Tell me in one sentence: what does your business do?", "input");
           // Stay on step 3 but now expecting text input
         } else {
           setProfile((p) => ({ ...p, businessDescription: val }));
           await ackThenAsk(
-            "Entendido. 👌",
-            "¿Quién es tu cliente ideal?",
+            "Got it. 👌",
+            "Who's your ideal customer?",
             "chips",
             { options: audienceChips, multiSelect: true }
           );
@@ -370,8 +370,8 @@ export function OnboardingClient({
         const cleaned = selected.map((s) => s.replace(/^[^\s]+\s/, "")).join(", ");
         setProfile((p) => ({ ...p, targetAudience: cleaned }));
         await ackThenAsk(
-          `Claro, ${cleaned}. 🎯`,
-          "¿Tienes un sitio web? Puedo analizarlo para ahorrar tiempo.",
+          `Sure, ${cleaned}. 🎯`,
+          "Do you have a website? I can analyze it to save time.",
           "url"
         );
         setStep(5);
@@ -379,35 +379,35 @@ export function OnboardingClient({
       }
       case 5.5: {
         // Analysis confirmation
-        if (selected[0].includes("Correcto")) {
+        if (selected[0].includes("Correct")) {
           await ackThenAsk(
-            "¡Perfecto! Ya tengo buena info de tu sitio. 🚀",
-            "¿Tienes redes sociales? Compárteme tus handles.",
+            "Perfect! I got good info from your site. 🚀",
+            "Do you have social media? Share your handles.",
             "social-inputs"
           );
           setStep(8);
         } else {
-          await pushBot("Ok, sigamos paso a paso para ajustar.");
+          await pushBot("Ok, let's go step by step to adjust.");
           advance(6);
         }
         break;
       }
       case 6: {
         const val = selected[0];
-        const hasBranding = val.includes("Sí") ? true : val.includes("No") ? false : null;
+        const hasBranding = val.includes("Yes") ? true : val.includes("No") ? false : null;
         setProfile((p) => ({ ...p, hasBranding }));
         if (hasBranding === false) {
           await ackThenAsk(
-            "No te preocupes, podemos crear tu marca desde cero. 🎨",
-            "¿Tienes redes sociales? Compárteme tus handles.",
+            "Don't worry, we can create your brand from scratch. 🎨",
+            "Do you have social media? Share your handles.",
             "social-inputs"
           );
           setStep(8);
         } else {
-          const ack = hasBranding ? "Buena base. 👍" : "Algo es mejor que nada. 😉";
+          const ack = hasBranding ? "Good foundation. 👍" : "Something is better than nothing. 😉";
           await ackThenAsk(
             ack,
-            "¿Cómo describirías el estilo de tu marca?",
+            "How would you describe your brand style?",
             "chips",
             { options: brandStyles, multiSelect: true }
           );
@@ -418,8 +418,8 @@ export function OnboardingClient({
       case 7:
         setProfile((p) => ({ ...p, brandStyle: selected.join(", ") }));
         await ackThenAsk(
-          `${selected.join(" + ")} — buena combinación. ✨`,
-          "¿Tienes redes sociales? Compárteme tus handles.",
+          `${selected.join(" + ")} — great combo. ✨`,
+          "Do you have social media? Share your handles.",
           "social-inputs"
         );
         setStep(8);
@@ -448,17 +448,17 @@ export function OnboardingClient({
     const desc = data.businessDescription || "";
     if (desc) {
       await pushBot(
-        `Vi que tu negocio se trata de: "${desc}"\n\n¿Es correcto?`,
+        `I see your business is about: "${desc}"\n\nIs that correct?`,
         "chips",
-        { options: ["✅ Correcto", "✏️ Quiero ajustar algo"] }
+        { options: ["✅ Correct", "✏️ I want to adjust something"] }
       );
       setStep(5.5 as number);
     } else {
       await ackThenAsk(
-        "Guardé tu sitio web. Sigamos con unas preguntas rápidas. 👍",
-        "¿Ya tienes logo o identidad visual?",
+        "Saved your website. Let's continue with a few quick questions. 👍",
+        "Do you have a logo or visual identity?",
         "chips",
-        { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+        { options: ["✅ Yes", "❌ No", "🔨 Something basic"] }
       );
       setStep(6);
     }
@@ -470,23 +470,23 @@ export function OnboardingClient({
     const fullUrl = url.match(/^https?:\/\//) ? url : `https://${url}`;
     setProfile((p) => ({ ...p, website: fullUrl }));
     await ackThenAsk(
-      "Guardé tu sitio web. Sigamos con unas preguntas rápidas. 👍",
-      "¿Ya tienes logo o identidad visual?",
+      "Saved your website. Let's continue with a few quick questions. 👍",
+      "Do you have a logo or visual identity?",
       "chips",
-      { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+      { options: ["✅ Yes", "❌ No", "🔨 Something basic"] }
     );
     setStep(6);
   };
 
   const handleUrlSkip = async () => {
-    pushUser("No tengo sitio web");
+    pushUser("I don't have a website");
     markAnswered();
     setProfile((p) => ({ ...p, website: undefined }));
     await ackThenAsk(
-      "Sin problema. 👍",
-      "¿Ya tienes logo o identidad visual?",
+      "No problem. 👍",
+      "Do you have a logo or visual identity?",
       "chips",
-      { options: ["✅ Sí", "❌ No", "🔨 Algo básico"] }
+      { options: ["✅ Yes", "❌ No", "🔨 Something basic"] }
     );
     setStep(6);
   };
@@ -496,7 +496,7 @@ export function OnboardingClient({
     pushUser(
       filled.length > 0
         ? filled.map(([k, v]) => `${k}: ${v}`).join(", ")
-        : "Sin redes por ahora"
+        : "No social media for now"
     );
     markAnswered();
     setProfile((p) => ({
@@ -504,11 +504,11 @@ export function OnboardingClient({
       socialMedia: Object.fromEntries(filled),
     }));
     const ack = filled.length > 0
-      ? "Anotado. 📱"
-      : "Las redes son clave, te podemos ayudar con eso. 📱";
+      ? "Noted. 📱"
+      : "Social media is key, we can help with that. 📱";
     await ackThenAsk(
       ack,
-      "Último paso: ¿qué tan importante es cada servicio para ti ahora mismo?",
+      "Last step: how important is each service to you right now?",
       "stars"
     );
     setStep(9);
@@ -516,7 +516,7 @@ export function OnboardingClient({
 
   const handleStars = async (ratings: Record<string, number>) => {
     const labels: Record<string, string> = {
-      design: "Diseño",
+      design: "Design",
       web: "Web",
       marketing: "Marketing",
     };
@@ -536,7 +536,7 @@ export function OnboardingClient({
   // ─── Submit ─────────────────────────────────────
   const submitOnboarding = async (finalProfile: OnboardingProfile) => {
     setSaving(true);
-    await pushBot("Guardando tu perfil... 🎉");
+    await pushBot("Saving your profile... 🎉");
 
     try {
       const res = await fetch("/api/onboarding", {
@@ -561,21 +561,21 @@ export function OnboardingClient({
 
       const data = await res.json();
       if (!res.ok) {
-        await pushBot(`Hubo un error: ${data.error}. Intenta de nuevo.`);
+        await pushBot(`There was an error: ${data.error}. Try again.`);
         setSaving(false);
         return;
       }
 
       await pushBot(
         data.welcomeCredits
-          ? `✅ ¡Listo! Tu perfil está configurado.\n\n🎁 Te regalamos ${data.welcomeCredits} créditos de bienvenida.\n\nRedirigiendo a tu panel...`
-          : "✅ ¡Listo! Tu perfil está configurado.\n\nRedirigiendo a tu panel..."
+          ? `✅ All set! Your profile is configured.\n\n🎁 You received ${data.welcomeCredits} welcome credits.\n\nRedirecting to your dashboard...`
+          : "✅ All set! Your profile is configured.\n\nRedirecting to your dashboard..."
       );
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 2000);
     } catch {
-      await pushBot("Error de conexión. Intenta de nuevo.");
+      await pushBot("Connection error. Try again.");
       setSaving(false);
     }
   };
@@ -645,7 +645,7 @@ export function OnboardingClient({
                     <div className="ml-11">
                       <StarRating
                         rows={[
-                          { label: "🎨 Diseño", key: "design" },
+                          { label: "🎨 Design", key: "design" },
                           { label: "💻 Web", key: "web" },
                           { label: "📱 Marketing", key: "marketing" },
                         ]}
@@ -671,7 +671,7 @@ export function OnboardingClient({
             <Input
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Escribe tu respuesta..."
+              placeholder="Type your answer..."
               disabled={saving}
               autoFocus
               className="flex-1 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] focus:border-[var(--gold-bar)]"
@@ -702,12 +702,12 @@ function SocialInputs({
 
   return (
     <div className="space-y-2">
-      <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Instagram: @tuhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
-      <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="Facebook: Tu Página" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
-      <Input value={tiktok} onChange={(e) => setTiktok(e.target.value)} placeholder="TikTok: @tuhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
+      <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Instagram: @yourhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
+      <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="Facebook: Your Page" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
+      <Input value={tiktok} onChange={(e) => setTiktok(e.target.value)} placeholder="TikTok: @yourhandle" className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm" />
       <div className="flex gap-2">
-        <Button onClick={() => onConfirm({ instagram, facebook, tiktok })} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4">Confirmar</Button>
-        <button onClick={() => onConfirm({})} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]">Sin redes →</button>
+        <Button onClick={() => onConfirm({ instagram, facebook, tiktok })} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4">Confirm</Button>
+        <button onClick={() => onConfirm({})} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]">No social media →</button>
       </div>
     </div>
   );

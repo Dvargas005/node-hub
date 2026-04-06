@@ -12,11 +12,11 @@ import {
 import type { NavItem } from "@/components/layout/sidebar";
 
 const clientNav: NavItem[] = [
-  { label: "Panel", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Nueva Solicitud", href: "/request", icon: Plus },
-  { label: "Mis Tickets", href: "/tickets", icon: Ticket },
-  { label: "Facturación", href: "/billing", icon: CreditCard },
-  { label: "Configuración", href: "/settings", icon: Settings },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "New Request", href: "/request", icon: Plus },
+  { label: "My Tickets", href: "/tickets", icon: Ticket },
+  { label: "Billing", href: "/billing", icon: CreditCard },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function ClientLayout({
