@@ -4,8 +4,10 @@ import pt from "./pt.json";
 
 const translations: Record<string, Record<string, string>> = { es, en, pt };
 
-export function t(key: string, lang: string = "es"): string {
-  return translations[lang]?.[key] || translations["es"]?.[key] || key;
+export const DEFAULT_LANG = "en";
+
+export function t(key: string, lang: string = DEFAULT_LANG): string {
+  return translations[lang]?.[key] || translations[DEFAULT_LANG]?.[key] || key;
 }
 
 export function getLanguageName(code: string): string {
