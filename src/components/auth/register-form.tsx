@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,25 +16,34 @@ import {
 } from "@/components/ui/card";
 import { Check, Eye, EyeOff } from "lucide-react";
 
-const RECAPTCHA_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcRBKcsAAAAABZ7FSuDCSpwYofze-wVPV2H9Jd7";
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      enterprise: {
+        ready: (cb: () => void) => void;
+        execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      };
+    };
+  }
+}
+
+async function getRecaptchaToken(): Promise<string | null> {
+  if (typeof window === "undefined" || !window.grecaptcha?.enterprise) return null;
+  try {
+    return await new Promise((resolve, reject) => {
+      window.grecaptcha!.enterprise.ready(async () => {
+        try {
+          const token = await window.grecaptcha!.enterprise.execute(RECAPTCHA_SITE_KEY, { action: "REGISTER" });
+          resolve(token);
+        } catch (err) { reject(err); }
+      });
+    });
+  } catch { return null; }
+}
 
 export function RegisterForm() {
-  if (RECAPTCHA_KEY) {
-    return (
-      <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_KEY}>
-        <RegisterFormWithCaptcha />
-      </GoogleReCaptchaProvider>
-    );
-  }
-  return <RegisterFormCore executeRecaptcha={null} />;
-}
-
-function RegisterFormWithCaptcha() {
-  const { executeRecaptcha } = useGoogleReCaptcha();
-  return <RegisterFormCore executeRecaptcha={executeRecaptcha || null} />;
-}
-
-function RegisterFormCore({ executeRecaptcha }: { executeRecaptcha: ((action: string) => Promise<string>) | null }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -84,11 +93,7 @@ function RegisterFormCore({ executeRecaptcha }: { executeRecaptcha: ((action: st
     setError("");
 
     try {
-      // Get reCAPTCHA token if available
-      let recaptchaToken: string | undefined;
-      if (executeRecaptcha) {
-        try { recaptchaToken = await executeRecaptcha("register"); } catch {}
-      }
+      const recaptchaToken = await getRecaptchaToken();
 
       const res = await fetch("/api/register", {
         method: "POST",
@@ -119,6 +124,8 @@ function RegisterFormCore({ executeRecaptcha }: { executeRecaptcha: ((action: st
   };
 
   return (
+    <>
+    <Script src={`https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`} strategy="afterInteractive" />
     <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
       <CardHeader className="text-center">
         <CardTitle className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
@@ -259,5 +266,6 @@ function RegisterFormCore({ executeRecaptcha }: { executeRecaptcha: ((action: st
         </form>
       </CardContent>
     </Card>
+    </>
   );
 }

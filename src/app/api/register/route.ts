@@ -2,9 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { sendEmail } from "@/lib/email";
 import { welcomeEmail } from "@/lib/email-templates";
+
+// reCAPTCHA Enterprise verification
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcRBKcsAAAAABZ7FSuDCSpwYofze-wVPV2H9Jd7";
+
+async function verifyRecaptchaEnterprise(token: string): Promise<{ success: boolean; score: number }> {
+  const projectId = process.env.GOOGLE_CLOUD_PROJECT || "nouvos-vector-tms";
+  const apiKey = process.env.RECAPTCHA_SECRET_KEY;
+  if (!apiKey || !token) return { success: true, score: 1.0 };
+  try {
+    const res = await fetch(
+      `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: { token, siteKey: RECAPTCHA_SITE_KEY, expectedAction: "REGISTER" },
+        }),
+      }
+    );
+    const data = await res.json();
+    const score = data.riskAnalysis?.score ?? 0;
+    const valid = data.tokenProperties?.valid ?? false;
+    return { success: valid && score >= 0.5, score };
+  } catch (err) {
+    console.error("[RECAPTCHA] Verification failed:", err);
+    return { success: true, score: 1.0 };
+  }
+}
 
 // S5: Simple in-memory rate limiting for registration
 const registerAttempts = new Map<string, number[]>();
@@ -26,12 +53,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, email, password, businessName, allianceCode, recaptchaToken } = body;
 
-    // reCAPTCHA verification (skipped if not configured)
-    if (process.env.RECAPTCHA_SECRET_KEY && recaptchaToken) {
-      const isHuman = await verifyRecaptcha(recaptchaToken);
-      if (!isHuman) {
-        return NextResponse.json({ error: "Verificación de seguridad fallida. Intenta de nuevo." }, { status: 400 });
-      }
+    // reCAPTCHA Enterprise verification (skipped if not configured)
+    const recaptcha = await verifyRecaptchaEnterprise(recaptchaToken || "");
+    if (!recaptcha.success) {
+      return NextResponse.json({ error: "Verificación de seguridad fallida. Intenta de nuevo." }, { status: 400 });
     }
 
     // Input validation
