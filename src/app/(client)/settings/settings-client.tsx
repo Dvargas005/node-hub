@@ -33,6 +33,8 @@ interface ProfileData {
   brandStyle: string;
   website: string;
   socialMedia: Record<string, string>;
+  language?: string;
+  deliveryLanguage?: string;
 }
 
 export function SettingsClient({
@@ -59,8 +61,34 @@ export function SettingsClient({
   const [website, setWebsite] = useState(profile.website);
   const [instagram, setInstagram] = useState(profile.socialMedia?.instagram || "");
   const [facebook, setFacebook] = useState(profile.socialMedia?.facebook || "");
+  const [platformLang, setPlatformLang] = useState(profile.language || "es");
+  const [deliveryLang, setDeliveryLang] = useState(profile.deliveryLanguage || "es");
 
   const canAfford = totalCredits >= EDIT_COST;
+
+  const handlePlatformLangChange = async (newLang: string) => {
+    setPlatformLang(newLang);
+    localStorage.setItem("node-language", newLang);
+    document.cookie = `node-language=${newLang};path=/;max-age=31536000`;
+    try {
+      await fetch("/api/profile/language", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: newLang }),
+      });
+    } catch {}
+  };
+
+  const handleDeliveryLangChange = async (newLang: string) => {
+    setDeliveryLang(newLang);
+    try {
+      await fetch("/api/profile/language", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deliveryLanguage: newLang }),
+      });
+    } catch {}
+  };
 
   const handleStartEdit = () => {
     if (!canAfford) {
@@ -276,6 +304,40 @@ export function SettingsClient({
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Language settings */}
+      <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+        <CardHeader>
+          <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">Idioma</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">Idioma de la plataforma</Label>
+            <select
+              value={platformLang}
+              onChange={(e) => handlePlatformLangChange(e.target.value)}
+              className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)]"
+            >
+              <option value="es">🇪🇸 Español</option>
+              <option value="en">🇺🇸 English</option>
+              <option value="pt">🇧🇷 Português</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">Idioma de entregables</Label>
+            <p className="text-xs text-[rgba(245,246,252,0.4)]">El idioma en que se producirán tus diseños y contenido</p>
+            <select
+              value={deliveryLang}
+              onChange={(e) => handleDeliveryLangChange(e.target.value)}
+              className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)]"
+            >
+              <option value="es">🇪🇸 Español</option>
+              <option value="en">🇺🇸 English</option>
+              <option value="pt">🇧🇷 Português</option>
+            </select>
+          </div>
         </CardContent>
       </Card>
     </div>

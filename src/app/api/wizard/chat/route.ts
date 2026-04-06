@@ -55,8 +55,9 @@ function buildSystemPrompt(opts: {
   maxActiveReqs: number;
   recommendations: string[];
   cheapestInCategory: number | null;
+  deliveryLanguage: string;
 }) {
-  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory } = opts;
+  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory, deliveryLanguage } = opts;
 
   const recsBlock = recommendations.length > 0
     ? `\nRECOMENDACIONES PENDIENTES DEL ANÁLISIS AI:\n${recommendations.map((r: any, i: number) => `${i + 1}. "${r}"`).join("\n")}\nSi lo que el cliente pide se relaciona con alguna, menciónalo: "Esto se alinea con la recomendación de tu análisis de empresa."\n`
@@ -76,6 +77,9 @@ PLAN DEL CLIENTE: ${planName}
 - Requests activos: ${activeTickets}/${maxActiveReqs === 999 ? "ilimitados" : maxActiveReqs}
 - Tiempo de entrega: ${deliveryDays} días hábiles
 ${creditWarning}
+
+IDIOMA DE ENTREGABLES: ${deliveryLanguage}
+Si es diferente al idioma de la conversación, menciona: "Tus entregables serán en ${deliveryLanguage === "en" ? "inglés" : deliveryLanguage === "pt" ? "portugués" : "español"}."
 
 HISTORIAL DEL CLIENTE:
 ${history}
@@ -190,6 +194,7 @@ Cuando tengas suficiente información y hayas hecho el cierre profesional, gener
 {
   "suggestedServiceSlug": "string",
   "suggestedVariantId": "string",
+  "deliveryLanguage": "${deliveryLanguage}",
   "summary": "Resumen de 2-3 oraciones",
   "details": {
     "deliverable": "Qué se va a entregar exactamente",
@@ -255,6 +260,7 @@ export async function POST(req: NextRequest) {
           socialMedia: true,
           freeCredits: true,
           companyAnalysis: true,
+          deliveryLanguage: true,
         },
       }),
       db.subscription.findUnique({
@@ -335,6 +341,7 @@ export async function POST(req: NextRequest) {
       maxActiveReqs,
       recommendations,
       cheapestInCategory,
+      deliveryLanguage: (user?.deliveryLanguage as string) || "es",
     });
 
     // S1: Use native systemInstruction instead of injecting as user message

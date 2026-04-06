@@ -22,6 +22,8 @@ export default async function SettingsPage() {
         website: true,
         socialMedia: true,
         freeCredits: true,
+        language: true,
+        deliveryLanguage: true,
       },
     }),
     db.subscription.findUnique({
@@ -45,6 +47,8 @@ export default async function SettingsPage() {
         brandStyle: user?.brandStyle || "",
         website: user?.website || "",
         socialMedia: (user?.socialMedia as Record<string, string>) || {},
+        language: user?.language || "es",
+        deliveryLanguage: user?.deliveryLanguage || "es",
       }}
       totalCredits={totalCredits}
     />
