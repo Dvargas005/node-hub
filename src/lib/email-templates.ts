@@ -8,34 +8,34 @@ function wrap(title: string, body: string, link: string, linkText: string) {
 }
 
 export function welcomeEmail(name: string) {
-  return { subject: "Bienvenido a N.O.D.E.!", html: wrap("Hola, " + name + "!", "<p>Tu cuenta ha sido creada. Tienes 10 créditos gratis para explorar la plataforma.</p>", "/dashboard", "Ir a mi panel →") };
+  return { subject: "Welcome to N.O.D.E.!", html: wrap("Hi, " + name + "!", "<p>Your N.O.D.E. account has been created. You have 10 free credits to explore the platform.</p><p>Set up your business profile and discover everything we can do for your business.</p>", "/dashboard", "Go to my dashboard →") };
 }
 
 export function ticketCreatedEmail(name: string, num: number, svc: string) {
-  return { subject: `Solicitud #${num} recibida — ${svc}`, html: wrap("Solicitud recibida", `<p>Hola ${name}, tu solicitud <strong>#${num}</strong> para <strong>${svc}</strong> ha sido creada. Un PM la revisará pronto.</p>`, "/tickets", "Ver mis solicitudes →") };
+  return { subject: `Request #${num} received — ${svc}`, html: wrap("Request received", `<p>Hi ${name}, your request <strong>#${num}</strong> for <strong>${svc}</strong> has been created.</p><p>A Project Manager will review your request and reach out soon to confirm the details.</p>`, "/tickets", "View my requests →") };
 }
 
 export function ticketAssignedEmail(name: string, num: number) {
-  return { subject: `Solicitud #${num} — Especialista asignado`, html: wrap("Tu solicitud está en marcha!", `<p>Hola ${name}, un especialista ha sido asignado a tu solicitud <strong>#${num}</strong>.</p>`, "/tickets", "Ver estado →") };
+  return { subject: `Request #${num} — Specialist assigned`, html: wrap("Your request is underway!", `<p>Hi ${name}, a specialist has been assigned to your request <strong>#${num}</strong>.</p><p>We're working on it. We'll let you know when we have something ready for you.</p>`, "/tickets", "Check status →") };
 }
 
 export function deliveryReadyEmail(name: string, num: number, svc: string) {
-  return { subject: `Solicitud #${num} — Entrega lista`, html: wrap("Tu entrega está lista!", `<p>Hola ${name}, la entrega de <strong>${svc}</strong> (#${num}) está lista para tu revisión.</p>`, "/tickets", "Revisar entrega →") };
+  return { subject: `Request #${num} — Delivery ready`, html: wrap("Your delivery is ready!", `<p>Hi ${name}, the delivery for <strong>${svc}</strong> (request <strong>#${num}</strong>) is ready for your review.</p><p>Review it and approve, or request adjustments if you need changes.</p>`, "/tickets", "Review delivery →") };
 }
 
 export function ticketCompletedEmail(name: string, num: number, svc: string, bonus?: number) {
-  const bonusLine = bonus ? `<p style="color:#FFC919;">🎁 +${bonus} créditos bonus por aprobar en primera ronda!</p>` : "";
-  return { subject: `Solicitud #${num} completada`, html: wrap("Solicitud completada!", `<p>Hola ${name}, tu solicitud <strong>#${num}</strong> (<strong>${svc}</strong>) ha sido completada.</p>${bonusLine}`, "/request", "Nueva solicitud →") };
+  const bonusLine = bonus ? `<p style="color:#FFC919;">+${bonus} bonus credits for approving on the first round!</p>` : "";
+  return { subject: `Request #${num} completed`, html: wrap("Request completed!", `<p>Hi ${name}, your request <strong>#${num}</strong> (<strong>${svc}</strong>) has been completed.</p>${bonusLine}<p>Ready for your next project?</p>`, "/request", "New request →") };
 }
 
 export function subscriptionActiveEmail(name: string, plan: string, credits: number) {
-  return { subject: `Plan ${plan} activado — ${credits} créditos`, html: wrap("Tu plan está activo!", `<p>Hola ${name}, tu plan <strong>${plan}</strong> está activo. Tienes <strong>${credits} créditos</strong> disponibles.</p>`, "/request", "Crear solicitud →") };
+  return { subject: `${plan} plan activated — ${credits} credits available`, html: wrap("Your plan is active!", `<p>Hi ${name}, your <strong>${plan}</strong> plan has been activated. You have <strong>${credits} credits</strong> available.</p><p>Create your first request and put your digital team to work.</p>`, "/request", "Create request →") };
 }
 
 export function pmNewTicketEmail(pmName: string, num: number, client: string, svc: string) {
-  return { subject: `Nuevo ticket #${num} — ${client}`, html: wrap("Nuevo ticket", `<p>Hola ${pmName}, el cliente <strong>${client}</strong> creó la solicitud <strong>#${num}</strong> para <strong>${svc}</strong>.</p>`, "/admin/tickets", "Ver tickets →") };
+  return { subject: `New ticket #${num} — ${client}`, html: wrap("New ticket assigned", `<p>Hi ${pmName}, client <strong>${client}</strong> created request <strong>#${num}</strong> for <strong>${svc}</strong>.</p><p>Review the brief and assign a freelancer.</p>`, "/admin/tickets", "View tickets →") };
 }
 
 export function freelancerNewAssignmentEmail(flName: string, num: number, svc: string) {
-  return { subject: `Nueva asignación — Ticket #${num}`, html: wrap("Nueva tarea", `<p>Hola ${flName}, se te asignó el ticket <strong>#${num}</strong> para <strong>${svc}</strong>.</p>`, "/freelancer/portal", "Ver mis tickets →") };
+  return { subject: `New assignment — Ticket #${num}`, html: wrap("New task assigned", `<p>Hi ${flName}, you've been assigned ticket <strong>#${num}</strong> for <strong>${svc}</strong>.</p><p>Review the brief and your PM's instructions.</p>`, "/freelancer/portal", "View my tickets →") };
 }

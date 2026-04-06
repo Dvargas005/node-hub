@@ -15,11 +15,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,26 +34,23 @@ export function LoginForm() {
     setError("");
 
     try {
-      // Check rate limit before attempting login
       const rateCheck = await fetch("/api/auth/rate-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       if (rateCheck.status === 429) {
-        const data = await rateCheck.json();
-        setError(data.error || "Demasiados intentos.");
+        setError(t("auth.error.rateLimit"));
         return;
       }
 
       const result = await signIn.email({ email, password });
 
       if (result.error) {
-        setError("Email o contraseña incorrectos");
+        setError(t("auth.error.invalid"));
         return;
       }
 
-      // Redirect based on role or callbackUrl
       const role = (result.data?.user as Record<string, unknown>)?.role as string;
       if (role === "ADMIN" || role === "PM") {
         window.location.href = "/admin/overview";
@@ -61,7 +60,7 @@ export function LoginForm() {
         window.location.href = callbackUrl;
       }
     } catch {
-      setError("Error de conexión");
+      setError(t("auth.error.connection"));
     } finally {
       setLoading(false);
     }
@@ -74,7 +73,7 @@ export function LoginForm() {
           N.O.D.E.
         </CardTitle>
         <CardDescription className="font-[var(--font-atkinson)] text-[rgba(245,246,252,0.5)]">
-          Inicia sesión en tu cuenta
+          {t("auth.login.subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,7 +83,7 @@ export function LoginForm() {
           )}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-[var(--ice-white)]">
-              Email
+              {t("auth.email")}
             </Label>
             <Input
               id="email"
@@ -98,7 +97,7 @@ export function LoginForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password" className="text-[var(--ice-white)]">
-              Contraseña
+              {t("auth.password")}
             </Label>
             <div className="relative">
               <Input
@@ -124,15 +123,12 @@ export function LoginForm() {
             disabled={loading}
             className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Entrando..." : "Iniciar Sesión"}
+            {loading ? t("auth.submit.login.loading") : t("auth.submit.login")}
           </Button>
           <p className="text-center text-sm text-[rgba(245,246,252,0.5)]">
-            ¿No tienes cuenta?{" "}
-            <Link
-              href="/register"
-              className="text-[var(--gold-bar)] hover:underline"
-            >
-              Regístrate
+            {t("auth.noAccount")}{" "}
+            <Link href="/register" className="text-[var(--gold-bar)] hover:underline">
+              {t("auth.register")}
             </Link>
           </p>
         </form>

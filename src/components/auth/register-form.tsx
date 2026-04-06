@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Check, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcRBKcsAAAAABZ7FSuDCSpwYofze-wVPV2H9Jd7";
 
@@ -45,6 +46,7 @@ async function getRecaptchaToken(): Promise<string | null> {
 
 export function RegisterForm() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -132,7 +134,7 @@ export function RegisterForm() {
           N.O.D.E.
         </CardTitle>
         <CardDescription className="font-[var(--font-atkinson)] text-[rgba(245,246,252,0.5)]">
-          Crea tu cuenta para empezar
+          {t("auth.register.subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -143,7 +145,7 @@ export function RegisterForm() {
 
           <div className="space-y-2">
             <Label htmlFor="name" className="text-[var(--ice-white)]">
-              Nombre completo
+              {t("auth.name")}
             </Label>
             <Input
               id="name"
@@ -158,7 +160,7 @@ export function RegisterForm() {
 
           <div className="space-y-2">
             <Label htmlFor="email" className="text-[var(--ice-white)]">
-              Email
+              {t("auth.email")}
             </Label>
             <Input
               id="email"
@@ -173,7 +175,7 @@ export function RegisterForm() {
 
           <div className="space-y-2">
             <Label htmlFor="password" className="text-[var(--ice-white)]">
-              Contraseña
+              {t("auth.password")}
             </Label>
             <div className="relative">
               <Input
@@ -198,8 +200,7 @@ export function RegisterForm() {
 
           <div className="space-y-2">
             <Label htmlFor="businessName" className="text-[var(--ice-white)]">
-              Nombre de tu negocio{" "}
-              <span className="text-[rgba(245,246,252,0.3)]">(opcional)</span>
+              {t("auth.businessName")}
             </Label>
             <Input
               id="businessName"
@@ -213,8 +214,7 @@ export function RegisterForm() {
 
           <div className="space-y-2">
             <Label htmlFor="allianceCode" className="text-[var(--ice-white)]">
-              Código de alianza{" "}
-              <span className="text-[rgba(245,246,252,0.3)]">(opcional)</span>
+              {t("auth.allianceCode")}
             </Label>
             <div className="relative">
               <Input
@@ -225,7 +225,7 @@ export function RegisterForm() {
                   setAllianceCode(e.target.value.toUpperCase());
                   validateAllianceCode(e.target.value);
                 }}
-                placeholder="Código de referido (opcional)"
+                placeholder={t("auth.allianceCode.placeholder")}
                 className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
               />
               {allianceValid === true && (
@@ -251,16 +251,16 @@ export function RegisterForm() {
             disabled={loading}
             className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creando cuenta..." : "Crear Cuenta"}
+            {loading ? t("auth.submit.register.loading") : t("auth.submit.register")}
           </Button>
 
           <p className="text-center text-sm text-[rgba(245,246,252,0.5)]">
-            ¿Ya tienes cuenta?{" "}
+            {t("auth.hasAccount")}{" "}
             <Link
               href="/login"
               className="text-[var(--gold-bar)] hover:underline"
             >
-              Inicia sesión
+              {t("auth.login")}
             </Link>
           </p>
         </form>
