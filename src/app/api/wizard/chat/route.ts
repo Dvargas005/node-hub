@@ -56,8 +56,9 @@ function buildSystemPrompt(opts: {
   recommendations: string[];
   cheapestInCategory: number | null;
   deliveryLanguage: string;
+  pmHasCalendly: boolean;
 }) {
-  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory, deliveryLanguage } = opts;
+  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory, deliveryLanguage, pmHasCalendly } = opts;
 
   const recsBlock = recommendations.length > 0
     ? `\nRECOMENDACIONES PENDIENTES DEL ANÁLISIS AI:\n${recommendations.map((r: any, i: number) => `${i + 1}. "${r}"`).join("\n")}\nSi lo que el cliente pide se relaciona con alguna, menciónalo: "Esto se alinea con la recomendación de tu análisis de empresa."\n`
@@ -186,6 +187,9 @@ PRIMER MENSAJE:
 - Si no tiene recomendaciones, empieza directo con la primera pregunta de la categoría.
 - NO repitas info que ya sabes del perfil.
 
+${pmHasCalendly ? `MEETINGS:
+The client's PM has a calendar available for booking meetings. If the client has complex requirements, custom needs, or seems to need a consultation, suggest: "Would you like to schedule a call with your Project Manager?" If the client says yes, include "meetingRequested": true in the brief JSON. Otherwise include "meetingRequested": false.` : ""}
+
 CATÁLOGO DE SERVICIOS DISPONIBLES:
 ${catalog}
 
@@ -206,7 +210,8 @@ Cuando tengas suficiente información y hayas hecho el cierre profesional, gener
   "discount": null,
   "firstRoundBonus": 0,
   "insufficientCredits": false,
-  "escalated": false
+  "escalated": false,
+  "meetingRequested": false
 }
 :::END_BRIEF:::`;
 }
@@ -261,6 +266,7 @@ export async function POST(req: NextRequest) {
           freeCredits: true,
           companyAnalysis: true,
           deliveryLanguage: true,
+          assignedPm: { select: { calendlyUrl: true } },
         },
       }),
       db.subscription.findUnique({
@@ -328,6 +334,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const pmHasCalendly = !!(user?.assignedPm as { calendlyUrl?: string | null } | null)?.calendlyUrl;
+
     const systemPrompt = buildSystemPrompt({
       catalog: catalogText,
       category,
@@ -342,6 +350,7 @@ export async function POST(req: NextRequest) {
       recommendations,
       cheapestInCategory,
       deliveryLanguage: (user?.deliveryLanguage as string) || "es",
+      pmHasCalendly,
     });
 
     // S1: Use native systemInstruction instead of injecting as user message

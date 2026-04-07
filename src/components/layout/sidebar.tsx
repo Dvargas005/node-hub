@@ -10,6 +10,8 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   badge?: number;
+  // When set, item renders as a button and onClick fires instead of navigating.
+  onClick?: () => void;
 }
 
 interface SidebarProps {
@@ -47,18 +49,14 @@ export function Sidebar({ items, title = "N.O.D.E.", isOpen = false, onClose }: 
         <nav className="flex-1 space-y-1 p-4">
           {items.map((item) => {
             const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 rounded-none px-3 py-2.5 text-sm transition-colors",
-                  isActive
-                    ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-semibold"
-                    : "text-[rgba(245,246,252,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--ice-white)]"
-                )}
-              >
+            const className = cn(
+              "flex items-center gap-3 rounded-none px-3 py-2.5 text-sm transition-colors w-full text-left",
+              isActive
+                ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-semibold"
+                : "text-[rgba(245,246,252,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--ice-white)]"
+            );
+            const inner = (
+              <>
                 <item.icon className="h-4 w-4" />
                 {item.label}
                 {item.badge ? (
@@ -66,6 +64,31 @@ export function Sidebar({ items, title = "N.O.D.E.", isOpen = false, onClose }: 
                     {item.badge}
                   </span>
                 ) : null}
+              </>
+            );
+            if (item.onClick) {
+              return (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => {
+                    item.onClick?.();
+                    onClose?.();
+                  }}
+                  className={className}
+                >
+                  {inner}
+                </button>
+              );
+            }
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={className}
+              >
+                {inner}
               </Link>
             );
           })}

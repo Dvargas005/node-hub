@@ -49,7 +49,7 @@ export default async function DashboardPage() {
   const pm = user?.assignedPmId
     ? await db.user.findUnique({
         where: { id: user.assignedPmId },
-        select: { name: true, email: true },
+        select: { name: true, email: true, calendlyUrl: true },
       })
     : null;
 
@@ -103,7 +103,7 @@ export default async function DashboardPage() {
             }
           : null
       }
-      pm={pm ? { name: pm.name, email: pm.email } : null}
+      pm={pm ? { name: pm.name, email: pm.email, calendlyUrl: pm.calendlyUrl || null } : null}
     />
   );
 }

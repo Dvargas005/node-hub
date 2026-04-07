@@ -16,6 +16,7 @@ import {
   ShieldCheck, TrendingUp, AlertTriangle, Target, Palette, Monitor, Megaphone, RefreshCw,
 } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors } from "@/lib/status-labels";
+import { CalendlyButton } from "@/components/calendly/calendly-button";
 
 // ─── Types ──────────────────────────────────────────
 interface Profile {
@@ -46,7 +47,7 @@ interface Props {
   subscriptionRenewedAt: string | null;
   activeTickets: TicketRow[];
   latestTicket: { number: number; status: string; serviceName: string } | null;
-  pm: { name: string; email: string } | null;
+  pm: { name: string; email: string; calendlyUrl: string | null } | null;
 }
 
 // ─── Greeting ───────────────────────────────────────
@@ -513,12 +514,20 @@ export function DashboardClient({
         <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Your Project Manager</CardTitle></CardHeader>
         <CardContent>
           {pm ? (
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold text-lg">{pm?.name?.charAt(0) || "PM"}</div>
-              <div>
-                <p className="font-medium text-[var(--ice-white)]">{pm?.name || "Project Manager"}</p>
-                <a href={`mailto:${pm.email}`} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] flex items-center gap-1"><Mail className="h-3 w-3" />{pm.email}</a>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold text-lg">{pm?.name?.charAt(0) || "PM"}</div>
+                <div>
+                  <p className="font-medium text-[var(--ice-white)]">{pm?.name || "Project Manager"}</p>
+                  <a href={`mailto:${pm.email}`} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] flex items-center gap-1"><Mail className="h-3 w-3" />{pm.email}</a>
+                </div>
               </div>
+              {pm.calendlyUrl ? (
+                <div className="flex flex-col items-start sm:items-end gap-1">
+                  <p className="text-xs text-[rgba(245,246,252,0.5)]">{tr("calendly.needToTalk")}</p>
+                  <CalendlyButton url={pm.calendlyUrl} />
+                </div>
+              ) : null}
             </div>
           ) : (
             <div className="flex items-center gap-3 text-[rgba(245,246,252,0.4)]">

@@ -170,5 +170,11 @@
   "messages.emptyPm": "Sin mensajes aún. Tus clientes aparecerán aquí.",
   "messages.you": "Tú",
   "messages.conversations": "Conversaciones",
-  "messages.newMessage": "Nuevo mensaje de"
+  "messages.newMessage": "Nuevo mensaje de",
+  "calendly.book": "Agendar reunión",
+  "calendly.subtitle": "Agenda una llamada con tu Project Manager",
+  "calendly.schedule": "Agendar",
+  "calendly.noPm": "Podrás agendar reuniones después de que tu PM sea asignado.",
+  "calendly.needToTalk": "¿Necesitas hablar?",
+  "calendly.saved": "URL de Calendly guardada"
 }
