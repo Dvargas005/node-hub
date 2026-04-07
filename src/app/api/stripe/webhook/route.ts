@@ -53,6 +53,50 @@ export async function POST(req: NextRequest) {
           break;
         }
 
+        // ── Starter plan (one-time, non-recurring) ──
+        if (metadata?.type === "starter_plan" && userId && planSlug) {
+          const starter = await db.plan.findUnique({ where: { slug: planSlug } });
+          if (!starter) {
+            console.warn("[WEBHOOK] Starter plan not found:", planSlug);
+            break;
+          }
+          const periodStart = new Date();
+          const periodEnd = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+          await db.subscription.upsert({
+            where: { userId },
+            create: {
+              userId,
+              planId: starter.id,
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: null,
+              status: "ACTIVE",
+              currentPeriodStart: periodStart,
+              currentPeriodEnd: periodEnd,
+              creditsRemaining: starter.monthlyCredits + starter.bonusCredits,
+            },
+            update: {
+              planId: starter.id,
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: null,
+              status: "ACTIVE",
+              currentPeriodStart: periodStart,
+              currentPeriodEnd: periodEnd,
+              creditsRemaining: starter.monthlyCredits + starter.bonusCredits,
+              canceledAt: null,
+            },
+          });
+
+          await db.user.update({
+            where: { id: userId },
+            data: { stripeCustomerId: customerId },
+          });
+
+          await db.processedWebhook.create({ data: { sessionId, type: "starter_plan" } });
+          console.log(`[WEBHOOK] Starter plan activated: ${userId} (expires ${periodEnd.toISOString()})`);
+          break;
+        }
+
         // Credit pack purchase (fixed pack OR custom amount)
         if ((metadata?.type === "credit_pack" || metadata?.type === "credit_pack_custom") && packCredits) {
           const credits = parseInt(packCredits);

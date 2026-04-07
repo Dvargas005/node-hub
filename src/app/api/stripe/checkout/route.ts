@@ -141,6 +141,24 @@ export async function POST(req: NextRequest) {
       await db.user.update({ where: { id: userId }, data: { stripeCustomerId: customerId } });
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    // ── ONE-TIME plan (Starter) — mode: "payment", no subscription, no setup fee
+    if (!plan.isRecurring) {
+      const oneTimeParams: Stripe.Checkout.SessionCreateParams = {
+        mode: "payment",
+        customer: customerId,
+        line_items: [{ price: plan.stripePriceId, quantity: 1 }],
+        success_url: `${baseUrl}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/billing?checkout=canceled`,
+        metadata: { userId, planSlug, type: "starter_plan" },
+      };
+      const oneTimeSession = await stripe.checkout.sessions.create(oneTimeParams);
+      return NextResponse.json({ url: oneTimeSession.url });
+    }
+
+    // ── Recurring plan flow (Member, Growth, Pro)
+
     // Build line items
     const lineItems: { price: string; quantity: number }[] = [
       { price: plan.stripePriceId, quantity: 1 },
@@ -161,8 +179,6 @@ export async function POST(req: NextRequest) {
     if (chargeSetupFee && plan.setupFeeStripePriceId) {
       lineItems.push({ price: plan.setupFeeStripePriceId, quantity: 1 });
     }
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",

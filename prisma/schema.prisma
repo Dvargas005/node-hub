@@ -131,6 +131,7 @@ model Plan {
   stripePriceId          String?
   setupFeeStripePriceId  String?
   isActive               Boolean   @default(true)
+  isRecurring            Boolean   @default(true)  // false = one-time payment, no auto-renew
   createdAt       DateTime  @default(now())
 
   subscriptions   Subscription[]
@@ -163,6 +164,7 @@ enum SubStatus {
   PAST_DUE
   CANCELED
   PAUSED
+  EXPIRED
 }
 
 model CreditPack {

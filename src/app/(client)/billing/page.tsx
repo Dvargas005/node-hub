@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/session";
+import { expireIfNeeded } from "@/lib/sub-expiration";
 import { BillingClient } from "./billing-client";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ export default async function BillingPage() {
   const session = await requireAuth();
   const userId = session.user.id;
 
-  const [plans, subscription, creditPacks, user] = await Promise.all([
+  const [plans, rawSubscription, creditPacks, user] = await Promise.all([
     db.plan.findMany({
       where: { isActive: true },
       orderBy: { priceMonthly: "asc" },
@@ -26,6 +27,9 @@ export default async function BillingPage() {
       select: { freeCredits: true, allianceId: true },
     }),
   ]);
+
+  // Lazy-expire one-time plans (Starter) past their period end
+  const subscription = await expireIfNeeded(rawSubscription as any);
 
   // Check if user has LEN alliance for discount
   let allianceDiscount = 0;
@@ -49,6 +53,7 @@ export default async function BillingPage() {
         maxActiveReqs: p.maxActiveReqs,
         deliveryDays: p.deliveryDays,
         stripePriceId: p.stripePriceId,
+        isRecurring: p.isRecurring,
       }))}
       subscription={
         subscription

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/session";
+import { expireIfNeeded } from "@/lib/sub-expiration";
 import { DashboardClient } from "./dashboard-client";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ export default async function DashboardPage() {
   const session = await requireAuth();
   const userId = session.user.id;
 
-  const [user, subscription, activeTickets, allTickets] = await Promise.all([
+  const [user, rawSubscription, activeTickets, allTickets] = await Promise.all([
     db.user.findUnique({
       where: { id: userId },
       select: {
@@ -45,6 +46,8 @@ export default async function DashboardPage() {
       select: { id: true, number: true, status: true, createdAt: true, variant: { select: { name: true, service: { select: { name: true } } } } },
     }),
   ]);
+
+  const subscription = await expireIfNeeded(rawSubscription as any);
 
   const pm = user?.assignedPmId
     ? await db.user.findUnique({

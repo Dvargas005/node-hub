@@ -17,7 +17,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag,
+  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag, Sparkles,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -25,6 +25,7 @@ interface Plan {
   id: string; name: string; slug: string; priceMonthly: number;
   setupFee: number; monthlyCredits: number; maxActiveReqs: number;
   deliveryDays: number; stripePriceId: string | null;
+  isRecurring: boolean;
 }
 
 interface Sub {
@@ -51,12 +52,13 @@ interface UpgradePreview {
 }
 
 const planIcons: Record<string, typeof CreditCard> = {
-  member: CreditCard, growth: Zap, pro: Crown,
+  starter: Sparkles, member: CreditCard, growth: Zap, pro: Crown,
 };
 
 const planFeatures: Record<string, string[]> = {
-  member: ["140 credits/mo", "1 active request", "Delivery in 5 days", "Email support"],
-  growth: ["350 credits/mo", "2 active requests", "Delivery in 3 days", "Dedicated PM", "Priority support"],
+  starter: ["1 active request", "Delivery in 5 days", "Buy credits 1:1", "No commitment — 1 month"],
+  member: ["140 credits/mo", "2 active requests", "Delivery in 5 days", "Email support"],
+  growth: ["350 credits/mo", "5 active requests", "Delivery in 3 days", "Dedicated PM", "Priority support"],
   pro: ["650 credits/mo", "Unlimited requests", "Delivery 24-48h", "Dedicated PM", "24/7 support", "All services"],
 };
 
@@ -87,6 +89,10 @@ export function BillingClient({
   const isActive = subscription?.status === "ACTIVE";
   const isPastDue = subscription?.status === "PAST_DUE";
   const isCanceled = subscription?.status === "CANCELED";
+  const isExpired = subscription?.status === "EXPIRED";
+
+  const starterPlan = plans.find((p: Plan) => p.slug === "starter");
+  const recurringPlans = plans.filter((p: Plan) => p.slug !== "starter");
 
   const handleSubscribe = async (planSlug: string) => {
     setLoadingPlan(planSlug);
@@ -200,7 +206,7 @@ export function BillingClient({
   const applyDiscount = (cents: number) =>
     effectiveDiscount > 0 ? Math.round(cents * (1 - effectiveDiscount / 100)) : cents;
 
-  const showPricing = !isActive || isCanceled;
+  const showPricing = !isActive || isCanceled || isExpired;
 
   return (
     <div className="space-y-8">
@@ -273,13 +279,74 @@ export function BillingClient({
       )}
 
       {/* Pricing cards */}
+      {showPricing && isExpired && (
+        <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 p-3 text-sm text-yellow-400 flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {t("billing.starter.expired")}
+        </div>
+      )}
+
+      {/* Starter plan — one-time, $5, no credits */}
+      {showPricing && starterPlan && (
+        <Card className="border-[var(--gold-bar)]/20 bg-[rgba(255,201,25,0.03)]">
+          <CardContent className="py-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[var(--gold-bar)]/15 text-[var(--gold-bar)]">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">
+                      {t("billing.starter")}
+                    </h3>
+                    <Badge className="bg-[var(--gold-bar)]/15 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[10px]">
+                      {t("billing.starter.noCommitment")}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">{t("billing.starter.description")}</p>
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[rgba(245,246,252,0.6)]">
+                    {(planFeatures.starter || []).map((f: string) => (
+                      <li key={f} className="flex items-center gap-1">
+                        <Check className="h-3 w-3 text-[var(--gold-bar)]" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="flex flex-col items-start sm:items-end gap-2">
+                <div>
+                  <span className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
+                    ${starterPlan.priceMonthly / 100}
+                  </span>
+                  <span className="text-xs text-[rgba(245,246,252,0.5)]">/mo</span>
+                </div>
+                <Button
+                  onClick={() => handleSubscribe(starterPlan.slug)}
+                  disabled={loadingPlan === starterPlan.slug || !starterPlan.stripePriceId}
+                  className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+                >
+                  {loadingPlan === starterPlan.slug ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : isExpired ? (
+                    t("billing.starter.renew")
+                  ) : (
+                    t("billing.starter.cta")
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {showPricing && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            {isCanceled ? "Reactivate your plan" : "Choose your plan"}
+            {isCanceled || isExpired ? "Reactivate your plan" : "Choose your plan"}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan: any) => {
+            {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;
               const features = planFeatures[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
@@ -411,7 +478,7 @@ export function BillingClient({
             Plans
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan: Plan) => {
+            {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;
               const features = planFeatures[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
