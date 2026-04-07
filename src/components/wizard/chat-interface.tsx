@@ -89,12 +89,12 @@ export function ChatInterface({
     } else if (!started && category) {
       setStarted(true);
       const categoryLabels: Record<string, string> = {
-        DESIGN: "diseño y branding",
-        WEB: "desarrollo web",
-        MARKETING: "marketing digital",
+        DESIGN: "design and branding",
+        WEB: "web development",
+        MARKETING: "digital marketing",
       };
       sendMessage(
-        `Hola, necesito ayuda con un proyecto de ${categoryLabels[category] || category}.`
+        `Hi, I need help with a ${categoryLabels[category] || category} project.`
       );
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,7 +119,7 @@ export function ChatInterface({
       if (!res.ok) {
         setMessages([
           ...newMessages,
-          { role: "assistant", content: data.error || "Error en la conversación" },
+          { role: "assistant", content: data.error || "Error in conversation" },
         ]);
         return;
       }
@@ -140,7 +140,7 @@ export function ChatInterface({
     } catch {
       setMessages([
         ...newMessages,
-        { role: "assistant", content: "Error de conexión. Intenta de nuevo." },
+        { role: "assistant", content: "Connection error. Please try again." },
       ]);
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ export function ChatInterface({
   return (
     <div className="flex flex-col h-[calc(100vh-220px)] max-h-[600px]">
       <div className="flex items-center justify-between px-4 py-2 border-b border-[rgba(245,246,252,0.06)] text-xs text-[rgba(245,246,252,0.5)]">
-        <span>Estimado: {estimatedCost ? `${estimatedCost} créditos` : "pendiente"}</span>
+        <span>Estimate: {estimatedCost ? `${estimatedCost} credits` : "pending"}</span>
       </div>
       {/* Chat messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 p-4">
@@ -174,9 +174,9 @@ export function ChatInterface({
               }`}
             >
               {msg.role === "assistant" ? stripBriefJson(msg.content) : msg.content}
-              {msg.role === "assistant" && msg.content.includes("facturación") && (
+              {msg.role === "assistant" && (msg.content.includes("facturación") || msg.content.includes("billing")) && (
                 <a href="/billing" className="inline-block mt-2 text-xs text-[var(--gold-bar)] hover:underline">
-                  Ir a facturación →
+                  Go to billing →
                 </a>
               )}
             </div>
@@ -200,7 +200,7 @@ export function ChatInterface({
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe tu mensaje..."
+            placeholder="Type your message..."
             disabled={loading}
             className="flex-1 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] focus:border-[var(--gold-bar)]"
           />

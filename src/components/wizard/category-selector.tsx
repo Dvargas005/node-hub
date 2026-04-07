@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Palette, Monitor, Megaphone, ArrowRight } from "lucide-react";
 
 const categories = [
-  { key: "DESIGN", label: "Diseño & Branding", icon: Palette },
-  { key: "WEB", label: "Desarrollo Web", icon: Monitor },
-  { key: "MARKETING", label: "Marketing Digital", icon: Megaphone },
+  { key: "DESIGN", label: "Design & Branding", icon: Palette },
+  { key: "WEB", label: "Web Development", icon: Monitor },
+  { key: "MARKETING", label: "Digital Marketing", icon: Megaphone },
 ];
 
 export function CategorySelector({
@@ -31,10 +31,10 @@ export function CategorySelector({
     <div className="flex flex-col items-center gap-8 py-8">
       <div className="text-center">
         <h2 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          ¿Qué necesitas?
+          What do you need?
         </h2>
         <p className="mt-2 text-sm text-[rgba(245,246,252,0.5)]">
-          Elige una categoría o describe tu proyecto
+          Choose a category or describe your project
         </p>
       </div>
 
@@ -64,7 +64,7 @@ export function CategorySelector({
           <Input
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
-            placeholder="Describe lo que necesitas con tus palabras..."
+            placeholder="Describe what you need in your own words..."
             className="flex-1 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
           />
           <Button

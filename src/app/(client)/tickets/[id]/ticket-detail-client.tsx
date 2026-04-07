@@ -38,14 +38,14 @@ interface Delivery {
 }
 
 const detailLabels: Record<string, string> = {
-  deliverable: "Entregable", style: "Estilo", content: "Contenido",
-  deadline: "Plazo", extras: "Notas",
+  deliverable: "Deliverable", style: "Style", content: "Content",
+  deadline: "Deadline", extras: "Notes",
 };
 
 const deliveryStatusLabels: Record<string, string> = {
-  PENDING_REVIEW: "Pendiente", PM_APPROVED: "Aprobado por PM",
-  SENT_TO_CLIENT: "Enviado", CLIENT_APPROVED: "Aprobado",
-  REVISION_REQUESTED: "Revisión solicitada",
+  PENDING_REVIEW: "Pending", PM_APPROVED: "PM Approved",
+  SENT_TO_CLIENT: "Sent", CLIENT_APPROVED: "Approved",
+  REVISION_REQUESTED: "Revision requested",
 };
 
 const deliveryStatusColors: Record<string, string> = {
@@ -96,7 +96,7 @@ export function TicketDetailClient({
         }]);
         setNewMessage("");
       }
-    } catch { setError("No se pudo enviar el mensaje"); } finally { setSending(false); }
+    } catch { setError("Could not send message"); } finally { setSending(false); }
   };
 
   const [confirmApprove, setConfirmApprove] = useState(false);
@@ -107,7 +107,7 @@ export function TicketDetailClient({
       const res = await fetch(`/api/tickets/${ticket.id}/approve`, { method: "POST" });
       if (res.ok) window.location.reload();
       else { const d = await res.json(); setError(d.error); }
-    } catch { setError("Error de conexión"); } finally { setActing(false); setConfirmApprove(false); }
+    } catch { setError("Connection error"); } finally { setActing(false); setConfirmApprove(false); }
   };
 
   const handleRevision = async () => {
@@ -121,7 +121,7 @@ export function TicketDetailClient({
       });
       if (res.ok) { setShowRevision(false); window.location.reload(); }
       else { const d = await res.json(); setError(d.error); }
-    } catch { setError("Error de conexión"); } finally { setActing(false); }
+    } catch { setError("Connection error"); } finally { setActing(false); }
   };
 
   const handleCancel = async () => {
@@ -130,7 +130,7 @@ export function TicketDetailClient({
       const res = await fetch(`/api/tickets/${ticket.id}/cancel`, { method: "POST" });
       if (res.ok) window.location.reload();
       else { const d = await res.json(); setError(d.error); }
-    } catch { setError("Error de conexión"); } finally { setActing(false); setShowCancel(false); }
+    } catch { setError("Connection error"); } finally { setActing(false); setShowCancel(false); }
   };
 
   // I5: only SENT_TO_CLIENT is approvable by client
@@ -142,7 +142,7 @@ export function TicketDetailClient({
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm">
         <Link href="/tickets" className="flex items-center gap-1 text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)]">
-          <ArrowLeft className="h-4 w-4" /> Mis Solicitudes
+          <ArrowLeft className="h-4 w-4" /> My Requests
         </Link>
         <span className="text-[rgba(245,246,252,0.3)]">/</span>
         <span className="text-[var(--ice-white)]">#{String(ticket.number).padStart(3, "0")}</span>
@@ -191,12 +191,12 @@ export function TicketDetailClient({
           {/* Deliveries */}
           {deliveries.length > 0 && (
             <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-              <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Entregas</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Deliveries</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 {deliveries.map((d: any) => (
                   <div key={d.id} className="border border-[rgba(245,246,252,0.06)] p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-[var(--ice-white)]">Ronda #{d.round}</span>
+                      <span className="text-sm font-medium text-[var(--ice-white)]">Round #{d.round}</span>
                       <Badge className={`text-xs ${deliveryStatusColors[d.status] || "bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]"}`}>
                         {deliveryStatusLabels[d.status] || d.status}
                       </Badge>
@@ -205,7 +205,7 @@ export function TicketDetailClient({
                     {d.fileUrl && (
                       <div>
                         <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
-                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Open file"}
                         </a>
                         {getGoogleDrivePreview(d.fileUrl) && (
                           <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
@@ -214,7 +214,7 @@ export function TicketDetailClient({
                     )}
                     {d.clientFeedback && (
                       <div className="mt-2 bg-[rgba(255,255,255,0.02)] p-2 text-xs text-[rgba(245,246,252,0.5)]">
-                        Tu feedback: {d.clientFeedback}
+                        Your feedback: {d.clientFeedback}
                       </div>
                     )}
                   </div>
@@ -224,22 +224,22 @@ export function TicketDetailClient({
                 {canApprove && !showRevision && !confirmApprove && (
                   <div className="flex gap-2">
                     <Button onClick={() => setConfirmApprove(true)} className="bg-green-600 text-white hover:bg-green-700 font-bold text-sm flex-1">
-                      <Check className="h-4 w-4 mr-1" /> Aprobar entrega
+                      <Check className="h-4 w-4 mr-1" /> Approve delivery
                     </Button>
                     <Button onClick={() => setShowRevision(true)} variant="outline" className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm flex-1">
-                      <Pencil className="h-4 w-4 mr-1" /> Pedir revisión
+                      <Pencil className="h-4 w-4 mr-1" /> Request revision
                     </Button>
                   </div>
                 )}
                 {confirmApprove && (
                   <div className="bg-green-500/10 border border-green-500/20 p-3 space-y-2">
-                    <p className="text-xs text-green-400">¿Confirmas que apruebas esta entrega? El ticket se marcará como completado.</p>
+                    <p className="text-xs text-green-400">Confirm you approve this delivery? The ticket will be marked as completed.</p>
                     <div className="flex gap-2">
                       <Button onClick={handleApprove} disabled={acting} className="flex-1 bg-green-600 text-white hover:bg-green-700 text-sm disabled:opacity-50">
-                        {acting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Sí, aprobar"}
+                        {acting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Yes, approve"}
                       </Button>
                       <Button onClick={() => setConfirmApprove(false)} variant="outline" className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm">
-                        Cancelar
+                        Cancel
                       </Button>
                     </div>
                   </div>
@@ -249,16 +249,16 @@ export function TicketDetailClient({
                     <textarea
                       value={revisionFeedback}
                       onChange={(e) => setRevisionFeedback(e.target.value)}
-                      placeholder="¿Qué ajustes necesitas?"
+                      placeholder="What adjustments do you need?"
                       rows={3}
                       className="w-full border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] p-2 text-sm resize-none"
                     />
                     <div className="flex gap-2">
                       <Button onClick={handleRevision} disabled={acting || !revisionFeedback.trim()} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm disabled:opacity-50">
-                        {acting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enviar revisión"}
+                        {acting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send revision"}
                       </Button>
                       <Button onClick={() => setShowRevision(false)} variant="outline" className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm">
-                        Cancelar
+                        Cancel
                       </Button>
                     </div>
                   </div>
@@ -269,12 +269,12 @@ export function TicketDetailClient({
 
           {/* Messages */}
           <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-            <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Mensajes</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Messages</CardTitle></CardHeader>
             <CardContent>
               <div ref={scrollRef} className="space-y-3 max-h-80 overflow-y-auto mb-4">
                 {messages.length === 0 && (
                   <p className="text-sm text-[rgba(245,246,252,0.4)] text-center py-4">
-                    Tu PM se pondrá en contacto pronto.
+                    Your PM will be in touch soon.
                   </p>
                 )}
                 {messages.map((m: any) => (
@@ -304,7 +304,7 @@ export function TicketDetailClient({
                   <textarea
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Escribe un mensaje..."
+                    placeholder="Write a message..."
                     rows={1}
                     className="flex-1 border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] px-3 py-2 text-sm resize-none"
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())}
@@ -330,15 +330,15 @@ export function TicketDetailClient({
               <Separator className="bg-[rgba(245,246,252,0.06)]" />
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-[rgba(245,246,252,0.5)]">
-                  <span className="flex items-center gap-1"><CreditCard className="h-3 w-3" /> Créditos</span>
+                  <span className="flex items-center gap-1"><CreditCard className="h-3 w-3" /> Credits</span>
                   <span className="text-[var(--gold-bar)] font-bold">{ticket.creditsCharged}</span>
                 </div>
                 <div className="flex items-center justify-between text-[rgba(245,246,252,0.5)]">
-                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Creado</span>
+                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Created</span>
                   <span className="text-[var(--ice-white)]">{new Date(ticket.createdAt).toLocaleDateString("es-MX")}</span>
                 </div>
                 <div className="flex items-center justify-between text-[rgba(245,246,252,0.5)]">
-                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Actualizado</span>
+                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Updated</span>
                   <span className="text-[var(--ice-white)]">{new Date(ticket.updatedAt).toLocaleDateString("es-MX")}</span>
                 </div>
                 <Separator className="bg-[rgba(245,246,252,0.06)]" />
@@ -350,7 +350,7 @@ export function TicketDetailClient({
                       {ticket.freelancerRole ? ` (${freelancerRoleLabels[ticket.freelancerRole] || ticket.freelancerRole})` : ""}
                     </span>
                   ) : (
-                    <span>Pendiente de asignación</span>
+                    <span>Pending assignment</span>
                   )}
                 </div>
               </div>
@@ -362,15 +362,15 @@ export function TicketDetailClient({
             <div>
               {!showCancel ? (
                 <Button onClick={() => setShowCancel(true)} variant="outline" className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 text-sm">
-                  <X className="h-4 w-4 mr-1" /> Cancelar solicitud
+                  <X className="h-4 w-4 mr-1" /> Cancel request
                 </Button>
               ) : (
                 <Card className="border-red-500/20 bg-red-500/5">
                   <CardContent className="py-3 space-y-2">
-                    <p className="text-xs text-red-400">¿Seguro? Los créditos no se reembolsan.</p>
+                    <p className="text-xs text-red-400">Are you sure? Credits are not refundable.</p>
                     <div className="flex gap-2">
                       <Button onClick={handleCancel} disabled={acting} className="flex-1 bg-red-600 text-white hover:bg-red-700 text-sm disabled:opacity-50">
-                        {acting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Sí, cancelar"}
+                        {acting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Yes, cancel"}
                       </Button>
                       <Button onClick={() => setShowCancel(false)} variant="outline" className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm">
                         No

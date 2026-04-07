@@ -16,15 +16,15 @@ import {
 import type { NavItem } from "@/components/layout/sidebar";
 
 const baseNav: NavItem[] = [
-  { label: "Panel General", href: "/admin/overview", icon: LayoutDashboard },
+  { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
-  { label: "Clientes", href: "/admin/clients", icon: Users },
+  { label: "Clients", href: "/admin/clients", icon: Users },
   { label: "Freelancers", href: "/admin/freelancers", icon: UserCog },
-  { label: "Equipo", href: "/admin/team", icon: UserCog },
-  { label: "Servicios", href: "/admin/services", icon: Package },
-  { label: "Alianzas", href: "/admin/alliances", icon: Handshake },
+  { label: "Team", href: "/admin/team", icon: UserCog },
+  { label: "Services", href: "/admin/services", icon: Package },
+  { label: "Alliances", href: "/admin/alliances", icon: Handshake },
   { label: "Promos", href: "/admin/promos", icon: Gift },
-  { label: "Métricas", href: "/admin/metrics", icon: BarChart3 },
+  { label: "Metrics", href: "/admin/metrics", icon: BarChart3 },
   { label: "Sync", href: "/admin/sync", icon: RefreshCw },
 ];
 

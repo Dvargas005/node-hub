@@ -69,13 +69,13 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setCreateError(data.error || "Error al crear PM");
+        setCreateError(data.error || "Error creating PM");
         return;
       }
       setTempPassword(data.tempPassword);
       router.refresh();
     } catch (err: any) {
-      setCreateError("Error de conexión");
+      setCreateError("Connection error");
     } finally {
       setCreating(false);
     }
@@ -92,13 +92,13 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          Equipo
+          Team
         </h1>
         <Button
           onClick={() => setShowCreate(true)}
           className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
         >
-          <Plus className="mr-2 h-4 w-4" /> Nuevo PM
+          <Plus className="mr-2 h-4 w-4" /> New PM
         </Button>
       </div>
 
@@ -106,7 +106,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardHeader>
           <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">
-            {team.length} miembros
+            {team.length} members
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -114,12 +114,12 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
             <Table>
               <TableHeader>
                 <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Nombre</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Role</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Clientes asignados</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Freelancers supervisados</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Fecha registro</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Assigned clients</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Supervised freelancers</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -129,7 +129,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                       colSpan={6}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
-                      No hay miembros del equipo
+                      No team members
                     </TableCell>
                   </TableRow>
                 )}
@@ -170,9 +170,9 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
       <Dialog open={showCreate} onOpenChange={(open) => { if (!open) resetDialog(); }}>
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)]">
           <DialogHeader>
-            <DialogTitle className="text-[var(--ice-white)]">Crear nuevo PM</DialogTitle>
+            <DialogTitle className="text-[var(--ice-white)]">Create new PM</DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              Se creará una cuenta con contraseña temporal.
+              An account will be created with a temporary password.
             </DialogDescription>
           </DialogHeader>
 
@@ -180,32 +180,32 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
             <div className="space-y-4">
               <div className="rounded-lg border border-[var(--gold-bar)]/30 bg-[var(--gold-bar)]/10 p-4">
                 <p className="text-sm font-bold text-[var(--gold-bar)] mb-2">
-                  Password temporal:
+                  Temporary password:
                 </p>
                 <p className="font-mono text-lg text-[var(--ice-white)] select-all break-all">
                   {tempPassword}
                 </p>
                 <p className="text-xs text-[rgba(245,246,252,0.5)] mt-2">
-                  Comparte esto con el nuevo PM. No se puede recuperar.
+                  Share this with the new PM. It cannot be recovered.
                 </p>
               </div>
               <Button
                 onClick={resetDialog}
                 className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
               >
-                Cerrar
+                Close
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               <div>
                 <label className="text-sm text-[rgba(245,246,252,0.6)] mb-1 block">
-                  Nombre *
+                  Name *
                 </label>
                 <Input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Nombre completo"
+                  placeholder="Full name"
                   className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)]"
                 />
               </div>
@@ -216,14 +216,14 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                 <Input
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="email@ejemplo.com"
+                  placeholder="email@example.com"
                   type="email"
                   className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)]"
                 />
               </div>
               <div>
                 <label className="text-sm text-[rgba(245,246,252,0.6)] mb-1 block">
-                  Teléfono (opcional)
+                  Phone (optional)
                 </label>
                 <Input
                   value={form.phone}
@@ -234,7 +234,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
               </div>
               <div>
                 <label className="text-sm text-[rgba(245,246,252,0.6)] mb-1 block">
-                  Zona horaria
+                  Timezone
                 </label>
                 <select
                   value={form.timezone}
@@ -260,7 +260,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                 disabled={creating || !form.name || !form.email}
                 className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50"
               >
-                {creating ? "Creando..." : "Crear PM"}
+                {creating ? "Creating..." : "Create PM"}
               </Button>
             </div>
           )}

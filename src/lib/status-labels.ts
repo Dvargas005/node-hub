@@ -1,12 +1,12 @@
 export const ticketStatusLabels: Record<string, string> = {
-  NEW: "Nuevo",
-  REVIEWING: "En revisión",
-  ASSIGNED: "Asignado",
-  IN_PROGRESS: "En progreso",
-  DELIVERED: "Entregado",
-  REVISION: "Revisión",
-  COMPLETED: "Completado",
-  CANCELED: "Cancelado",
+  NEW: "New",
+  REVIEWING: "Reviewing",
+  ASSIGNED: "Assigned",
+  IN_PROGRESS: "In Progress",
+  DELIVERED: "Delivered",
+  REVISION: "Revision",
+  COMPLETED: "Completed",
+  CANCELED: "Canceled",
 };
 
 export const ticketStatusColors: Record<string, string> = {
@@ -21,10 +21,10 @@ export const ticketStatusColors: Record<string, string> = {
 };
 
 export const priorityLabels: Record<string, string> = {
-  LOW: "Baja",
+  LOW: "Low",
   NORMAL: "Normal",
-  HIGH: "Alta",
-  URGENT: "Urgente",
+  HIGH: "High",
+  URGENT: "Urgent",
 };
 
 export const priorityColors: Record<string, string> = {
@@ -35,10 +35,10 @@ export const priorityColors: Record<string, string> = {
 };
 
 export const availabilityLabels: Record<string, string> = {
-  AVAILABLE: "Disponible",
-  BUSY: "Ocupado",
-  ON_LEAVE: "Ausente",
-  INACTIVE: "Inactivo",
+  AVAILABLE: "Available",
+  BUSY: "Busy",
+  ON_LEAVE: "On Leave",
+  INACTIVE: "Inactive",
 };
 
 export const availabilityColors: Record<string, string> = {
@@ -49,13 +49,13 @@ export const availabilityColors: Record<string, string> = {
 };
 
 export const freelancerRoleLabels: Record<string, string> = {
-  GRAPHIC_DESIGNER: "Diseñador",
-  AI_DEVELOPER: "Desarrollador IA",
+  GRAPHIC_DESIGNER: "Designer",
+  AI_DEVELOPER: "AI Developer",
   COMMUNITY_MANAGER: "Community Manager",
 };
 
 export const categoryLabels: Record<string, string> = {
-  DESIGN: "Diseño",
+  DESIGN: "Design",
   WEB: "Web",
   MARKETING: "Marketing",
 };

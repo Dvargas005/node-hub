@@ -60,7 +60,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
       {/* Header */}
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-bold font-[var(--font-lexend)] text-[var(--ice-white)]">
-          Hola, {firstName}
+          Hello, {firstName}
         </h1>
         <Badge
           variant="outline"
@@ -74,7 +74,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className={crd}>
           <CardContent className="pt-4 pb-4">
-            <p className={sub}>Tickets activos</p>
+            <p className={sub}>Active tickets</p>
             <p className="text-2xl font-bold text-[var(--ice-white)]">
               {activeCount}
             </p>
@@ -83,7 +83,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
 
         <Card className={crd}>
           <CardContent className="pt-4 pb-4">
-            <p className={sub}>Completados este mes</p>
+            <p className={sub}>Completed this month</p>
             <p className="text-2xl font-bold text-[var(--ice-white)]">
               {completedThisMonth}
             </p>
@@ -92,7 +92,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
 
         <Card className={crd}>
           <CardContent className="pt-4 pb-4">
-            <p className={sub}>Carga</p>
+            <p className={sub}>Load</p>
             <p className="text-lg font-bold text-[var(--ice-white)]">
               {freelancer.currentLoad} / {freelancer.clientCapacity}
             </p>
@@ -107,7 +107,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
 
         <Card className={crd}>
           <CardContent className="pt-4 pb-4">
-            <p className={sub}>Disponibilidad</p>
+            <p className={sub}>Availability</p>
             <button
               onClick={toggleAvailability}
               disabled={toggling}
@@ -124,7 +124,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
               </Badge>
             </button>
             <p className="text-xs text-[rgba(245,246,252,0.3)] mt-1">
-              Click para cambiar
+              Click to change
             </p>
           </CardContent>
         </Card>
@@ -133,10 +133,10 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
       {/* Active Tickets */}
       <div>
         <h2 className="font-[var(--font-lexend)] text-sm text-[rgba(245,246,252,0.5)] uppercase tracking-wider mb-3">
-          Tickets activos
+          Active tickets
         </h2>
         {activeTickets.length === 0 ? (
-          <p className={sub}>No tienes tickets activos.</p>
+          <p className={sub}>No active tickets.</p>
         ) : (
           <div className="space-y-2">
             {activeTickets.map((t: any) => (
@@ -189,7 +189,7 @@ export function PortalClient({ freelancer, activeTickets, completedTickets, acti
             onClick={() => setShowCompleted(!showCompleted)}
             className="flex items-center gap-2 font-[var(--font-lexend)] text-sm text-[rgba(245,246,252,0.5)] uppercase tracking-wider mb-3 hover:text-[rgba(245,246,252,0.7)] transition-colors"
           >
-            Completados recientes
+            Recently completed
             {showCompleted ? (
               <ChevronUp className="w-4 h-4" />
             ) : (

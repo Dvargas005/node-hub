@@ -79,7 +79,7 @@ export function BriefConfirmation({
           <Check className="h-6 w-6 text-[var(--gold-bar)]" />
         </div>
         <h2 className="font-[var(--font-lexend)] text-xl font-bold text-[var(--ice-white)]">
-          Confirma tu solicitud
+          Confirm your request
         </h2>
       </div>
 
@@ -91,7 +91,7 @@ export function BriefConfirmation({
                 {variant?.serviceName || brief.suggestedServiceSlug}
               </CardTitle>
               <p className="text-sm text-[rgba(245,246,252,0.5)]">
-                {variant?.name || "Variante sugerida"}
+                {variant?.name || "Suggested variant"}
               </p>
             </div>
             {variant && (
@@ -99,7 +99,7 @@ export function BriefConfirmation({
                 <p className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--gold-bar)]">
                   {variant.creditCost}
                 </p>
-                <p className="text-xs text-[rgba(245,246,252,0.4)]">créditos</p>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">credits</p>
               </div>
             )}
           </div>
@@ -107,7 +107,7 @@ export function BriefConfirmation({
         <CardContent className="space-y-3">
           {variant && (
             <p className="text-xs text-[rgba(245,246,252,0.4)]">
-              Entrega estimada: ~{variant.estimatedDays} días
+              Estimated delivery: ~{variant.estimatedDays} days
             </p>
           )}
 
@@ -121,7 +121,7 @@ export function BriefConfirmation({
                 onClick={() => setExpanded(!expanded)}
                 className="flex items-center gap-1 text-xs text-[var(--gold-bar)] hover:underline"
               >
-                {expanded ? "Ocultar detalles" : "Ver detalles del brief"}
+                {expanded ? "Hide details" : "View brief details"}
                 {expanded ? (
                   <ChevronUp className="h-3 w-3" />
                 ) : (
@@ -133,7 +133,7 @@ export function BriefConfirmation({
                   {detailEntries.map(([key, value]) => (
                     <div key={key}>
                       <span className="text-[rgba(245,246,252,0.4)] capitalize">
-                        {{ deliverable: "Entregable", style: "Estilo", content: "Contenido", extras: "Notas adicionales" }[key] || key}
+                        {{ deliverable: "Deliverable", style: "Style", content: "Content", extras: "Additional notes" }[key] || key}
                         :{" "}
                       </span>
                       <span className="text-[rgba(245,246,252,0.7)]">{value}</span>
@@ -151,27 +151,27 @@ export function BriefConfirmation({
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[rgba(245,246,252,0.5)]">Tus créditos</span>
+              <span className="text-[rgba(245,246,252,0.5)]">Your credits</span>
               <span className="text-[var(--ice-white)]">
-                {totalAvailable} disponibles
+                {totalAvailable} available
               </span>
             </div>
             {freeCredits > 0 && (
               <p className="text-xs text-[rgba(245,246,252,0.3)] text-right">
-                {freeCredits} gratis + {subscription?.creditsRemaining || 0} del plan
+                {freeCredits} free + {subscription?.creditsRemaining || 0} from plan
               </p>
             )}
             <div className="flex items-center justify-between text-sm mt-1">
-              <span className="text-[rgba(245,246,252,0.5)]">Costo</span>
+              <span className="text-[rgba(245,246,252,0.5)]">Cost</span>
               <span className="text-[var(--gold-bar)] font-bold">
-                -{variant.creditCost} créditos
+                -{variant.creditCost} credits
               </span>
             </div>
             <Separator className="bg-[rgba(245,246,252,0.1)] my-2" />
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[rgba(245,246,252,0.5)]">Después</span>
+              <span className="text-[rgba(245,246,252,0.5)]">After</span>
               <span className="text-[var(--ice-white)] font-bold">
-                {totalAvailable - variant.creditCost} créditos
+                {totalAvailable - variant.creditCost} credits
               </span>
             </div>
           </CardContent>
@@ -184,17 +184,17 @@ export function BriefConfirmation({
           <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-yellow-400 font-medium">
-              Créditos insuficientes
+              Insufficient credits
             </p>
             <p className="text-xs text-[rgba(245,246,252,0.5)]">
-              Necesitas {variant.creditCost}, tienes{" "}
+              You need {variant.creditCost}, you have{" "}
               {totalAvailable}.
             </p>
             <Link
               href="/billing"
               className="text-xs text-[var(--gold-bar)] hover:underline"
             >
-              {hasSubscription ? "Comprar créditos extra" : "Ver planes disponibles"}
+              {hasSubscription ? "Buy extra credits" : "View available plans"}
             </Link>
           </div>
         </div>
@@ -207,14 +207,14 @@ export function BriefConfirmation({
           onClick={onAdjust}
           className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
         >
-          Quiero ajustar algo
+          I want to adjust something
         </Button>
         <Button
           onClick={handleConfirm}
           disabled={!hasEnoughCredits || confirming}
           className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-40"
         >
-          {confirming ? "Creando..." : "Confirmar y crear ticket"}
+          {confirming ? "Creating..." : "Confirm and create ticket"}
         </Button>
       </div>
     </div>

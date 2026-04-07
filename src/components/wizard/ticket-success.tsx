@@ -23,32 +23,32 @@ interface Suggestion {
 
 const crossSellMap: Record<string, Suggestion[]> = {
   "logo-design": [
-    { slug: "social-media-design", title: "Templates para redes sociales", description: "Usa tu nueva marca en posts y stories profesionales", category: "DESIGN" },
-    { slug: "print-design", title: "Tarjetas de presentación", description: "Lleva tu marca a lo físico con tarjetas profesionales", category: "DESIGN" },
+    { slug: "social-media-design", title: "Social media templates", description: "Use your new brand in professional posts and stories", category: "DESIGN" },
+    { slug: "print-design", title: "Business cards", description: "Bring your brand to print with professional cards", category: "DESIGN" },
   ],
   "brand-identity": [
-    { slug: "social-media-design", title: "Diseño para redes sociales", description: "Aplica tu identidad en contenido para Instagram y Facebook", category: "DESIGN" },
-    { slug: "landing-page", title: "Landing Page", description: "Crea una presencia web con tu nueva identidad de marca", category: "WEB" },
+    { slug: "social-media-design", title: "Social media design", description: "Apply your identity to Instagram and Facebook content", category: "DESIGN" },
+    { slug: "landing-page", title: "Landing Page", description: "Create a web presence with your new brand identity", category: "WEB" },
   ],
   "landing-page": [
-    { slug: "seo-optimization", title: "Optimización SEO", description: "Potencia tu landing para que aparezca en Google", category: "MARKETING" },
-    { slug: "paid-advertising", title: "Publicidad Digital", description: "Lleva tráfico calificado a tu nueva landing", category: "MARKETING" },
+    { slug: "seo-optimization", title: "SEO Optimization", description: "Boost your landing page to appear on Google", category: "MARKETING" },
+    { slug: "paid-advertising", title: "Digital Advertising", description: "Drive qualified traffic to your new landing page", category: "MARKETING" },
   ],
   "website-development": [
-    { slug: "seo-optimization", title: "Optimización SEO", description: "Posiciona tu sitio web en los buscadores", category: "MARKETING" },
-    { slug: "content-marketing", title: "Marketing de Contenido", description: "Contenido profesional para alimentar tu sitio", category: "MARKETING" },
+    { slug: "seo-optimization", title: "SEO Optimization", description: "Rank your website on search engines", category: "MARKETING" },
+    { slug: "content-marketing", title: "Content Marketing", description: "Professional content to power your site", category: "MARKETING" },
   ],
   "social-media-design": [
-    { slug: "social-media-management", title: "Community Management", description: "Deja que gestionemos tus redes con tu nuevo contenido", category: "MARKETING" },
+    { slug: "social-media-management", title: "Community Management", description: "Let us manage your social media with your new content", category: "MARKETING" },
   ],
   "social-media-management": [
-    { slug: "paid-advertising", title: "Publicidad Digital", description: "Amplifica el alcance de tu contenido con ads", category: "MARKETING" },
+    { slug: "paid-advertising", title: "Digital Advertising", description: "Amplify your content reach with ads", category: "MARKETING" },
   ],
   "content-marketing": [
-    { slug: "seo-optimization", title: "Optimización SEO", description: "Que tu contenido aparezca en los primeros resultados", category: "MARKETING" },
+    { slug: "seo-optimization", title: "SEO Optimization", description: "Get your content to appear in top results", category: "MARKETING" },
   ],
   "email-marketing": [
-    { slug: "landing-page", title: "Landing Page", description: "Crea una landing para captar leads de tus campañas", category: "WEB" },
+    { slug: "landing-page", title: "Landing Page", description: "Create a landing page to capture leads from your campaigns", category: "WEB" },
   ],
 };
 
@@ -83,10 +83,10 @@ export function TicketSuccess({
       </div>
 
       <h2 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)] text-center">
-        ¡Solicitud creada!
+        Request created!
       </h2>
       <p className="mt-2 text-[rgba(245,246,252,0.5)] text-center">
-        Nuestro equipo revisará tu solicitud pronto
+        Our team will review your request soon
       </p>
 
       <Card className="mt-6 w-full border-[var(--gold-bar)] bg-[rgba(255,201,25,0.03)]">
@@ -98,15 +98,15 @@ export function TicketSuccess({
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgba(245,246,252,0.5)]">Servicio</span>
+            <span className="text-[rgba(245,246,252,0.5)]">Service</span>
             <span className="text-[var(--ice-white)]">{ticket.serviceName}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgba(245,246,252,0.5)]">Variante</span>
+            <span className="text-[rgba(245,246,252,0.5)]">Variant</span>
             <span className="text-[var(--ice-white)]">{ticket.variantName}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgba(245,246,252,0.5)]">Créditos</span>
+            <span className="text-[rgba(245,246,252,0.5)]">Credits</span>
             <span className="text-[var(--gold-bar)] font-bold">
               {ticket.creditsCharged}
             </span>
@@ -117,7 +117,7 @@ export function TicketSuccess({
       <div className="flex gap-3 mt-6 w-full">
         <Link href="/tickets" className="flex-1">
           <Button className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold">
-            Ver mis tickets
+            View my tickets
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -126,7 +126,7 @@ export function TicketSuccess({
             variant="outline"
             className="w-full border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
           >
-            Ir al panel
+            Go to dashboard
           </Button>
         </Link>
       </div>
@@ -137,7 +137,7 @@ export function TicketSuccess({
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-4 w-4 text-[var(--gold-bar)]" />
             <p className="text-sm font-medium text-[rgba(245,246,252,0.5)]">
-              También te puede interesar
+              You might also be interested in
             </p>
           </div>
           <div className="space-y-2">

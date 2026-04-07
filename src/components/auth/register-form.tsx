@@ -113,13 +113,13 @@ export function RegisterForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Error al crear cuenta");
+        setError(data.error || "Error creating account");
         return;
       }
 
       router.push("/dashboard");
     } catch {
-      setError("Error de conexión");
+      setError("Connection error");
     } finally {
       setLoading(false);
     }

@@ -128,14 +128,14 @@ export function RequestClient({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Error al crear el ticket");
+        setError(data.error || "Error creating ticket");
         return;
       }
 
       setTicket(data.ticket);
       setStep("success");
     } catch {
-      setError("Error de conexión");
+      setError("Connection error");
     }
   };
 

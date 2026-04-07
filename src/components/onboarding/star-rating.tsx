@@ -58,7 +58,7 @@ export function StarRating({
           disabled={submitted}
           className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4 mt-2 disabled:opacity-50"
         >
-          {submitted ? "Guardando..." : "Confirmar"}
+          {submitted ? "Saving..." : "Confirm"}
         </Button>
       )}
     </div>

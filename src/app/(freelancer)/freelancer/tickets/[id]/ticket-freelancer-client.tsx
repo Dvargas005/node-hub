@@ -27,9 +27,9 @@ const lbl = "text-xs font-medium text-[rgba(245,246,252,0.5)]";
 const val = "text-sm text-[var(--ice-white)]";
 const secHdr = "font-[var(--font-lexend)] text-xs text-[rgba(245,246,252,0.5)] uppercase tracking-wider";
 const goldBtn = "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-xs";
-const dlvLabels: Record<string, string> = { PENDING_REVIEW: "Pendiente", PM_APPROVED: "Aprobada PM", SENT_TO_CLIENT: "Enviada", CLIENT_APPROVED: "Aprobada cliente", REVISION_REQUESTED: "Revision" };
+const dlvLabels: Record<string, string> = { PENDING_REVIEW: "Pending", PM_APPROVED: "PM Approved", SENT_TO_CLIENT: "Sent", CLIENT_APPROVED: "Client Approved", REVISION_REQUESTED: "Revision" };
 const dlvColors: Record<string, string> = { PENDING_REVIEW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", PM_APPROVED: "bg-blue-500/20 text-blue-400 border-blue-500/30", SENT_TO_CLIENT: "bg-purple-500/20 text-purple-400 border-purple-500/30", CLIENT_APPROVED: "bg-green-500/20 text-green-400 border-green-500/30", REVISION_REQUESTED: "bg-red-500/20 text-red-400 border-red-500/30" };
-const BRIEF_LABELS: Record<string, string> = { objective: "Objetivo", audience: "Audiencia", tone: "Tono", style: "Estilo", dimensions: "Dimensiones", format: "Formato", references: "Referencias", extras: "Extras", description: "Descripcion" };
+const BRIEF_LABELS: Record<string, string> = { objective: "Objective", audience: "Audience", tone: "Tone", style: "Style", dimensions: "Dimensions", format: "Format", references: "References", extras: "Extras", description: "Description" };
 const fmt = (iso: string) => new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 const fmtD = (iso: string) => new Date(iso).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -66,7 +66,7 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" onClick={() => router.push("/freelancer/portal")} className="text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Volver
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back
         </Button>
         <h1 className="text-xl font-bold font-[var(--font-lexend)] text-[var(--ice-white)]">Ticket #{t.number}</h1>
         <Badge variant="outline" className={ticketStatusColors[t.status] || ""}>{ticketStatusLabels[t.status] || t.status}</Badge>
@@ -77,7 +77,7 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
         <div className="flex-1 md:w-2/3 space-y-6">
           {t.pmNotes && (
             <Card className="border-blue-500/30 bg-blue-500/5"><CardContent className="py-4">
-              <p className={`${secHdr} text-blue-400 mb-2`}>Instrucciones del PM</p>
+              <p className={`${secHdr} text-blue-400 mb-2`}>PM Instructions</p>
               <p className="text-sm text-[var(--ice-white)] whitespace-pre-wrap">{t.pmNotes}</p>
             </CardContent></Card>
           )}
@@ -95,7 +95,7 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
 
           {t.files.length > 0 && (
             <Card className={crd}><CardContent className="py-4">
-              <p className={`${secHdr} mb-3`}>Archivos</p>
+              <p className={`${secHdr} mb-3`}>Files</p>
               <div className="space-y-1">
                 {t.files.map((f: any) => (
                   <a key={f.id} href={f.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-blue-400 hover:underline">
@@ -108,9 +108,9 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
 
           {/* Messages */}
           <Card className={crd}><CardContent className="py-4">
-            <p className={`${secHdr} mb-3`}>Canal interno con PM</p>
+            <p className={`${secHdr} mb-3`}>Internal channel with PM</p>
             <div className="space-y-3 max-h-[400px] overflow-y-auto mb-4">
-              {t.messages.length === 0 && <p className="text-xs text-[rgba(245,246,252,0.3)]">No hay mensajes aun.</p>}
+              {t.messages.length === 0 && <p className="text-xs text-[rgba(245,246,252,0.3)]">No messages yet.</p>}
               {t.messages.map((m: any) => {
                 const isPm = m.senderRole === "PM" || m.senderRole === "ADMIN";
                 return (
@@ -125,22 +125,22 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
               })}
             </div>
             <div className="flex gap-2">
-              <textarea value={msgContent} onChange={(e) => setMsgContent(e.target.value)} placeholder="Escribe un mensaje..." className={txa} rows={2} />
+              <textarea value={msgContent} onChange={(e) => setMsgContent(e.target.value)} placeholder="Write a message..." className={txa} rows={2} />
               <Button onClick={sendMessage} disabled={sending || !msgContent.trim()} className={`${goldBtn} self-end`} size="sm">
-                <Send className="w-3 h-3 mr-1" />{sending ? "..." : "Enviar"}
+                <Send className="w-3 h-3 mr-1" />{sending ? "..." : "Send"}
               </Button>
             </div>
           </CardContent></Card>
 
           {/* Deliveries */}
           <Card className={crd}><CardContent className="py-4">
-            <p className={`${secHdr} mb-3`}>Entregas</p>
-            {t.deliveries.length === 0 ? <p className="text-xs text-[rgba(245,246,252,0.3)] mb-4">No hay entregas aun.</p> : (
+            <p className={`${secHdr} mb-3`}>Deliveries</p>
+            {t.deliveries.length === 0 ? <p className="text-xs text-[rgba(245,246,252,0.3)] mb-4">No deliveries yet.</p> : (
               <div className="space-y-3 mb-4">
                 {t.deliveries.map((d: any) => (
                   <div key={d.id} className="rounded-lg border border-[rgba(245,246,252,0.1)] p-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-bold text-[var(--ice-white)]">Ronda {d.round}</span>
+                      <span className="text-sm font-bold text-[var(--ice-white)]">Round {d.round}</span>
                       <Badge variant="outline" className={`text-xs ${dlvColors[d.status] || ""}`}>{dlvLabels[d.status] || d.status}</Badge>
                       <span className="text-xs text-[rgba(245,246,252,0.3)] ml-auto">{fmt(d.createdAt)}</span>
                     </div>
@@ -148,7 +148,7 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
                     {d.fileUrl && (
                       <div>
                         <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
-                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                          <ExternalLink className="h-3 w-3" /> {d.fileName || "Open file"}
                         </a>
                         {getGoogleDrivePreview(d.fileUrl) && (
                           <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
@@ -156,19 +156,19 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
                       </div>
                     )}
                     {d.pmFeedback && <p className="text-xs text-blue-400 mt-1"><span className="font-medium">PM:</span> {d.pmFeedback}</p>}
-                    {d.clientFeedback && <p className="text-xs text-purple-400 mt-1"><span className="font-medium">Cliente:</span> {d.clientFeedback}</p>}
+                    {d.clientFeedback && <p className="text-xs text-purple-400 mt-1"><span className="font-medium">Client:</span> {d.clientFeedback}</p>}
                   </div>
                 ))}
               </div>
             )}
             <div className="border-t border-[rgba(245,246,252,0.1)] pt-4 space-y-2">
-              <p className="text-xs font-medium text-[rgba(245,246,252,0.5)]">Subir entrega</p>
-              <label className="text-xs text-[rgba(245,246,252,0.4)]">Link del recurso (Google Drive, Figma, Dropbox, etc.)</label>
+              <p className="text-xs font-medium text-[rgba(245,246,252,0.5)]">Upload delivery</p>
+              <label className="text-xs text-[rgba(245,246,252,0.4)]">Resource link (Google Drive, Figma, Dropbox, etc.)</label>
               <input type="text" value={dlvUrl} onChange={(e) => setDlvUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." className={inp} />
-              <input type="text" value={dlvName} onChange={(e) => setDlvName(e.target.value)} placeholder="Nombre del archivo" className={inp} />
-              <textarea value={dlvNotes} onChange={(e) => setDlvNotes(e.target.value)} placeholder="Notas (opcional)" className={txa} rows={2} />
+              <input type="text" value={dlvName} onChange={(e) => setDlvName(e.target.value)} placeholder="File name" className={inp} />
+              <textarea value={dlvNotes} onChange={(e) => setDlvNotes(e.target.value)} placeholder="Notes (optional)" className={txa} rows={2} />
               <Button onClick={submitDelivery} disabled={uploading || !dlvUrl.trim()} className={goldBtn} size="sm">
-                <Upload className="w-3 h-3 mr-1" />{uploading ? "Subiendo..." : "Subir entrega"}
+                <Upload className="w-3 h-3 mr-1" />{uploading ? "Uploading..." : "Upload delivery"}
               </Button>
             </div>
           </CardContent></Card>
@@ -177,19 +177,19 @@ export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
         {/* Sidebar */}
         <div className="md:w-1/3 space-y-4">
           <Card className={crd}><CardContent className="py-4 space-y-4">
-            <div><p className={lbl}>Estado</p><Badge variant="outline" className={`mt-1 ${ticketStatusColors[t.status] || ""}`}>{ticketStatusLabels[t.status] || t.status}</Badge></div>
-            <div><p className={lbl}>Prioridad</p><span className={`text-sm ${priorityColors[t.priority] || ""}`}>{priorityLabels[t.priority] || t.priority}</span></div>
-            <div><p className={lbl}>Servicio</p><p className={val}>{t.serviceName}</p><p className="text-xs text-[rgba(245,246,252,0.4)]">{t.variantName}</p></div>
-            <div><p className={lbl}>Cliente</p><p className={val}>{t.clientName}</p>{t.businessName && <p className="text-xs text-[rgba(245,246,252,0.4)]">{t.businessName}</p>}</div>
+            <div><p className={lbl}>Status</p><Badge variant="outline" className={`mt-1 ${ticketStatusColors[t.status] || ""}`}>{ticketStatusLabels[t.status] || t.status}</Badge></div>
+            <div><p className={lbl}>Priority</p><span className={`text-sm ${priorityColors[t.priority] || ""}`}>{priorityLabels[t.priority] || t.priority}</span></div>
+            <div><p className={lbl}>Service</p><p className={val}>{t.serviceName}</p><p className="text-xs text-[rgba(245,246,252,0.4)]">{t.variantName}</p></div>
+            <div><p className={lbl}>Client</p><p className={val}>{t.clientName}</p>{t.businessName && <p className="text-xs text-[rgba(245,246,252,0.4)]">{t.businessName}</p>}</div>
           </CardContent></Card>
 
           <Card className={crd}><CardContent className="py-4 space-y-3">
-            <p className={`${secHdr} mb-1`}>Fechas</p>
-            {t.assignedAt && <div><p className={lbl}>Asignado</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.assignedAt)}</p></div>}
-            {t.startedAt && <div><p className={lbl}>Iniciado</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.startedAt)}</p></div>}
-            {t.deliveredAt && <div><p className={lbl}>Entregado</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.deliveredAt)}</p></div>}
-            {t.completedAt && <div><p className={lbl}>Completado</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.completedAt)}</p></div>}
-            <div><p className={lbl}>Entregas</p><p className="text-xs text-[var(--ice-white)]">{t.deliveries.length}</p></div>
+            <p className={`${secHdr} mb-1`}>Dates</p>
+            {t.assignedAt && <div><p className={lbl}>Assigned</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.assignedAt)}</p></div>}
+            {t.startedAt && <div><p className={lbl}>Started</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.startedAt)}</p></div>}
+            {t.deliveredAt && <div><p className={lbl}>Delivered</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.deliveredAt)}</p></div>}
+            {t.completedAt && <div><p className={lbl}>Completed</p><p className="text-xs text-[var(--ice-white)]">{fmtD(t.completedAt)}</p></div>}
+            <div><p className={lbl}>Deliveries</p><p className="text-xs text-[var(--ice-white)]">{t.deliveries.length}</p></div>
           </CardContent></Card>
         </div>
       </div>

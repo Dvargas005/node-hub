@@ -19,7 +19,7 @@ export default async function FreelancerPortalPage() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <p className="text-[rgba(245,246,252,0.5)] text-lg">
-          {isImpersonating ? "No hay freelancers en el sistema." : "Perfil de freelancer no encontrado. Contacta al administrador."}
+          {isImpersonating ? "No freelancers in the system." : "Freelancer profile not found. Contact the administrator."}
         </p>
       </div>
     );

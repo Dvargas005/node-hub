@@ -141,14 +141,14 @@ export function ServicesClient({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Error al guardar");
+        setError(data.error || "Error saving");
         return;
       }
 
       setSvcOpen(false);
       router.refresh();
     } catch {
-      setError("Error de conexion");
+      setError("Connection error");
     } finally {
       setSaving(false);
     }
@@ -216,14 +216,14 @@ export function ServicesClient({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Error al guardar variante");
+        setError(data.error || "Error saving variant");
         return;
       }
 
       setVarOpen(false);
       router.refresh();
     } catch {
-      setError("Error de conexion");
+      setError("Connection error");
     } finally {
       setSaving(false);
     }
@@ -239,7 +239,7 @@ export function ServicesClient({
         </h1>
         {isAdmin && (
           <Button className={goldBtn} onClick={openNewService}>
-            <Plus className="mr-1 h-3.5 w-3.5" /> Nuevo servicio
+            <Plus className="mr-1 h-3.5 w-3.5" /> New service
           </Button>
         )}
       </div>
@@ -248,7 +248,7 @@ export function ServicesClient({
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgba(245,246,252,0.3)]" />
         <input
-          placeholder="Buscar servicio..."
+          placeholder="Search service..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={`${inp} pl-9`}
@@ -303,7 +303,7 @@ export function ServicesClient({
                                 : "border-gray-500/30 text-gray-400 hover:bg-gray-500/10"
                             }`}
                           >
-                            {service.isActive ? "Activo" : "Inactivo"}
+                            {service.isActive ? "Active" : "Inactive"}
                           </button>
                           <button
                             onClick={() => openEditService(service)}
@@ -423,7 +423,7 @@ export function ServicesClient({
         <DialogContent className={dlg + " max-w-lg max-h-[90vh] overflow-y-auto"}>
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">
-              {editSvc ? "Editar servicio" : "Nuevo servicio"}
+              {editSvc ? "Edit service" : "New service"}
             </DialogTitle>
           </DialogHeader>
 
@@ -535,7 +535,7 @@ export function ServicesClient({
                   }`}
                 />
               </button>
-              <span className="text-xs text-[var(--ice-white)]">Activo</span>
+              <span className="text-xs text-[var(--ice-white)]">Active</span>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
@@ -548,7 +548,7 @@ export function ServicesClient({
                 Cancelar
               </Button>
               <Button className={goldBtn} size="sm" onClick={saveService} disabled={saving}>
-                {saving ? "Guardando..." : "Guardar"}
+                {saving ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>
@@ -666,7 +666,7 @@ export function ServicesClient({
                     }`}
                   />
                 </button>
-                <span className="text-xs text-[var(--ice-white)]">Nuevo</span>
+                <span className="text-xs text-[var(--ice-white)]">New</span>
               </div>
             </div>
 
@@ -680,7 +680,7 @@ export function ServicesClient({
                 Cancelar
               </Button>
               <Button className={goldBtn} size="sm" onClick={saveVariant} disabled={saving}>
-                {saving ? "Guardando..." : "Guardar"}
+                {saving ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>

@@ -71,12 +71,12 @@ export function OverviewClient({
       icon: Ticket,
     },
     {
-      label: "Entregados este mes",
+      label: "Delivered this month",
       value: metrics.deliveredThisMonth,
       icon: Package,
     },
     {
-      label: "Créditos consumidos",
+      label: "Credits consumed",
       value: metrics.creditsConsumed,
       icon: CreditCard,
     },
@@ -138,7 +138,7 @@ export function OverviewClient({
                       colSpan={7}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
-                      Sin tickets aún
+                      No tickets yet
                     </TableCell>
                   </TableRow>
                 )}

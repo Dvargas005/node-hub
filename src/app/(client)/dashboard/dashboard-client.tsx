@@ -50,30 +50,30 @@ interface Props {
 // ─── Greeting ───────────────────────────────────────
 function getGreeting(firstName: string, latestTicket: Props["latestTicket"], analysis: unknown) {
   if (!latestTicket && !analysis) {
-    return { title: `¡Hola, ${firstName}!`, subtitle: "Bienvenido a tu panel de N.O.D.E.", cta: "analysis" as const };
+    return { title: `Hello, ${firstName}!`, subtitle: "Welcome to your N.O.D.E. dashboard.", cta: "analysis" as const };
   }
   if (!latestTicket) {
-    return { title: `¡Hola, ${firstName}!`, subtitle: "Tu perfil de empresa está listo. ¡Es hora de crear tu primera solicitud!", cta: null };
+    return { title: `Hello, ${firstName}!`, subtitle: "Your business profile is ready. Time to create your first request!", cta: null };
   }
   const msgs: Record<string, string> = {
-    NEW: `Tu solicitud #${latestTicket.number} fue recibida. Un PM la revisará pronto.`,
-    REVIEWING: `Tu solicitud #${latestTicket.number} está siendo revisada por tu PM.`,
-    ASSIGNED: `¡Buenas noticias! Tu solicitud #${latestTicket.number} fue asignada a un especialista.`,
-    IN_PROGRESS: `Tu solicitud #${latestTicket.number} está en producción. 🔨`,
-    DELIVERED: `🎉 ¡Tu solicitud #${latestTicket.number} tiene una entrega lista para revisar!`,
-    REVISION: `Tu solicitud #${latestTicket.number} está en revisión con los ajustes que pediste.`,
-    COMPLETED: `Tu última solicitud #${latestTicket.number} fue completada. ¿Listo para la siguiente?`,
-    CANCELED: `Tu solicitud #${latestTicket.number} fue cancelada.`,
+    NEW: `Your request #${latestTicket.number} was received. A PM will review it soon.`,
+    REVIEWING: `Your request #${latestTicket.number} is being reviewed by your PM.`,
+    ASSIGNED: `Great news! Your request #${latestTicket.number} was assigned to a specialist.`,
+    IN_PROGRESS: `Your request #${latestTicket.number} is in production.`,
+    DELIVERED: `Your request #${latestTicket.number} has a delivery ready for review!`,
+    REVISION: `Your request #${latestTicket.number} is in revision with the adjustments you requested.`,
+    COMPLETED: `Your last request #${latestTicket.number} was completed. Ready for the next one?`,
+    CANCELED: `Your request #${latestTicket.number} was canceled.`,
   };
-  return { title: `¡Hola, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Bienvenido de vuelta.", cta: null };
+  return { title: `Hello, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Welcome back.", cta: null };
 }
 
 // ─── SWOT colors ────────────────────────────────────
 const swotConfig = [
-  { key: "strengths", label: "Fortalezas", icon: ShieldCheck, color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" },
-  { key: "opportunities", label: "Oportunidades", icon: TrendingUp, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-  { key: "weaknesses", label: "Debilidades", icon: AlertTriangle, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
-  { key: "threats", label: "Amenazas", icon: Target, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
+  { key: "strengths", label: "Strengths", icon: ShieldCheck, color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" },
+  { key: "opportunities", label: "Opportunities", icon: TrendingUp, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+  { key: "weaknesses", label: "Weaknesses", icon: AlertTriangle, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+  { key: "threats", label: "Threats", icon: Target, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
 ];
 
 // ─── Component ──────────────────────────────────────
@@ -82,7 +82,7 @@ export function DashboardClient({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const firstName = userName?.split(" ")[0] || "usuario";
+  const firstName = userName?.split(" ")[0] || "user";
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const greeting = getGreeting(firstName, latestTicket, companyAnalysis);
 
@@ -122,14 +122,14 @@ export function DashboardClient({
       .then((res) => res.json())
       .then((data: any) => {
         if (data.success) {
-          toast.success("¡Suscripción activada!");
+          toast.success("Subscription activated!");
           router.refresh();
         } else if (data.error) {
-          toast.error("Verificando tu pago... intenta recargar en unos segundos");
+          toast.error("Verifying your payment... try reloading in a few seconds");
         }
       })
       .catch(() => {
-        toast.error("Verificando tu pago... intenta recargar en unos segundos");
+        toast.error("Verifying your payment... try reloading in a few seconds");
       });
   }, [searchParams, router]);
 
@@ -139,10 +139,10 @@ export function DashboardClient({
     try {
       const res = await fetch("/api/company-analysis/options", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) { setGenError(data.error || "Error al generar"); return; }
+      if (!res.ok) { setGenError(data.error || "Error generating"); return; }
       setLocalOptions(data.options);
       setShowOptions(true);
-    } catch { setGenError("Error de conexión"); } finally { setGenerating(false); }
+    } catch { setGenError("Connection error"); } finally { setGenerating(false); }
   };
 
   const handleSelect = async (option: "A" | "B") => {
@@ -156,10 +156,10 @@ export function DashboardClient({
         body: JSON.stringify({ option, feedback: feedback || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) { setGenError(data.error || "Error al completar"); return; }
+      if (!res.ok) { setGenError(data.error || "Error completing"); return; }
       setShowOptions(false);
       router.refresh();
-    } catch { setGenError("Error de conexión"); } finally { setCompleting(false); }
+    } catch { setGenError("Connection error"); } finally { setCompleting(false); }
   };
 
   return (
@@ -173,7 +173,7 @@ export function DashboardClient({
             onClick={() => document.getElementById("company-analysis")?.scrollIntoView({ behavior: "smooth" })}
             className="mt-3 inline-block bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-[var(--font-lexend)] font-bold text-sm px-5 py-2.5 hover:opacity-90 transition-opacity"
           >
-            Generar análisis gratuito →
+            Generate free analysis →
           </button>
         )}
       </div>
@@ -186,20 +186,20 @@ export function DashboardClient({
             <CardContent>
               <p className="font-[var(--font-lexend)] text-xl font-bold text-[var(--ice-white)]">{subscription.planName}</p>
               <Badge className={subscription.status === "ACTIVE" ? "bg-green-500/20 text-green-400 border-green-500/30 mt-1" : "bg-red-500/20 text-red-400 border-red-500/30 mt-1"}>
-                {subscription.status === "ACTIVE" ? "Activo" : subscription.status}
+                {subscription.status === "ACTIVE" ? "Active" : subscription.status}
               </Badge>
             </CardContent>
           </Card>
           <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-            <CardHeader className="pb-2"><CardDescription className="text-[rgba(245,246,252,0.5)]">Créditos</CardDescription></CardHeader>
+            <CardHeader className="pb-2"><CardDescription className="text-[rgba(245,246,252,0.5)]">Credits</CardDescription></CardHeader>
             <CardContent>
               <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--gold-bar)]">{totalCredits}</span>
-              <span className="text-sm text-[rgba(245,246,252,0.4)] ml-1">disponibles</span>
-              {freeCredits > 0 && <p className="text-xs text-[rgba(245,246,252,0.3)] mt-1">{freeCredits} gratis + {subscription.creditsRemaining} del plan</p>}
+              <span className="text-sm text-[rgba(245,246,252,0.4)] ml-1">available</span>
+              {freeCredits > 0 && <p className="text-xs text-[rgba(245,246,252,0.3)] mt-1">{freeCredits} free + {subscription.creditsRemaining} from plan</p>}
             </CardContent>
           </Card>
           <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-            <CardHeader className="pb-2"><CardDescription className="text-[rgba(245,246,252,0.5)]">Tickets activos</CardDescription></CardHeader>
+            <CardHeader className="pb-2"><CardDescription className="text-[rgba(245,246,252,0.5)]">Active tickets</CardDescription></CardHeader>
             <CardContent>
               <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--ice-white)]">{activeTickets.length}</span>
               <span className="text-sm text-[rgba(245,246,252,0.4)] ml-1">/ {subscription.maxActiveReqs === 999 ? "∞" : subscription.maxActiveReqs}</span>
@@ -211,7 +211,7 @@ export function DashboardClient({
       {!subscription && freeCredits > 0 && (
         <Card className="border-[var(--gold-bar)] bg-[rgba(255,201,25,0.05)]">
           <CardContent className="py-4 flex items-center justify-between">
-            <p className="text-sm text-[rgba(245,246,252,0.5)]">Créditos de bienvenida</p>
+            <p className="text-sm text-[rgba(245,246,252,0.5)]">Welcome credits</p>
             <span className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--gold-bar)]">{freeCredits}</span>
           </CardContent>
         </Card>
@@ -222,10 +222,10 @@ export function DashboardClient({
           <CardContent className="flex flex-col items-center gap-4 py-8">
             <CreditCard className="h-10 w-10 text-[var(--gold-bar)]" />
             <div className="text-center">
-              <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Elige tu plan</h2>
-              <p className="mt-1 text-sm text-[rgba(245,246,252,0.5)]">Suscríbete para empezar a solicitar servicios.</p>
+              <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Choose your plan</h2>
+              <p className="mt-1 text-sm text-[rgba(245,246,252,0.5)]">Subscribe to get started with services.</p>
             </div>
-            <Link href="/billing"><Button className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold px-6">Ver planes <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+            <Link href="/billing"><Button className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold px-6">View plans <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
           </CardContent>
         </Card>
       )}
@@ -235,10 +235,10 @@ export function DashboardClient({
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">Tu empresa</CardTitle>
+              <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">Your business</CardTitle>
               <Link href="/settings">
                 <Button variant="ghost" size="sm" className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] gap-1">
-                  <Pencil className="h-3 w-3" /> Editar
+                  <Pencil className="h-3 w-3" /> Edit
                 </Button>
               </Link>
             </div>
@@ -255,7 +255,7 @@ export function DashboardClient({
               </div>
             )}
             <div className="flex flex-wrap gap-3 text-xs text-[rgba(245,246,252,0.4)]">
-              {profile.hasBranding !== null && <span>Marca: {profile.hasBranding ? `Sí${profile.brandColors ? ` · ${profile.brandColors}` : ""}` : "No"}</span>}
+              {profile.hasBranding !== null && <span>Branding: {profile.hasBranding ? `Yes${profile.brandColors ? ` · ${profile.brandColors}` : ""}` : "No"}</span>}
               {profile.website && <a href={profile.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-[var(--gold-bar)]"><Globe className="h-3 w-3" />{profile.website.replace(/^https?:\/\//, "")}</a>}
               {profile.socialMedia.instagram && <span className="flex items-center gap-1"><Instagram className="h-3 w-3" />{profile.socialMedia.instagram}</span>}
               {profile.socialMedia.facebook && <span className="flex items-center gap-1"><Facebook className="h-3 w-3" />{profile.socialMedia.facebook}</span>}
@@ -280,12 +280,12 @@ export function DashboardClient({
           <CardContent className="py-8 text-center space-y-4">
             <Search className="h-10 w-10 text-[var(--gold-bar)] mx-auto" />
             <div>
-              <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Análisis inteligente de tu empresa</h2>
-              <p className="text-sm text-[rgba(245,246,252,0.5)] mt-1 max-w-md mx-auto">Nuestro AI analizará tu empresa a fondo: competidores, fortalezas y áreas de oportunidad en diseño, web y marketing.</p>
+              <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Smart business analysis</h2>
+              <p className="text-sm text-[rgba(245,246,252,0.5)] mt-1 max-w-md mx-auto">Our AI will analyze your business in depth: competitors, strengths, and areas of opportunity in design, web, and marketing.</p>
             </div>
             {genError && <p className="text-sm text-red-400">{genError}</p>}
             <Button onClick={handleGenerate} disabled={generating} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50">
-              {generating ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Analizando...</> : <>Generar análisis (10 créditos) <ArrowRight className="ml-2 h-4 w-4" /></>}
+              {generating ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Analyzing...</> : <>Generate analysis (10 credits) <ArrowRight className="ml-2 h-4 w-4" /></>}
             </Button>
           </CardContent>
         </Card>
@@ -294,7 +294,7 @@ export function DashboardClient({
       {/* Option selection */}
       {showOptions && localOptions && !hasAnalysis && (
         <div className="space-y-4">
-          <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Elige tu perfil de empresa</h2>
+          <h2 className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">Choose your business profile</h2>
           {genError && <p className="text-sm text-red-400">{genError}</p>}
           <div className="grid gap-4 md:grid-cols-2">
             {(["optionA", "optionB"] as const).map((key) => {
@@ -310,19 +310,19 @@ export function DashboardClient({
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <p className="text-sm text-[rgba(245,246,252,0.6)]">{opt.description as string}</p>
-                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Tono: {opt.tone as string}</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Tone: {opt.tone as string}</p>
                     <Separator className="bg-[rgba(245,246,252,0.06)]" />
-                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Propuesta de valor:</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Value proposition:</p>
                     <p className="text-sm text-[rgba(245,246,252,0.7)]">{opt.valueProposition as string}</p>
                     <textarea
                       value={fb}
                       onChange={(e) => setFb(e.target.value)}
-                      placeholder="¿Quieres ajustar algo? (opcional)"
+                      placeholder="Want to adjust something? (optional)"
                       rows={2}
                       className="w-full rounded-md border border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] resize-none"
                     />
                     <Button onClick={() => handleSelect(isA ? "A" : "B")} disabled={completing} className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50">
-                      {completing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Generando análisis...</> : "Elegir este perfil"}
+                      {completing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Generating analysis...</> : "Choose this profile"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -338,10 +338,10 @@ export function DashboardClient({
           <CardContent className="py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4 text-blue-400" />
-              <p className="text-sm text-blue-400">Tu análisis tiene más de un mes. Puedes actualizarlo gratis con tu renovación.</p>
+              <p className="text-sm text-blue-400">Your analysis is over a month old. You can update it for free with your renewal.</p>
             </div>
             <Button onClick={handleGenerate} disabled={generating} size="sm" className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 text-xs">
-              {generating ? <Loader2 className="h-3 w-3 animate-spin" /> : "Actualizar"}
+              {generating ? <Loader2 className="h-3 w-3 animate-spin" /> : "Update"}
             </Button>
           </CardContent>
         </Card>
@@ -359,7 +359,7 @@ export function DashboardClient({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">
-                    Análisis de tu empresa
+                    Business analysis
                   </p>
                   {selectedProfile.tone ? (
                     <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.1)] text-[10px]">
@@ -383,7 +383,7 @@ export function DashboardClient({
               <div className="mt-4 space-y-4 border-t border-[rgba(245,246,252,0.06)] pt-4 overflow-hidden">
                 <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.description as string}</p>
                 <div className="bg-[rgba(255,201,25,0.05)] border border-[var(--gold-bar)]/20 p-3">
-                  <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Propuesta de valor</p>
+                  <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Value proposition</p>
                   <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.valueProposition as string}</p>
                 </div>
 
@@ -409,7 +409,7 @@ export function DashboardClient({
                 {/* Competitors */}
                 {(selectedProfile.competitors as string[] | undefined)?.length ? (
                   <div>
-                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Competidores identificados</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Identified competitors</p>
                     <div className="flex flex-wrap gap-2">
                       {(selectedProfile.competitors as string[]).map((c: any, i: number) => (
                         <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)] break-words">{c}</Badge>
@@ -421,7 +421,7 @@ export function DashboardClient({
                 {/* Actionable recommendations */}
                 {(selectedProfile.recommendations as string[] | undefined)?.length ? (
                   <div>
-                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recomendaciones</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recommendations</p>
                     <div className="flex flex-wrap gap-2">
                       {(selectedProfile.recommendations as string[]).map((r: any, i: number) => {
                         const lower = r.toLowerCase();
@@ -450,14 +450,14 @@ export function DashboardClient({
       {/* SECTION 4 — Active tickets */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)]">Solicitudes activas</h2>
-          <Link href="/tickets" className="text-xs text-[var(--gold-bar)] hover:underline flex items-center gap-1">Ver todas <ArrowRight className="h-3 w-3" /></Link>
+          <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)]">Active requests</h2>
+          <Link href="/tickets" className="text-xs text-[var(--gold-bar)] hover:underline flex items-center gap-1">View all <ArrowRight className="h-3 w-3" /></Link>
         </div>
         {activeTickets.length === 0 ? (
           <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
             <CardContent className="py-8 text-center">
-              <p className="text-sm text-[rgba(245,246,252,0.4)]">No tienes solicitudes activas.</p>
-              <Link href="/request"><Button className="mt-3 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm">Crear solicitud <Plus className="ml-1 h-4 w-4" /></Button></Link>
+              <p className="text-sm text-[rgba(245,246,252,0.4)]">No active requests.</p>
+              <Link href="/request"><Button className="mt-3 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm">Create request <Plus className="ml-1 h-4 w-4" /></Button></Link>
             </CardContent>
           </Card>
         ) : (
@@ -483,7 +483,7 @@ export function DashboardClient({
           <Card className="cursor-pointer border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-all hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.03)]">
             <CardContent className="flex items-center gap-4 py-5">
               <div className="flex h-10 w-10 items-center justify-center bg-[rgba(255,201,25,0.1)]"><Plus className="h-5 w-5 text-[var(--gold-bar)]" /></div>
-              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">Nueva Solicitud</p><p className="text-xs text-[rgba(245,246,252,0.4)]">Crear un nuevo ticket</p></div>
+              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">New Request</p><p className="text-xs text-[rgba(245,246,252,0.4)]">Create a new ticket</p></div>
             </CardContent>
           </Card>
         </Link>
@@ -491,7 +491,7 @@ export function DashboardClient({
           <Card className="cursor-pointer border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-all hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.03)]">
             <CardContent className="flex items-center gap-4 py-5">
               <div className="flex h-10 w-10 items-center justify-center bg-[rgba(255,201,25,0.1)]"><Ticket className="h-5 w-5 text-[var(--gold-bar)]" /></div>
-              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">Mis Tickets</p><p className="text-xs text-[rgba(245,246,252,0.4)]">Ver todos tus tickets</p></div>
+              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">My Tickets</p><p className="text-xs text-[rgba(245,246,252,0.4)]">View all your tickets</p></div>
             </CardContent>
           </Card>
         </Link>
@@ -499,7 +499,7 @@ export function DashboardClient({
           <Card className="cursor-pointer border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-all hover:border-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.03)]">
             <CardContent className="flex items-center gap-4 py-5">
               <div className="flex h-10 w-10 items-center justify-center bg-[rgba(255,201,25,0.1)]"><CreditCard className="h-5 w-5 text-[var(--gold-bar)]" /></div>
-              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">Facturación</p><p className="text-xs text-[rgba(245,246,252,0.4)]">Plan, créditos y pagos</p></div>
+              <div><p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">Billing</p><p className="text-xs text-[rgba(245,246,252,0.4)]">Plan, credits & payments</p></div>
             </CardContent>
           </Card>
         </Link>
@@ -507,7 +507,7 @@ export function DashboardClient({
 
       {/* SECTION 6 — PM */}
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
-        <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Tu Project Manager</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">Your Project Manager</CardTitle></CardHeader>
         <CardContent>
           {pm ? (
             <div className="flex items-center gap-4">
@@ -520,7 +520,7 @@ export function DashboardClient({
           ) : (
             <div className="flex items-center gap-3 text-[rgba(245,246,252,0.4)]">
               <User className="h-8 w-8" />
-              <p className="text-sm">Tu PM será asignado con tu primera solicitud.</p>
+              <p className="text-sm">Your PM will be assigned with your first request.</p>
             </div>
           )}
         </CardContent>

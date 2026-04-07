@@ -148,10 +148,10 @@ export function FreelancersClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setCreateError(data.error || "Error al crear freelancer");
+        setCreateError(data.error || "Error creating freelancer");
       }
     } catch {
-      setCreateError("Error de conexión");
+      setCreateError("Connection error");
     } finally {
       setCreating(false);
     }
@@ -215,10 +215,10 @@ export function FreelancersClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setEditError(data.error || "Error al editar freelancer");
+        setEditError(data.error || "Error editing freelancer");
       }
     } catch {
-      setEditError("Error de conexión");
+      setEditError("Connection error");
     } finally {
       setEditing(false);
     }
@@ -632,7 +632,7 @@ export function FreelancersClient({
               disabled={creating}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {creating ? "Creando..." : "Crear"}
+              {creating ? "Creating..." : "Create"}
             </Button>
           </div>
         </DialogContent>
@@ -674,7 +674,7 @@ export function FreelancersClient({
               disabled={editing}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {editing ? "Guardando..." : "Guardar"}
+              {editing ? "Saving..." : "Save"}
             </Button>
           </div>
         </DialogContent>

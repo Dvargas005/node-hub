@@ -38,10 +38,10 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
     setLoading(true); setError("");
     try {
       const res = await fetch("/api/admin/sync-tigrenator", { method: "POST" });
-      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "Error al sincronizar"); return; }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "Error syncing"); return; }
       const data = await res.json();
       setResult(data);
-    } catch { setError("Error de red"); } finally { setLoading(false); }
+    } catch { setError("Network error"); } finally { setLoading(false); }
   }
 
   const prices: PriceRow[] = result?.outdatedPrices || [];
@@ -71,7 +71,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
           <Card className={crd}>
             <CardHeader className="pb-2"><CardTitle className={secHdr}>Precios desactualizados ({prices.length})</CardTitle></CardHeader>
             <CardContent>
-              {prices.length === 0 ? <p className={sub}>Todos los precios están al día</p> : (
+              {prices.length === 0 ? <p className={sub}>All prices are up to date</p> : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead><tr><th className={thCls}>Servicio</th><th className={thCls}>Variante</th><th className={thCls}>Actual</th><th className={thCls}>Tigrenator</th><th className={thCls}>Diferencia</th></tr></thead>
@@ -96,7 +96,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
           <Card className={crd}>
             <CardHeader className="pb-2"><CardTitle className={secHdr}>Servicios nuevos sugeridos ({suggestions.length})</CardTitle></CardHeader>
             <CardContent>
-              {suggestions.length === 0 ? <p className={sub}>Sin sugerencias nuevas</p> : (
+              {suggestions.length === 0 ? <p className={sub}>No new suggestions</p> : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {suggestions.map((s: any, i: number) => (
                     <div key={i} className="rounded-md border border-[rgba(245,246,252,0.1)] p-3 space-y-1">
@@ -114,9 +114,9 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
 
           {/* No Match */}
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Sin match en Tigrenator ({noMatch.length})</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>No match in Tigrenator ({noMatch.length})</CardTitle></CardHeader>
             <CardContent>
-              {noMatch.length === 0 ? <p className={sub}>Todos los servicios tienen match</p> : (
+              {noMatch.length === 0 ? <p className={sub}>All services have a match</p> : (
                 <ul className="space-y-1">
                   {noMatch.map((name: any, i: number) => <li key={i} className="text-sm text-[rgba(245,246,252,0.7)]">&bull; {name}</li>)}
                 </ul>
@@ -130,7 +130,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
       <Card className={crd}>
         <CardHeader className="pb-2"><CardTitle className={secHdr}>Historial de syncs</CardTitle></CardHeader>
         <CardContent className="space-y-2">
-          {reports.length === 0 ? <p className={sub}>Sin historial</p> : reports.map((r: any) => (
+          {reports.length === 0 ? <p className={sub}>No history</p> : reports.map((r: any) => (
             <div key={r.id} className="rounded-md border border-[rgba(245,246,252,0.05)] p-2">
               <button className="w-full flex items-center justify-between text-left" onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}>
                 <span className="text-sm text-[var(--ice-white)]">{fmt(r.createdAt)}</span>

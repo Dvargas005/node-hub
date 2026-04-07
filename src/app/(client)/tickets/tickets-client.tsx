@@ -29,11 +29,11 @@ interface TicketRow {
 }
 
 const tabs = [
-  { key: "all", label: "Todos" },
-  { key: "active", label: "Activos", statuses: ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS"] },
-  { key: "delivered", label: "Entregados", statuses: ["DELIVERED", "REVISION"] },
-  { key: "completed", label: "Completados", statuses: ["COMPLETED"] },
-  { key: "canceled", label: "Cancelados", statuses: ["CANCELED"] },
+  { key: "all", label: "All" },
+  { key: "active", label: "Active", statuses: ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS"] },
+  { key: "delivered", label: "Delivered", statuses: ["DELIVERED", "REVISION"] },
+  { key: "completed", label: "Completed", statuses: ["COMPLETED"] },
+  { key: "canceled", label: "Canceled", statuses: ["CANCELED"] },
 ];
 
 export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
@@ -49,17 +49,17 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
     return (
       <div className="space-y-6">
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          Mis Solicitudes
+          My Requests
         </h1>
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardContent className="py-16 text-center space-y-4">
             <Ticket className="h-12 w-12 text-[rgba(245,246,252,0.2)] mx-auto" />
             <p className="text-[rgba(245,246,252,0.5)]">
-              Aún no tienes solicitudes
+              You don't have any requests yet
             </p>
             <Link href="/request">
               <Button className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold">
-                Crear mi primera solicitud
+                Create my first request
                 <Plus className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -98,7 +98,7 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
       </div>
 
       <p className="text-xs text-[rgba(245,246,252,0.4)]">
-        {filtered.length} solicitud{filtered.length !== 1 ? "es" : ""}
+        {filtered.length} request{filtered.length !== 1 ? "s" : ""}
       </p>
 
       {/* Ticket cards */}
@@ -150,7 +150,7 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
                   </span>
                   <span className="flex items-center gap-1">
                     <CreditCard className="h-3 w-3" />
-                    {t.creditsCharged} créditos
+                    {t.creditsCharged} credits
                   </span>
                   {t.freelancerName && (
                     <span className="flex items-center gap-1">

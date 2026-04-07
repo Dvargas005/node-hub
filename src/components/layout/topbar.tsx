@@ -120,7 +120,7 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
             <div className="absolute right-0 top-11 z-50 w-80 rounded-lg border border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] shadow-xl">
               <div className="max-h-72 overflow-y-auto">
                 {notifs.length === 0 && (
-                  <p className="px-4 py-6 text-center text-sm text-[rgba(245,246,252,0.4)]">Sin notificaciones</p>
+                  <p className="px-4 py-6 text-center text-sm text-[rgba(245,246,252,0.4)]">No notifications</p>
                 )}
                 {notifs.map((n: any) => (
                   <button
@@ -139,7 +139,7 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
                   onClick={markAllRead}
                   className="w-full border-t border-[rgba(245,246,252,0.1)] px-4 py-2 text-center text-xs font-medium text-[var(--gold-bar)] hover:bg-[rgba(255,255,255,0.03)]"
                 >
-                  Marcar todas como leídas
+                  Mark all as read
                 </button>
               )}
             </div>
@@ -164,16 +164,16 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push(isAdmin ? "/admin/overview" : "/settings")}>
               <Settings className="mr-2 h-4 w-4" />
-              {isAdmin ? "Panel Admin" : "Configuración"}
+              {isAdmin ? "Admin Panel" : "Settings"}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push(isAdmin ? "/admin/overview" : "/dashboard")}>
               <User className="mr-2 h-4 w-4" />
-              {isAdmin ? "Overview" : "Mi Perfil"}
+              {isAdmin ? "Overview" : "My Profile"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
-              Cerrar Sesión
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

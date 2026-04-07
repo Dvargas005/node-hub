@@ -29,7 +29,7 @@ interface TicketData {
 interface Freelancer { id: string; name: string; role: string; skills: string[]; skillTags: string[]; currentLoad: number; clientCapacity: number }
 
 const ALL_STATUS = ["NEW","REVIEWING","ASSIGNED","IN_PROGRESS","DELIVERED","REVISION","COMPLETED","CANCELED"];
-const dlvLabels: Record<string, string> = { PENDING_REVIEW: "Pendiente", PM_APPROVED: "Aprobada PM", SENT_TO_CLIENT: "Enviada", CLIENT_APPROVED: "Aprobada cliente", REVISION_REQUESTED: "Revisión" };
+const dlvLabels: Record<string, string> = { PENDING_REVIEW: "Pending", PM_APPROVED: "PM Approved", SENT_TO_CLIENT: "Sent", CLIENT_APPROVED: "Client Approved", REVISION_REQUESTED: "Revision" };
 const dlvColors: Record<string, string> = { PENDING_REVIEW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", PM_APPROVED: "bg-blue-500/20 text-blue-400 border-blue-500/30", SENT_TO_CLIENT: "bg-green-500/20 text-green-400 border-green-500/30", CLIENT_APPROVED: "bg-green-500/20 text-green-400 border-green-500/30", REVISION_REQUESTED: "bg-red-500/20 text-red-400 border-red-500/30" };
 
 const sel = "h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]";
@@ -67,10 +67,10 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
     setError(""); setSaving(true);
     try {
       const res = await fetch(url, { ...opts, headers: { "Content-Type": "application/json" } });
-      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "Error en la operación"); return null; }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "Operation error"); return null; }
       router.refresh();
       return await res.json();
-    } catch (e: any) { setError("Error de red"); return null; } finally { setSaving(false); }
+    } catch (e: any) { setError("Network error"); return null; } finally { setSaving(false); }
   }
 
   const changeStatus = (status: string) => api(`/api/admin/tickets/${t.id}/status`, { method: "POST", body: JSON.stringify({ status }) });
@@ -132,7 +132,7 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
           {isPmAlert && (
             <div className="flex items-start gap-2 rounded-md bg-yellow-500/10 border border-yellow-500/20 p-3 text-sm text-yellow-400">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>Nota del sistema: {t.pmNotes}</span>
+              <span>System note: {t.pmNotes}</span>
             </div>
           )}
 
@@ -144,23 +144,23 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
                 {briefEntries.map(([key, v]: any) => (
                   <div key={key}><span className={lbl}>{key}: </span><span className="text-[rgba(245,246,252,0.8)]">{typeof v === "string" ? v : JSON.stringify(v)}</span></div>
                 ))}
-                {t.clientNotes && (<><Separator className="bg-[rgba(245,246,252,0.1)]" /><div><span className={lbl}>Notas del cliente: </span><span className="text-[rgba(245,246,252,0.8)]">{t.clientNotes}</span></div></>)}
+                {t.clientNotes && (<><Separator className="bg-[rgba(245,246,252,0.1)]" /><div><span className={lbl}>Client notes: </span><span className="text-[rgba(245,246,252,0.8)]">{t.clientNotes}</span></div></>)}
               </CardContent>
             </Card>
           )}
 
           {/* Messages */}
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className="font-[var(--font-lexend)] text-sm text-[var(--ice-white)]">Mensajes</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="font-[var(--font-lexend)] text-sm text-[var(--ice-white)]">Messages</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              {t.messages.length === 0 && <p className={sub}>Sin mensajes aún</p>}
+              {t.messages.length === 0 && <p className={sub}>No messages yet</p>}
               {t.messages.map((m: any) => {
                 const border = m.isInternal ? "" : m.senderRole === "CLIENT" ? "border-l-2 border-l-[var(--gold-bar)]" : "border-l-2 border-l-blue-500";
                 return (
                   <div key={m.id} className={`rounded-md p-3 ${border} ${m.isInternal ? "bg-[rgba(255,255,255,0.05)]" : ""}`}>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-medium text-[var(--ice-white)]">{m.senderName}</span>
-                      {m.isInternal && <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-[10px] px-1.5">Interno</Badge>}
+                      {m.isInternal && <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-[10px] px-1.5">Internal</Badge>}
                       <span className="text-[10px] text-[rgba(245,246,252,0.4)] ml-auto">{fmt(m.createdAt)}</span>
                     </div>
                     <p className="text-sm text-[rgba(245,246,252,0.8)] whitespace-pre-wrap">{m.content}</p>
@@ -169,14 +169,14 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
               })}
               <Separator className="bg-[rgba(245,246,252,0.1)]" />
               <div className="space-y-2">
-                <label className={lbl}>Mensaje al cliente</label>
-                <textarea className={txa} value={clientMsg} onChange={(e) => setClientMsg(e.target.value)} placeholder="Escribe un mensaje visible para el cliente..." />
-                <Button size="sm" disabled={saving || !clientMsg.trim()} onClick={() => sendMessage(false)} className={`${goldBtn} gap-1`}><Send className="h-3 w-3" /> Enviar</Button>
+                <label className={lbl}>Message to client</label>
+                <textarea className={txa} value={clientMsg} onChange={(e) => setClientMsg(e.target.value)} placeholder="Write a message visible to the client..." />
+                <Button size="sm" disabled={saving || !clientMsg.trim()} onClick={() => sendMessage(false)} className={`${goldBtn} gap-1`}><Send className="h-3 w-3" /> Send</Button>
               </div>
               <div className="space-y-2 rounded-md bg-[rgba(255,255,255,0.05)] p-3">
-                <label className={lbl}>Nota interna <span className="ml-2 text-[rgba(245,246,252,0.3)]">Solo visible para el equipo</span></label>
-                <textarea className={txa} value={internalMsg} onChange={(e) => setInternalMsg(e.target.value)} placeholder="Nota interna..." />
-                <Button size="sm" variant="outline" disabled={saving || !internalMsg.trim()} onClick={() => sendMessage(true)} className={`${outBtn} gap-1`}><Send className="h-3 w-3" /> Enviar nota</Button>
+                <label className={lbl}>Internal note <span className="ml-2 text-[rgba(245,246,252,0.3)]">Only visible to the team</span></label>
+                <textarea className={txa} value={internalMsg} onChange={(e) => setInternalMsg(e.target.value)} placeholder="Internal note..." />
+                <Button size="sm" variant="outline" disabled={saving || !internalMsg.trim()} onClick={() => sendMessage(true)} className={`${outBtn} gap-1`}><Send className="h-3 w-3" /> Send note</Button>
               </div>
             </CardContent>
           </Card>
@@ -184,30 +184,30 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
           {/* Deliveries */}
           <Card className={crd}>
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="font-[var(--font-lexend)] text-sm text-[var(--ice-white)]">Entregas</CardTitle>
-              <Button size="sm" variant="outline" onClick={() => setShowDlv(!showDlv)} className={`${outBtn} gap-1`}><Upload className="h-3 w-3" /> Subir entrega</Button>
+              <CardTitle className="font-[var(--font-lexend)] text-sm text-[var(--ice-white)]">Deliveries</CardTitle>
+              <Button size="sm" variant="outline" onClick={() => setShowDlv(!showDlv)} className={`${outBtn} gap-1`}><Upload className="h-3 w-3" /> Upload delivery</Button>
             </CardHeader>
             <CardContent className="space-y-3">
               {showDlv && (
                 <div className="space-y-2 rounded-md border border-[rgba(245,246,252,0.1)] p-3">
-                  <input className={inp} placeholder="URL del archivo" value={dlvUrl} onChange={(e) => setDlvUrl(e.target.value)} />
-                  <input className={inp} placeholder="Nombre del archivo" value={dlvName} onChange={(e) => setDlvName(e.target.value)} />
-                  <textarea className={txa} placeholder="Notas de la entrega" value={dlvNotes} onChange={(e) => setDlvNotes(e.target.value)} />
-                  <Button size="sm" disabled={saving} onClick={createDelivery} className={goldBtn}>Crear entrega</Button>
+                  <input className={inp} placeholder="File URL" value={dlvUrl} onChange={(e) => setDlvUrl(e.target.value)} />
+                  <input className={inp} placeholder="File name" value={dlvName} onChange={(e) => setDlvName(e.target.value)} />
+                  <textarea className={txa} placeholder="Delivery notes" value={dlvNotes} onChange={(e) => setDlvNotes(e.target.value)} />
+                  <Button size="sm" disabled={saving} onClick={createDelivery} className={goldBtn}>Create delivery</Button>
                 </div>
               )}
-              {t.deliveries.length === 0 && !showDlv && <p className={sub}>Sin entregas aún</p>}
+              {t.deliveries.length === 0 && !showDlv && <p className={sub}>No deliveries yet</p>}
               {t.deliveries.map((d: any) => (
                 <div key={d.id} className="rounded-md border border-[rgba(245,246,252,0.1)] p-3 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-[var(--ice-white)]">Ronda {d.round}</span>
+                    <span className="text-sm font-medium text-[var(--ice-white)]">Round {d.round}</span>
                     <Badge className={dlvColors[d.status] || ""}>{dlvLabels[d.status] || d.status}</Badge>
                     <span className="text-[10px] text-[rgba(245,246,252,0.4)] ml-auto">{fmt(d.createdAt)}</span>
                   </div>
                   {d.fileUrl && (
                     <div>
                       <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs">
-                        <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                        <ExternalLink className="h-3 w-3" /> {d.fileName || "Open file"}
                       </a>
                       {getGoogleDrivePreview(d.fileUrl) && (
                         <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />
@@ -216,8 +216,8 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
                   )}
                   {d.notes && <p className="text-xs text-[rgba(245,246,252,0.7)]">{d.notes}</p>}
                   {d.pmFeedback && <p className="text-xs text-[rgba(245,246,252,0.5)]"><span className="font-medium">PM:</span> {d.pmFeedback}</p>}
-                  {d.clientFeedback && <p className="text-xs text-[rgba(245,246,252,0.5)]"><span className="font-medium">Cliente:</span> {d.clientFeedback}</p>}
-                  {d.status === "PENDING_REVIEW" && <Button size="sm" disabled={saving} onClick={() => sendToClient(d.id)} className={`${goldBtn} gap-1`}><Send className="h-3 w-3" /> Enviar al cliente</Button>}
+                  {d.clientFeedback && <p className="text-xs text-[rgba(245,246,252,0.5)]"><span className="font-medium">Client:</span> {d.clientFeedback}</p>}
+                  {d.status === "PENDING_REVIEW" && <Button size="sm" disabled={saving} onClick={() => sendToClient(d.id)} className={`${goldBtn} gap-1`}><Send className="h-3 w-3" /> Send to client</Button>}
                 </div>
               ))}
             </CardContent>
@@ -229,27 +229,27 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
           <Card className={crd}>
             <CardContent className="pt-4 space-y-3">
               <div>
-                <label className={lbl}>Estado</label>
+                <label className={lbl}>Status</label>
                 <select className={sel} value={t.status} onChange={(e) => changeStatus(e.target.value)} disabled={saving}>
                   {ALL_STATUS.map((s: any) => <option key={s} value={s}>{ticketStatusLabels[s] || s}</option>)}
                 </select>
               </div>
               <div>
-                <label className={lbl}>Prioridad</label>
+                <label className={lbl}>Priority</label>
                 <p className={`text-sm font-medium ${priorityColors[t.priority] || ""}`}>{priorityLabels[t.priority] || t.priority}</p>
               </div>
               <Separator className="bg-[rgba(245,246,252,0.1)]" />
               <div>
-                <label className={lbl}>Servicio</label>
+                <label className={lbl}>Service</label>
                 <p className={val}>{t.service.name}</p>
                 <p className={sub}>{t.variant.name} &middot; {categoryLabels[t.service.category] || t.service.category}</p>
               </div>
-              <div><label className={lbl}>Créditos</label><p className={val}>{t.creditsCharged}</p></div>
+              <div><label className={lbl}>Credits</label><p className={val}>{t.creditsCharged}</p></div>
             </CardContent>
           </Card>
 
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Cliente</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>Client</CardTitle></CardHeader>
             <CardContent className="space-y-1">
               <p className={val}>{t.user.name}</p>
               <p className={sub}>{t.user.email}</p>
@@ -268,32 +268,32 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
                   <p className={sub}>{freelancerRoleLabels[t.freelancer.role] || t.freelancer.role}</p>
                 </div>
               ) : (
-                <Button size="sm" onClick={() => setShowAssign(true)} className={`${goldBtn} gap-1`}><UserPlus className="h-3 w-3" /> Asignar freelancer</Button>
+                <Button size="sm" onClick={() => setShowAssign(true)} className={`${goldBtn} gap-1`}><UserPlus className="h-3 w-3" /> Assign freelancer</Button>
               )}
             </CardContent>
           </Card>
 
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Notas PM</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>PM Notes</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <textarea className={txa} value={pmNotes} onChange={(e) => setPmNotes(e.target.value)} placeholder="Notas internas del PM..." />
-              <Button size="sm" variant="outline" disabled={saving} onClick={savePmNotes} className={`${outBtn} gap-1`}><Save className="h-3 w-3" /> Guardar</Button>
+              <textarea className={txa} value={pmNotes} onChange={(e) => setPmNotes(e.target.value)} placeholder="Internal PM notes..." />
+              <Button size="sm" variant="outline" disabled={saving} onClick={savePmNotes} className={`${outBtn} gap-1`}><Save className="h-3 w-3" /> Save</Button>
             </CardContent>
           </Card>
 
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Ajustes</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>Adjustments</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "recargo" ? null : "recargo")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Recargo</Button>
-                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "reembolso" ? null : "reembolso")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Reembolso</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "recargo" ? null : "recargo")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Surcharge</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "reembolso" ? null : "reembolso")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Refund</Button>
               </div>
               {showSurcharge && (
                 <div className="space-y-2 rounded-md border border-[rgba(245,246,252,0.1)] p-2">
-                  <label className={lbl}>{showSurcharge === "recargo" ? "Recargo" : "Reembolso"}</label>
-                  <input type="number" className={inp} placeholder="Monto (créditos)" value={surAmt} onChange={(e) => setSurAmt(e.target.value)} />
-                  <input className={inp} placeholder="Razón" value={surReason} onChange={(e) => setSurReason(e.target.value)} />
-                  <Button size="sm" disabled={saving || !surAmt || !surReason.trim()} onClick={submitSurcharge} className={goldBtn}>Aplicar</Button>
+                  <label className={lbl}>{showSurcharge === "recargo" ? "Surcharge" : "Refund"}</label>
+                  <input type="number" className={inp} placeholder="Amount (credits)" value={surAmt} onChange={(e) => setSurAmt(e.target.value)} />
+                  <input className={inp} placeholder="Reason" value={surReason} onChange={(e) => setSurReason(e.target.value)} />
+                  <Button size="sm" disabled={saving || !surAmt || !surReason.trim()} onClick={submitSurcharge} className={goldBtn}>Apply</Button>
                 </div>
               )}
               {t.surcharges.length > 0 && (
@@ -311,9 +311,9 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
           </Card>
 
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Fechas</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>Dates</CardTitle></CardHeader>
             <CardContent className="space-y-1.5">
-              {([["Creado", t.createdAt], ["Asignado", t.assignedAt], ["Iniciado", t.startedAt], ["Entregado", t.deliveredAt], ["Completado", t.completedAt]] as [string, string | null][])
+              {([["Created", t.createdAt], ["Assigned", t.assignedAt], ["Started", t.startedAt], ["Delivered", t.deliveredAt], ["Completed", t.completedAt]] as [string, string | null][])
                 .filter(([, v]: any) => v)
                 .map(([label, v]: any) => (
                   <div key={label} className="flex items-center gap-2">
@@ -331,24 +331,24 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
       <Dialog open={showAssign} onOpenChange={(open) => !open && setShowAssign(false)}>
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-[var(--font-lexend)]">Asignar Ticket #{t.number}</DialogTitle>
+            <DialogTitle className="font-[var(--font-lexend)]">Assign Ticket #{t.number}</DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">{t.service.name} &mdash; {t.variant.name}</DialogDescription>
           </DialogHeader>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {availableFreelancers.length === 0 ? (
-              <p className="text-sm text-[rgba(245,246,252,0.4)] text-center py-4">No hay freelancers disponibles</p>
+              <p className="text-sm text-[rgba(245,246,252,0.4)] text-center py-4">No freelancers available</p>
             ) : availableFreelancers.map((f: any) => (
               <div key={f.id} className="flex items-center justify-between rounded-md border border-[rgba(245,246,252,0.1)] p-3 hover:bg-[rgba(255,255,255,0.03)]">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-[var(--ice-white)]">{f.name}</p>
-                  <p className="text-xs text-[rgba(245,246,252,0.5)]">{freelancerRoleLabels[f.role] || f.role} &middot; Carga: {f.currentLoad}/{f.clientCapacity}</p>
+                  <p className="text-xs text-[rgba(245,246,252,0.5)]">{freelancerRoleLabels[f.role] || f.role} &middot; Load: {f.currentLoad}/{f.clientCapacity}</p>
                   {f.skillTags.length > 0 && (
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {f.skillTags.map((tag: any) => <span key={tag} className="text-[10px] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] px-1.5 py-0.5 rounded">{tag}</span>)}
                     </div>
                   )}
                 </div>
-                <Button size="sm" disabled={assigning} onClick={() => handleAssign(f.id)} className={`ml-3 ${goldBtn} h-7`}>Asignar</Button>
+                <Button size="sm" disabled={assigning} onClick={() => handleAssign(f.id)} className={`ml-3 ${goldBtn} h-7`}>Assign</Button>
               </div>
             ))}
           </div>

@@ -33,9 +33,9 @@ const planIcons: Record<string, typeof CreditCard> = {
 };
 
 const planFeatures: Record<string, string[]> = {
-  member: ["140 créditos/mes", "1 solicitud activa", "Entrega en 5 días", "Soporte por email"],
-  growth: ["350 créditos/mes", "2 solicitudes activas", "Entrega en 3 días", "PM dedicado", "Soporte prioritario"],
-  pro: ["650 créditos/mes", "Solicitudes ilimitadas", "Entrega 24-48h", "PM dedicado", "Soporte 24/7", "Todos los servicios"],
+  member: ["140 credits/mo", "1 active request", "Delivery in 5 days", "Email support"],
+  growth: ["350 credits/mo", "2 active requests", "Delivery in 3 days", "Dedicated PM", "Priority support"],
+  pro: ["650 credits/mo", "Unlimited requests", "Delivery 24-48h", "Dedicated PM", "24/7 support", "All services"],
 };
 
 export function BillingClient({
@@ -67,8 +67,8 @@ export function BillingClient({
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error al iniciar el pago");
-    } catch { setError("Error de conexión"); } finally { setLoadingPlan(null); }
+      setError(data.error || "Error starting payment");
+    } catch { setError("Connection error"); } finally { setLoadingPlan(null); }
   };
 
   const handlePortal = async () => {
@@ -77,8 +77,8 @@ export function BillingClient({
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error al abrir portal");
-    } catch { setError("Error de conexión"); }
+      setError(data.error || "Error opening portal");
+    } catch { setError("Connection error"); }
   };
 
   const handleBuyPack = async (packId: string) => {
@@ -92,8 +92,8 @@ export function BillingClient({
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error al iniciar el pago");
-    } catch { setError("Error de conexión"); } finally { setLoadingPack(null); }
+      setError(data.error || "Error starting payment");
+    } catch { setError("Connection error"); } finally { setLoadingPack(null); }
   };
 
   const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
@@ -105,9 +105,9 @@ export function BillingClient({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">Facturación</h1>
+        <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">Billing</h1>
         <p className="mt-1 text-[rgba(245,246,252,0.5)]">
-          {isActive ? "Gestiona tu suscripción y créditos" : "Elige tu plan para empezar"}
+          {isActive ? "Manage your subscription and credits" : "Choose your plan to get started"}
         </p>
       </div>
 
@@ -121,10 +121,10 @@ export function BillingClient({
           <CardContent className="py-4 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0" />
             <div>
-              <p className="text-sm text-yellow-400 font-medium">Tu pago no se pudo procesar</p>
-              <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">Actualiza tu método de pago para mantener tu plan activo.</p>
+              <p className="text-sm text-yellow-400 font-medium">Your payment couldn't be processed</p>
+              <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">Update your payment method to keep your plan active.</p>
               <Button onClick={handlePortal} size="sm" className="mt-2 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs">
-                Actualizar pago
+                Update payment
               </Button>
             </div>
           </CardContent>
@@ -140,32 +140,32 @@ export function BillingClient({
                 <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">
                   Plan {subscription.planName}
                 </CardTitle>
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Activo</Badge>
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
               </div>
               <div className="text-right">
                 <p className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--gold-bar)]">{totalCredits}</p>
-                <p className="text-xs text-[rgba(245,246,252,0.4)]">créditos disponibles</p>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">available credits</p>
                 {freeCredits > 0 && (
-                  <p className="text-[10px] text-[rgba(245,246,252,0.3)]">{freeCredits} gratis + {subscription.creditsRemaining} del plan</p>
+                  <p className="text-[10px] text-[rgba(245,246,252,0.3)]">{freeCredits} free + {subscription.creditsRemaining} from plan</p>
                 )}
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between text-sm text-[rgba(245,246,252,0.5)]">
-              <span>Próxima renovación</span>
+              <span>Next renewal</span>
               <span>{new Date(subscription.currentPeriodEnd).toLocaleDateString("es-MX")}</span>
             </div>
             {/* Low credits warning */}
             {subscription.creditsRemaining < subscription.monthlyCredits * 0.2 && (
               <div className="flex items-center gap-2 bg-yellow-500/5 border border-yellow-500/20 p-2 text-xs text-yellow-400">
                 <AlertTriangle className="h-3 w-3" />
-                Créditos bajos — compra un pack extra abajo
+                Low credits — buy an extra pack below
               </div>
             )}
             {subscription.hasStripeCustomer && (
               <Button onClick={handlePortal} variant="outline" className="w-full border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]">
-                Gestionar suscripción en Stripe
+                Manage subscription in Stripe
               </Button>
             )}
           </CardContent>
@@ -176,7 +176,7 @@ export function BillingClient({
       {showPricing && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            {isCanceled ? "Reactiva tu plan" : "Elige tu plan"}
+            {isCanceled ? "Reactivate your plan" : "Choose your plan"}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
             {plans.map((plan: any) => {
@@ -190,7 +190,7 @@ export function BillingClient({
                 <Card key={plan.id} className={`relative border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
                   {isFeatured && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold">Más popular</Badge>
+                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold">Most popular</Badge>
                     </div>
                   )}
                   <CardHeader className="text-center pt-6">
@@ -203,7 +203,7 @@ export function BillingClient({
                       <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--ice-white)]">
                         ${discountedPrice / 100}
                       </span>
-                      <span className="text-[rgba(245,246,252,0.5)]">/mes</span>
+                      <span className="text-[rgba(245,246,252,0.5)]">/mo</span>
                     </div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)]">Setup: ${plan.setupFee / 100} USD (una vez)</p>
                   </CardHeader>
@@ -225,7 +225,7 @@ export function BillingClient({
                       }`}
                     >
                       {loadingPlan === plan.slug ? <Loader2 className="h-4 w-4 animate-spin" /> :
-                       !plan.stripePriceId ? "Próximamente" : "Suscribirme"}
+                       !plan.stripePriceId ? "Coming soon" : "Subscribe"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -234,7 +234,7 @@ export function BillingClient({
           </div>
           {effectiveDiscount > 0 && (
             <p className="mt-3 text-center text-xs text-[var(--gold-bar)]">
-              {promoApplied ? `Código ${promoCode}: ${promoDiscount}% descuento aplicado` : `Descuento de alianza: ${allianceDiscount}% aplicado`}
+              {promoApplied ? `Code ${promoCode}: ${promoDiscount}% discount applied` : `Alliance discount: ${allianceDiscount}% applied`}
             </p>
           )}
 
@@ -245,7 +245,7 @@ export function BillingClient({
               <Input
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder="Código promocional"
+                placeholder="Promo code"
                 className="flex-1 h-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] text-sm"
               />
               <Button
@@ -259,12 +259,12 @@ export function BillingClient({
                     setPromoApplied(true);
                     setPromoDiscount(discount);
                   } else {
-                    setError("Código no válido. Puedes ingresarlo directamente en el checkout.");
+                    setError("Invalid code. You can enter it directly at checkout.");
                   }
                 }}
                 className="bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)] text-xs h-9"
               >
-                Aplicar
+                Apply
               </Button>
             </div>
           )}
@@ -278,7 +278,7 @@ export function BillingClient({
       {isActive && creditPacks.length > 0 && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            Créditos extra
+            Extra credits
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
             {creditPacks.map((pack: any) => (
@@ -287,7 +287,7 @@ export function BillingClient({
                   <Package className="h-6 w-6 text-[var(--gold-bar)] mx-auto" />
                   <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">{pack.name}</p>
                   <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px]">1:1</Badge>
-                  <p className="text-2xl font-bold text-[var(--gold-bar)]">{pack.credits} <span className="text-sm font-normal">créditos</span></p>
+                  <p className="text-2xl font-bold text-[var(--gold-bar)]">{pack.credits} <span className="text-sm font-normal">credits</span></p>
                   <p className="text-sm text-[rgba(245,246,252,0.5)]">${pack.priceInCents / 100} USD</p>
                   <Button
                     onClick={() => handleBuyPack(pack.id)}
@@ -295,7 +295,7 @@ export function BillingClient({
                     variant="outline"
                     className="w-full border-[var(--gold-bar)]/30 text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)] disabled:opacity-50"
                   >
-                    {loadingPack === pack.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Comprar <ArrowRight className="ml-1 h-3 w-3" /></>}
+                    {loadingPack === pack.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Buy <ArrowRight className="ml-1 h-3 w-3" /></>}
                   </Button>
                 </CardContent>
               </Card>
@@ -316,7 +316,7 @@ const verdictColors: Record<string, string> = {
   justo: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   holgado: "bg-green-500/20 text-green-400 border-green-500/30",
 };
-const verdictLabels: Record<string, string> = { insuficiente: "Insuficiente", justo: "Justo", holgado: "Holgado" };
+const verdictLabels: Record<string, string> = { insuficiente: "Insufficient", justo: "Just right", holgado: "Comfortable" };
 const catEmoji: Record<string, string> = { DESIGN: "🎨", WEB: "💻", MARKETING: "📱" };
 
 function BillingProjection() {
@@ -338,10 +338,10 @@ function BillingProjection() {
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardContent className="py-6 text-center">
           <p className="text-sm text-[rgba(245,246,252,0.5)]">
-            Completa tu perfil de empresa para ver una recomendación personalizada de plan.
+            Complete your business profile to see a personalized plan recommendation.
           </p>
           <Link href="/dashboard" className="text-xs text-[var(--gold-bar)] hover:underline mt-2 inline-block">
-            Ir al dashboard
+            Go to dashboard
           </Link>
         </CardContent>
       </Card>
@@ -353,9 +353,9 @@ function BillingProjection() {
   return (
     <div>
       <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-2">
-        ¿Qué plan te conviene?
+        Which plan is right for you?
       </h2>
-      <p className="text-xs text-[rgba(245,246,252,0.4)] mb-4">Estimación basada en las necesidades de tu negocio</p>
+      <p className="text-xs text-[rgba(245,246,252,0.4)] mb-4">Estimate based on your business needs</p>
 
       <div className="grid gap-4 md:grid-cols-3">
         {data.projections.map((p: any) => {
@@ -365,17 +365,17 @@ function BillingProjection() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-sm">{p.planName}</CardTitle>
-                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recomendado para ti</Badge>}
+                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recommended for you</Badge>}
                 </div>
-                <p className="text-xs text-[rgba(245,246,252,0.4)]">${p.priceMonthly / 100}/mes — {p.monthlyCredits} créditos</p>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">${p.priceMonthly / 100}/mo — {p.monthlyCredits} credits</p>
                 <p className="text-[11px] text-[rgba(245,246,252,0.5)] italic mt-1">{p.tagline}</p>
               </CardHeader>
               <CardContent className="space-y-3">
                 {p.months.map((m: any) => (
                   <div key={m.month} className="space-y-1">
-                    <p className="text-[10px] font-medium text-[rgba(245,246,252,0.5)]">Mes {m.month}</p>
+                    <p className="text-[10px] font-medium text-[rgba(245,246,252,0.5)]">Month {m.month}</p>
                     {m.suggestedServices.length === 0 ? (
-                      <p className="text-[10px] text-[rgba(245,246,252,0.3)]">Sin servicios sugeridos</p>
+                      <p className="text-[10px] text-[rgba(245,246,252,0.3)]">No suggested services</p>
                     ) : (
                       <div className="space-y-0.5">
                         {m.suggestedServices.map((s: any, i: number) => (
@@ -396,7 +396,7 @@ function BillingProjection() {
                           />
                         </div>
                         <p className={`text-[9px] mt-0.5 ${m.remaining >= 0 ? "text-green-400" : "text-red-400"}`}>
-                          {m.remaining >= 0 ? `+${m.remaining} sobran` : `${m.remaining} faltan`}
+                          {m.remaining >= 0 ? `+${m.remaining} remaining` : `${m.remaining} short`}
                         </p>
                       </div>
                     )}
@@ -405,7 +405,7 @@ function BillingProjection() {
                 <Separator className="bg-[rgba(245,246,252,0.06)]" />
                 <div className="flex items-center justify-between">
                   <Badge className={verdictColors[p.verdict] || ""}>{verdictLabels[p.verdict] || p.verdict}</Badge>
-                  <span className="text-[10px] text-[rgba(245,246,252,0.4)]">3 meses: ${p.priceMonthly * 3 / 100}</span>
+                  <span className="text-[10px] text-[rgba(245,246,252,0.4)]">3 months: ${p.priceMonthly * 3 / 100}</span>
                 </div>
               </CardContent>
             </Card>

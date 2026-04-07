@@ -7,7 +7,7 @@ const roles = [
   { key: "ADMIN", label: "Admin", emoji: "👑", path: "/admin/overview" },
   { key: "PM", label: "PM", emoji: "📋", path: "/admin/overview" },
   { key: "FREELANCER", label: "Freelancer", emoji: "🎨", path: "/freelancer/portal" },
-  { key: "CLIENT", label: "Cliente", emoji: "👤", path: "/dashboard" },
+  { key: "CLIENT", label: "Client", emoji: "👤", path: "/dashboard" },
 ];
 
 export function useViewAsRole(realRole: string | undefined) {
@@ -103,9 +103,9 @@ export function ViewAsBanner() {
 
   return (
     <div className="bg-yellow-500 text-black text-center py-1 text-sm font-medium">
-      Viendo como: {label} —{" "}
+      Viewing as: {label} —{" "}
       <button onClick={resetView} className="underline font-bold">
-        Volver a Admin
+        Back to Admin
       </button>
     </div>
   );

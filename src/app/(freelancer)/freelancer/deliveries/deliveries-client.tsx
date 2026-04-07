@@ -20,11 +20,11 @@ interface DeliveryRow {
 }
 
 const deliveryStatusLabels: Record<string, string> = {
-  PENDING_REVIEW: "Pendiente de revision",
-  PM_APPROVED: "Aprobada por PM",
-  SENT_TO_CLIENT: "Enviada al cliente",
-  CLIENT_APPROVED: "Aprobada por cliente",
-  REVISION_REQUESTED: "Revision solicitada",
+  PENDING_REVIEW: "Pending review",
+  PM_APPROVED: "PM Approved",
+  SENT_TO_CLIENT: "Sent to client",
+  CLIENT_APPROVED: "Client approved",
+  REVISION_REQUESTED: "Revision requested",
 };
 const deliveryStatusColors: Record<string, string> = {
   PENDING_REVIEW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
@@ -71,14 +71,14 @@ export function DeliveriesClient({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-[var(--font-lexend)] text-[var(--ice-white)]">
-          Entregas
+          Deliveries
         </h1>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className={sel}
         >
-          <option value="ALL">Todos los estados</option>
+          <option value="ALL">All statuses</option>
           {ALL_STATUSES.map((s) => (
             <option key={s} value={s}>
               {deliveryStatusLabels[s] || s}
@@ -88,7 +88,7 @@ export function DeliveriesClient({
       </div>
 
       {filtered.length === 0 ? (
-        <p className={sub}>No hay entregas con este filtro.</p>
+        <p className={sub}>No deliveries match this filter.</p>
       ) : (
         <div className="space-y-2">
           {filtered.map((d: any) => (
@@ -105,7 +105,7 @@ export function DeliveriesClient({
                   {d.serviceName}
                 </span>
                 <span className="text-xs text-[var(--ice-white)]">
-                  Ronda {d.round}
+                  Round {d.round}
                 </span>
                 <Badge
                   variant="outline"
@@ -121,7 +121,7 @@ export function DeliveriesClient({
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-[var(--gold-bar)] hover:underline text-xs"
                     >
-                      <ExternalLink className="h-3 w-3" /> {d.fileName || "Abrir recurso"}
+                      <ExternalLink className="h-3 w-3" /> {d.fileName || "Open file"}
                     </a>
                     {getGoogleDrivePreview(d.fileUrl) && (
                       <img src={getGoogleDrivePreview(d.fileUrl)!} alt="Preview" className="mt-2 max-w-[200px] opacity-80 rounded" />

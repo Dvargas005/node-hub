@@ -60,20 +60,20 @@ interface AvailableFreelancer {
 }
 
 const statusOptions = [
-  { value: "", label: "Todos" },
-  { value: "NEW", label: "Nuevo" },
-  { value: "REVIEWING", label: "En revisión" },
-  { value: "ASSIGNED", label: "Asignado" },
-  { value: "IN_PROGRESS", label: "En progreso" },
-  { value: "DELIVERED", label: "Entregado" },
-  { value: "REVISION", label: "Revisión" },
-  { value: "COMPLETED", label: "Completado" },
-  { value: "CANCELED", label: "Cancelado" },
+  { value: "", label: "All" },
+  { value: "NEW", label: "New" },
+  { value: "REVIEWING", label: "Reviewing" },
+  { value: "ASSIGNED", label: "Assigned" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "REVISION", label: "Revision" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELED", label: "Canceled" },
 ];
 
 const categoryOptions = [
-  { value: "", label: "Todas" },
-  { value: "DESIGN", label: "Diseño" },
+  { value: "", label: "All" },
+  { value: "DESIGN", label: "Design" },
   { value: "WEB", label: "Web" },
   { value: "MARKETING", label: "Marketing" },
 ];
@@ -129,7 +129,7 @@ export function TicketsClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setAssignError(data.error || "Error al asignar");
+        setAssignError(data.error || "Error assigning");
       }
     } finally {
       setAssigning(false);
@@ -139,7 +139,7 @@ export function TicketsClient({
   return (
     <div className="space-y-6">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Todos los Tickets
+        All Tickets
       </h1>
 
       {/* Filters */}
@@ -162,11 +162,11 @@ export function TicketsClient({
               onChange={(e) => setFilterPriority(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              <option value="">Toda prioridad</option>
-              <option value="LOW">Baja</option>
+              <option value="">All priorities</option>
+              <option value="LOW">Low</option>
               <option value="NORMAL">Normal</option>
-              <option value="HIGH">Alta</option>
-              <option value="URGENT">Urgente</option>
+              <option value="HIGH">High</option>
+              <option value="URGENT">Urgent</option>
             </select>
             <select
               value={filterCategory}
@@ -196,13 +196,13 @@ export function TicketsClient({
               <TableHeader>
                 <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
                   <TableHead className="text-[rgba(245,246,252,0.5)]">#</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Cliente</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Servicio</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Estado</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Prioridad</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Client</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Service</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Status</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Priority</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Freelancer</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Creado</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Actualizado</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Created</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Updated</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,7 +212,7 @@ export function TicketsClient({
                       colSpan={8}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
-                      Sin tickets
+                      No tickets
                     </TableCell>
                   </TableRow>
                 )}
@@ -279,7 +279,7 @@ export function TicketsClient({
                           className="h-7 gap-1 text-xs text-[var(--gold-bar)] hover:text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)]"
                         >
                           <UserPlus className="h-3 w-3" />
-                          Asignar
+                          Assign
                         </Button>
                       )}
                     </TableCell>
@@ -305,7 +305,7 @@ export function TicketsClient({
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)]">
-              Asignar Ticket #{assignTicket?.number}
+              Assign Ticket #{assignTicket?.number}
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
               {assignTicket?.serviceName} — {assignTicket?.variantName}
@@ -316,7 +316,7 @@ export function TicketsClient({
           {assignTicket?.pmNotes && (
             <div className="flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/20 p-3 text-sm text-yellow-400">
               <span>⚠️</span>
-              <span>Nota del sistema: {assignTicket.pmNotes}</span>
+              <span>System note: {assignTicket.pmNotes}</span>
             </div>
           )}
 
@@ -324,7 +324,7 @@ export function TicketsClient({
           {(assignTicket?.briefStructured || assignTicket?.clientNotes) && (
             <div className="rounded-md bg-[rgba(255,255,255,0.03)] border border-[rgba(245,246,252,0.1)] p-3 mb-2">
               <p className="text-xs font-medium text-[rgba(245,246,252,0.5)] mb-1">
-                Brief del cliente
+                Client brief
               </p>
               <p className="text-sm text-[rgba(245,246,252,0.7)]">
                 {assignTicket?.briefStructured
@@ -336,7 +336,7 @@ export function TicketsClient({
 
           {/* Category */}
           <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">
-            Categoría:{" "}
+            Category:{" "}
             <Badge className="ml-1 bg-[rgba(255,255,255,0.05)]">
               {categoryLabels[assignTicket?.serviceCategory || ""] ||
                 assignTicket?.serviceCategory}
@@ -353,7 +353,7 @@ export function TicketsClient({
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {matchingFreelancers.length === 0 ? (
               <p className="text-sm text-[rgba(245,246,252,0.4)] text-center py-4">
-                No hay freelancers disponibles para esta categoría
+                No freelancers available for this category
               </p>
             ) : (
               matchingFreelancers.map((f: any) => (
@@ -366,7 +366,7 @@ export function TicketsClient({
                       {f.name}
                     </p>
                     <p className="text-xs text-[rgba(245,246,252,0.5)]">
-                      {freelancerRoleLabels[f.role] || f.role} · Carga:{" "}
+                      {freelancerRoleLabels[f.role] || f.role} · Load:{" "}
                       {f.currentLoad}/{f.clientCapacity}
                     </p>
                     {f.skillTags.length > 0 && (

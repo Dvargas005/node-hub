@@ -5,7 +5,7 @@ import { Plus, X } from "lucide-react";
 
 const TYPE_LABELS: Record<string, string> = {
   PERCENT_OFF: "% Descuento",
-  FIXED_CREDITS: "Créditos",
+  FIXED_CREDITS: "Credits",
   FREE_MONTH: "Mes gratis",
 };
 
@@ -47,7 +47,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
       setShowDialog(false);
       setForm({ code: "", type: "PERCENT_OFF", value: "", maxUses: "", validFrom: "", validUntil: "" });
     } catch {
-      alert("Error al crear código");
+      alert("Error creating code");
     } finally {
       setSaving(false);
     }
@@ -75,7 +75,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
           className="inline-flex items-center gap-2 rounded-md bg-[var(--gold-bar)] px-4 py-2 text-sm font-bold text-[var(--asphalt-black)] hover:opacity-90"
         >
           <Plus className="h-4 w-4" />
-          Nuevo código
+          New code
         </button>
       </div>
 
@@ -90,7 +90,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
               <th className="px-4 py-3">Usos</th>
               <th className="px-4 py-3">Válido desde</th>
               <th className="px-4 py-3">Válido hasta</th>
-              <th className="px-4 py-3">Activo</th>
+              <th className="px-4 py-3">Active</th>
             </tr>
           </thead>
           <tbody>
@@ -154,7 +154,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="w-full max-w-md rounded-lg border border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] p-6 text-[var(--ice-white)]">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold">Nuevo código promocional</h2>
+              <h2 className="text-lg font-bold">New code promocional</h2>
               <button
                 onClick={() => setShowDialog(false)}
                 className="text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
@@ -189,7 +189,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                     className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)]"
                   >
                     <option value="PERCENT_OFF">% Descuento</option>
-                    <option value="FIXED_CREDITS">Créditos</option>
+                    <option value="FIXED_CREDITS">Credits</option>
                     <option value="FREE_MONTH">Mes gratis</option>
                   </select>
                 </div>
@@ -264,7 +264,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                 disabled={saving || !form.code || !form.value}
                 className="rounded-md bg-[var(--gold-bar)] px-4 py-2 text-sm font-bold text-[var(--asphalt-black)] hover:opacity-90 disabled:opacity-50"
               >
-                {saving ? "Creando..." : "Crear código"}
+                {saving ? "Creating..." : "Create code"}
               </button>
             </div>
           </div>

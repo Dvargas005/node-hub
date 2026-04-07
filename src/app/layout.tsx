@@ -20,14 +20,14 @@ const atkinson = Atkinson_Hyperlegible({
 export const metadata: Metadata = {
   title: "N.O.D.E. — Network Organized Delivery Engine",
   description:
-    "Diseño, desarrollo web y marketing por suscripción. Powered by Nouvos.",
+    "Design, web development and marketing by subscription. Powered by Nouvos.",
   openGraph: {
     title: "N.O.D.E. — Network Organized Delivery Engine",
     description:
-      "Diseño, desarrollo web y marketing por suscripción. Powered by Nouvos.",
+      "Design, web development and marketing by subscription. Powered by Nouvos.",
     url: "https://node.nouvos.one",
     siteName: "N.O.D.E. by Nouvos",
-    locale: "es_MX",
+    locale: "en_US",
     type: "website",
   },
 };
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`dark ${lexend.variable} ${atkinson.variable} font-sans`}>
+    <html lang="en" className={`dark ${lexend.variable} ${atkinson.variable} font-sans`}>
       <head>
         {/* Inline fallback — guarantees dark bg even if CSS fails to load */}
         <style dangerouslySetInnerHTML={{ __html: "body{background:#130A06;color:#F5F6FC}" }} />

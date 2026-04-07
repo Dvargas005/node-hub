@@ -126,10 +126,10 @@ export function AlliancesClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setCreateError(data.error || "Error al crear alianza");
+        setCreateError(data.error || "Error creating alliance");
       }
     } catch {
-      setCreateError("Error de conexión");
+      setCreateError("Connection error");
     } finally {
       setCreating(false);
     }
@@ -185,10 +185,10 @@ export function AlliancesClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setEditError(data.error || "Error al editar alianza");
+        setEditError(data.error || "Error editing alliance");
       }
     } catch {
-      setEditError("Error de conexión");
+      setEditError("Connection error");
     } finally {
       setEditing(false);
     }
@@ -301,7 +301,7 @@ export function AlliancesClient({
       {/* Bonus Credits */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Créditos bonus
+          Bonus credits
         </label>
         <input
           type="number"
@@ -362,7 +362,7 @@ export function AlliancesClient({
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Nombre</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Código</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Descuento</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Créditos bonus</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Bonus credits</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Revenue share</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Referidos</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Estado</TableHead>
@@ -494,7 +494,7 @@ export function AlliancesClient({
               disabled={creating}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {creating ? "Creando..." : "Crear"}
+              {creating ? "Creating..." : "Create"}
             </Button>
           </div>
         </DialogContent>
@@ -508,7 +508,7 @@ export function AlliancesClient({
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)]">
-              Editar Alianza
+              Edit Alliance
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
               Modifica los campos de la alianza.
@@ -536,7 +536,7 @@ export function AlliancesClient({
               disabled={editing}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {editing ? "Guardando..." : "Guardar"}
+              {editing ? "Saving..." : "Save"}
             </Button>
           </div>
         </DialogContent>

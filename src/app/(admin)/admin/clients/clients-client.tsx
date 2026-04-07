@@ -92,7 +92,7 @@ export function ClientsClient({
   return (
     <div className="space-y-6">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Clientes
+        Clients
       </h1>
 
       {/* Filters */}
@@ -102,7 +102,7 @@ export function ClientsClient({
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgba(245,246,252,0.4)]" />
               <Input
-                placeholder="Buscar por nombre, email o negocio..."
+                placeholder="Search by name, email or business..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
@@ -113,13 +113,13 @@ export function ClientsClient({
               onChange={(e) => setFilterPlan(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              <option value="">Todos los planes</option>
+              <option value="">All plans</option>
               {plans.map((p: any) => (
                 <option key={p.slug} value={p.slug}>
                   {p.name}
                 </option>
               ))}
-              <option value="__none">Sin plan</option>
+              <option value="__none">No plan</option>
             </select>
             <button
               onClick={() => setFilterAlliance(!filterAlliance)}
@@ -129,7 +129,7 @@ export function ClientsClient({
                   : "border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)]"
               }`}
             >
-              Con alianza
+              With alliance
             </button>
           </div>
         </CardContent>
@@ -139,7 +139,7 @@ export function ClientsClient({
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardHeader>
           <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">
-            {filtered.length} clientes
+            {filtered.length} clients
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -147,15 +147,15 @@ export function ClientsClient({
             <Table>
               <TableHeader>
                 <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Nombre</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Negocio</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Business</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Plan</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Créditos</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Credits</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Tickets</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Alianza</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Registro</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Alliance</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -165,7 +165,7 @@ export function ClientsClient({
                       colSpan={9}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
-                      No se encontraron clientes
+                      No clients found
                     </TableCell>
                   </TableRow>
                 )}
@@ -192,7 +192,7 @@ export function ClientsClient({
                         </Badge>
                       ) : (
                         <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-                          Sin plan
+                          No plan
                         </Badge>
                       )}
                     </TableCell>
@@ -220,7 +220,7 @@ export function ClientsClient({
                           }}
                           className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
                         >
-                          <option value="">Sin asignar</option>
+                          <option value="">Unassigned</option>
                           {pms.map((p: any) => (
                             <option key={p.id} value={p.id}>
                               {p.name}

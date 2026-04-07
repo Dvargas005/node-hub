@@ -6,8 +6,8 @@ import type { NavItem } from "@/components/layout/sidebar";
 
 const freelancerNav: NavItem[] = [
   { label: "Portal", href: "/freelancer/portal", icon: Briefcase },
-  { label: "Mis Tickets", href: "/freelancer/portal", icon: ClipboardList },
-  { label: "Entregas", href: "/freelancer/deliveries", icon: Package },
+  { label: "My Tickets", href: "/freelancer/portal", icon: ClipboardList },
+  { label: "Deliveries", href: "/freelancer/deliveries", icon: Package },
 ];
 
 export function FreelancerShell({ children }: { children: React.ReactNode }) {
