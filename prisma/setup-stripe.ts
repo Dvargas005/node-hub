@@ -1,12 +1,23 @@
 /**
  * Idempotent Stripe + Plan setup.
  *
- * - Plans: upserts in DB with full payload. For each plan, only creates Stripe
- *   Products + Prices when stripePriceId is missing in DB. Existing rows are
- *   left untouched on Stripe side (avoids duplicate Stripe products).
- * - Credit packs: skipped entirely (legacy duplicates exist; the new
- *   `credit_pack_custom` flow replaces fixed packs anyway).
- * - Coupons: SOMOSLEN + NOUVOSVIP — creation is idempotent via try/catch.
+ * Default behaviour: per plan, skips Stripe creation if the DB row already
+ * has a stripePriceId. Pass `--force` to ignore the skip and re-create
+ * everything from scratch (useful when DB IDs point to stale/wiped Stripe
+ * objects, or when switching from TEST to LIVE).
+ *
+ * After every Stripe creation, the DB row is updated with the new price IDs
+ * AND immediately re-fetched and logged so the user can verify the write.
+ *
+ * - Plans: upserts in DB with full payload, then provisions Stripe + writes
+ *   IDs back. Per-plan try/catch — one failure doesn't abort the others.
+ * - Credit packs: skipped (legacy duplicates exist; the credit_pack_custom
+ *   flow replaces fixed packs).
+ * - Coupons: SOMOSLEN + NOUVOSVIP — idempotent via try/catch.
+ *
+ * Usage:
+ *   npx tsx prisma/setup-stripe.ts            # idempotent (skips if provisioned)
+ *   npx tsx prisma/setup-stripe.ts --force    # re-create everything in Stripe
  */
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
@@ -17,6 +28,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
+
+const FORCE = process.argv.includes("--force");
 
 interface PlanSeed {
   slug: string;
@@ -82,92 +95,154 @@ const plans: PlanSeed[] = [
   },
 ];
 
-async function main() {
-  const isLive = (process.env.STRIPE_SECRET_KEY || "").startsWith("sk_live_");
-  console.log(`=== Stripe mode: ${isLive ? "LIVE" : "TEST"} ===\n`);
-  console.log("=== Plan setup (idempotent) ===\n");
+interface ProvisionResult {
+  slug: string;
+  status: "skipped" | "provisioned" | "error";
+  before: { stripePriceId: string | null; setupFeeStripePriceId: string | null };
+  after?: { stripePriceId: string | null; setupFeeStripePriceId: string | null };
+  error?: string;
+}
 
-  for (const plan of plans) {
-    console.log(`>>> ${plan.name} (${plan.slug})`);
+async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
+  console.log(`\n>>> ${plan.name} (${plan.slug})`);
 
-    // 1. Upsert DB row first (no Stripe IDs yet on create)
-    const existing = await prisma.plan.findUnique({ where: { slug: plan.slug } });
-    const dbRow = existing
-      ? await prisma.plan.update({
-          where: { slug: plan.slug },
-          data: {
-            name: plan.name,
-            priceMonthly: plan.priceMonthly,
-            setupFee: plan.setupFee,
-            monthlyCredits: plan.monthlyCredits,
-            bonusCredits: plan.bonusCredits,
-            maxActiveReqs: plan.maxActiveReqs,
-            deliveryDays: plan.deliveryDays,
-            isRecurring: plan.isRecurring,
-          },
-        })
-      : await prisma.plan.create({
-          data: {
-            name: plan.name,
-            slug: plan.slug,
-            priceMonthly: plan.priceMonthly,
-            setupFee: plan.setupFee,
-            monthlyCredits: plan.monthlyCredits,
-            bonusCredits: plan.bonusCredits,
-            maxActiveReqs: plan.maxActiveReqs,
-            deliveryDays: plan.deliveryDays,
-            isRecurring: plan.isRecurring,
-          },
-        });
-
-    // 2. Skip Stripe creation if already provisioned
-    if (dbRow.stripePriceId) {
-      console.log(`  ⏭  Stripe already provisioned: ${dbRow.stripePriceId}`);
-      continue;
-    }
-
-    // 3. Create Stripe Product + Price(s)
-    const product = await stripe.products.create({
-      name: plan.name,
-      description: plan.description,
-      metadata: { slug: plan.slug },
-    });
-    console.log(`  Product:       ${product.id}`);
-
-    const price = await stripe.prices.create({
-      product: product.id,
-      unit_amount: plan.priceMonthly,
-      currency: "usd",
-      // Recurring only for subscription plans; one-time payment for non-recurring (Starter)
-      ...(plan.isRecurring ? { recurring: { interval: "month" as const } } : {}),
-      metadata: { slug: plan.slug, type: plan.isRecurring ? "subscription" : "one_time" },
-    });
-    console.log(`  Monthly price: ${price.id} ($${plan.priceMonthly / 100}${plan.isRecurring ? "/mo" : " one-time"})`);
-
-    // Setup fee price (only when > 0)
-    let setupPriceId: string | null = null;
-    if (plan.setupFee > 0) {
-      const setupPrice = await stripe.prices.create({
-        product: product.id,
-        unit_amount: plan.setupFee,
-        currency: "usd",
-        metadata: { slug: plan.slug, type: "setup" },
+  // 1. Upsert DB row first (only updates non-Stripe fields)
+  const existing = await prisma.plan.findUnique({ where: { slug: plan.slug } });
+  const dbRow = existing
+    ? await prisma.plan.update({
+        where: { slug: plan.slug },
+        data: {
+          name: plan.name,
+          priceMonthly: plan.priceMonthly,
+          setupFee: plan.setupFee,
+          monthlyCredits: plan.monthlyCredits,
+          bonusCredits: plan.bonusCredits,
+          maxActiveReqs: plan.maxActiveReqs,
+          deliveryDays: plan.deliveryDays,
+          isRecurring: plan.isRecurring,
+        },
+      })
+    : await prisma.plan.create({
+        data: {
+          name: plan.name,
+          slug: plan.slug,
+          priceMonthly: plan.priceMonthly,
+          setupFee: plan.setupFee,
+          monthlyCredits: plan.monthlyCredits,
+          bonusCredits: plan.bonusCredits,
+          maxActiveReqs: plan.maxActiveReqs,
+          deliveryDays: plan.deliveryDays,
+          isRecurring: plan.isRecurring,
+        },
       });
-      setupPriceId = setupPrice.id;
-      console.log(`  Setup price:   ${setupPrice.id} ($${plan.setupFee / 100})`);
-    }
 
-    await prisma.plan.update({
-      where: { slug: plan.slug },
-      data: {
-        stripePriceId: price.id,
-        setupFeeStripePriceId: setupPriceId,
-      },
-    });
-    console.log(`  ✅ DB updated with Stripe IDs\n`);
+  const before = {
+    stripePriceId: dbRow.stripePriceId,
+    setupFeeStripePriceId: dbRow.setupFeeStripePriceId,
+  };
+  console.log(
+    `  Before:        price=${before.stripePriceId ?? "null"}, setup=${before.setupFeeStripePriceId ?? "null"}`,
+  );
+
+  // 2. Skip if already provisioned (unless --force)
+  if (dbRow.stripePriceId && !FORCE) {
+    console.log(`  ⏭  Skipped (already provisioned). Use --force to re-create.`);
+    return { slug: plan.slug, status: "skipped", before };
   }
 
-  console.log("=== Coupons ===\n");
+  // 3. Create Stripe Product + Price(s)
+  const product = await stripe.products.create({
+    name: plan.name,
+    description: plan.description,
+    metadata: { slug: plan.slug },
+  });
+  console.log(`  Product:       ${product.id}`);
+
+  const monthlyPrice = await stripe.prices.create({
+    product: product.id,
+    unit_amount: plan.priceMonthly,
+    currency: "usd",
+    // Recurring only for subscription plans; one-time payment for non-recurring (Starter)
+    ...(plan.isRecurring ? { recurring: { interval: "month" as const } } : {}),
+    metadata: { slug: plan.slug, type: plan.isRecurring ? "subscription" : "one_time" },
+  });
+  console.log(
+    `  Monthly price: ${monthlyPrice.id} ($${plan.priceMonthly / 100}${plan.isRecurring ? "/mo" : " one-time"})`,
+  );
+
+  // Setup fee price (only when > 0)
+  let setupFeePrice: Stripe.Price | null = null;
+  if (plan.setupFee > 0) {
+    setupFeePrice = await stripe.prices.create({
+      product: product.id,
+      unit_amount: plan.setupFee,
+      currency: "usd",
+      metadata: { slug: plan.slug, type: "setup" },
+    });
+    console.log(`  Setup price:   ${setupFeePrice.id} ($${plan.setupFee / 100})`);
+  }
+
+  // 4. Update DB with the new Stripe IDs
+  await prisma.plan.update({
+    where: { slug: plan.slug },
+    data: {
+      stripePriceId: monthlyPrice.id,
+      setupFeeStripePriceId: setupFeePrice?.id || null,
+    },
+  });
+
+  // 5. Re-fetch and verify the write actually landed in the DB
+  const verified = await prisma.plan.findUnique({
+    where: { slug: plan.slug },
+    select: { stripePriceId: true, setupFeeStripePriceId: true },
+  });
+
+  console.log(
+    `  After:         price=${verified?.stripePriceId ?? "null"}, setup=${verified?.setupFeeStripePriceId ?? "null"}`,
+  );
+
+  if (verified?.stripePriceId !== monthlyPrice.id) {
+    throw new Error(
+      `DB write verification FAILED: expected ${monthlyPrice.id}, got ${verified?.stripePriceId}`,
+    );
+  }
+
+  console.log(`  ✅ DB updated and verified`);
+
+  return {
+    slug: plan.slug,
+    status: "provisioned",
+    before,
+    after: {
+      stripePriceId: verified.stripePriceId,
+      setupFeeStripePriceId: verified.setupFeeStripePriceId,
+    },
+  };
+}
+
+async function main() {
+  const isLive = (process.env.STRIPE_SECRET_KEY || "").startsWith("sk_live_");
+  console.log(`=== Stripe mode: ${isLive ? "LIVE" : "TEST"} ===`);
+  console.log(`=== Plan setup ${FORCE ? "(--force: re-create)" : "(idempotent)"} ===`);
+
+  const results: ProvisionResult[] = [];
+  for (const plan of plans) {
+    try {
+      const result = await provisionPlan(plan);
+      results.push(result);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`  ❌ ERROR: ${message}`);
+      results.push({
+        slug: plan.slug,
+        status: "error",
+        before: { stripePriceId: null, setupFeeStripePriceId: null },
+        error: message,
+      });
+    }
+  }
+
+  console.log("\n=== Coupons ===");
 
   const coupons = [
     { id: "SOMOSLEN", percent_off: 30, duration: "forever" as const, name: "LEN Members 30% Off" },
@@ -181,7 +256,9 @@ async function main() {
     } catch (err: any) {
       if (err.code === "resource_already_exists") {
         console.log(`⏭  Coupon ${coupon.id} already exists`);
-      } else throw err;
+      } else {
+        console.error(`❌ Coupon ${coupon.id}: ${err.message}`);
+      }
     }
   }
 
@@ -202,11 +279,35 @@ async function main() {
     }
   }
 
-  console.log("\n=== Done ===\n");
+  // Final summary table
+  console.log("\n=== Final DB state (verified by re-read) ===\n");
+  const finalRows = await prisma.plan.findMany({ orderBy: { priceMonthly: "asc" } });
+  for (const p of finalRows) {
+    const r = results.find((x) => x.slug === p.slug);
+    const tag =
+      r?.status === "provisioned"
+        ? "✅ PROVISIONED"
+        : r?.status === "skipped"
+          ? "⏭  SKIPPED"
+          : r?.status === "error"
+            ? "❌ ERROR"
+            : "—";
+    console.log(
+      `${p.slug.padEnd(8)} | ${tag.padEnd(15)} | $${(p.priceMonthly / 100).toString().padStart(5)} | price:${p.stripePriceId ?? "null"} | setup:${p.setupFeeStripePriceId ?? "null"}`,
+    );
+    if (r?.error) console.log(`         error: ${r.error}`);
+  }
+
+  const failed = results.filter((r) => r.status === "error");
+  console.log(
+    `\n${failed.length === 0 ? "🎉 All good." : `⚠  ${failed.length} plan(s) failed.`}`,
+  );
+
   await prisma.$disconnect();
+  if (failed.length > 0) process.exit(1);
 }
 
 main().then(() => process.exit(0)).catch((err) => {
-  console.error("ERROR:", err);
+  console.error("FATAL:", err);
   process.exit(1);
 });
