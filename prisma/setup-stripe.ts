@@ -11,8 +11,8 @@
  *
  * - Plans: upserts in DB with full payload, then provisions Stripe + writes
  *   IDs back. Per-plan try/catch — one failure doesn't abort the others.
- * - Credit packs: skipped (legacy duplicates exist; the credit_pack_custom
- *   flow replaces fixed packs).
+ * - Credit packs: 4 canonical packs (20/50/100/500 credits, 1:1 USD).
+ *   Detects duplicates and runs a clean reset when needed.
  * - Coupons: SOMOSLEN + NOUVOSVIP — idempotent via try/catch.
  *
  * Usage:
@@ -220,6 +220,94 @@ async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
   };
 }
 
+interface CreditPackSeed {
+  name: string;
+  credits: number;
+  priceInCents: number;
+}
+
+const CANONICAL_PACKS: CreditPackSeed[] = [
+  { name: "20 Credits", credits: 20, priceInCents: 2000 },
+  { name: "50 Credits", credits: 50, priceInCents: 5000 },
+  { name: "100 Credits", credits: 100, priceInCents: 10000 },
+  { name: "500 Credits", credits: 500, priceInCents: 50000 },
+];
+
+async function provisionCreditPacks() {
+  const existing = await prisma.creditPack.findMany({ orderBy: { credits: "asc" } });
+  console.log(`Existing packs: ${existing.length}`);
+
+  // Detect a clean state: exactly 4 packs, one per canonical credit value,
+  // English names, all priced 1:1, all with stripePriceId set, no extras.
+  const isClean =
+    !FORCE &&
+    existing.length === CANONICAL_PACKS.length &&
+    CANONICAL_PACKS.every((canonical: CreditPackSeed) => {
+      const matches = existing.filter((p: any) => p.credits === canonical.credits);
+      if (matches.length !== 1) return false;
+      const p = matches[0];
+      return (
+        p.priceInCents === canonical.priceInCents &&
+        p.name === canonical.name &&
+        !!p.stripePriceId
+      );
+    });
+
+  if (isClean) {
+    console.log("⏭  Already clean — 4 canonical packs with Stripe IDs. Use --force to re-create.");
+    return;
+  }
+
+  console.log(
+    FORCE
+      ? "🗑  --force: wiping all credit packs and re-creating from scratch"
+      : "🗑  Detected duplicates / legacy packs — wiping and re-creating",
+  );
+  const wipeCount = await prisma.creditPack.deleteMany({});
+  console.log(`   Deleted ${wipeCount.count} pack rows from DB`);
+
+  for (const pack of CANONICAL_PACKS) {
+    console.log(`\n>>> ${pack.name}`);
+    const product = await stripe.products.create({
+      name: `N.O.D.E. ${pack.name}`,
+      description: `${pack.credits} extra credits for N.O.D.E. (1:1 USD)`,
+      metadata: { type: "credit_pack", credits: String(pack.credits) },
+    });
+    console.log(`  Product:       ${product.id}`);
+
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: pack.priceInCents,
+      currency: "usd",
+      metadata: { type: "credit_pack", credits: String(pack.credits) },
+    });
+    console.log(`  Price:         ${price.id} ($${pack.priceInCents / 100} = ${pack.credits} credits)`);
+
+    await prisma.creditPack.create({
+      data: {
+        name: pack.name,
+        credits: pack.credits,
+        priceInCents: pack.priceInCents,
+        stripePriceId: price.id,
+        isActive: true,
+      },
+    });
+
+    // Verify
+    const verified = await prisma.creditPack.findFirst({ where: { credits: pack.credits } });
+    if (!verified || verified.stripePriceId !== price.id) {
+      throw new Error(`Pack ${pack.name}: DB write verification FAILED`);
+    }
+    console.log(`  ✅ DB row created and verified (id=${verified.id})`);
+  }
+
+  console.log("\n📦 Final pack summary:");
+  const finalPacks = await prisma.creditPack.findMany({ orderBy: { credits: "asc" } });
+  for (const p of finalPacks) {
+    console.log(`  ${p.name.padEnd(15)} | ${p.credits} cr | $${p.priceInCents / 100} | stripe:${p.stripePriceId}`);
+  }
+}
+
 async function main() {
   const isLive = (process.env.STRIPE_SECRET_KEY || "").startsWith("sk_live_");
   console.log(`=== Stripe mode: ${isLive ? "LIVE" : "TEST"} ===`);
@@ -241,6 +329,9 @@ async function main() {
       });
     }
   }
+
+  console.log("\n=== Credit packs ===");
+  await provisionCreditPacks();
 
   console.log("\n=== Coupons ===");
 
