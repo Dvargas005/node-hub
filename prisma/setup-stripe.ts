@@ -41,7 +41,7 @@ const plans = [
     setupFee: 130000, // $1300
     monthlyCredits: 650,
     bonusCredits: 0,
-    maxActiveReqs: 10,
+    maxActiveReqs: 999, // unlimited
     deliveryDays: 2,
   },
 ];

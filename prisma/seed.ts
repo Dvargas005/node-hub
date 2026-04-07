@@ -56,7 +56,7 @@ async function main() {
       priceMonthly: 42900,
       setupFee: 130000,
       monthlyCredits: 650,
-      maxActiveReqs: 10,
+      maxActiveReqs: 999,
       deliveryDays: 2,
     },
     create: {
@@ -65,7 +65,7 @@ async function main() {
       priceMonthly: 42900, // $429
       setupFee: 130000, // $1300
       monthlyCredits: 650,
-      maxActiveReqs: 10,
+      maxActiveReqs: 999, // unlimited (display fallback in dashboard-client.tsx:208)
       deliveryDays: 2,
     },
   });
