@@ -24,6 +24,12 @@ export default async function SettingsPage() {
         freeCredits: true,
         language: true,
         deliveryLanguage: true,
+        phone: true,
+        whatsappNumber: true,
+        telegramId: true,
+        linkedinUrl: true,
+        instagramHandle: true,
+        preferredContact: true,
       },
     }),
     db.subscription.findUnique({
@@ -49,6 +55,12 @@ export default async function SettingsPage() {
         socialMedia: (user?.socialMedia as Record<string, string>) || {},
         language: user?.language || "es",
         deliveryLanguage: user?.deliveryLanguage || "es",
+        phone: user?.phone || "",
+        whatsappNumber: user?.whatsappNumber || "",
+        telegramId: user?.telegramId || "",
+        linkedinUrl: user?.linkedinUrl || "",
+        instagramHandle: user?.instagramHandle || "",
+        preferredContact: user?.preferredContact || "email",
       }}
       totalCredits={totalCredits}
     />

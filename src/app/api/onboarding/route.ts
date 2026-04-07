@@ -21,6 +21,23 @@ export async function POST(req: NextRequest) {
       priorities,
     } = body;
 
+    // Contact fields (all optional)
+    const contactClean = (v: unknown, max = 200): string | null => {
+      if (typeof v !== "string") return null;
+      const t = v.trim();
+      return t ? t.slice(0, max) : null;
+    };
+    const phone = contactClean(body.phone);
+    const whatsappNumber = contactClean(body.whatsappNumber);
+    const telegramId = contactClean(body.telegramId);
+    const linkedinUrl = contactClean(body.linkedinUrl, 500);
+    const instagramHandle = contactClean(body.instagramHandle);
+    let preferredContact: string | null = null;
+    if (typeof body.preferredContact === "string") {
+      const v = body.preferredContact.toLowerCase();
+      if (["email", "phone", "whatsapp", "telegram"].includes(v)) preferredContact = v;
+    }
+
     // Step 1 required fields
     if (!businessName || !businessIndustry || !businessDescription) {
       return NextResponse.json(
@@ -65,6 +82,12 @@ export async function POST(req: NextRequest) {
             brandStyle: brandStyle || undefined,
             website: website || undefined,
             socialMedia: socialMedia || undefined,
+            phone: phone ?? undefined,
+            whatsappNumber: whatsappNumber ?? undefined,
+            telegramId: telegramId ?? undefined,
+            linkedinUrl: linkedinUrl ?? undefined,
+            instagramHandle: instagramHandle ?? undefined,
+            ...(preferredContact ? { preferredContact } : {}),
             priorities: priorities || undefined,
           },
         });
@@ -84,6 +107,12 @@ export async function POST(req: NextRequest) {
           brandStyle: brandStyle || undefined,
           website: website || undefined,
           socialMedia: socialMedia || undefined,
+          phone: phone ?? undefined,
+          whatsappNumber: whatsappNumber ?? undefined,
+          telegramId: telegramId ?? undefined,
+          linkedinUrl: linkedinUrl ?? undefined,
+          instagramHandle: instagramHandle ?? undefined,
+          ...(preferredContact ? { preferredContact } : {}),
           priorities: priorities || undefined,
           onboardingCompleted: true,
           freeCredits: { increment: 10 },

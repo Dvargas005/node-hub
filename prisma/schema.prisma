@@ -14,6 +14,11 @@ model User {
   emailVerified Boolean   @default(false)
   name          String
   phone         String?
+  whatsappNumber    String?
+  telegramId        String?
+  linkedinUrl       String?
+  instagramHandle   String?
+  preferredContact  String?   @default("email")
   image         String?
   language          String    @default("es")
   deliveryLanguage  String    @default("es")

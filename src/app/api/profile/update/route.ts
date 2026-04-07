@@ -23,6 +23,24 @@ export async function POST(req: NextRequest) {
       socialMedia,
     } = body;
 
+    // Contact fields — accepted but NOT charged. Persisted alongside the
+    // business profile update so the client can update everything in one call.
+    const contactClean = (v: unknown, max = 200): string | null => {
+      if (typeof v !== "string") return null;
+      const t = v.trim();
+      return t ? t.slice(0, max) : null;
+    };
+    const phone = contactClean(body.phone);
+    const whatsappNumber = contactClean(body.whatsappNumber);
+    const telegramId = contactClean(body.telegramId);
+    const linkedinUrl = contactClean(body.linkedinUrl, 500);
+    const instagramHandle = contactClean(body.instagramHandle);
+    let preferredContact: string | null = null;
+    if (typeof body.preferredContact === "string") {
+      const v = body.preferredContact.toLowerCase();
+      if (["email", "phone", "whatsapp", "telegram"].includes(v)) preferredContact = v;
+    }
+
     if (!businessName || !businessIndustry || !businessDescription) {
       return NextResponse.json(
         { error: "Nombre, giro y descripción del negocio son requeridos" },
@@ -41,7 +59,8 @@ export async function POST(req: NextRequest) {
       website = "https://" + website;
     }
 
-    // I12: Check if anything actually changed before charging
+    // I12: Check if anything actually changed before charging.
+    // Contact fields are NOT included in this diff — they are saved separately for free.
     const currentProfile = await db.user.findUnique({
       where: { id: userId },
       select: { businessName: true, businessIndustry: true, businessDescription: true, targetAudience: true, hasBranding: true, brandColors: true, brandStyle: true, website: true, socialMedia: true },
@@ -56,8 +75,31 @@ export async function POST(req: NextRequest) {
       (currentProfile.brandStyle || "") === (brandStyle || "") &&
       (currentProfile.website || "") === (website || "") &&
       JSON.stringify(currentProfile.socialMedia || {}) === JSON.stringify(socialMedia || {});
+
+    // Always persist contact fields (free) — even when business profile is unchanged
+    const hasContactPayload =
+      body.phone !== undefined ||
+      body.whatsappNumber !== undefined ||
+      body.telegramId !== undefined ||
+      body.linkedinUrl !== undefined ||
+      body.instagramHandle !== undefined ||
+      body.preferredContact !== undefined;
+    if (hasContactPayload) {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          phone,
+          whatsappNumber,
+          telegramId,
+          linkedinUrl,
+          instagramHandle,
+          ...(preferredContact ? { preferredContact } : {}),
+        },
+      });
+    }
+
     if (noChange) {
-      return NextResponse.json({ success: true, message: "Sin cambios" });
+      return NextResponse.json({ success: true, message: "No business profile changes" });
     }
 
     // Atomic: check balance + deduct + update inside transaction

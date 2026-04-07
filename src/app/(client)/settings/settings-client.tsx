@@ -38,6 +38,12 @@ interface ProfileData {
   socialMedia: Record<string, string>;
   language?: string;
   deliveryLanguage?: string;
+  phone?: string;
+  whatsappNumber?: string;
+  telegramId?: string;
+  linkedinUrl?: string;
+  instagramHandle?: string;
+  preferredContact?: string;
 }
 
 export function SettingsClient({
@@ -68,7 +74,45 @@ export function SettingsClient({
   const [platformLang, setPlatformLang] = useState(profile.language || "en");
   const [deliveryLang, setDeliveryLang] = useState(profile.deliveryLanguage || "en");
 
+  // Contact info — separate state, NOT charged
+  const [phone, setPhone] = useState(profile.phone || "");
+  const [whatsappNumber, setWhatsappNumber] = useState(profile.whatsappNumber || "");
+  const [telegramId, setTelegramId] = useState(profile.telegramId || "");
+  const [linkedinUrl, setLinkedinUrl] = useState(profile.linkedinUrl || "");
+  const [instagramHandle, setInstagramHandle] = useState(profile.instagramHandle || "");
+  const [preferredContact, setPreferredContact] = useState(profile.preferredContact || "email");
+  const [contactSaving, setContactSaving] = useState(false);
+
   const canAfford = totalCredits >= EDIT_COST;
+
+  const handleSaveContact = async () => {
+    setContactSaving(true);
+    try {
+      const res = await fetch("/api/profile/contact", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone,
+          whatsappNumber,
+          telegramId,
+          linkedinUrl,
+          instagramHandle,
+          preferredContact,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to save");
+        return;
+      }
+      toast.success(t("contact.saved"));
+      router.refresh();
+    } catch {
+      toast.error("Connection error");
+    } finally {
+      setContactSaving(false);
+    }
+  };
 
   const handlePlatformLangChange = async (newLang: string) => {
     setPlatformLang(newLang);
@@ -309,6 +353,82 @@ export function SettingsClient({
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Contact Information — free to edit */}
+      <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+        <CardHeader>
+          <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">{t("contact.title")}</CardTitle>
+          <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">{t("contact.subtitle")}</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.phone")}</Label>
+            <Input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder={t("contact.placeholder.phone")}
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.whatsapp")}</Label>
+            <Input
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder={t("contact.placeholder.whatsapp")}
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.telegram")}</Label>
+            <Input
+              value={telegramId}
+              onChange={(e) => setTelegramId(e.target.value)}
+              placeholder={t("contact.placeholder.telegram")}
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.linkedin")}</Label>
+            <Input
+              value={linkedinUrl}
+              onChange={(e) => setLinkedinUrl(e.target.value)}
+              placeholder={t("contact.placeholder.linkedin")}
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.instagram")}</Label>
+            <Input
+              value={instagramHandle}
+              onChange={(e) => setInstagramHandle(e.target.value)}
+              placeholder={t("contact.placeholder.instagram")}
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[var(--ice-white)]">{t("contact.preferred")}</Label>
+            <select
+              value={preferredContact}
+              onChange={(e) => setPreferredContact(e.target.value)}
+              className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
+            >
+              <option value="email">{t("contact.method.email")}</option>
+              <option value="phone">{t("contact.method.phone")}</option>
+              <option value="whatsapp">{t("contact.method.whatsapp")}</option>
+              <option value="telegram">{t("contact.method.telegram")}</option>
+            </select>
+          </div>
+          <Button
+            onClick={handleSaveContact}
+            disabled={contactSaving}
+            className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {contactSaving ? "Saving..." : t("settings.save")}
+          </Button>
         </CardContent>
       </Card>
 
