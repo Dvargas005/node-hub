@@ -19,6 +19,7 @@ model User {
   linkedinUrl       String?
   instagramHandle   String?
   preferredContact  String?   @default("email")
+  calendlyUrl       String?
   image         String?
   language          String    @default("es")
   deliveryLanguage  String    @default("es")

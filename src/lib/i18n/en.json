@@ -234,5 +234,11 @@
   "messages.emptyPm": "No messages yet. Your clients will appear here.",
   "messages.you": "You",
   "messages.conversations": "Conversations",
-  "messages.newMessage": "New message from"
+  "messages.newMessage": "New message from",
+  "calendly.book": "Book a meeting",
+  "calendly.subtitle": "Schedule a call with your Project Manager",
+  "calendly.schedule": "Schedule",
+  "calendly.noPm": "You'll be able to schedule meetings after your PM is assigned.",
+  "calendly.needToTalk": "Need to talk?",
+  "calendly.saved": "Calendly URL saved"
 }

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
+import { Plus, Calendar } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -30,6 +32,7 @@ interface TeamMember {
   role: string;
   phone: string | null;
   timezone: string | null;
+  calendlyUrl: string | null;
   createdAt: string;
   clientCount: number;
   freelancerCount: number;
@@ -42,6 +45,7 @@ const roleBadge: Record<string, string> = {
 
 export function TeamClient({ team }: { team: TeamMember[] }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
@@ -52,6 +56,44 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
     phone: "",
     timezone: "America/Chicago",
   });
+
+  const [editingCalendly, setEditingCalendly] = useState<TeamMember | null>(null);
+  const [calendlyDraft, setCalendlyDraft] = useState("");
+  const [savingCalendly, setSavingCalendly] = useState(false);
+
+  const openCalendlyEdit = (member: TeamMember) => {
+    setEditingCalendly(member);
+    setCalendlyDraft(member.calendlyUrl || "");
+  };
+
+  const handleSaveCalendly = async () => {
+    if (!editingCalendly) return;
+    const value = calendlyDraft.trim();
+    if (value && !value.startsWith("https://calendly.com/")) {
+      toast.error("URL must start with https://calendly.com/");
+      return;
+    }
+    setSavingCalendly(true);
+    try {
+      const res = await fetch(`/api/admin/team/${editingCalendly.id}/calendly`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ calendlyUrl: value || null }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to save");
+        return;
+      }
+      toast.success(t("calendly.saved"));
+      setEditingCalendly(null);
+      router.refresh();
+    } catch {
+      toast.error("Connection error");
+    } finally {
+      setSavingCalendly(false);
+    }
+  };
 
   const handleCreate = async () => {
     try {
@@ -117,6 +159,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Role</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Calendly</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Assigned clients</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Supervised freelancers</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
@@ -126,14 +169,14 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                 {team.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={7}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
                       No team members
                     </TableCell>
                   </TableRow>
                 )}
-                {team.map((m: any) => (
+                {team.map((m: TeamMember) => (
                   <TableRow
                     key={m.id}
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"
@@ -148,6 +191,20 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                       <Badge className={roleBadge[m.role] || ""}>
                         {m.role}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <button
+                        type="button"
+                        onClick={() => openCalendlyEdit(m)}
+                        className="flex items-center gap-1.5 text-[rgba(245,246,252,0.6)] hover:text-[var(--gold-bar)] transition-colors"
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        {m.calendlyUrl ? (
+                          <span className="truncate max-w-[180px]">{m.calendlyUrl.replace("https://calendly.com/", "")}</span>
+                        ) : (
+                          <span className="text-[rgba(245,246,252,0.3)] italic">Not set</span>
+                        )}
+                      </button>
                     </TableCell>
                     <TableCell className="text-sm text-[var(--ice-white)]">
                       {m.clientCount}
@@ -165,6 +222,47 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Calendly Dialog */}
+      <Dialog open={!!editingCalendly} onOpenChange={(open) => { if (!open) setEditingCalendly(null); }}>
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)]">
+          <DialogHeader>
+            <DialogTitle className="text-[var(--ice-white)]">
+              {editingCalendly?.name} — Calendly URL
+            </DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]">
+              Clients with this PM assigned will be able to book meetings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              value={calendlyDraft}
+              onChange={(e) => setCalendlyDraft(e.target.value)}
+              placeholder="https://calendly.com/your-name/30min"
+              className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
+            />
+            <p className="text-xs text-[rgba(245,246,252,0.4)]">
+              Must start with <code className="text-[var(--gold-bar)]">https://calendly.com/</code>. Leave empty to remove.
+            </p>
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setEditingCalendly(null)}
+                className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveCalendly}
+                disabled={savingCalendly}
+                className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+              >
+                {savingCalendly ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Create PM Dialog */}
       <Dialog open={showCreate} onOpenChange={(open) => { if (!open) resetDialog(); }}>
