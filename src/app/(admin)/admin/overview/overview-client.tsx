@@ -20,6 +20,7 @@ import {
   availabilityColors,
   freelancerRoleLabels,
 } from "@/lib/status-labels";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Metrics {
   activeClients: number;
@@ -59,14 +60,15 @@ export function OverviewClient({
   recentTickets: RecentTicket[];
   freelancers: FreelancerSummary[];
 }) {
+  const { t } = useTranslation();
   const metricCards = [
     {
-      label: "Clientes activos",
+      label: t("admin.overview.activeClients"),
       value: metrics.activeClients,
       icon: Users,
     },
     {
-      label: "Tickets abiertos",
+      label: t("admin.overview.openTickets"),
       value: metrics.openTickets,
       icon: Ticket,
     },
@@ -85,7 +87,7 @@ export function OverviewClient({
   return (
     <div className="space-y-8">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Panel General
+        Overview
       </h1>
 
       {/* Metrics */}

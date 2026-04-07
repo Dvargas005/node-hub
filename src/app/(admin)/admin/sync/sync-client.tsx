@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { categoryLabels, categoryColors } from "@/lib/status-labels";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SyncReport {
   id: string;
@@ -29,6 +30,7 @@ function fmt(iso: string) {
 }
 
 export function SyncClient({ reports }: { reports: SyncReport[] }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<any>(null);
@@ -59,7 +61,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
         <h1 className="font-[var(--font-lexend)] text-xl font-bold text-[var(--ice-white)]">Sync Tigrenator</h1>
         <Button onClick={handleSync} disabled={loading} className={`${goldBtn} gap-2`}>
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Sincronizando..." : "Sincronizar con Tigrenator"}
+          {loading ? t("admin.sync.syncing") : t("admin.sync.syncWith")}
         </Button>
       </div>
 

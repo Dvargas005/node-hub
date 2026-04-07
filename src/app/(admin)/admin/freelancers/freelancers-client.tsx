@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Eye, EyeOff, Copy } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   availabilityLabels,
   availabilityColors,
@@ -77,6 +78,7 @@ export function FreelancersClient({
   isAdmin: boolean;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [filterRole, setFilterRole] = useState("");
   const [filterAvailability, setFilterAvailability] = useState("");
 
@@ -113,7 +115,7 @@ export function FreelancersClient({
 
   const handleCreate = async () => {
     if (!createForm.name.trim() || !createForm.email.trim()) {
-      setCreateError("Nombre y email son obligatorios");
+      setCreateError(t("admin.freelancers.requiredFields"));
       return;
     }
     setCreating(true);
@@ -180,7 +182,7 @@ export function FreelancersClient({
   const handleEdit = async () => {
     if (!editTarget) return;
     if (!editForm.name.trim() || !editForm.email.trim()) {
-      setEditError("Nombre y email son obligatorios");
+      setEditError(t("admin.freelancers.requiredFields"));
       return;
     }
     setEditing(true);
@@ -251,7 +253,7 @@ export function FreelancersClient({
       {/* Name */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Nombre *
+          {t("common.name")} *
         </label>
         <input
           value={form.name}
@@ -263,32 +265,32 @@ export function FreelancersClient({
       {/* Email */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Email *
+          {t("common.email")} *
         </label>
         <input
           type="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="email@ejemplo.com"
+          placeholder="email@example.com"
         />
       </div>
       {/* Phone */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Teléfono
+          {t("common.phone")}
         </label>
         <input
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="+58 412 000 0000"
+          placeholder="+1 555 000 0000"
         />
       </div>
       {/* Role */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Rol
+          {t("common.role")}
         </label>
         <select
           value={form.role}
@@ -332,7 +334,7 @@ export function FreelancersClient({
       {/* Skill Tags */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Skill Tags (separados por coma)
+          {t("admin.freelancers.skillTagsLabel")}
         </label>
         <input
           value={form.skillTags}
@@ -345,7 +347,7 @@ export function FreelancersClient({
       {showSalaryField && (
         <div>
           <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-            Salario mensual (USD)
+            {t("admin.freelancers.monthlySalary")}
           </label>
           <input
             type="number"
@@ -361,7 +363,7 @@ export function FreelancersClient({
       {/* Client Capacity */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Capacidad de clientes
+          {t("admin.freelancers.clientCapacity")}
         </label>
         <input
           type="number"
@@ -401,7 +403,7 @@ export function FreelancersClient({
       {/* Timezone */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Timezone
+          {t("admin.freelancers.timezone")}
         </label>
         <input
           value={form.timezone}
@@ -425,7 +427,7 @@ export function FreelancersClient({
             className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold gap-1.5"
           >
             <Plus className="h-4 w-4" />
-            Crear freelancer
+            {t("admin.freelancers.create")}
           </Button>
         )}
       </div>
@@ -439,21 +441,21 @@ export function FreelancersClient({
               onChange={(e) => setFilterRole(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              <option value="">Todos los roles</option>
-              <option value="GRAPHIC_DESIGNER">Diseñador</option>
-              <option value="AI_DEVELOPER">Desarrollador IA</option>
-              <option value="COMMUNITY_MANAGER">Community Manager</option>
+              <option value="">{t("admin.freelancers.allRoles")}</option>
+              <option value="GRAPHIC_DESIGNER">{t("admin.freelancers.designer")}</option>
+              <option value="AI_DEVELOPER">{t("admin.freelancers.aiDeveloper")}</option>
+              <option value="COMMUNITY_MANAGER">{t("admin.freelancers.communityManager")}</option>
             </select>
             <select
               value={filterAvailability}
               onChange={(e) => setFilterAvailability(e.target.value)}
               className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
             >
-              <option value="">Toda disponibilidad</option>
-              <option value="AVAILABLE">Disponible</option>
-              <option value="BUSY">Ocupado</option>
-              <option value="ON_LEAVE">Ausente</option>
-              <option value="INACTIVE">Inactivo</option>
+              <option value="">{t("admin.freelancers.allAvailability")}</option>
+              <option value="AVAILABLE">{t("admin.freelancers.available")}</option>
+              <option value="BUSY">{t("admin.freelancers.busy")}</option>
+              <option value="ON_LEAVE">{t("admin.freelancers.onLeave")}</option>
+              <option value="INACTIVE">{t("admin.freelancers.inactive")}</option>
             </select>
           </div>
         </CardContent>
@@ -471,16 +473,16 @@ export function FreelancersClient({
             <Table>
               <TableHeader>
                 <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Nombre</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Rol</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Skills</TableHead>
-                  {showSalary && <TableHead className="text-[rgba(245,246,252,0.5)]">Salario</TableHead>}
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Carga</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Disponibilidad</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
-                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">Credenciales</TableHead>}
-                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">Acciones</TableHead>}
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("common.name")}</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("common.email")}</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("common.role")}</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.skills")}</TableHead>
+                  {showSalary && <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.salary")}</TableHead>}
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.load")}</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.availability")}</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.pm")}</TableHead>
+                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.freelancers.credentials")}</TableHead>}
+                  {isAdmin && <TableHead className="text-[rgba(245,246,252,0.5)]">{t("common.actions")}</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -490,7 +492,7 @@ export function FreelancersClient({
                       colSpan={isAdmin ? (showSalary ? 9 : 8) : (showSalary ? 8 : 7)}
                       className="text-center text-[rgba(245,246,252,0.4)] py-8"
                     >
-                      No hay freelancers
+                      {t("admin.freelancers.empty")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -587,7 +589,7 @@ export function FreelancersClient({
                           className="h-7 gap-1 text-xs text-[var(--gold-bar)] hover:text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)]"
                         >
                           <Pencil className="h-3 w-3" />
-                          Editar
+                          {t("common.edit")}
                         </Button>
                       </TableCell>
                     )}
@@ -604,10 +606,10 @@ export function FreelancersClient({
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)]">
-              Crear Freelancer
+              {t("admin.freelancers.createTitle")}
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              Completa los campos para registrar un nuevo freelancer.
+              {t("admin.freelancers.createHint")}
             </DialogDescription>
           </DialogHeader>
 
@@ -625,14 +627,14 @@ export function FreelancersClient({
               onClick={() => setShowCreate(false)}
               className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleCreate}
               disabled={creating}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {creating ? "Creating..." : "Create"}
+              {creating ? t("common.creating") : t("common.create")}
             </Button>
           </div>
         </DialogContent>
@@ -646,10 +648,10 @@ export function FreelancersClient({
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)]">
-              Editar Freelancer
+              {t("admin.freelancers.editTitle")}
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              Modifica los campos del freelancer.
+              {t("admin.freelancers.editHint")}
             </DialogDescription>
           </DialogHeader>
 
@@ -667,14 +669,14 @@ export function FreelancersClient({
               onClick={() => setEditTarget(null)}
               className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleEdit}
               disabled={editing}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {editing ? "Saving..." : "Save"}
+              {editing ? t("common.saving") : t("common.save")}
             </Button>
           </div>
         </DialogContent>

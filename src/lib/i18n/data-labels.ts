@@ -11,14 +11,15 @@ const audienceMap: Record<string, string> = {
   "Professionals": "audience.professionals",
   "Local community": "audience.local",
   "Online / E-commerce": "audience.ecommerce",
-  // Spanish
+  // Spanish + Portuguese (sharing strings where identical)
   "Consumidor final (B2C)": "audience.b2c",
   "Empresas (B2B)": "audience.b2b",
   "Ambos": "audience.both",
   "Familias": "audience.families",
   "Profesionistas": "audience.professionals",
+  "Profesionales": "audience.professionals",
   "Comunidad local": "audience.local",
-  // Portuguese
+  // Portuguese-only
   "Famílias": "audience.families",
   "Profissionais": "audience.professionals",
   "Comunidade local": "audience.local",
@@ -54,6 +55,7 @@ const industryMap: Record<string, string> = {
   "Eventos": "industry.events",
   "Construcción": "industry.construction",
   "Transporte": "industry.transport",
+  "Logística": "industry.transport",
   "Bienes Raíces": "industry.realestate",
   "Automotriz": "industry.automotive",
   "Limpieza y Mantenimiento": "industry.cleaning",
@@ -62,6 +64,22 @@ const industryMap: Record<string, string> = {
   "Turismo y Hotelería": "industry.tourism",
   "Agricultura": "industry.agriculture",
   "Otro": "industry.other",
+  // Portuguese (only entries unique to PT — shared strings already covered above)
+  "Alimentos e Padaria": "industry.food",
+  "Varejo / Loja": "industry.retail",
+  "Serviços Profissionais": "industry.professional",
+  "Saúde e Terapia": "industry.health",
+  "Tecnologia": "industry.tech",
+  "Educação": "industry.education",
+  "Construção": "industry.construction",
+  "Imóveis": "industry.realestate",
+  "Automotivo": "industry.automotive",
+  "Limpeza e Manutenção": "industry.cleaning",
+  "Beleza e Cabeleireiro": "industry.beauty",
+  "Fitness e Academia": "industry.fitness",
+  "Jurídico": "industry.legal",
+  "Turismo e Hotelaria": "industry.tourism",
+  "Outro": "industry.other",
 };
 
 /** Given a stored value in any language, return the translated version */

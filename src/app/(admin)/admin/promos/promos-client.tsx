@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-
-const TYPE_LABELS: Record<string, string> = {
-  PERCENT_OFF: "% Descuento",
-  FIXED_CREDITS: "Credits",
-  FREE_MONTH: "Mes gratis",
-};
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
+  const { t } = useTranslation();
+  const TYPE_LABELS: Record<string, string> = {
+    PERCENT_OFF: "% Off",
+    FIXED_CREDITS: "Credits",
+    FREE_MONTH: t("admin.promos.freeMonth"),
+  };
   const [promos, setPromos] = useState(initialPromos);
   const [showDialog, setShowDialog] = useState(false);
   const [form, setForm] = useState({
@@ -188,9 +189,9 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                     onChange={(e) => setForm({ ...form, type: e.target.value })}
                     className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)]"
                   >
-                    <option value="PERCENT_OFF">% Descuento</option>
+                    <option value="PERCENT_OFF">% Off</option>
                     <option value="FIXED_CREDITS">Credits</option>
-                    <option value="FREE_MONTH">Mes gratis</option>
+                    <option value="FREE_MONTH">{t("admin.promos.freeMonth")}</option>
                   </select>
                 </div>
                 <div>
@@ -257,14 +258,14 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                 onClick={() => setShowDialog(false)}
                 className="rounded-md border border-[rgba(245,246,252,0.2)] px-4 py-2 text-sm text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
               >
-                Cancelar
+                {t("common.cancel")}
               </button>
               <button
                 onClick={handleCreate}
                 disabled={saving || !form.code || !form.value}
                 className="rounded-md bg-[var(--gold-bar)] px-4 py-2 text-sm font-bold text-[var(--asphalt-black)] hover:opacity-90 disabled:opacity-50"
               >
-                {saving ? "Creating..." : "Create code"}
+                {saving ? t("common.creating") : t("common.create")}
               </button>
             </div>
           </div>

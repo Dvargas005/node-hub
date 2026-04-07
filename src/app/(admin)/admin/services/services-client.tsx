@@ -31,7 +31,7 @@ interface ServiceData {
 
 const categories = ["DESIGN", "WEB", "MARKETING"] as const;
 const planOptions = [
-  { value: "", label: "Ninguno" },
+  { value: "", label: "None" },
   { value: "member", label: "Member" },
   { value: "growth", label: "Growth" },
   { value: "pro", label: "Pro" },

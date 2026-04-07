@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Pencil } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface AllianceRow {
   id: string;
@@ -62,6 +63,7 @@ export function AlliancesClient({
   isAdmin: boolean;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Create dialog
   const [showCreate, setShowCreate] = useState(false);
@@ -95,7 +97,7 @@ export function AlliancesClient({
 
   const handleCreate = async () => {
     if (!createForm.name.trim()) {
-      setCreateError("El nombre es obligatorio");
+      setCreateError(t("admin.alliances.requiredName"));
       return;
     }
     setCreating(true);
@@ -126,10 +128,10 @@ export function AlliancesClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setCreateError(data.error || "Error creating alliance");
+        setCreateError(data.error || t("admin.alliances.errorCreating"));
       }
     } catch {
-      setCreateError("Connection error");
+      setCreateError(t("common.connectionError"));
     } finally {
       setCreating(false);
     }
@@ -154,7 +156,7 @@ export function AlliancesClient({
   const handleEdit = async () => {
     if (!editTarget) return;
     if (!editForm.name.trim()) {
-      setEditError("El nombre es obligatorio");
+      setEditError(t("admin.alliances.requiredName"));
       return;
     }
     setEditing(true);
@@ -185,10 +187,10 @@ export function AlliancesClient({
         router.refresh();
       } else {
         const data = await res.json();
-        setEditError(data.error || "Error editing alliance");
+        setEditError(data.error || t("admin.alliances.errorEditing"));
       }
     } catch {
-      setEditError("Connection error");
+      setEditError(t("common.connectionError"));
     } finally {
       setEditing(false);
     }
@@ -247,7 +249,7 @@ export function AlliancesClient({
       {/* Code */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Código (mayúsculas)
+          Code (uppercase)
         </label>
         <input
           value={form.code}
@@ -255,13 +257,13 @@ export function AlliancesClient({
             setForm({ ...form, code: e.target.value.toUpperCase() })
           }
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)] uppercase"
-          placeholder="ALIANZA2024"
+          placeholder="ALLIANCE2024"
         />
       </div>
       {/* Contact Name */}
       <div>
         <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-          Nombre de contacto
+          Contact name
         </label>
         <input
           value={form.contactName}
@@ -422,21 +424,21 @@ export function AlliancesClient({
                         >
                           {a.isActive ? (
                             <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              {togglingId === a.id ? "..." : "Activa"}
+                              {togglingId === a.id ? "..." : t("admin.alliances.active")}
                             </Badge>
                           ) : (
                             <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-                              {togglingId === a.id ? "..." : "Inactiva"}
+                              {togglingId === a.id ? "..." : t("admin.alliances.inactive")}
                             </Badge>
                           )}
                         </button>
                       ) : a.isActive ? (
                         <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                          Activa
+                          {t("admin.alliances.active")}
                         </Badge>
                       ) : (
                         <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-                          Inactiva
+                          {t("admin.alliances.inactive")}
                         </Badge>
                       )}
                     </TableCell>
@@ -449,7 +451,7 @@ export function AlliancesClient({
                           className="h-7 gap-1 text-xs text-[var(--gold-bar)] hover:text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)]"
                         >
                           <Pencil className="h-3 w-3" />
-                          Editar
+                          {t("common.edit")}
                         </Button>
                       </TableCell>
                     )}
@@ -466,10 +468,10 @@ export function AlliancesClient({
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)]">
-              Crear Alianza
+              Create Alliance
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              Completa los campos para registrar una nueva alianza.
+              Fill the fields to register a new alliance.
             </DialogDescription>
           </DialogHeader>
 
@@ -487,14 +489,14 @@ export function AlliancesClient({
               onClick={() => setShowCreate(false)}
               className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleCreate}
               disabled={creating}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {creating ? "Creating..." : "Create"}
+              {creating ? t("common.creating") : t("common.create")}
             </Button>
           </div>
         </DialogContent>
@@ -511,7 +513,7 @@ export function AlliancesClient({
               Edit Alliance
             </DialogTitle>
             <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              Modifica los campos de la alianza.
+              Edit alliance details.
             </DialogDescription>
           </DialogHeader>
 
@@ -529,14 +531,14 @@ export function AlliancesClient({
               onClick={() => setEditTarget(null)}
               className="text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)]"
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleEdit}
               disabled={editing}
               className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
             >
-              {editing ? "Saving..." : "Save"}
+              {editing ? t("common.saving") : t("common.save")}
             </Button>
           </div>
         </DialogContent>

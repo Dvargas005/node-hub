@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { CategorySelector } from "@/components/wizard/category-selector";
 import { ChatInterface } from "@/components/wizard/chat-interface";
 import { BriefConfirmation } from "@/components/wizard/brief-confirmation";
@@ -50,6 +51,7 @@ export function RequestClient({
 }: {
   subscription: { creditsRemaining: number; planName: string; freeCredits?: number } | null;
 }) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
   const [step, setStep] = useState<Step>(initialCategory ? "chat" : "category");
@@ -102,7 +104,7 @@ export function RequestClient({
         }
       }
     } catch {
-      setError("No se pudo cargar el catálogo. Intenta de nuevo.");
+      setError(t("wizard.errorLoadingCatalog"));
       setStep("category");
       return;
     }
@@ -146,26 +148,26 @@ export function RequestClient({
   return (
     <div className="space-y-6">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Nueva Solicitud
+        {t("nav.request")}
       </h1>
 
       {/* Step indicator */}
       {step !== "success" && (
         <div className="flex items-center gap-2 text-xs text-[rgba(245,246,252,0.4)]">
           <span className={step === "category" ? "text-[var(--gold-bar)]" : ""}>
-            Categoría
+            {t("wizard.step.category")}
           </span>
           <span>→</span>
           <span
             className={step === "chat" ? "text-[var(--gold-bar)]" : ""}
           >
-            Conversación
+            {t("wizard.step.conversation")}
           </span>
           <span>→</span>
           <span
             className={step === "confirm" ? "text-[var(--gold-bar)]" : ""}
           >
-            Confirmación
+            {t("wizard.step.confirmation")}
           </span>
         </div>
       )}
