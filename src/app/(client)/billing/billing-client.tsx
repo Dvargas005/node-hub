@@ -286,60 +286,6 @@ export function BillingClient({
         </div>
       )}
 
-      {/* Starter plan — one-time, $5, no credits */}
-      {showPricing && starterPlan && (
-        <Card className="border-[var(--gold-bar)]/20 bg-[rgba(255,201,25,0.03)]">
-          <CardContent className="py-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[var(--gold-bar)]/15 text-[var(--gold-bar)]">
-                  <Sparkles className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">
-                      {t("billing.starter")}
-                    </h3>
-                    <Badge className="bg-[var(--gold-bar)]/15 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[10px]">
-                      {t("billing.starter.noCommitment")}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">{t("billing.starter.description")}</p>
-                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[rgba(245,246,252,0.6)]">
-                    {(planFeatures.starter || []).map((f: string) => (
-                      <li key={f} className="flex items-center gap-1">
-                        <Check className="h-3 w-3 text-[var(--gold-bar)]" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="flex flex-col items-start sm:items-end gap-2">
-                <div>
-                  <span className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-                    ${starterPlan.priceMonthly / 100}
-                  </span>
-                  <span className="text-xs text-[rgba(245,246,252,0.5)]">/mo</span>
-                </div>
-                <Button
-                  onClick={() => handleSubscribe(starterPlan.slug)}
-                  disabled={loadingPlan === starterPlan.slug || !starterPlan.stripePriceId}
-                  className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
-                >
-                  {loadingPlan === starterPlan.slug ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : isExpired ? (
-                    t("billing.starter.renew")
-                  ) : (
-                    t("billing.starter.cta")
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {showPricing && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
@@ -433,6 +379,26 @@ export function BillingClient({
               >
                 Apply
               </Button>
+            </div>
+          )}
+
+          {/* Starter — secondary CTA, text only, no card */}
+          {starterPlan && (
+            <div className="mt-6 text-center text-sm text-[rgba(245,246,252,0.5)]">
+              <Sparkles className="inline h-3.5 w-3.5 text-[var(--gold-bar)] mr-1 align-text-top" />
+              {t("billing.starter.description")}{" "}
+              <button
+                type="button"
+                onClick={() => handleSubscribe(starterPlan.slug)}
+                disabled={loadingPlan === starterPlan.slug || !starterPlan.stripePriceId}
+                className="text-[var(--gold-bar)] hover:underline font-medium disabled:opacity-50"
+              >
+                {loadingPlan === starterPlan.slug
+                  ? "..."
+                  : isExpired
+                  ? t("billing.starter.renew")
+                  : t("billing.starter.cta")}
+              </button>
             </div>
           )}
         </div>

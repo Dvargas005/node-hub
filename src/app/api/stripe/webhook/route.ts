@@ -152,7 +152,12 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // C2: Credits always RESET to plan total (old credits are lost — business rule)
+        // C2: Credits RESET to plan total (business rule). EXCEPTION: when
+        // upgrading from a non-recurring Starter sub, carryCredits metadata
+        // brings forward the unused credits the user already paid for.
+        const carryCredits = parseInt(metadata?.carryCredits || "0") || 0;
+        const startingCredits = plan.monthlyCredits + plan.bonusCredits + carryCredits;
+
         await db.subscription.upsert({
           where: { userId },
           update: {
@@ -162,7 +167,7 @@ export async function POST(req: NextRequest) {
             status: "ACTIVE",
             currentPeriodStart: periodStart,
             currentPeriodEnd: periodEnd,
-            creditsRemaining: plan.monthlyCredits + plan.bonusCredits,
+            creditsRemaining: startingCredits,
             canceledAt: null,
           },
           create: {
@@ -173,9 +178,12 @@ export async function POST(req: NextRequest) {
             status: "ACTIVE",
             currentPeriodStart: periodStart,
             currentPeriodEnd: periodEnd,
-            creditsRemaining: plan.monthlyCredits + plan.bonusCredits,
+            creditsRemaining: startingCredits,
           },
         });
+        if (carryCredits > 0) {
+          console.log(`[WEBHOOK] Carried ${carryCredits} unused credits from previous Starter`);
+        }
 
         // Save stripeCustomerId on user too
         await db.user.update({

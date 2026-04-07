@@ -34,8 +34,8 @@ interface PlanSeed {
 const plans: PlanSeed[] = [
   {
     slug: "starter",
-    name: "N.O.D.E. Starter",
-    description: "1-month trial. No credits included — buy as you go.",
+    name: "N.O.D.E. On demand",
+    description: "1-month pay-as-you-go. No credits included — buy 1:1 as you need them.",
     priceMonthly: 500, // $5
     setupFee: 0,
     monthlyCredits: 0,

@@ -11,15 +11,21 @@ export async function POST(req: NextRequest) {
   try {
     const stripe = getStripe();
     if (!stripe) {
-      return NextResponse.json({ error: "Stripe no disponible" }, { status: 503 });
+      return NextResponse.json({ error: "Stripe is not configured" }, { status: 503 });
     }
 
     const { planSlug, promoCode } = await req.json();
     const userId = session.user.id;
 
     const plan = await db.plan.findUnique({ where: { slug: planSlug } });
-    if (!plan || !plan.stripePriceId) {
-      return NextResponse.json({ error: "Plan no encontrado o sin precio configurado" }, { status: 404 });
+    if (!plan) {
+      return NextResponse.json({ error: `Plan "${planSlug}" not found` }, { status: 404 });
+    }
+    if (!plan.stripePriceId) {
+      return NextResponse.json(
+        { error: `Plan "${plan.name}" has no Stripe price configured. Run setup-stripe.ts.` },
+        { status: 500 },
+      );
     }
 
     // If user has ACTIVE subscription → upgrade flow (proration + setup diff + carry credits)
@@ -180,15 +186,24 @@ export async function POST(req: NextRequest) {
       lineItems.push({ price: plan.setupFeeStripePriceId, quantity: 1 });
     }
 
+    // Carry credits from a non-recurring (Starter) subscription forward
+    const carryCredits =
+      existingSub && !existingSub.stripeSubscriptionId && existingSub.creditsRemaining > 0
+        ? existingSub.creditsRemaining
+        : 0;
+
+    const subscriptionMetadata: Record<string, string> = { userId, planSlug };
+    if (carryCredits > 0) subscriptionMetadata.carryCredits = String(carryCredits);
+
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       customer: customerId,
       line_items: lineItems,
       success_url: `${baseUrl}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/billing?checkout=canceled`,
-      metadata: { userId, planSlug },
+      metadata: subscriptionMetadata,
       subscription_data: {
-        metadata: { userId, planSlug },
+        metadata: subscriptionMetadata,
       },
     };
 
@@ -208,6 +223,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
     console.error("[STRIPE_CHECKOUT]", err);
-    return NextResponse.json({ error: "Error al crear sesión de pago" }, { status: 500 });
+    const message =
+      err instanceof Stripe.errors.StripeError
+        ? `Stripe error: ${err.message}`
+        : err instanceof Error
+        ? err.message
+        : "Failed to create checkout session";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
