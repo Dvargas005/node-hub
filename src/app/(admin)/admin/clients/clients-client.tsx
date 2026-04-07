@@ -2,9 +2,18 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -13,8 +22,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search } from "lucide-react";
+import { Search, Coins, AlertTriangle } from "lucide-react";
 import { ContactIcons } from "@/components/admin/contact-links";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ClientRow {
   id: string;
@@ -57,9 +67,73 @@ export function ClientsClient({
   pms: { id: string; name: string }[];
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("");
   const [filterAlliance, setFilterAlliance] = useState(false);
+
+  // Credit adjustment dialog
+  const [creditTarget, setCreditTarget] = useState<ClientRow | null>(null);
+  const [creditMode, setCreditMode] = useState<"add" | "remove">("add");
+  const [creditAmount, setCreditAmount] = useState<string>("");
+  const [creditReason, setCreditReason] = useState("");
+  const [creditConfirming, setCreditConfirming] = useState(false);
+  const [creditSaving, setCreditSaving] = useState(false);
+  const [creditError, setCreditError] = useState("");
+
+  const openCreditDialog = (client: ClientRow) => {
+    setCreditTarget(client);
+    setCreditMode("add");
+    setCreditAmount("");
+    setCreditReason("");
+    setCreditConfirming(false);
+    setCreditError("");
+  };
+
+  const closeCreditDialog = () => {
+    setCreditTarget(null);
+    setCreditConfirming(false);
+    setCreditError("");
+  };
+
+  const handleAdjustCredits = async () => {
+    if (!creditTarget) return;
+    setCreditError("");
+    const amountNum = parseInt(creditAmount, 10);
+    if (!Number.isFinite(amountNum) || amountNum <= 0) {
+      setCreditError("Invalid amount");
+      return;
+    }
+    if (creditReason.trim().length < 3) {
+      setCreditError("Reason required (min 3 chars)");
+      return;
+    }
+    if (!creditConfirming) {
+      setCreditConfirming(true);
+      return;
+    }
+    setCreditSaving(true);
+    try {
+      const signed = creditMode === "add" ? amountNum : -amountNum;
+      const res = await fetch(`/api/admin/clients/${creditTarget.id}/credits`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: signed, reason: creditReason.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCreditError(data.error || "Error");
+        return;
+      }
+      toast.success(t("admin.credits.success"));
+      closeCreditDialog();
+      router.refresh();
+    } catch {
+      setCreditError("Connection error");
+    } finally {
+      setCreditSaving(false);
+    }
+  };
 
   const handleAssignPm = async (clientId: string, pmId: string) => {
     try {
@@ -215,16 +289,29 @@ export function ClientsClient({
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      {c.creditsRemaining !== null ? (
-                        <span>
-                          <span className="text-[var(--ice-white)]">
-                            {c.creditsRemaining}
+                      <div className="flex items-center gap-1.5">
+                        {c.creditsRemaining !== null ? (
+                          <span>
+                            <span className="text-[var(--ice-white)]">
+                              {c.creditsRemaining}
+                            </span>
+                            /{c.monthlyCredits}
                           </span>
-                          /{c.monthlyCredits}
-                        </span>
-                      ) : (
-                        <span className="text-[rgba(245,246,252,0.3)]">—</span>
-                      )}
+                        ) : (
+                          <span className="text-[rgba(245,246,252,0.3)]">—</span>
+                        )}
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => openCreditDialog(c)}
+                            className="text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] transition-colors p-0.5"
+                            title={t("admin.credits.adjust")}
+                            aria-label={t("admin.credits.adjust")}
+                          >
+                            <Coins className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-sm text-[var(--ice-white)]">
                       {c.activeTickets}
@@ -270,6 +357,117 @@ export function ClientsClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Credit adjustment dialog */}
+      <Dialog open={!!creditTarget} onOpenChange={(open) => { if (!open) closeCreditDialog(); }}>
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-[var(--font-lexend)]">
+              {t("admin.credits.adjust")}
+              {creditTarget && (
+                <span className="block text-sm font-normal text-[rgba(245,246,252,0.5)] mt-1">
+                  {creditTarget.name}
+                </span>
+              )}
+            </DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]" />
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Add / Remove toggle */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setCreditMode("add")}
+                className={`flex-1 py-2 rounded-md text-sm font-medium border transition-colors ${
+                  creditMode === "add"
+                    ? "border-[var(--gold-bar)] bg-[var(--gold-bar)]/15 text-[var(--gold-bar)]"
+                    : "border-[rgba(245,246,252,0.2)] text-[rgba(245,246,252,0.6)] hover:border-[var(--gold-bar)]/50"
+                }`}
+              >
+                + {t("admin.credits.add")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreditMode("remove")}
+                className={`flex-1 py-2 rounded-md text-sm font-medium border transition-colors ${
+                  creditMode === "remove"
+                    ? "border-red-500/60 bg-red-500/10 text-red-400"
+                    : "border-[rgba(245,246,252,0.2)] text-[rgba(245,246,252,0.6)] hover:border-red-500/50"
+                }`}
+              >
+                − {t("admin.credits.remove")}
+              </button>
+            </div>
+
+            <div>
+              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+                {t("admin.credits.amount")}
+              </label>
+              <Input
+                type="number"
+                min={1}
+                max={99999}
+                value={creditAmount}
+                onChange={(e) => setCreditAmount(e.target.value)}
+                placeholder="100"
+                className="border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)]"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
+                {t("admin.credits.reason")}
+              </label>
+              <textarea
+                value={creditReason}
+                onChange={(e) => setCreditReason(e.target.value.slice(0, 500))}
+                placeholder={t("admin.credits.reason.placeholder")}
+                rows={3}
+                className="w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] px-3 py-2 text-sm text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] resize-none focus:outline-none focus:border-[var(--gold-bar)]"
+              />
+            </div>
+
+            <div className="flex items-start gap-2 text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-md p-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+              <span>{t("admin.credits.warning")}</span>
+            </div>
+
+            {creditError && (
+              <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-2">
+                {creditError}
+              </div>
+            )}
+
+            {creditConfirming && (
+              <div className="text-sm text-[var(--gold-bar)] bg-[var(--gold-bar)]/10 border border-[var(--gold-bar)]/30 rounded-md p-2 text-center">
+                {t("admin.credits.confirm")}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={closeCreditDialog}
+                className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                onClick={handleAdjustCredits}
+                disabled={creditSaving}
+                className={`flex-1 font-bold ${
+                  creditConfirming
+                    ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90"
+                    : "bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)]"
+                }`}
+              >
+                {creditSaving ? "..." : creditConfirming ? t("admin.credits.confirm") : t("admin.credits.adjust")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
