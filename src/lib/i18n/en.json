@@ -222,5 +222,17 @@
   "onboarding.contact": "How can your Project Manager reach you?",
   "onboarding.contact.hint": "All optional — we'll use email by default.",
   "onboarding.contact.continue": "Continue",
-  "onboarding.contact.skip": "Skip for now"
+  "onboarding.contact.skip": "Skip for now",
+  "messages.title": "Messages",
+  "messages.with": "Messages with",
+  "messages.noPm": "A Project Manager will be assigned when you create your first request.",
+  "messages.placeholder": "Write a message...",
+  "messages.send": "Send",
+  "messages.sent": "Message sent",
+  "messages.empty": "No messages yet.",
+  "messages.emptyClient": "No messages yet. Say hi to your PM!",
+  "messages.emptyPm": "No messages yet. Your clients will appear here.",
+  "messages.you": "You",
+  "messages.conversations": "Conversations",
+  "messages.newMessage": "New message from"
 }
