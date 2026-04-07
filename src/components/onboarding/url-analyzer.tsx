@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Globe, Loader2 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function UrlAnalyzer({
   onResult,
@@ -14,6 +15,7 @@ export function UrlAnalyzer({
   onFail: (url: string) => void;
   onSkip: () => void;
 }) {
+  const { t } = useTranslation();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +51,7 @@ export function UrlAnalyzer({
           <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="tusitio.com"
+            placeholder={t("onboarding.urlPlaceholder")}
             disabled={loading}
             className="pl-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
             onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
@@ -60,7 +62,7 @@ export function UrlAnalyzer({
           disabled={loading || !url.trim()}
           className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Analizar"}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("onboarding.analyze")}
         </Button>
       </div>
       <button
@@ -68,7 +70,7 @@ export function UrlAnalyzer({
         disabled={loading}
         className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]"
       >
-        No tengo sitio web →
+        {t("onboarding.noWebsite")} →
       </button>
     </div>
   );
