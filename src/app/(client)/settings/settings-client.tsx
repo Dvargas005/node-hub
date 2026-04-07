@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateIndustry, translateAudience } from "@/lib/i18n/data-labels";
 import {
   Card,
   CardContent,
@@ -45,6 +48,7 @@ export function SettingsClient({
   totalCredits: number;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [confirmingEdit, setConfirmingEdit] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -87,6 +91,7 @@ export function SettingsClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ deliveryLanguage: newLang }),
       });
+      toast.success(t("settings.deliveryLanguage.saved"));
     } catch {}
   };
 
@@ -288,9 +293,9 @@ export function SettingsClient({
           ) : (
             <div className="space-y-3">
               <ProfileRow label="Business" value={profile.businessName} />
-              <ProfileRow label="Industry" value={profile.businessIndustry} />
+              <ProfileRow label="Industry" value={translateIndustry(profile.businessIndustry, t)} />
               <ProfileRow label="Description" value={profile.businessDescription} />
-              <ProfileRow label="Audience" value={profile.targetAudience} />
+              <ProfileRow label="Audience" value={translateAudience(profile.targetAudience, t)} />
               <Separator className="bg-[rgba(245,246,252,0.1)]" />
               <ProfileRow label="Colors" value={profile.brandColors} />
               <ProfileRow label="Style" value={profile.brandStyle} />

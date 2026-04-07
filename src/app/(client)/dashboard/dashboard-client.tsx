@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateIndustry, translateAudience } from "@/lib/i18n/data-labels";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,6 +84,7 @@ export function DashboardClient({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t: tr } = useTranslation();
   const firstName = userName?.split(" ")[0] || "user";
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const greeting = getGreeting(firstName, latestTicket, companyAnalysis);
@@ -245,12 +248,12 @@ export function DashboardClient({
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="font-[var(--font-lexend)] text-lg font-bold text-[var(--ice-white)]">{profile.businessName}</p>
-            {profile.businessIndustry && <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{profile.businessIndustry}</Badge>}
+            {profile.businessIndustry && <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)]">{translateIndustry(profile.businessIndustry, tr)}</Badge>}
             {profile.businessDescription && <p className="text-sm text-[rgba(245,246,252,0.6)]">{profile.businessDescription}</p>}
             {profile.targetAudience && (
               <div className="flex flex-wrap gap-1">
-                {profile.targetAudience.split(",").map((t: any) => (
-                  <Badge key={t} className="text-xs bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.08)]">{t.trim()}</Badge>
+                {translateAudience(profile.targetAudience, tr).split(",").map((seg: any) => (
+                  <Badge key={seg} className="text-xs bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.08)]">{seg.trim()}</Badge>
                 ))}
               </div>
             )}
