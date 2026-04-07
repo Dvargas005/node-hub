@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        // Credit pack purchase
-        if (metadata?.type === "credit_pack" && packCredits) {
+        // Credit pack purchase (fixed pack OR custom amount)
+        if ((metadata?.type === "credit_pack" || metadata?.type === "credit_pack_custom") && packCredits) {
           const credits = parseInt(packCredits);
           const sub = userId
             ? await db.subscription.findUnique({ where: { userId } })
@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
             });
           }
 
-          await db.processedWebhook.create({ data: { sessionId, type: "credit_pack" } });
-          console.log(`[WEBHOOK] Credit pack: +${credits} créditos (pack ${packId})`);
+          await db.processedWebhook.create({ data: { sessionId, type: metadata.type } });
+          console.log(`[WEBHOOK] ${metadata.type}: +${credits} credits${packId ? ` (pack ${packId})` : ""}`);
           break;
         }
 

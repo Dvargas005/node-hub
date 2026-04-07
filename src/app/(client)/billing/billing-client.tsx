@@ -52,6 +52,8 @@ export function BillingClient({
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoDiscount, setPromoDiscount] = useState(0);
+  const [customAmount, setCustomAmount] = useState(20);
+  const [loadingCustom, setLoadingCustom] = useState(false);
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -96,6 +98,21 @@ export function BillingClient({
       if (data.url) { window.location.href = data.url; return; }
       setError(data.error || "Error starting payment");
     } catch { setError("Connection error"); } finally { setLoadingPack(null); }
+  };
+
+  const handleBuyCustom = async () => {
+    setLoadingCustom(true);
+    setError("");
+    try {
+      const res = await fetch("/api/stripe/credit-pack-custom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: customAmount }),
+      });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; return; }
+      setError(data.error || "Error starting payment");
+    } catch { setError("Connection error"); } finally { setLoadingCustom(false); }
   };
 
   const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
@@ -304,6 +321,77 @@ export function BillingClient({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Custom credit amount */}
+      {isActive && (
+        <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+          <CardHeader>
+            <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">
+              {t("billing.customCredits")}
+            </CardTitle>
+            <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">{t("billing.customCredits.subtitle")}</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => setCustomAmount((prev: number) => Math.max(5, prev - 5))}
+                    disabled={customAmount <= 5}
+                    variant="outline"
+                    size="sm"
+                    className="h-9 w-9 p-0 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+                  >
+                    −
+                  </Button>
+                  <Input
+                    type="number"
+                    min={5}
+                    max={9999}
+                    value={customAmount}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value);
+                      if (Number.isFinite(v)) setCustomAmount(Math.min(9999, Math.max(5, v)));
+                      else setCustomAmount(5);
+                    }}
+                    className="flex-1 h-9 text-center border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)]"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => setCustomAmount((prev: number) => Math.min(9999, prev + 5))}
+                    disabled={customAmount >= 9999}
+                    variant="outline"
+                    size="sm"
+                    className="h-9 w-9 p-0 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+                  >
+                    +
+                  </Button>
+                </div>
+                <p className="mt-2 text-xs text-[rgba(245,246,252,0.5)]">
+                  ${customAmount} = {customAmount} credits
+                </p>
+                <p className="text-[10px] text-[rgba(245,246,252,0.4)]">
+                  {t("billing.customCredits.min")} · {t("billing.customCredits.max")}
+                </p>
+              </div>
+              <Button
+                onClick={handleBuyCustom}
+                disabled={loadingCustom || customAmount < 5 || customAmount > 9999}
+                className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+              >
+                {loadingCustom ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.customCredits.buy")}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {!isActive && (
+        <p className="text-xs text-[rgba(245,246,252,0.5)] text-center">
+          {t("billing.customCredits.requiresPlan")}
+        </p>
       )}
     </div>
   );
