@@ -101,5 +101,12 @@
   "auth.resetPassword.updating": "Atualizando...",
   "auth.resetPassword.success": "Senha atualizada. Agora você pode entrar.",
   "auth.resetPassword.expired": "Este link expirou.",
-  "auth.resetPassword.mismatch": "As senhas não coincidem."
+  "auth.resetPassword.mismatch": "As senhas não coincidem.",
+  "auth.placeholder.name": "Seu nome",
+  "auth.placeholder.email": "seu@email.com",
+  "auth.placeholder.password": "Mínimo 8 caracteres",
+  "auth.placeholder.businessName": "Minha Empresa Ltda",
+  "auth.placeholder.allianceCode": "Ex: LEN2026",
+  "auth.placeholder.newPassword": "Mínimo 8 caracteres",
+  "auth.placeholder.confirmPassword": "Repita sua senha"
 }

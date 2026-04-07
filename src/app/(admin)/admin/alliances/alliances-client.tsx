@@ -229,7 +229,7 @@ export function AlliancesClient({
             }
           }}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="Nombre de la alianza"
+          placeholder="Alliance name"
         />
       </div>
       {/* Slug */}
@@ -267,7 +267,7 @@ export function AlliancesClient({
           value={form.contactName}
           onChange={(e) => setForm({ ...form, contactName: e.target.value })}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="Nombre del contacto"
+          placeholder="Contact name"
         />
       </div>
       {/* Contact Email */}

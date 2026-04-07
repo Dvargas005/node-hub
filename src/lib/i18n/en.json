@@ -101,5 +101,12 @@
   "auth.resetPassword.updating": "Updating...",
   "auth.resetPassword.success": "Password updated. You can now log in.",
   "auth.resetPassword.expired": "This reset link has expired.",
-  "auth.resetPassword.mismatch": "Passwords don't match."
+  "auth.resetPassword.mismatch": "Passwords don't match.",
+  "auth.placeholder.name": "Your name",
+  "auth.placeholder.email": "your@email.com",
+  "auth.placeholder.password": "Minimum 8 characters",
+  "auth.placeholder.businessName": "My Business LLC",
+  "auth.placeholder.allianceCode": "E.g.: LEN2026",
+  "auth.placeholder.newPassword": "Minimum 8 characters",
+  "auth.placeholder.confirmPassword": "Repeat your password"
 }

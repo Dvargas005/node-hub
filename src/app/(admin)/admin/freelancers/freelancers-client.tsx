@@ -257,7 +257,7 @@ export function FreelancersClient({
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="Nombre completo"
+          placeholder="Full name"
         />
       </div>
       {/* Email */}
@@ -383,7 +383,7 @@ export function FreelancersClient({
           onChange={(e) => setForm({ ...form, bio: e.target.value })}
           rows={3}
           className="w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 py-2 text-sm outline-none focus:border-[var(--gold-bar)] resize-none"
-          placeholder="Breve descripción..."
+          placeholder="Brief description..."
         />
       </div>
       {/* Portfolio URL */}

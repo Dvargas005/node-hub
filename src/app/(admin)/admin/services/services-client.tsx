@@ -560,7 +560,7 @@ export function ServicesClient({
         <DialogContent className={dlg + " max-w-md max-h-[90vh] overflow-y-auto"}>
           <DialogHeader>
             <DialogTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">
-              {editVar ? "Editar variante" : "Nueva variante"}
+              {editVar ? "Edit variant" : "New variant"}
             </DialogTitle>
           </DialogHeader>
 
