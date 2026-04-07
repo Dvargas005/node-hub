@@ -492,16 +492,16 @@ export function ServicesClient({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={lbl}>Icono</label>
+                <label className={lbl}>Icon</label>
                 <input
                   className={inp}
-                  placeholder="emoji o clase"
+                  placeholder="emoji or class"
                   value={svcForm.icon}
                   onChange={(e) => setSvcForm((f) => ({ ...f, icon: e.target.value }))}
                 />
               </div>
               <div>
-                <label className={lbl}>Orden</label>
+                <label className={lbl}>Order</label>
                 <input
                   type="number"
                   className={inp}
@@ -512,10 +512,10 @@ export function ServicesClient({
             </div>
 
             <div>
-              <label className={lbl}>Tags (separados por coma)</label>
+              <label className={lbl}>Tags (comma separated)</label>
               <input
                 className={inp}
-                placeholder="logo, branding, identidad"
+                placeholder="logo, branding, identity"
                 value={svcForm.tags}
                 onChange={(e) => setSvcForm((f) => ({ ...f, tags: e.target.value }))}
               />

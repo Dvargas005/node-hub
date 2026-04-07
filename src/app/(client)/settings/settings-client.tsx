@@ -20,10 +20,14 @@ import { Pencil, AlertTriangle, Save } from "lucide-react";
 
 const EDIT_COST = 10;
 
+// Default English values — stored in DB. translateIndustry handles display.
 const industries = [
-  "Restaurante", "Tienda / Retail", "Servicios profesionales",
-  "Salud / Bienestar", "Tecnología", "Educación", "Eventos",
-  "Construcción", "Transporte", "Otro",
+  "Food & Bakery", "Retail / Store", "Professional Services",
+  "Health & Therapy", "Technology", "Education", "Events",
+  "Construction", "Transportation", "Real Estate",
+  "Automotive", "Cleaning & Maintenance", "Beauty & Hair",
+  "Fitness & Gym", "Legal", "Tourism & Hospitality",
+  "Agriculture", "Other",
 ];
 
 interface ProfileData {
@@ -282,7 +286,7 @@ export function SettingsClient({
                 <Label className="text-[var(--ice-white)]">Industry</Label>
                 <select value={businessIndustry} onChange={(e) => setBusinessIndustry(e.target.value)} className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]">
                   <option value="">Select...</option>
-                  {industries.map((i: any) => <option key={i} value={i}>{i}</option>)}
+                  {industries.map((i: string) => <option key={i} value={i}>{translateIndustry(i, t)}</option>)}
                 </select>
               </div>
               <div className="space-y-2">

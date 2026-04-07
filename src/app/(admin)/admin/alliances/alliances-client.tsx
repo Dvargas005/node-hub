@@ -243,7 +243,7 @@ export function AlliancesClient({
           value={form.slug}
           onChange={(e) => setForm({ ...form, slug: e.target.value })}
           className="w-full h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] px-3 text-sm outline-none focus:border-[var(--gold-bar)]"
-          placeholder="auto-generado"
+          placeholder="auto-generated"
         />
       </div>
       {/* Code */}
