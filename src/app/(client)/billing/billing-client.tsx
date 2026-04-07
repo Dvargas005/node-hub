@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import {
   Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Plan {
   id: string; name: string; slug: string; priceMonthly: number;
@@ -44,6 +45,7 @@ export function BillingClient({
   plans: Plan[]; subscription: Sub | null; creditPacks: CreditPack[];
   freeCredits: number; allianceDiscount: number;
 }) {
+  const { t } = useTranslation();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -187,10 +189,10 @@ export function BillingClient({
               const hasDiscount = discountedPrice < plan.priceMonthly;
 
               return (
-                <Card key={plan.id} className={`relative border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
+                <Card key={plan.id} className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
                   {isFeatured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold">Most popular</Badge>
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold whitespace-nowrap">Most popular</Badge>
                     </div>
                   )}
                   <CardHeader className="text-center pt-6">
@@ -205,7 +207,7 @@ export function BillingClient({
                       </span>
                       <span className="text-[rgba(245,246,252,0.5)]">/mo</span>
                     </div>
-                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Setup: ${plan.setupFee / 100} USD (una vez)</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">Setup: ${plan.setupFee / 100} USD {t("billing.oneTime")}</p>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 mb-6">

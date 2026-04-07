@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function ChipSelector({
   options,
@@ -12,6 +13,7 @@ export function ChipSelector({
   multiSelect?: boolean;
   onConfirm: (selected: string[]) => void;
 }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (opt: string) => {
@@ -47,7 +49,7 @@ export function ChipSelector({
           onClick={() => onConfirm(selected)}
           className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4"
         >
-          Confirmar selección
+          {t("onboarding.confirmSelection")}
         </Button>
       )}
     </div>
