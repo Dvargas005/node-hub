@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag,
 } from "lucide-react";
@@ -29,6 +38,18 @@ interface CreditPack {
   priceInCents: number; stripePriceId: string | null;
 }
 
+interface UpgradePreview {
+  currentPlan: { slug: string; name: string; priceMonthly: number; setupFee: number };
+  newPlan: { slug: string; name: string; priceMonthly: number; setupFee: number; monthlyCredits: number };
+  currentCredits: number;
+  newPlanCredits: number;
+  totalCreditsAfter: number;
+  proratedMonthlyDiff: number;
+  setupFeeDiff: number;
+  estimatedCharge: number;
+  daysRemaining: number;
+}
+
 const planIcons: Record<string, typeof CreditCard> = {
   member: CreditCard, growth: Zap, pro: Crown,
 };
@@ -46,6 +67,7 @@ export function BillingClient({
   freeCredits: number; allianceDiscount: number;
 }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -54,6 +76,12 @@ export function BillingClient({
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [customAmount, setCustomAmount] = useState(20);
   const [loadingCustom, setLoadingCustom] = useState(false);
+
+  // Upgrade flow state
+  const [upgradePreview, setUpgradePreview] = useState<UpgradePreview | null>(null);
+  const [upgradePlanSlug, setUpgradePlanSlug] = useState<string | null>(null);
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [upgradeConfirming, setUpgradeConfirming] = useState(false);
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -113,6 +141,59 @@ export function BillingClient({
       if (data.url) { window.location.href = data.url; return; }
       setError(data.error || "Error starting payment");
     } catch { setError("Connection error"); } finally { setLoadingCustom(false); }
+  };
+
+  const openUpgradeDialog = async (planSlug: string) => {
+    setUpgradePlanSlug(planSlug);
+    setUpgradePreview(null);
+    setUpgradeConfirming(false);
+    try {
+      const res = await fetch(`/api/stripe/upgrade-preview?plan=${planSlug}`);
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Failed to load preview");
+        setUpgradePlanSlug(null);
+        return;
+      }
+      setUpgradePreview(data);
+    } catch {
+      toast.error("Connection error");
+      setUpgradePlanSlug(null);
+    }
+  };
+
+  const closeUpgradeDialog = () => {
+    setUpgradePlanSlug(null);
+    setUpgradePreview(null);
+    setUpgradeConfirming(false);
+  };
+
+  const confirmUpgrade = async () => {
+    if (!upgradePlanSlug) return;
+    setUpgradeLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planSlug: upgradePlanSlug }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Upgrade failed");
+        return;
+      }
+      if (data.upgraded) {
+        toast.success(`Plan upgraded! You now have ${data.totalCredits} credits.`);
+        closeUpgradeDialog();
+        router.refresh();
+      } else if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      toast.error("Connection error");
+    } finally {
+      setUpgradeLoading(false);
+    }
   };
 
   const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
@@ -322,6 +403,162 @@ export function BillingClient({
           </div>
         </div>
       )}
+
+      {/* Plan upgrade options for active subscribers */}
+      {isActive && subscription && (
+        <div>
+          <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
+            Plans
+          </h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {plans.map((plan: Plan) => {
+              const Icon = planIcons[plan.slug] || CreditCard;
+              const features = planFeatures[plan.slug] || [];
+              const isFeatured = plan.slug === "growth";
+              const isCurrent = plan.slug === subscription.planSlug;
+              const isUpgrade = plan.priceMonthly > (plans.find((p: Plan) => p.slug === subscription.planSlug)?.priceMonthly || 0);
+
+              return (
+                <Card
+                  key={plan.id}
+                  className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] ${
+                    isCurrent ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""
+                  }`}
+                >
+                  {isCurrent && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold whitespace-nowrap">
+                        {t("billing.currentPlan")}
+                      </Badge>
+                    </div>
+                  )}
+                  <CardHeader className="text-center pt-6">
+                    <Icon className="mx-auto mb-2 h-8 w-8 text-[var(--gold-bar)]" />
+                    <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">{plan.name}</CardTitle>
+                    <div className="mt-2">
+                      <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--ice-white)]">
+                        ${plan.priceMonthly / 100}
+                      </span>
+                      <span className="text-[rgba(245,246,252,0.5)]">/mo</span>
+                    </div>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">
+                      Setup: ${plan.setupFee / 100} USD {t("billing.oneTime")}
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 mb-6">
+                      {features.map((f: string) => (
+                        <li key={f} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    {isCurrent ? (
+                      <Button disabled className="w-full bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] cursor-default">
+                        {t("billing.currentPlan")}
+                      </Button>
+                    ) : isUpgrade ? (
+                      <Button
+                        onClick={() => openUpgradeDialog(plan.slug)}
+                        disabled={!plan.stripePriceId}
+                        className={`w-full font-bold ${
+                          isFeatured
+                            ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90"
+                            : "bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)]"
+                        }`}
+                      >
+                        {t("billing.upgrade").replace("{plan}", plan.name)}
+                      </Button>
+                    ) : (
+                      <p className="text-xs text-center text-[rgba(245,246,252,0.4)] py-2">
+                        {t("billing.downgrade")}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade preview dialog */}
+      <Dialog open={!!upgradePlanSlug} onOpenChange={(open) => { if (!open) closeUpgradeDialog(); }}>
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-[var(--font-lexend)]">
+              {upgradePreview
+                ? t("billing.upgrade.title").replace("{plan}", upgradePreview.newPlan.name)
+                : "Loading..."}
+            </DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]" />
+          </DialogHeader>
+          {!upgradePreview ? (
+            <div className="py-8 text-center">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto text-[var(--gold-bar)]" />
+            </div>
+          ) : (
+            <div className="space-y-3 text-sm">
+              <div className="rounded-md border border-[rgba(245,246,252,0.1)] p-3 space-y-2">
+                <p className="text-[rgba(245,246,252,0.7)]">
+                  {t("billing.upgrade.monthlyChange")
+                    .replace("{current}", String(upgradePreview.currentPlan.priceMonthly / 100))
+                    .replace("{new}", String(upgradePreview.newPlan.priceMonthly / 100))}
+                </p>
+                <p className="text-xs text-[rgba(245,246,252,0.5)]">
+                  {t("billing.upgrade.prorated")
+                    .replace("{days}", String(upgradePreview.daysRemaining))
+                    .replace("{amount}", (upgradePreview.proratedMonthlyDiff / 100).toFixed(2))}
+                </p>
+              </div>
+
+              {upgradePreview.setupFeeDiff > 0 && (
+                <div className="rounded-md border border-[rgba(245,246,252,0.1)] p-3">
+                  <p className="text-xs text-[rgba(245,246,252,0.5)]">
+                    {t("billing.upgrade.setupDiff")
+                      .replace("{new}", String(upgradePreview.newPlan.setupFee / 100))
+                      .replace("{current}", String(upgradePreview.currentPlan.setupFee / 100))
+                      .replace("{diff}", String(upgradePreview.setupFeeDiff / 100))}
+                  </p>
+                </div>
+              )}
+
+              <div className="rounded-md border border-[var(--gold-bar)]/20 bg-[var(--gold-bar)]/5 p-3 space-y-1">
+                <p className="text-xs text-[rgba(245,246,252,0.7)]">
+                  {t("billing.upgrade.currentCredits").replace("{credits}", String(upgradePreview.currentCredits))}
+                </p>
+                <p className="text-xs text-[rgba(245,246,252,0.7)]">
+                  {t("billing.upgrade.newCredits").replace("{credits}", String(upgradePreview.newPlanCredits))}
+                </p>
+                <p className="text-sm font-bold text-[var(--gold-bar)] pt-1 border-t border-[var(--gold-bar)]/20">
+                  {t("billing.upgrade.totalCredits").replace("{credits}", String(upgradePreview.totalCreditsAfter))}
+                </p>
+              </div>
+
+              <p className="text-center text-base font-bold text-[var(--ice-white)] pt-2">
+                {t("billing.upgrade.estimatedCharge").replace("{amount}", (upgradePreview.estimatedCharge / 100).toFixed(2))}
+              </p>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={closeUpgradeDialog}
+                  className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  onClick={confirmUpgrade}
+                  disabled={upgradeLoading}
+                  className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+                >
+                  {upgradeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.upgrade.confirm")}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Custom credit amount */}
       {isActive && (

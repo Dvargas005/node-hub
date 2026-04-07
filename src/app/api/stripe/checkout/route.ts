@@ -22,14 +22,98 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plan no encontrado o sin precio configurado" }, { status: 404 });
     }
 
-    // C1: If user already has ACTIVE subscription, redirect to portal
-    const existingSub = await db.subscription.findUnique({ where: { userId } });
-    if (existingSub?.status === "ACTIVE" && existingSub.stripeCustomerId) {
-      const portal = await stripe.billingPortal.sessions.create({
-        customer: existingSub.stripeCustomerId,
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/billing`,
-      });
-      return NextResponse.json({ url: portal.url });
+    // If user has ACTIVE subscription → upgrade flow (proration + setup diff + carry credits)
+    const existingSub = await db.subscription.findUnique({
+      where: { userId },
+      include: { plan: true },
+    });
+    if (existingSub?.status === "ACTIVE" && existingSub.stripeSubscriptionId) {
+      // Same plan: redirect to portal (manage payment method, etc.)
+      if (existingSub.planId === plan.id) {
+        const portal = await stripe.billingPortal.sessions.create({
+          customer: existingSub.stripeCustomerId || undefined,
+          return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/billing`,
+        });
+        return NextResponse.json({ url: portal.url });
+      }
+
+      // Downgrade not supported via self-service
+      if (plan.priceMonthly <= existingSub.plan.priceMonthly) {
+        return NextResponse.json(
+          { error: "Only upgrades are supported. Contact support to downgrade." },
+          { status: 400 },
+        );
+      }
+
+      // === UPGRADE FLOW ===
+      try {
+        const stripeSub = await stripe.subscriptions.retrieve(existingSub.stripeSubscriptionId);
+        const currentItemId = stripeSub.items.data[0]?.id;
+        if (!currentItemId) {
+          return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
+        }
+
+        const customerId = existingSub.stripeCustomerId || (stripeSub.customer as string);
+
+        // 1. Update subscription with proration (Stripe charges the prorated diff automatically)
+        await stripe.subscriptions.update(existingSub.stripeSubscriptionId, {
+          items: [{ id: currentItemId, price: plan.stripePriceId! }],
+          proration_behavior: "create_prorations",
+        });
+
+        // 2. Charge setup fee difference as one-time invoice item
+        const setupFeeDifference = (plan.setupFee || 0) - (existingSub.plan.setupFee || 0);
+        if (setupFeeDifference > 0) {
+          await stripe.invoiceItems.create({
+            customer: customerId,
+            amount: setupFeeDifference,
+            currency: "usd",
+            description: `Setup fee upgrade: ${existingSub.plan.name} → ${plan.name} (difference: $${setupFeeDifference / 100})`,
+          });
+          const invoice = await stripe.invoices.create({
+            customer: customerId,
+            auto_advance: true,
+          });
+          if (invoice.id) {
+            await stripe.invoices.pay(invoice.id);
+          }
+        }
+
+        // 3. Update DB: keep unused credits + add new plan credits
+        const previousCredits = existingSub.creditsRemaining;
+        const newTotalCredits = previousCredits + plan.monthlyCredits + plan.bonusCredits;
+
+        await db.subscription.update({
+          where: { id: existingSub.id },
+          data: {
+            planId: plan.id,
+            creditsRemaining: newTotalCredits,
+          },
+        });
+
+        // 4. Notify
+        await db.notification.create({
+          data: {
+            userId,
+            title: "Plan upgraded!",
+            message: `Upgraded to ${plan.name}. ${previousCredits} unused credits carried over + ${plan.monthlyCredits + plan.bonusCredits} new = ${newTotalCredits} total.`,
+            type: "payment",
+            link: "/billing",
+          },
+        });
+
+        return NextResponse.json({
+          upgraded: true,
+          plan: plan.name,
+          previousCredits,
+          newPlanCredits: plan.monthlyCredits + plan.bonusCredits,
+          totalCredits: newTotalCredits,
+          setupFeeDifference: setupFeeDifference / 100,
+        });
+      } catch (upgradeErr) {
+        console.error("[STRIPE_UPGRADE]", upgradeErr);
+        return NextResponse.json({ error: "Upgrade failed" }, { status: 500 });
+      }
     }
 
     // I17: Find or create Stripe customer — check User.stripeCustomerId first, then Stripe, then create
