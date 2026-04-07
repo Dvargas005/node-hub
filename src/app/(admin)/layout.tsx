@@ -12,11 +12,13 @@ import {
   Gift,
   BarChart3,
   RefreshCw,
+  MessageCircle,
 } from "lucide-react";
 import type { NavItem } from "@/components/layout/sidebar";
 
 const baseNav: NavItem[] = [
   { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
+  { label: "Messages", href: "/admin/messages", icon: MessageCircle },
   { label: "Tickets", href: "/admin/tickets", icon: Ticket },
   { label: "Clients", href: "/admin/clients", icon: Users },
   { label: "Freelancers", href: "/admin/freelancers", icon: UserCog },
@@ -36,6 +38,7 @@ export default function AdminLayout({
   const [counts, setCounts] = useState<{
     newTickets?: number;
     pendingDeliveries?: number;
+    unreadMessages?: number;
   }>({});
 
   useEffect(() => {
@@ -47,12 +50,15 @@ export default function AdminLayout({
       .catch(() => {});
   }, []);
 
-  const adminNav: NavItem[] = baseNav.map((item: any) => {
+  const adminNav: NavItem[] = baseNav.map((item: NavItem) => {
     if (item.href === "/admin/tickets" && counts.newTickets) {
       return { ...item, badge: counts.newTickets };
     }
     if (item.href === "/admin/overview" && counts.pendingDeliveries) {
       return { ...item, badge: counts.pendingDeliveries };
+    }
+    if (item.href === "/admin/messages" && counts.unreadMessages) {
+      return { ...item, badge: counts.unreadMessages };
     }
     return item;
   });

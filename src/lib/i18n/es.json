@@ -158,5 +158,17 @@
   "onboarding.contact": "¿Cómo puede contactarte tu Project Manager?",
   "onboarding.contact.hint": "Todo opcional — usaremos email por defecto.",
   "onboarding.contact.continue": "Continuar",
-  "onboarding.contact.skip": "Omitir por ahora"
+  "onboarding.contact.skip": "Omitir por ahora",
+  "messages.title": "Mensajes",
+  "messages.with": "Mensajes con",
+  "messages.noPm": "Un Project Manager será asignado cuando crees tu primera solicitud.",
+  "messages.placeholder": "Escribe un mensaje...",
+  "messages.send": "Enviar",
+  "messages.sent": "Mensaje enviado",
+  "messages.empty": "Sin mensajes aún.",
+  "messages.emptyClient": "Sin mensajes aún. ¡Saluda a tu PM!",
+  "messages.emptyPm": "Sin mensajes aún. Tus clientes aparecerán aquí.",
+  "messages.you": "Tú",
+  "messages.conversations": "Conversaciones",
+  "messages.newMessage": "Nuevo mensaje de"
 }
