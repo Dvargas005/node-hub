@@ -11,13 +11,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ArrowLeft, Send, Upload, ExternalLink, UserPlus, Save, Clock, AlertTriangle, DollarSign } from "lucide-react";
 import { ticketStatusLabels, ticketStatusColors, priorityLabels, priorityColors, freelancerRoleLabels, categoryLabels } from "@/lib/status-labels";
 import { getGoogleDrivePreview } from "@/lib/file-preview";
+import { ContactBlock } from "@/components/admin/contact-links";
 
 interface TicketData {
   id: string; number: number; status: string; priority: string; creditsCharged: number;
   clientNotes: string | null; pmNotes: string | null; briefStructured: Record<string, unknown> | null;
   createdAt: string; updatedAt: string; assignedAt: string | null; startedAt: string | null;
   deliveredAt: string | null; completedAt: string | null;
-  user: { name: string; email: string; businessName: string | null; plan: string | null };
+  user: {
+    name: string; email: string; businessName: string | null; plan: string | null;
+    phone: string | null; whatsappNumber: string | null; telegramId: string | null;
+    linkedinUrl: string | null; instagramHandle: string | null; preferredContact: string | null;
+  };
   service: { name: string; slug: string; category: string };
   variant: { name: string };
   freelancer: { id: string; name: string; email: string; role: string } | null;
@@ -250,11 +255,24 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
 
           <Card className={crd}>
             <CardHeader className="pb-2"><CardTitle className={secHdr}>Client</CardTitle></CardHeader>
-            <CardContent className="space-y-1">
-              <p className={val}>{t.user.name}</p>
-              <p className={sub}>{t.user.email}</p>
-              {t.user.businessName && <p className={sub}>{t.user.businessName}</p>}
-              {t.user.plan && <p className="text-xs text-[var(--gold-bar)]">Plan: {t.user.plan}</p>}
+            <CardContent className="space-y-2">
+              <div>
+                <p className={val}>{t.user.name}</p>
+                {t.user.businessName && <p className={sub}>{t.user.businessName}</p>}
+                {t.user.plan && <p className="text-xs text-[var(--gold-bar)]">Plan: {t.user.plan}</p>}
+              </div>
+              <Separator className="bg-[rgba(245,246,252,0.1)]" />
+              <ContactBlock
+                contact={{
+                  email: t.user.email,
+                  phone: t.user.phone,
+                  whatsappNumber: t.user.whatsappNumber,
+                  telegramId: t.user.telegramId,
+                  linkedinUrl: t.user.linkedinUrl,
+                  instagramHandle: t.user.instagramHandle,
+                  preferredContact: t.user.preferredContact,
+                }}
+              />
             </CardContent>
           </Card>
 

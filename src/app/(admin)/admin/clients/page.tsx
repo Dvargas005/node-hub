@@ -53,6 +53,12 @@ export default async function AdminClientsPage() {
         assignedPmId: c.assignedPmId || null,
         assignedPmName: c.assignedPm?.name || null,
         createdAt: c.createdAt.toISOString(),
+        phone: c.phone || null,
+        whatsappNumber: c.whatsappNumber || null,
+        telegramId: c.telegramId || null,
+        linkedinUrl: c.linkedinUrl || null,
+        instagramHandle: c.instagramHandle || null,
+        preferredContact: c.preferredContact || null,
       }))}
       plans={plans.map((p: any) => ({ slug: p.slug, name: p.name }))}
     />

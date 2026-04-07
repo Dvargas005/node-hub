@@ -12,6 +12,7 @@ import { ChipSelector } from "@/components/onboarding/chip-selector";
 import { StarRating } from "@/components/onboarding/star-rating";
 import { UrlAnalyzer } from "@/components/onboarding/url-analyzer";
 import { Send } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // ─── Types ──────────────────────────────────────────
 interface OnboardingProfile {
@@ -25,6 +26,12 @@ interface OnboardingProfile {
   website?: string;
   socialMedia?: Record<string, string>;
   priorities?: Record<string, number>;
+  phone?: string;
+  whatsappNumber?: string;
+  telegramId?: string;
+  linkedinUrl?: string;
+  instagramHandle?: string;
+  preferredContact?: string;
 }
 
 type MsgType =
@@ -33,7 +40,8 @@ type MsgType =
   | "input"
   | "url"
   | "social-inputs"
-  | "stars";
+  | "stars"
+  | "contact-inputs";
 
 interface ChatMsg {
   id: string;
@@ -126,6 +134,7 @@ export function OnboardingClient({
 }: {
   initialBusinessName: string;
 }) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<OnboardingProfile>({
@@ -269,11 +278,14 @@ export function OnboardingClient({
           break;
         case 9:
           await pushBot(
-            "Last step: how important is each service to you right now?",
+            "Almost done: how important is each service to you right now?",
             "stars"
           );
           break;
         case 10:
+          await pushBot(t("onboarding.contact"), "contact-inputs");
+          break;
+        case 11:
           submitOnboarding(profile);
           break;
       }
@@ -526,11 +538,31 @@ export function OnboardingClient({
         .join(", ")
     );
     markAnswered();
-    const finalProfile = { ...profile, priorities: ratings };
-    setProfile(finalProfile);
+    setProfile((p) => ({ ...p, priorities: ratings }));
     await pushBot(getPriorityAck(ratings));
+    await pushBot(t("onboarding.contact"), "contact-inputs");
     setStep(10);
-    submitOnboarding(finalProfile);
+  };
+
+  const handleContact = async (data: {
+    phone?: string;
+    whatsappNumber?: string;
+    telegramId?: string;
+    linkedinUrl?: string;
+    instagramHandle?: string;
+    preferredContact?: string;
+  }) => {
+    markAnswered();
+    const filled = Object.entries(data).filter(([k, v]) => k !== "preferredContact" && !!v);
+    pushUser(
+      filled.length > 0
+        ? filled.map(([k, v]) => `${k}: ${v}`).join(", ")
+        : t("onboarding.contact.skip")
+    );
+    const finalProfile = { ...profile, ...data };
+    setProfile(finalProfile);
+    setStep(11);
+    await submitOnboarding(finalProfile);
   };
 
   // ─── Submit ─────────────────────────────────────
@@ -556,6 +588,12 @@ export function OnboardingClient({
               ? finalProfile.socialMedia
               : null,
           priorities: finalProfile.priorities || null,
+          phone: finalProfile.phone || null,
+          whatsappNumber: finalProfile.whatsappNumber || null,
+          telegramId: finalProfile.telegramId || null,
+          linkedinUrl: finalProfile.linkedinUrl || null,
+          instagramHandle: finalProfile.instagramHandle || null,
+          preferredContact: finalProfile.preferredContact || null,
         }),
       });
 
@@ -587,7 +625,7 @@ export function OnboardingClient({
     <div className="flex flex-col h-[calc(100vh-120px)] max-w-lg mx-auto">
       {/* Progress */}
       <div className="flex items-center gap-1 px-4 py-3">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((s) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((s) => (
           <div
             key={s}
             className={`h-1 flex-1 transition-colors ${
@@ -653,6 +691,11 @@ export function OnboardingClient({
                       />
                     </div>
                   )}
+                  {msg.type === "contact-inputs" && (
+                    <div className="ml-11">
+                      <ContactInputs onConfirm={handleContact} />
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -708,6 +751,118 @@ function SocialInputs({
       <div className="flex gap-2">
         <Button onClick={() => onConfirm({ instagram, facebook, tiktok })} className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4">Confirm</Button>
         <button onClick={() => onConfirm({})} className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]">No social media →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Contact inputs ────────────────────────────────
+function ContactInputs({
+  onConfirm,
+}: {
+  onConfirm: (data: {
+    phone?: string;
+    whatsappNumber?: string;
+    telegramId?: string;
+    linkedinUrl?: string;
+    instagramHandle?: string;
+    preferredContact?: string;
+  }) => void;
+}) {
+  const { t } = useTranslation();
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [telegram, setTelegram] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [preferred, setPreferred] = useState<string>("email");
+
+  const inputCls =
+    "border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] h-8 text-sm";
+
+  const submit = () => {
+    onConfirm({
+      phone: phone.trim() || undefined,
+      whatsappNumber: whatsapp.trim() || undefined,
+      telegramId: telegram.trim() || undefined,
+      linkedinUrl: linkedin.trim() || undefined,
+      instagramHandle: instagram.trim() || undefined,
+      preferredContact: preferred,
+    });
+  };
+
+  const methods: { key: string; label: string }[] = [
+    { key: "email", label: t("contact.method.email") },
+    { key: "phone", label: t("contact.method.phone") },
+    { key: "whatsapp", label: t("contact.method.whatsapp") },
+    { key: "telegram", label: t("contact.method.telegram") },
+  ];
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-[rgba(245,246,252,0.5)]">{t("onboarding.contact.hint")}</p>
+      <Input
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder={`📱 ${t("contact.phone")}: ${t("contact.placeholder.phone")}`}
+        className={inputCls}
+      />
+      <Input
+        value={whatsapp}
+        onChange={(e) => setWhatsapp(e.target.value)}
+        placeholder={`💬 WhatsApp: ${t("contact.placeholder.whatsapp")}`}
+        className={inputCls}
+      />
+      <Input
+        value={telegram}
+        onChange={(e) => setTelegram(e.target.value)}
+        placeholder={`✈️ Telegram: ${t("contact.placeholder.telegram")}`}
+        className={inputCls}
+      />
+      <Input
+        value={linkedin}
+        onChange={(e) => setLinkedin(e.target.value)}
+        placeholder={`💼 LinkedIn: ${t("contact.placeholder.linkedin")}`}
+        className={inputCls}
+      />
+      <Input
+        value={instagram}
+        onChange={(e) => setInstagram(e.target.value)}
+        placeholder={`📸 Instagram: ${t("contact.placeholder.instagram")}`}
+        className={inputCls}
+      />
+      <div className="pt-1">
+        <p className="text-xs text-[rgba(245,246,252,0.5)] mb-1">{t("contact.preferred")}</p>
+        <div className="flex flex-wrap gap-1">
+          {methods.map((m) => (
+            <button
+              key={m.key}
+              type="button"
+              onClick={() => setPreferred(m.key)}
+              className={`px-2.5 py-1 text-xs border transition-colors ${
+                preferred === m.key
+                  ? "border-[var(--gold-bar)] bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-medium"
+                  : "border-[rgba(245,246,252,0.2)] bg-transparent text-[rgba(245,246,252,0.7)] hover:border-[var(--gold-bar)]"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex gap-2 pt-1">
+        <Button
+          onClick={submit}
+          className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm h-8 px-4"
+        >
+          {t("onboarding.contact.continue")}
+        </Button>
+        <button
+          onClick={() => onConfirm({ preferredContact: "email" })}
+          className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.6)]"
+        >
+          {t("onboarding.contact.skip")} →
+        </button>
       </div>
     </div>
   );

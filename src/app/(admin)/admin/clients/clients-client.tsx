@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search } from "lucide-react";
+import { ContactIcons } from "@/components/admin/contact-links";
 
 interface ClientRow {
   id: string;
@@ -30,6 +31,12 @@ interface ClientRow {
   assignedPmId: string | null;
   assignedPmName: string | null;
   createdAt: string;
+  phone: string | null;
+  whatsappNumber: string | null;
+  telegramId: string | null;
+  linkedinUrl: string | null;
+  instagramHandle: string | null;
+  preferredContact: string | null;
 }
 
 const planColors: Record<string, string> = {
@@ -148,8 +155,8 @@ export function ClientsClient({
               <TableHeader>
                 <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Business</TableHead>
+                  <TableHead className="text-[rgba(245,246,252,0.5)]">Contact</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Plan</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Credits</TableHead>
                   <TableHead className="text-[rgba(245,246,252,0.5)]">Tickets</TableHead>
@@ -175,15 +182,26 @@ export function ClientsClient({
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"
                   >
                     <TableCell className="text-[var(--ice-white)] font-medium">
-                      {c.name}
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      {c.email}
+                      <div>{c.name}</div>
+                      <div className="text-xs text-[rgba(245,246,252,0.5)] font-normal">{c.email}</div>
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
                       {c.businessName || (
                         <span className="text-[rgba(245,246,252,0.3)]">—</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <ContactIcons
+                        contact={{
+                          email: c.email,
+                          phone: c.phone,
+                          whatsappNumber: c.whatsappNumber,
+                          telegramId: c.telegramId,
+                          linkedinUrl: c.linkedinUrl,
+                          instagramHandle: c.instagramHandle,
+                          preferredContact: c.preferredContact,
+                        }}
+                      />
                     </TableCell>
                     <TableCell>
                       {c.planSlug ? (
