@@ -40,10 +40,10 @@ const planFeatures: Record<string, string[]> = {
 };
 
 export function BillingClient({
-  plans, subscription, creditPacks, freeCredits, allianceDiscount,
+  plans, subscription, creditPacks, freeCredits,
 }: {
   plans: Plan[]; subscription: Sub | null; creditPacks: CreditPack[];
-  freeCredits: number; allianceDiscount: number;
+  freeCredits: number;
 }) {
   const { t } = useTranslation();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
@@ -98,10 +98,7 @@ export function BillingClient({
     } catch { setError("Connection error"); } finally { setLoadingPack(null); }
   };
 
-  const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
-  const applyDiscount = (cents: number) =>
-    effectiveDiscount > 0 ? Math.round(cents * (1 - effectiveDiscount / 100)) : cents;
-
+  // Display base prices only — promo discount is applied at Stripe Checkout via coupon (SOMOSLEN/NOUVOSVIP).
   const showPricing = !isActive || isCanceled;
 
   return (
@@ -185,8 +182,6 @@ export function BillingClient({
               const Icon = planIcons[plan.slug] || CreditCard;
               const features = planFeatures[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
-              const discountedPrice = applyDiscount(plan.priceMonthly);
-              const hasDiscount = discountedPrice < plan.priceMonthly;
 
               return (
                 <Card key={plan.id} className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
@@ -199,11 +194,8 @@ export function BillingClient({
                     <Icon className="mx-auto mb-2 h-8 w-8 text-[var(--gold-bar)]" />
                     <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">{plan.name}</CardTitle>
                     <div className="mt-2">
-                      {hasDiscount && (
-                        <span className="text-sm text-[rgba(245,246,252,0.4)] line-through mr-2">${plan.priceMonthly / 100}</span>
-                      )}
                       <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--ice-white)]">
-                        ${discountedPrice / 100}
+                        ${plan.priceMonthly / 100}
                       </span>
                       <span className="text-[rgba(245,246,252,0.5)]">/mo</span>
                     </div>
@@ -234,9 +226,9 @@ export function BillingClient({
               );
             })}
           </div>
-          {effectiveDiscount > 0 && (
+          {promoApplied && (
             <p className="mt-3 text-center text-xs text-[var(--gold-bar)]">
-              {promoApplied ? `Code ${promoCode}: ${promoDiscount}% discount applied` : `Alliance discount: ${allianceDiscount}% applied`}
+              Code {promoCode}: {promoDiscount}% off — applied at checkout
             </p>
           )}
 

@@ -9,44 +9,63 @@ async function main() {
   console.log("🌱 Seeding database...");
 
   // ─── PLANES ─────────────────────────────────────────
+  // Base prices. LEN 30% off applied via SOMOSLEN coupon at Stripe Checkout only.
   const member = await prisma.plan.upsert({
     where: { slug: "member" },
-    update: {},
+    update: {
+      priceMonthly: 13000,
+      setupFee: 26000,
+      monthlyCredits: 140,
+      maxActiveReqs: 2,
+      deliveryDays: 5,
+    },
     create: {
       name: "Member",
       slug: "member",
-      priceMonthly: 10000, // $100
-      setupFee: 20000, // $200
+      priceMonthly: 13000, // $130
+      setupFee: 26000, // $260
       monthlyCredits: 140,
-      maxActiveReqs: 1,
+      maxActiveReqs: 2,
       deliveryDays: 5,
     },
   });
 
   const growth = await prisma.plan.upsert({
     where: { slug: "growth" },
-    update: {},
+    update: {
+      priceMonthly: 24700,
+      setupFee: 91000,
+      monthlyCredits: 350,
+      maxActiveReqs: 5,
+      deliveryDays: 3,
+    },
     create: {
       name: "Growth",
       slug: "growth",
-      priceMonthly: 19000, // $190
-      setupFee: 70000, // $700
+      priceMonthly: 24700, // $247
+      setupFee: 91000, // $910
       monthlyCredits: 350,
-      maxActiveReqs: 2,
+      maxActiveReqs: 5,
       deliveryDays: 3,
     },
   });
 
   const pro = await prisma.plan.upsert({
     where: { slug: "pro" },
-    update: {},
+    update: {
+      priceMonthly: 42900,
+      setupFee: 130000,
+      monthlyCredits: 650,
+      maxActiveReqs: 999,
+      deliveryDays: 2,
+    },
     create: {
       name: "Pro",
       slug: "pro",
-      priceMonthly: 33000, // $330
-      setupFee: 100000, // $1000
+      priceMonthly: 42900, // $429
+      setupFee: 130000, // $1300
       monthlyCredits: 650,
-      maxActiveReqs: 999,
+      maxActiveReqs: 999, // unlimited (display fallback in dashboard-client.tsx:208)
       deliveryDays: 2,
     },
   });
