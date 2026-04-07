@@ -86,5 +86,20 @@
   "auth.signOut": "Cerrar sesión",
   "auth.error.invalid": "Email o contraseña incorrectos",
   "auth.error.connection": "Error de conexión",
-  "auth.error.rateLimit": "Demasiados intentos. Espera 15 minutos."
+  "auth.error.rateLimit": "Demasiados intentos. Espera 15 minutos.",
+  "auth.forgotPassword": "¿Olvidaste tu contraseña?",
+  "auth.forgotPassword.title": "Restablecer contraseña",
+  "auth.forgotPassword.subtitle": "Ingresa tu email y te enviaremos un enlace para restablecer.",
+  "auth.forgotPassword.submit": "Enviar enlace",
+  "auth.forgotPassword.sending": "Enviando...",
+  "auth.forgotPassword.success": "Si existe una cuenta con ese email, hemos enviado un enlace.",
+  "auth.forgotPassword.backToLogin": "Volver al login",
+  "auth.resetPassword.title": "Nueva contraseña",
+  "auth.resetPassword.newPassword": "Nueva contraseña",
+  "auth.resetPassword.confirmPassword": "Confirmar contraseña",
+  "auth.resetPassword.submit": "Actualizar contraseña",
+  "auth.resetPassword.updating": "Actualizando...",
+  "auth.resetPassword.success": "Contraseña actualizada. Ya puedes iniciar sesión.",
+  "auth.resetPassword.expired": "Este enlace ha expirado.",
+  "auth.resetPassword.mismatch": "Las contraseñas no coinciden."
 }

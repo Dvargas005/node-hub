@@ -22,6 +22,21 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
+    sendResetPassword: async ({ user, url }: { user: { email: string; name?: string }; url: string }) => {
+      const { sendEmail } = await import("@/lib/email");
+      sendEmail(
+        user.email,
+        "Reset your password — N.O.D.E.",
+        `<div style="font-family:sans-serif;background:#130A06;color:#F5F6FC;padding:40px;">
+          <h1 style="color:#FFC919;">Password Reset</h1>
+          <p>Hi ${user.name || "there"},</p>
+          <p>You requested a password reset. Click the link below:</p>
+          <a href="${url}" style="display:inline-block;background:#FFC919;color:#130A06;padding:12px 24px;text-decoration:none;font-weight:bold;margin:16px 0;">Reset my password →</a>
+          <p style="opacity:0.6;font-size:12px;margin-top:30px;">If you didn't request this, ignore this email. The link expires in 1 hour.</p>
+          <p style="opacity:0.6;font-size:12px;">N.O.D.E. — Powered by Nouvos</p>
+        </div>`
+      );
+    },
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days

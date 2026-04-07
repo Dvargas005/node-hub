@@ -86,5 +86,20 @@
   "auth.signOut": "Sign out",
   "auth.error.invalid": "Invalid email or password",
   "auth.error.connection": "Connection error",
-  "auth.error.rateLimit": "Too many attempts. Wait 15 minutes."
+  "auth.error.rateLimit": "Too many attempts. Wait 15 minutes.",
+  "auth.forgotPassword": "Forgot your password?",
+  "auth.forgotPassword.title": "Reset your password",
+  "auth.forgotPassword.subtitle": "Enter your email and we'll send you a reset link.",
+  "auth.forgotPassword.submit": "Send reset link",
+  "auth.forgotPassword.sending": "Sending...",
+  "auth.forgotPassword.success": "If an account exists with that email, we've sent a reset link.",
+  "auth.forgotPassword.backToLogin": "Back to login",
+  "auth.resetPassword.title": "Set new password",
+  "auth.resetPassword.newPassword": "New password",
+  "auth.resetPassword.confirmPassword": "Confirm password",
+  "auth.resetPassword.submit": "Update password",
+  "auth.resetPassword.updating": "Updating...",
+  "auth.resetPassword.success": "Password updated. You can now log in.",
+  "auth.resetPassword.expired": "This reset link has expired.",
+  "auth.resetPassword.mismatch": "Passwords don't match."
 }

@@ -86,5 +86,20 @@
   "auth.signOut": "Sair",
   "auth.error.invalid": "Email ou senha incorretos",
   "auth.error.connection": "Erro de conexão",
-  "auth.error.rateLimit": "Muitas tentativas. Espere 15 minutos."
+  "auth.error.rateLimit": "Muitas tentativas. Espere 15 minutos.",
+  "auth.forgotPassword": "Esqueceu sua senha?",
+  "auth.forgotPassword.title": "Redefinir senha",
+  "auth.forgotPassword.subtitle": "Insira seu email e enviaremos um link de redefinição.",
+  "auth.forgotPassword.submit": "Enviar link",
+  "auth.forgotPassword.sending": "Enviando...",
+  "auth.forgotPassword.success": "Se existir uma conta com esse email, enviamos um link.",
+  "auth.forgotPassword.backToLogin": "Voltar ao login",
+  "auth.resetPassword.title": "Nova senha",
+  "auth.resetPassword.newPassword": "Nova senha",
+  "auth.resetPassword.confirmPassword": "Confirmar senha",
+  "auth.resetPassword.submit": "Atualizar senha",
+  "auth.resetPassword.updating": "Atualizando...",
+  "auth.resetPassword.success": "Senha atualizada. Agora você pode entrar.",
+  "auth.resetPassword.expired": "Este link expirou.",
+  "auth.resetPassword.mismatch": "As senhas não coincidem."
 }

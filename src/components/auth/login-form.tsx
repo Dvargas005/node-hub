@@ -125,6 +125,11 @@ export function LoginForm() {
           >
             {loading ? t("auth.submit.login.loading") : t("auth.submit.login")}
           </Button>
+          <p className="text-center">
+            <Link href="/forgot-password" className="text-xs text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)]">
+              {t("auth.forgotPassword")}
+            </Link>
+          </p>
           <p className="text-center text-sm text-[rgba(245,246,252,0.5)]">
             {t("auth.noAccount")}{" "}
             <Link href="/register" className="text-[var(--gold-bar)] hover:underline">
