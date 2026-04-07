@@ -23,19 +23,9 @@ export default async function BillingPage() {
     }),
     db.user.findUnique({
       where: { id: userId },
-      select: { freeCredits: true, allianceId: true },
+      select: { freeCredits: true },
     }),
   ]);
-
-  // Check if user has LEN alliance for discount
-  let allianceDiscount = 0;
-  if (user?.allianceId) {
-    const alliance = await db.alliance.findUnique({
-      where: { id: user.allianceId },
-      select: { discountPercent: true },
-    });
-    allianceDiscount = alliance?.discountPercent || 0;
-  }
 
   return (
     <BillingClient
@@ -72,7 +62,6 @@ export default async function BillingPage() {
         stripePriceId: p.stripePriceId,
       }))}
       freeCredits={user?.freeCredits || 0}
-      allianceDiscount={allianceDiscount}
     />
   );
 }
