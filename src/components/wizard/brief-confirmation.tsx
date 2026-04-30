@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Check, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BriefDetails {
   deliverable: string;
@@ -37,6 +38,13 @@ interface SubscriptionInfo {
   freeCredits?: number;
 }
 
+const detailLabelKeys: Record<string, string> = {
+  deliverable: "wizard.detail.deliverable",
+  style: "wizard.detail.style",
+  content: "wizard.detail.content",
+  extras: "wizard.detail.extras",
+};
+
 export function BriefConfirmation({
   brief,
   variant,
@@ -50,6 +58,7 @@ export function BriefConfirmation({
   onConfirm: () => Promise<void>;
   onAdjust: () => void;
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
@@ -69,7 +78,7 @@ export function BriefConfirmation({
   };
 
   const detailEntries = brief.details
-    ? Object.entries(brief.details).filter(([k, v]) => k !== "pmAlert" && v && v !== "No mencionado" && v !== "N/A")
+    ? Object.entries(brief.details).filter(([k, v]) => k !== "pmAlert" && v && v !== "No mencionado" && v !== "Not mentioned" && v !== "N/A")
     : [];
 
   return (
@@ -79,7 +88,7 @@ export function BriefConfirmation({
           <Check className="h-6 w-6 text-[var(--gold-bar)]" />
         </div>
         <h2 className="font-[var(--font-lexend)] text-xl font-bold text-[var(--ice-white)]">
-          Confirm your request
+          {t("wizard.confirmRequest")}
         </h2>
       </div>
 
@@ -91,7 +100,7 @@ export function BriefConfirmation({
                 {variant?.serviceName || brief.suggestedServiceSlug}
               </CardTitle>
               <p className="text-sm text-[rgba(245,246,252,0.5)]">
-                {variant?.name || "Suggested variant"}
+                {variant?.name || t("wizard.suggestedVariant")}
               </p>
             </div>
             {variant && (
@@ -99,7 +108,7 @@ export function BriefConfirmation({
                 <p className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--gold-bar)]">
                   {variant.creditCost}
                 </p>
-                <p className="text-xs text-[rgba(245,246,252,0.4)]">credits</p>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">{t("wizard.credits")}</p>
               </div>
             )}
           </div>
@@ -107,7 +116,7 @@ export function BriefConfirmation({
         <CardContent className="space-y-3">
           {variant && (
             <p className="text-xs text-[rgba(245,246,252,0.4)]">
-              Estimated delivery: ~{variant.estimatedDays} days
+              {t("wizard.estimatedDelivery").replace("{days}", String(variant.estimatedDays))}
             </p>
           )}
 
@@ -121,7 +130,7 @@ export function BriefConfirmation({
                 onClick={() => setExpanded(!expanded)}
                 className="flex items-center gap-1 text-xs text-[var(--gold-bar)] hover:underline"
               >
-                {expanded ? "Hide details" : "View brief details"}
+                {expanded ? t("wizard.hideDetails") : t("wizard.viewDetails")}
                 {expanded ? (
                   <ChevronUp className="h-3 w-3" />
                 ) : (
@@ -133,7 +142,7 @@ export function BriefConfirmation({
                   {detailEntries.map(([key, value]) => (
                     <div key={key}>
                       <span className="text-[rgba(245,246,252,0.4)] capitalize">
-                        {{ deliverable: "Deliverable", style: "Style", content: "Content", extras: "Additional notes" }[key] || key}
+                        {t(detailLabelKeys[key] || key)}
                         :{" "}
                       </span>
                       <span className="text-[rgba(245,246,252,0.7)]">{value}</span>
@@ -151,27 +160,27 @@ export function BriefConfirmation({
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[rgba(245,246,252,0.5)]">Your credits</span>
+              <span className="text-[rgba(245,246,252,0.5)]">{t("wizard.yourCredits")}</span>
               <span className="text-[var(--ice-white)]">
-                {totalAvailable} available
+                {t("wizard.creditsAvailable").replace("{count}", String(totalAvailable))}
               </span>
             </div>
             {freeCredits > 0 && (
               <p className="text-xs text-[rgba(245,246,252,0.3)] text-right">
-                {freeCredits} free + {subscription?.creditsRemaining || 0} from plan
+                {t("wizard.freeFromPlan").replace("{free}", String(freeCredits)).replace("{plan}", String(subscription?.creditsRemaining || 0))}
               </p>
             )}
             <div className="flex items-center justify-between text-sm mt-1">
-              <span className="text-[rgba(245,246,252,0.5)]">Cost</span>
+              <span className="text-[rgba(245,246,252,0.5)]">{t("wizard.cost")}</span>
               <span className="text-[var(--gold-bar)] font-bold">
-                -{variant.creditCost} credits
+                -{variant.creditCost} {t("wizard.credits")}
               </span>
             </div>
             <Separator className="bg-[rgba(245,246,252,0.1)] my-2" />
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[rgba(245,246,252,0.5)]">After</span>
+              <span className="text-[rgba(245,246,252,0.5)]">{t("wizard.after")}</span>
               <span className="text-[var(--ice-white)] font-bold">
-                {totalAvailable - variant.creditCost} credits
+                {totalAvailable - variant.creditCost} {t("wizard.credits")}
               </span>
             </div>
           </CardContent>
@@ -184,17 +193,16 @@ export function BriefConfirmation({
           <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-yellow-400 font-medium">
-              Insufficient credits
+              {t("wizard.insufficientCredits")}
             </p>
             <p className="text-xs text-[rgba(245,246,252,0.5)]">
-              You need {variant.creditCost}, you have{" "}
-              {totalAvailable}.
+              {t("wizard.needCredits").replace("{need}", String(variant.creditCost)).replace("{have}", String(totalAvailable))}
             </p>
             <Link
               href="/billing"
               className="text-xs text-[var(--gold-bar)] hover:underline"
             >
-              {hasSubscription ? "Buy extra credits" : "View available plans"}
+              {hasSubscription ? t("wizard.buyExtraCredits") : t("wizard.viewPlans")}
             </Link>
           </div>
         </div>
@@ -207,14 +215,14 @@ export function BriefConfirmation({
           onClick={onAdjust}
           className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
         >
-          I want to adjust something
+          {t("wizard.adjustSomething")}
         </Button>
         <Button
           onClick={handleConfirm}
           disabled={!hasEnoughCredits || confirming}
           className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-40"
         >
-          {confirming ? "Creating..." : "Confirm and create ticket"}
+          {confirming ? t("common.creating") : t("wizard.confirmAndCreate")}
         </Button>
       </div>
     </div>

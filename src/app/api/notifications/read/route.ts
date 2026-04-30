@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { cookies } from "next/headers";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function PATCH() {
+  const lang = (await cookies()).get("node-language")?.value || DEFAULT_LANG;
   try {
     const { error, session } = await requireApiRole([
       "CLIENT",
@@ -21,7 +24,7 @@ export async function PATCH() {
   } catch (err: any) {
     console.error("[NOTIFICATIONS_READ]", err);
     return NextResponse.json(
-      { error: "Error al marcar notificaciones" },
+      { error: t("api.error.markNotificationsError", lang) },
       { status: 500 }
     );
   }

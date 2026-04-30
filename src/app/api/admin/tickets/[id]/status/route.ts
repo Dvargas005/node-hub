@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const validTransitions: Record<string, string[]> = {
   NEW: ["REVIEWING", "CANCELED"],
@@ -18,6 +19,8 @@ export async function POST(
   const { error, session } = await requireApiRole(["ADMIN", "PM"]);
   if (error || !session) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { status } = await req.json();
     const ticketId = params.id;
@@ -30,7 +33,7 @@ export async function POST(
     const allowed = validTransitions[ticket.status];
     if (!allowed || !allowed.includes(status)) {
       return NextResponse.json(
-        { error: `Transición no válida: ${ticket.status} → ${status}` },
+        { error: t("api.error.invalidTransition", lang).replace("{from}", ticket.status).replace("{to}", status) },
         { status: 400 }
       );
     }
@@ -55,6 +58,6 @@ export async function POST(
     return NextResponse.json(updated);
   } catch (err) {
     console.error("[TICKET_STATUS]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

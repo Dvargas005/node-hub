@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function GET(
   req: NextRequest,
@@ -9,13 +10,15 @@ export async function GET(
   const { error, session } = await requireApiRole(["FREELANCER"]);
   if (error || !session) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const freelancer = await db.freelancer.findUnique({
       where: { userId: session.user.id },
     });
     if (!freelancer) {
       return NextResponse.json(
-        { error: "Perfil de freelancer no encontrado" },
+        { error: t("api.error.freelancerNotFound", lang) },
         { status: 404 }
       );
     }
@@ -36,14 +39,14 @@ export async function GET(
 
     if (!ticket) {
       return NextResponse.json(
-        { error: "Ticket no encontrado" },
+        { error: t("api.error.ticketNotFound", lang) },
         { status: 404 }
       );
     }
 
     if (ticket.freelancerId !== freelancer.id) {
       return NextResponse.json(
-        { error: "Sin permisos para este ticket" },
+        { error: t("api.error.noPermission", lang) },
         { status: 403 }
       );
     }
@@ -61,7 +64,7 @@ export async function GET(
   } catch (err) {
     console.error("[FREELANCER_TICKET_DETAIL]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

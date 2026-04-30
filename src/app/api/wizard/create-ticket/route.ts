@@ -4,10 +4,12 @@ import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketCreatedEmail } from "@/lib/email-templates";
 import { createNotification } from "@/lib/notifications";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
 
 export async function POST(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   // I6: Only CLIENT can create tickets from wizard
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
@@ -17,10 +19,10 @@ export async function POST(req: NextRequest) {
 
     // S9: Validate brief schema
     if (!variantId || !briefStructured) {
-      return NextResponse.json({ error: "Datos del brief incompletos" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.requiredFields", lang) }, { status: 400 });
     }
     if (!briefStructured?.summary || typeof briefStructured.summary !== "string") {
-      return NextResponse.json({ error: "Brief inválido" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.requiredFields", lang) }, { status: 400 });
     }
 
     // S10: Limit conversation messages
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!variant) {
-      return NextResponse.json({ error: "Servicio no disponible" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 400 });
     }
 
     // S2: Log variant/service mismatch (possible manipulation)
@@ -51,12 +53,12 @@ export async function POST(req: NextRequest) {
     // Check min plan before transaction
     const subCheck = await db.subscription.findUnique({ where: { userId }, include: { plan: true } });
     if (variant.minPlan && !subCheck) {
-      return NextResponse.json({ error: "Este servicio requiere un plan activo" }, { status: 403 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 403 });
     }
     if (variant.minPlan && subCheck) {
       const planOrder = ["member", "growth", "pro"];
       if (planOrder.indexOf(subCheck.plan.slug) < planOrder.indexOf(variant.minPlan)) {
-        return NextResponse.json({ error: `Esta variante requiere el plan ${variant.minPlan} o superior` }, { status: 400 });
+        return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
       }
     }
 
@@ -164,7 +166,7 @@ export async function POST(req: NextRequest) {
     const emailTpl = ticketCreatedEmail(session.user.name, ticket.number, variant.service.name);
     sendEmail(session.user.email, emailTpl.subject, emailTpl.html);
     createNotification(userId, {
-      title: "Solicitud creada",
+      title: t("api.notification.requestCreated", lang),
       message: `Tu solicitud #${ticket.number} fue recibida`,
       type: "ticket_update",
       link: "/tickets",
@@ -184,16 +186,16 @@ export async function POST(req: NextRequest) {
     const msg = err instanceof Error ? err.message : "";
     if (msg.startsWith("INSUFFICIENT_CREDITS:")) {
       const [, needed, have] = msg.split(":");
-      return NextResponse.json({ error: `No tienes suficientes créditos. Necesitas ${needed}, tienes ${have}.` }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.needCredits", lang).replace("{cost}", String(needed)).replace("{total}", String(have)) }, { status: 400 });
     }
     if (msg.startsWith("MAX_ACTIVE:")) {
       const max = msg.split(":")[1];
-      return NextResponse.json({ error: `Has alcanzado el límite de solicitudes activas de tu plan (${max})` }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
     if (msg === "MAX_ACTIVE_FREE") {
-      return NextResponse.json({ error: "Necesitas un plan para tener más de una solicitud activa" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
     console.error("[WIZARD_CREATE_TICKET]", err);
-    return NextResponse.json({ error: "Error al crear el ticket" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

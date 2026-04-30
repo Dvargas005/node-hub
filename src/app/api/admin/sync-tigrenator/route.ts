@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { getTigrenatorServices, getTigrenatorBulkPricing } from "@/lib/tigrenator";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const slugToTigrenator: Record<string, string> = {
   "brand-starter": "logo",
@@ -18,9 +19,11 @@ const slugToTigrenator: Record<string, string> = {
   "business-kit": "business card",
 };
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   const { error } = await requireApiRole(["ADMIN"]);
   if (error) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     // 1. Fetch Tigrenator services
@@ -123,15 +126,17 @@ export async function POST() {
   } catch (err: any) {
     console.error("[SYNC_TIGRENATOR]", err);
     return NextResponse.json(
-      { error: "Error al sincronizar con Tigrenator" },
+      { error: t("api.error.syncError", lang) },
       { status: 500 }
     );
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const { error } = await requireApiRole(["ADMIN"]);
   if (error) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     const reports = await db.syncReport.findMany({
@@ -142,7 +147,7 @@ export async function GET() {
   } catch (err: any) {
     console.error("[SYNC_TIGRENATOR_GET]", err);
     return NextResponse.json(
-      { error: "Error al obtener reportes de sincronización" },
+      { error: t("api.error.syncReportsError", lang) },
       { status: 500 }
     );
   }

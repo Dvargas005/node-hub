@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,7 @@ const roleBadge: Record<string, string> = {
 
 export function TeamClient({ team }: { team: TeamMember[] }) {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
@@ -82,14 +83,14 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error || "Failed to save");
+        toast.error(data.error || t("common.failedToSave"));
         return;
       }
       toast.success(t("calendly.saved"));
       setEditingCalendly(null);
       router.refresh();
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     } finally {
       setSavingCalendly(false);
     }
@@ -213,7 +214,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
                       {m.freelancerCount}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(m.createdAt).toLocaleDateString("es-MX")}
+                      {new Date(m.createdAt).toLocaleDateString(getLocale(lang))}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -4,11 +4,12 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Palette, Monitor, Megaphone, ArrowRight } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const categories = [
-  { key: "DESIGN", label: "Design & Branding", icon: Palette },
-  { key: "WEB", label: "Web Development", icon: Monitor },
-  { key: "MARKETING", label: "Digital Marketing", icon: Megaphone },
+  { key: "DESIGN", labelKey: "wizard.designBranding", icon: Palette },
+  { key: "WEB", labelKey: "wizard.webDevelopment", icon: Monitor },
+  { key: "MARKETING", labelKey: "wizard.digitalMarketing", icon: Megaphone },
 ];
 
 export function CategorySelector({
@@ -18,6 +19,7 @@ export function CategorySelector({
   onSelect: (category: string) => void;
   onFreeText: (text: string) => void;
 }) {
+  const { t } = useTranslation();
   const [freeText, setFreeText] = useState("");
 
   const handleFreeTextSubmit = (e: React.FormEvent) => {
@@ -31,10 +33,10 @@ export function CategorySelector({
     <div className="flex flex-col items-center gap-8 py-8">
       <div className="text-center">
         <h2 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          What do you need?
+          {t("wizard.whatDoYouNeed")}
         </h2>
         <p className="mt-2 text-sm text-[rgba(245,246,252,0.5)]">
-          Choose a category or describe your project
+          {t("wizard.chooseCategoryOrDescribe")}
         </p>
       </div>
 
@@ -47,7 +49,7 @@ export function CategorySelector({
           >
             <cat.icon className="h-6 w-6 text-[var(--gold-bar)]" />
             <span className="font-[var(--font-lexend)] text-[var(--ice-white)] font-semibold group-hover:text-[var(--gold-bar)]">
-              {cat.label}
+              {t(cat.labelKey)}
             </span>
           </button>
         ))}
@@ -56,7 +58,7 @@ export function CategorySelector({
       <div className="w-full max-w-md">
         <div className="flex items-center gap-3 my-2">
           <div className="h-px flex-1 bg-[rgba(245,246,252,0.1)]" />
-          <span className="text-xs text-[rgba(245,246,252,0.3)]">o</span>
+          <span className="text-xs text-[rgba(245,246,252,0.3)]">{t("common.or")}</span>
           <div className="h-px flex-1 bg-[rgba(245,246,252,0.1)]" />
         </div>
 
@@ -64,7 +66,7 @@ export function CategorySelector({
           <Input
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
-            placeholder="Describe what you need in your own words..."
+            placeholder={t("wizard.describePlaceholder")}
             className="flex-1 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
           />
           <Button

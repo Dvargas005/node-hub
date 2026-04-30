@@ -1,10 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const { error, session } = await requireApiRole(["FREELANCER"]);
   if (error || !session) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     const freelancer = await db.freelancer.findUnique({
@@ -12,7 +15,7 @@ export async function GET() {
     });
     if (!freelancer) {
       return NextResponse.json(
-        { error: "Perfil de freelancer no encontrado" },
+        { error: t("api.error.freelancerNotFound", lang) },
         { status: 404 }
       );
     }
@@ -31,19 +34,19 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
     });
 
-    const serialized = tickets.map((t: any) => ({
-      ...t,
-      createdAt: t.createdAt.toISOString(),
-      updatedAt: t.updatedAt.toISOString(),
-      assignedAt: t.assignedAt?.toISOString() || null,
-      startedAt: t.startedAt?.toISOString() || null,
+    const serialized = tickets.map((tk: any) => ({
+      ...tk,
+      createdAt: tk.createdAt.toISOString(),
+      updatedAt: tk.updatedAt.toISOString(),
+      assignedAt: tk.assignedAt?.toISOString() || null,
+      startedAt: tk.startedAt?.toISOString() || null,
     }));
 
     return NextResponse.json(serialized);
   } catch (err) {
     console.error("[FREELANCER_TICKETS]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

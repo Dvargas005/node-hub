@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { error, session } = await requireApiRole(["ADMIN"]);
     if (error || !session) return error;
@@ -15,13 +18,15 @@ export async function GET() {
   } catch (err: any) {
     console.error("[PROMOS_GET]", err);
     return NextResponse.json(
-      { error: "Error al obtener promos" },
+      { error: t("api.error.promoFetchError", lang) },
       { status: 500 }
     );
   }
 }
 
 export async function POST(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { error, session } = await requireApiRole(["ADMIN"]);
     if (error || !session) return error;
@@ -51,13 +56,13 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     if (err?.code === "P2002") {
       return NextResponse.json(
-        { error: "Ya existe un código con ese nombre" },
+        { error: t("api.error.promoCodeExists", lang) },
         { status: 409 }
       );
     }
     console.error("[PROMOS_POST]", err);
     return NextResponse.json(
-      { error: "Error al crear promo" },
+      { error: t("api.error.promoCreateError", lang) },
       { status: 500 }
     );
   }

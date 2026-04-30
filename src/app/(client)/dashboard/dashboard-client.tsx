@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 import { translateIndustry, translateAudience } from "@/lib/i18n/data-labels";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +86,7 @@ export function DashboardClient({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t: tr } = useTranslation();
+  const { t: tr, lang } = useTranslation();
   const firstName = userName?.split(" ")[0] || "user";
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const greeting = getGreeting(firstName, latestTicket, companyAnalysis);
@@ -126,14 +127,14 @@ export function DashboardClient({
       .then((res) => res.json())
       .then((data: any) => {
         if (data.success) {
-          toast.success("Subscription activated!");
+          toast.success(tr("common.subscriptionActivated"));
           router.refresh();
         } else if (data.error) {
-          toast.error("Verifying your payment... try reloading in a few seconds");
+          toast.error(tr("common.verifyingPayment"));
         }
       })
       .catch(() => {
-        toast.error("Verifying your payment... try reloading in a few seconds");
+        toast.error(tr("common.verifyingPayment"));
       });
   }, [searchParams, router]);
 
@@ -143,10 +144,10 @@ export function DashboardClient({
     try {
       const res = await fetch("/api/company-analysis/options", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) { setGenError(data.error || "Error generating"); return; }
+      if (!res.ok) { setGenError(data.error || tr("common.error")); return; }
       setLocalOptions(data.options);
       setShowOptions(true);
-    } catch { setGenError("Connection error"); } finally { setGenerating(false); }
+    } catch { setGenError(tr("common.connectionError")); } finally { setGenerating(false); }
   };
 
   const handleSelect = async (option: "A" | "B") => {
@@ -160,10 +161,10 @@ export function DashboardClient({
         body: JSON.stringify({ option, feedback: feedback || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) { setGenError(data.error || "Error completing"); return; }
+      if (!res.ok) { setGenError(data.error || tr("common.error")); return; }
       setShowOptions(false);
       router.refresh();
-    } catch { setGenError("Connection error"); } finally { setCompleting(false); }
+    } catch { setGenError(tr("common.connectionError")); } finally { setCompleting(false); }
   };
 
   return (
@@ -471,7 +472,7 @@ export function DashboardClient({
                 <CardContent className="py-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm text-[var(--ice-white)]">#{t.number} — {t.serviceName}</p>
-                    <p className="text-xs text-[rgba(245,246,252,0.4)]">{t.variantName} · {new Date(t.createdAt).toLocaleDateString("es-MX")}</p>
+                    <p className="text-xs text-[rgba(245,246,252,0.4)]">{t.variantName} · {new Date(t.createdAt).toLocaleDateString(getLocale(lang))}</p>
                   </div>
                   <Badge className={ticketStatusColors[t.status] || ""}>{ticketStatusLabels[t.status] || t.status}</Badge>
                 </CardContent>

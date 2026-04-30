@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
@@ -56,15 +58,15 @@ export async function POST(
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
     if (msg === "NOT_FOUND") {
-      return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 404 });
     }
     if (msg === "INVALID_STATUS") {
       return NextResponse.json(
-        { error: "Solo puedes cancelar solicitudes que aún no están en producción" },
+        { error: t("api.error.cannotCancelInProgress", lang) },
         { status: 400 }
       );
     }
     console.error("[TICKET_CANCEL]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

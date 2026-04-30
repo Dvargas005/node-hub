@@ -55,11 +55,11 @@ const planIcons: Record<string, typeof CreditCard> = {
   starter: Sparkles, member: CreditCard, growth: Zap, pro: Crown,
 };
 
-const planFeatures: Record<string, string[]> = {
-  starter: ["1 active request", "Delivery in 5 days", "Buy credits 1:1", "No commitment — 1 month"],
-  member: ["140 credits/mo", "2 active requests", "Delivery in 5 days", "Email support"],
-  growth: ["350 credits/mo", "5 active requests", "Delivery in 3 days", "Dedicated PM", "Priority support"],
-  pro: ["650 credits/mo", "Unlimited requests", "Delivery 24-48h", "Dedicated PM", "24/7 support", "All services"],
+const planFeatureKeys: Record<string, string[]> = {
+  starter: ["billing.feature.starter.0", "billing.feature.starter.1", "billing.feature.starter.2", "billing.feature.starter.3"],
+  member: ["billing.feature.member.0", "billing.feature.member.1", "billing.feature.member.2", "billing.feature.member.3"],
+  growth: ["billing.feature.growth.0", "billing.feature.growth.1", "billing.feature.growth.2", "billing.feature.growth.3", "billing.feature.growth.4"],
+  pro: ["billing.feature.pro.0", "billing.feature.pro.1", "billing.feature.pro.2", "billing.feature.pro.3", "billing.feature.pro.4", "billing.feature.pro.5"],
 };
 
 export function BillingClient({
@@ -105,8 +105,8 @@ export function BillingClient({
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error starting payment");
-    } catch { setError("Connection error"); } finally { setLoadingPlan(null); }
+      setError(data.error || t("common.errorStartingPayment"));
+    } catch { setError(t("common.connectionError")); } finally { setLoadingPlan(null); }
   };
 
   const handlePortal = async () => {
@@ -115,8 +115,8 @@ export function BillingClient({
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error opening portal");
-    } catch { setError("Connection error"); }
+      setError(data.error || t("common.errorOpeningPortal"));
+    } catch { setError(t("common.connectionError")); }
   };
 
   const handleBuyPack = async (packId: string) => {
@@ -130,8 +130,8 @@ export function BillingClient({
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error starting payment");
-    } catch { setError("Connection error"); } finally { setLoadingPack(null); }
+      setError(data.error || t("common.errorStartingPayment"));
+    } catch { setError(t("common.connectionError")); } finally { setLoadingPack(null); }
   };
 
   const handleBuyCustom = async () => {
@@ -145,8 +145,8 @@ export function BillingClient({
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error || "Error starting payment");
-    } catch { setError("Connection error"); } finally { setLoadingCustom(false); }
+      setError(data.error || t("common.errorStartingPayment"));
+    } catch { setError(t("common.connectionError")); } finally { setLoadingCustom(false); }
   };
 
   const openUpgradeDialog = async (planSlug: string) => {
@@ -157,13 +157,13 @@ export function BillingClient({
       const res = await fetch(`/api/stripe/upgrade-preview?plan=${planSlug}`);
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Failed to load preview");
+        toast.error(data.error || t("common.failedToLoadPreview"));
         setUpgradePlanSlug(null);
         return;
       }
       setUpgradePreview(data);
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
       setUpgradePlanSlug(null);
     }
   };
@@ -185,18 +185,18 @@ export function BillingClient({
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Upgrade failed");
+        toast.error(data.error || t("common.upgradeFailed"));
         return;
       }
       if (data.upgraded) {
-        toast.success(`Plan upgraded! You now have ${data.totalCredits} credits.`);
+        toast.success(t("billing.upgrade.success").replace("{credits}", String(data.totalCredits)));
         closeUpgradeDialog();
         router.refresh();
       } else if (data.url) {
         window.location.href = data.url;
       }
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     } finally {
       setUpgradeLoading(false);
     }
@@ -211,9 +211,9 @@ export function BillingClient({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">Billing</h1>
+        <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">{t("billing.title")}</h1>
         <p className="mt-1 text-[rgba(245,246,252,0.5)]">
-          {isActive ? "Manage your subscription and credits" : "Choose your plan to get started"}
+          {isActive ? t("billing.manageSubtitle") : t("billing.chooseSubtitle")}
         </p>
       </div>
 
@@ -227,10 +227,10 @@ export function BillingClient({
           <CardContent className="py-4 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0" />
             <div>
-              <p className="text-sm text-yellow-400 font-medium">Your payment couldn't be processed</p>
-              <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">Update your payment method to keep your plan active.</p>
+              <p className="text-sm text-yellow-400 font-medium">{t("billing.pastDue")}</p>
+              <p className="text-xs text-[rgba(245,246,252,0.5)] mt-1">{t("billing.pastDueDetail")}</p>
               <Button onClick={handlePortal} size="sm" className="mt-2 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs">
-                Update payment
+                {t("billing.updatePayment")}
               </Button>
             </div>
           </CardContent>
@@ -246,32 +246,32 @@ export function BillingClient({
                 <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">
                   Plan {subscription.planName}
                 </CardTitle>
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">Active</Badge>
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mt-1">{t("billing.active")}</Badge>
               </div>
               <div className="text-right">
                 <p className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--gold-bar)]">{totalCredits}</p>
-                <p className="text-xs text-[rgba(245,246,252,0.4)]">available credits</p>
+                <p className="text-xs text-[rgba(245,246,252,0.4)]">{t("billing.availableCredits")}</p>
                 {freeCredits > 0 && (
-                  <p className="text-[10px] text-[rgba(245,246,252,0.3)]">{freeCredits} free + {subscription.creditsRemaining} from plan</p>
+                  <p className="text-[10px] text-[rgba(245,246,252,0.3)]">{t("billing.freeFromPlan").replace("{free}", String(freeCredits)).replace("{plan}", String(subscription.creditsRemaining))}</p>
                 )}
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between text-sm text-[rgba(245,246,252,0.5)]">
-              <span>Next renewal</span>
-              <span>{new Date(subscription.currentPeriodEnd).toLocaleDateString("es-MX")}</span>
+              <span>{t("billing.nextRenewal")}</span>
+              <span>{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</span>
             </div>
             {/* Low credits warning */}
             {subscription.creditsRemaining < subscription.monthlyCredits * 0.2 && (
               <div className="flex items-center gap-2 bg-yellow-500/5 border border-yellow-500/20 p-2 text-xs text-yellow-400">
                 <AlertTriangle className="h-3 w-3" />
-                Low credits — buy an extra pack below
+                {t("billing.lowCredits")}
               </div>
             )}
             {subscription.hasStripeCustomer && (
               <Button onClick={handlePortal} variant="outline" className="w-full border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]">
-                Manage subscription in Stripe
+                {t("billing.manageStripe")}
               </Button>
             )}
           </CardContent>
@@ -289,12 +289,12 @@ export function BillingClient({
       {showPricing && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            {isCanceled || isExpired ? "Reactivate your plan" : "Choose your plan"}
+            {isCanceled || isExpired ? t("billing.reactivatePlan") : t("billing.choosePlan")}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
             {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;
-              const features = planFeatures[plan.slug] || [];
+              const featureKeys = planFeatureKeys[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
               const discountedPrice = applyDiscount(plan.priceMonthly);
               const hasDiscount = discountedPrice < plan.priceMonthly;
@@ -303,7 +303,7 @@ export function BillingClient({
                 <Card key={plan.id} className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
                   {isFeatured && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold whitespace-nowrap">Most popular</Badge>
+                      <Badge className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] font-bold whitespace-nowrap">{t("billing.mostPopular")}</Badge>
                     </div>
                   )}
                   <CardHeader className="text-center pt-6">
@@ -322,9 +322,9 @@ export function BillingClient({
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 mb-6">
-                      {features.map((f: any) => (
-                        <li key={f} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
-                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {f}
+                      {featureKeys.map((key: string) => (
+                        <li key={key} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t(key)}
                         </li>
                       ))}
                     </ul>
@@ -338,7 +338,7 @@ export function BillingClient({
                       }`}
                     >
                       {loadingPlan === plan.slug ? <Loader2 className="h-4 w-4 animate-spin" /> :
-                       !plan.stripePriceId ? "Coming soon" : "Subscribe"}
+                       !plan.stripePriceId ? t("billing.comingSoon") : t("billing.subscribe")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -347,7 +347,7 @@ export function BillingClient({
           </div>
           {effectiveDiscount > 0 && (
             <p className="mt-3 text-center text-xs text-[var(--gold-bar)]">
-              {promoApplied ? `Code ${promoCode}: ${promoDiscount}% discount applied` : `Alliance discount: ${allianceDiscount}% applied`}
+              {promoApplied ? t("billing.promoApplied").replace("{code}", promoCode).replace("{discount}", String(promoDiscount)) : t("billing.allianceDiscount").replace("{discount}", String(allianceDiscount))}
             </p>
           )}
 
@@ -358,7 +358,7 @@ export function BillingClient({
               <Input
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder="Promo code"
+                placeholder={t("billing.promoCode")}
                 className="flex-1 h-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] text-sm"
               />
               <Button
@@ -372,12 +372,12 @@ export function BillingClient({
                     setPromoApplied(true);
                     setPromoDiscount(discount);
                   } else {
-                    setError("Invalid code. You can enter it directly at checkout.");
+                    setError(t("billing.invalidCode"));
                   }
                 }}
                 className="bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)] text-xs h-9"
               >
-                Apply
+                {t("billing.apply")}
               </Button>
             </div>
           )}
@@ -411,7 +411,7 @@ export function BillingClient({
       {isActive && creditPacks.length > 0 && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            Extra credits
+            {t("billing.creditPacks")}
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
             {creditPacks.map((pack: any) => (
@@ -428,7 +428,7 @@ export function BillingClient({
                     variant="outline"
                     className="w-full border-[var(--gold-bar)]/30 text-[var(--gold-bar)] hover:bg-[rgba(255,201,25,0.1)] disabled:opacity-50"
                   >
-                    {loadingPack === pack.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Buy <ArrowRight className="ml-1 h-3 w-3" /></>}
+                    {loadingPack === pack.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t("billing.creditPacks.buy")} <ArrowRight className="ml-1 h-3 w-3" /></>}
                   </Button>
                 </CardContent>
               </Card>
@@ -441,12 +441,12 @@ export function BillingClient({
       {isActive && subscription && (
         <div>
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
-            Plans
+            {t("billing.plans")}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
             {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;
-              const features = planFeatures[plan.slug] || [];
+              const featureKeys = planFeatureKeys[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
               const isCurrent = plan.slug === subscription.planSlug;
               const isUpgrade = plan.priceMonthly > (plans.find((p: Plan) => p.slug === subscription.planSlug)?.priceMonthly || 0);
@@ -480,9 +480,9 @@ export function BillingClient({
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 mb-6">
-                      {features.map((f: string) => (
-                        <li key={f} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
-                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {f}
+                      {featureKeys.map((key: string) => (
+                        <li key={key} className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t(key)}
                         </li>
                       ))}
                     </ul>
@@ -676,10 +676,11 @@ const verdictColors: Record<string, string> = {
   justo: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   holgado: "bg-green-500/20 text-green-400 border-green-500/30",
 };
-const verdictLabels: Record<string, string> = { insuficiente: "Insufficient", justo: "Just right", holgado: "Comfortable" };
+const verdictI18nKeys: Record<string, string> = { insuficiente: "billing.verdict.insufficient", justo: "billing.verdict.justRight", holgado: "billing.verdict.comfortable" };
 const catEmoji: Record<string, string> = { DESIGN: "🎨", WEB: "💻", MARKETING: "📱" };
 
 function BillingProjection() {
+  const { t } = useTranslation();
   const [data, setData] = useState<{ projections: Projection[]; recommended: string | null } | null>(null);
   const [reason, setReason] = useState<string | null>(null);
 
@@ -698,10 +699,10 @@ function BillingProjection() {
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardContent className="py-6 text-center">
           <p className="text-sm text-[rgba(245,246,252,0.5)]">
-            Complete your business profile to see a personalized plan recommendation.
+            {t("billing.noProjection")}
           </p>
           <Link href="/dashboard" className="text-xs text-[var(--gold-bar)] hover:underline mt-2 inline-block">
-            Go to dashboard
+            {t("billing.goToDashboard")}
           </Link>
         </CardContent>
       </Card>
@@ -713,9 +714,9 @@ function BillingProjection() {
   return (
     <div>
       <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-2">
-        Which plan is right for you?
+        {t("billing.whichPlan")}
       </h2>
-      <p className="text-xs text-[rgba(245,246,252,0.4)] mb-4">Estimate based on your business needs</p>
+      <p className="text-xs text-[rgba(245,246,252,0.4)] mb-4">{t("billing.estimateBased")}</p>
 
       <div className="grid gap-4 md:grid-cols-3">
         {data.projections.map((p: any) => {
@@ -725,7 +726,7 @@ function BillingProjection() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-sm">{p.planName}</CardTitle>
-                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">Recommended for you</Badge>}
+                  {isRec && <Badge className="bg-[var(--gold-bar)]/20 text-[var(--gold-bar)] border-[var(--gold-bar)]/30 text-[9px]">{t("billing.recommended")}</Badge>}
                 </div>
                 <p className="text-xs text-[rgba(245,246,252,0.4)]">${p.priceMonthly / 100}/mo — {p.monthlyCredits} credits</p>
                 <p className="text-[11px] text-[rgba(245,246,252,0.5)] italic mt-1">{p.tagline}</p>
@@ -733,9 +734,9 @@ function BillingProjection() {
               <CardContent className="space-y-3">
                 {p.months.map((m: any) => (
                   <div key={m.month} className="space-y-1">
-                    <p className="text-[10px] font-medium text-[rgba(245,246,252,0.5)]">Month {m.month}</p>
+                    <p className="text-[10px] font-medium text-[rgba(245,246,252,0.5)]">{t("billing.month").replace("{number}", String(m.month))}</p>
                     {m.suggestedServices.length === 0 ? (
-                      <p className="text-[10px] text-[rgba(245,246,252,0.3)]">No suggested services</p>
+                      <p className="text-[10px] text-[rgba(245,246,252,0.3)]">{t("billing.noSuggested")}</p>
                     ) : (
                       <div className="space-y-0.5">
                         {m.suggestedServices.map((s: any, i: number) => (
@@ -756,7 +757,7 @@ function BillingProjection() {
                           />
                         </div>
                         <p className={`text-[9px] mt-0.5 ${m.remaining >= 0 ? "text-green-400" : "text-red-400"}`}>
-                          {m.remaining >= 0 ? `+${m.remaining} remaining` : `${m.remaining} short`}
+                          {m.remaining >= 0 ? t("billing.remaining").replace("{count}", String(m.remaining)) : t("billing.short").replace("{count}", String(m.remaining))}
                         </p>
                       </div>
                     )}
@@ -764,8 +765,8 @@ function BillingProjection() {
                 ))}
                 <Separator className="bg-[rgba(245,246,252,0.06)]" />
                 <div className="flex items-center justify-between">
-                  <Badge className={verdictColors[p.verdict] || ""}>{verdictLabels[p.verdict] || p.verdict}</Badge>
-                  <span className="text-[10px] text-[rgba(245,246,252,0.4)]">3 months: ${p.priceMonthly * 3 / 100}</span>
+                  <Badge className={verdictColors[p.verdict] || ""}>{t(verdictI18nKeys[p.verdict] || p.verdict)}</Badge>
+                  <span className="text-[10px] text-[rgba(245,246,252,0.4)]">{t("billing.threeMonths").replace("{amount}", String(p.priceMonthly * 3 / 100))}</span>
                 </div>
               </CardContent>
             </Card>

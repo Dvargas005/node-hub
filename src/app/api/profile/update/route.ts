@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const EDIT_COST = 10;
 
 export async function POST(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
@@ -43,14 +45,14 @@ export async function POST(req: NextRequest) {
 
     if (!businessName || !businessIndustry || !businessDescription) {
       return NextResponse.json(
-        { error: "Nombre, giro y descripción del negocio son requeridos" },
+        { error: t("api.error.profileFieldsRequired", lang) },
         { status: 400 }
       );
     }
 
     if (socialMedia && JSON.stringify(socialMedia).length > 2000) {
       return NextResponse.json(
-        { error: "Datos de redes sociales demasiado largos" },
+        { error: t("api.error.socialMediaTooLong", lang) },
         { status: 400 }
       );
     }
@@ -143,9 +145,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof Error && err.message === "INSUFFICIENT_CREDITS") {
-      return NextResponse.json({ error: `Editar tu perfil cuesta ${EDIT_COST} créditos. No tienes suficientes.` }, { status: 400 });
+      return NextResponse.json({ error: t("settings.editCostError", lang).replace("{cost}", String(EDIT_COST)).replace("{credits}", "0") }, { status: 400 });
     }
     console.error("[PROFILE_UPDATE]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
   try {
     const { feedback } = await req.json();
     if (!feedback || typeof feedback !== "string" || feedback.trim().length === 0) {
-      return NextResponse.json({ error: "Describe los ajustes que necesitas" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.describeAdjustments", lang) }, { status: 400 });
     }
 
     // I9: all inside transaction
@@ -64,11 +66,11 @@ export async function POST(
         }
 
         await tx.ticketSurcharge.create({
-          data: { ticketId: ticket.id, amount: surchargeAmount, reason: `Revisión adicional #${revisionCount + 1}`, addedBy: session.user.id },
+          data: { ticketId: ticket.id, amount: surchargeAmount, reason: t("api.notification.additionalRevision", lang).replace("{count}", String(revisionCount + 1)), addedBy: session.user.id },
         });
 
         await tx.ticketMessage.create({
-          data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: `Esta revisión adicional tiene un costo de ${surchargeAmount} créditos.`, isInternal: false },
+          data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: t("api.notification.revisionCost", lang).replace("{amount}", String(surchargeAmount)), isInternal: false },
         });
       }
 
@@ -90,11 +92,11 @@ export async function POST(
     return NextResponse.json({ success: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
-    if (msg === "NOT_FOUND") return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
-    if (msg === "INVALID_STATUS") return NextResponse.json({ error: "No hay entrega para revisar en este estado" }, { status: 400 });
-    if (msg === "NO_DELIVERY") return NextResponse.json({ error: "No hay entrega pendiente" }, { status: 400 });
-    if (msg === "INSUFFICIENT_CREDITS_REVISION") return NextResponse.json({ error: "No tienes créditos suficientes para esta revisión adicional" }, { status: 402 });
+    if (msg === "NOT_FOUND") return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 404 });
+    if (msg === "INVALID_STATUS") return NextResponse.json({ error: t("api.error.noDeliveryToReview", lang) }, { status: 400 });
+    if (msg === "NO_DELIVERY") return NextResponse.json({ error: t("api.error.noPendingDelivery", lang) }, { status: 400 });
+    if (msg === "INSUFFICIENT_CREDITS_REVISION") return NextResponse.json({ error: t("api.error.insufficientCreditsRevision", lang) }, { status: 402 });
     console.error("[TICKET_REVISION]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

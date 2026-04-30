@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 import { requireAuth } from "@/lib/session";
 import { RequestClient } from "./request-client";
 
@@ -19,6 +21,9 @@ export default async function RequestPage() {
     }),
   ]);
 
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("node-language")?.value || DEFAULT_LANG;
+
   return (
     <RequestClient
       subscription={
@@ -31,7 +36,7 @@ export default async function RequestPage() {
           : user?.freeCredits
             ? {
                 creditsRemaining: 0,
-                planName: "Sin plan",
+                planName: t("billing.starter", lang),
                 freeCredits: user.freeCredits,
               }
             : null

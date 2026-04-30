@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
   req: NextRequest,
@@ -8,6 +9,8 @@ export async function POST(
 ) {
   const { error, session } = await requireApiRole(["FREELANCER"]);
   if (error || !session) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     const { notes, fileUrl, fileName } = await req.json();
@@ -39,10 +42,10 @@ export async function POST(
     return NextResponse.json(delivery);
   } catch (err: any) {
     if (err?.message === "NO_FREELANCER") {
-      return NextResponse.json({ error: "Perfil de freelancer no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: t("api.error.freelancerNotFound", lang) }, { status: 404 });
     }
     if (err?.message === "NOT_FOUND") {
-      return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 404 });
     }
     if (err?.message === "FORBIDDEN") {
       return NextResponse.json({ error: "Sin permisos para este ticket" }, { status: 403 });
@@ -52,7 +55,7 @@ export async function POST(
     }
     console.error("[FREELANCER_TICKET_DELIVERY]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

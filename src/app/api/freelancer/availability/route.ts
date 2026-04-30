@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const validAvailability = ["AVAILABLE", "BUSY", "ON_LEAVE"];
 
@@ -8,13 +9,15 @@ export async function PATCH(req: NextRequest) {
   const { error, session } = await requireApiRole(["FREELANCER"]);
   if (error || !session) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { availability } = await req.json();
 
     if (!availability || !validAvailability.includes(availability)) {
       return NextResponse.json(
         {
-          error: `Disponibilidad no válida. Valores permitidos: ${validAvailability.join(", ")}`,
+          error: t("api.error.invalidAvailability", lang),
         },
         { status: 400 }
       );
@@ -25,7 +28,7 @@ export async function PATCH(req: NextRequest) {
     });
     if (!freelancer) {
       return NextResponse.json(
-        { error: "Perfil de freelancer no encontrado" },
+        { error: t("api.error.freelancerNotFound", lang) },
         { status: 404 }
       );
     }
@@ -43,7 +46,7 @@ export async function PATCH(req: NextRequest) {
   } catch (err) {
     console.error("[FREELANCER_AVAILABILITY]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

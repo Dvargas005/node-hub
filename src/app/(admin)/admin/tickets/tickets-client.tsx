@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -86,6 +88,7 @@ export function TicketsClient({
   availableFreelancers: AvailableFreelancer[];
 }) {
   const router = useRouter();
+  const { lang } = useTranslation();
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -284,10 +287,10 @@ export function TicketsClient({
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(t.createdAt).toLocaleDateString("es-MX")}
+                      {new Date(t.createdAt).toLocaleDateString(getLocale(lang))}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(t.updatedAt).toLocaleDateString("es-MX")}
+                      {new Date(t.updatedAt).toLocaleDateString(getLocale(lang))}
                     </TableCell>
                   </TableRow>
                 ))}

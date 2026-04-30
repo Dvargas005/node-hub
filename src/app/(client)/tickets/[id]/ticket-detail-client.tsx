@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +64,7 @@ export function TicketDetailClient({
   ticket: TicketData; messages: Message[]; deliveries: Delivery[];
 }) {
   const router = useRouter();
+  const { lang } = useTranslation();
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -335,11 +338,11 @@ export function TicketDetailClient({
                 </div>
                 <div className="flex items-center justify-between text-[rgba(245,246,252,0.5)]">
                   <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Created</span>
-                  <span className="text-[var(--ice-white)]">{new Date(ticket.createdAt).toLocaleDateString("es-MX")}</span>
+                  <span className="text-[var(--ice-white)]">{new Date(ticket.createdAt).toLocaleDateString(getLocale(lang))}</span>
                 </div>
                 <div className="flex items-center justify-between text-[rgba(245,246,252,0.5)]">
                   <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Updated</span>
-                  <span className="text-[var(--ice-white)]">{new Date(ticket.updatedAt).toLocaleDateString("es-MX")}</span>
+                  <span className="text-[var(--ice-white)]">{new Date(ticket.updatedAt).toLocaleDateString(getLocale(lang))}</span>
                 </div>
                 <Separator className="bg-[rgba(245,246,252,0.06)]" />
                 <div className="flex items-center gap-2 text-[rgba(245,246,252,0.5)]">

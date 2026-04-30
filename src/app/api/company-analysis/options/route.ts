@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { parseGeminiJSON } from "@/lib/parse-gemini-json";
+import { cookies } from "next/headers";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const ANALYSIS_COST = 10;
 
@@ -58,6 +60,7 @@ async function refundCredits(userId: string, freeDeducted: number, planDeducted:
 }
 
 export async function POST() {
+  const lang = (await cookies()).get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
@@ -173,7 +176,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
           console.error("[ANALYSIS] CRITICAL: Refund failed!", refundErr);
         }
       }
-      return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
     }
 
     await db.user.update({
@@ -198,12 +201,12 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
     if (msg.startsWith("INSUFFICIENT:")) {
       const total = msg.split(":")[1];
       return NextResponse.json(
-        { error: `Necesitas ${ANALYSIS_COST} créditos. Tienes ${total}.` },
+        { error: t("api.error.needCredits", lang).replace("{cost}", String(ANALYSIS_COST)).replace("{total}", String(total)) },
         { status: 400 }
       );
     }
 
     console.error("[ANALYSIS_OPTIONS]", err);
-    return NextResponse.json({ error: "No se pudo generar el análisis. Se reembolsaron tus créditos." }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

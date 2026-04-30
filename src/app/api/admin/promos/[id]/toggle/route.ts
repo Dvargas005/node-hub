@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function PATCH(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { error, session } = await requireApiRole(["ADMIN"]);
     if (error || !session) return error;
@@ -16,7 +19,7 @@ export async function PATCH(
 
     if (!promo) {
       return NextResponse.json(
-        { error: "Promo no encontrada" },
+        { error: t("api.error.promoNotFound", lang) },
         { status: 404 }
       );
     }
@@ -30,7 +33,7 @@ export async function PATCH(
   } catch (err: any) {
     console.error("[PROMOS_TOGGLE]", err);
     return NextResponse.json(
-      { error: "Error al cambiar estado" },
+      { error: t("api.error.promoToggleError", lang) },
       { status: 500 }
     );
   }

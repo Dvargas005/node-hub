@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { getGeminiModel } from "@/lib/gemini";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 function buildClientProfile(user: Record<string, unknown>): string {
   const lines: string[] = [];
@@ -220,11 +221,12 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
   if (error || !session) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   try {
     const { messages, category } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: "Mensajes requeridos" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.messagesRequired", lang) }, { status: 400 });
     }
 
     const userId = session.user.id;
@@ -236,7 +238,7 @@ export async function POST(req: NextRequest) {
       select: { onboardingCompleted: true },
     });
     if (!userCheck?.onboardingCompleted) {
-      return NextResponse.json({ error: "Completa tu perfil primero" }, { status: 403 });
+      return NextResponse.json({ error: t("api.error.completeProfile", lang) }, { status: 403 });
     }
 
     // Verify client has credits (plan OR free)
@@ -245,7 +247,7 @@ export async function POST(req: NextRequest) {
       const subCheck = await db.subscription.findUnique({ where: { userId }, select: { status: true, creditsRemaining: true } });
       const total = (creditCheck?.freeCredits || 0) + (subCheck?.status === "ACTIVE" ? subCheck.creditsRemaining : 0);
       if (total <= 0) {
-        return NextResponse.json({ error: "No tienes créditos disponibles. Elige un plan o compra un pack." }, { status: 403 });
+        return NextResponse.json({ error: t("wizard.noCredits", lang) }, { status: 403 });
       }
     }
 
@@ -375,6 +377,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: response });
   } catch (err) {
     console.error("[WIZARD_CHAT]", err);
-    return NextResponse.json({ error: "Error al procesar la conversación" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

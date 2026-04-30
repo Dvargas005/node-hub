@@ -4,11 +4,13 @@ import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketCompletedEmail } from "@/lib/email-templates";
 import { createNotification } from "@/lib/notifications";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
@@ -49,7 +51,7 @@ export async function POST(
         if (!hadRevisions) {
           await tx.user.update({ where: { id: ticket.userId }, data: { freeCredits: { increment: bonus } } });
           await tx.ticketMessage.create({
-            data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: `🎉 ¡Bono de ${bonus} créditos por aprobar en primera ronda!`, isInternal: false },
+            data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: t("api.notification.bonusCredits", lang).replace("{bonus}", String(bonus)), isInternal: false },
           });
         }
       }
@@ -71,7 +73,7 @@ export async function POST(
       const tpl = ticketCompletedEmail(tktInfo.user.name, tktInfo.number, tktInfo.variant.service.name, bonus);
       sendEmail(tktInfo.user.email, tpl.subject, tpl.html);
       createNotification(tktInfo.userId, {
-        title: "Solicitud completada",
+        title: t("api.notification.requestCompleted", lang),
         message: `Tu solicitud #${tktInfo.number} ha sido completada`,
         type: "ticket_update",
         link: `/tickets/${params.id}`,
@@ -81,10 +83,10 @@ export async function POST(
     return NextResponse.json({ success: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
-    if (msg === "NOT_FOUND") return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
-    if (msg === "INVALID_STATUS") return NextResponse.json({ error: "No se puede aprobar en este estado" }, { status: 400 });
-    if (msg === "NO_DELIVERY") return NextResponse.json({ error: "No hay entrega pendiente de aprobación" }, { status: 400 });
+    if (msg === "NOT_FOUND") return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 404 });
+    if (msg === "INVALID_STATUS") return NextResponse.json({ error: t("api.error.noPendingApproval", lang) }, { status: 400 });
+    if (msg === "NO_DELIVERY") return NextResponse.json({ error: t("api.error.noPendingApproval", lang) }, { status: 400 });
     console.error("[TICKET_APPROVE]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

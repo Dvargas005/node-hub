@@ -65,7 +65,7 @@ export function ClientMessagesView({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error || "Failed to send");
+        toast.error(data.error || t("common.failedToSend"));
         return;
       }
       const data = await res.json();
@@ -73,7 +73,7 @@ export function ClientMessagesView({
       setDraft("");
       toast.success(t("messages.sent"));
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     } finally {
       setSending(false);
     }

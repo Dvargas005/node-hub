@@ -25,6 +25,7 @@ import {
 import { Search, Coins, AlertTriangle } from "lucide-react";
 import { ContactIcons } from "@/components/admin/contact-links";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 
 interface ClientRow {
   id: string;
@@ -67,7 +68,7 @@ export function ClientsClient({
   pms: { id: string; name: string }[];
 }) {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("");
   const [filterAlliance, setFilterAlliance] = useState(false);
@@ -348,7 +349,7 @@ export function ClientsClient({
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(c.createdAt).toLocaleDateString("es-MX")}
+                      {new Date(c.createdAt).toLocaleDateString(getLocale(lang))}
                     </TableCell>
                   </TableRow>
                 ))}

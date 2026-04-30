@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketAssignedEmail, freelancerNewAssignmentEmail } from "@/lib/email-templates";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
   req: NextRequest,
@@ -10,6 +11,8 @@ export async function POST(
 ) {
   const { error } = await requireApiRole(["ADMIN", "PM"]);
   if (error) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     const { freelancerId } = await req.json();
@@ -70,7 +73,7 @@ export async function POST(
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
     if (msg === "NOT_FOUND") {
-      return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: t("api.error.ticketNotFound", lang) }, { status: 404 });
     }
     if (msg === "ALREADY_ASSIGNED") {
       return NextResponse.json({ error: "Este ticket ya fue asignado" }, { status: 400 });
@@ -83,7 +86,7 @@ export async function POST(
     }
     console.error("[ASSIGN_TICKET]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

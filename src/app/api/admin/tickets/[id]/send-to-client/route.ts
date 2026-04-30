@@ -4,6 +4,7 @@ import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { deliveryReadyEmail } from "@/lib/email-templates";
 import { createNotification } from "@/lib/notifications";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
   req: NextRequest,
@@ -11,6 +12,8 @@ export async function POST(
 ) {
   const { error, session } = await requireApiRole(["ADMIN", "PM"]);
   if (error || !session) return error;
+
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
     const { deliveryId } = await req.json();
@@ -49,8 +52,8 @@ export async function POST(
       const tpl = deliveryReadyEmail(ticketInfo.user.name, ticketInfo.number, ticketInfo.variant.service.name);
       sendEmail(ticketInfo.user.email, tpl.subject, tpl.html);
       createNotification(ticketInfo.userId, {
-        title: "Entrega lista",
-        message: `La entrega de #${ticketInfo.number} está lista`,
+        title: t("api.notification.deliveryReady", lang),
+        message: t("api.notification.deliveryReadyDetail", lang).replace("{number}", String(ticketInfo.number)),
         type: "delivery",
         link: `/tickets/${ticketId}`,
       });
@@ -68,6 +71,6 @@ export async function POST(
       return NextResponse.json({ error: "La entrega no está pendiente de revisión" }, { status: 400 });
     }
     console.error("[SEND_TO_CLIENT]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

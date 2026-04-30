@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -75,6 +76,7 @@ export function ChatInterface({
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [estimatedCost, setEstimatedCost] = useState<number | null>(null);
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export function ChatInterface({
       if (!res.ok) {
         setMessages([
           ...newMessages,
-          { role: "assistant", content: data.error || "Error in conversation" },
+          { role: "assistant", content: data.error || t("common.error") },
         ]);
         return;
       }
@@ -140,7 +142,7 @@ export function ChatInterface({
     } catch {
       setMessages([
         ...newMessages,
-        { role: "assistant", content: "Connection error. Please try again." },
+        { role: "assistant", content: t("common.connectionError") },
       ]);
     } finally {
       setLoading(false);

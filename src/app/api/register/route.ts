@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { sendEmail } from "@/lib/email";
 import { welcomeEmail } from "@/lib/email-templates";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 // reCAPTCHA Enterprise verification
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcRBKcsAAAAABZ7FSuDCSpwYofze-wVPV2H9Jd7";
@@ -44,10 +45,11 @@ function isRateLimited(ip: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     if (isRateLimited(ip)) {
-      return NextResponse.json({ error: "Demasiados intentos. Intenta en una hora." }, { status: 429 });
+      return NextResponse.json({ error: t("api.error.tooManyAttempts", lang) }, { status: 429 });
     }
 
     const body = await req.json();
@@ -56,19 +58,19 @@ export async function POST(req: NextRequest) {
     // reCAPTCHA Enterprise verification (skipped if not configured)
     const recaptcha = await verifyRecaptchaEnterprise(recaptchaToken || "");
     if (!recaptcha.success) {
-      return NextResponse.json({ error: "Verificación de seguridad fallida. Intenta de nuevo." }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.recaptchaFailed", lang) }, { status: 400 });
     }
 
     // Input validation
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Todos los campos son requeridos" },
+        { error: t("api.error.fieldsRequired", lang) },
         { status: 400 }
       );
     }
     if (password.length < 8) {
       return NextResponse.json(
-        { error: "La contraseña debe tener al menos 8 caracteres" },
+        { error: t("api.error.passwordMin", lang) },
         { status: 400 }
       );
     }
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
       });
       if (!alliance) {
         return NextResponse.json(
-          { error: "Código de alianza no válido" },
+          { error: t("api.error.invalidAllianceCode", lang) },
           { status: 400 }
         );
       }
@@ -100,8 +102,8 @@ export async function POST(req: NextRequest) {
       console.error("[REGISTER] signUpEmail threw:", err);
       const message =
         err instanceof Error && err.message?.includes("already")
-          ? "Este email ya está registrado"
-          : "Error al crear la cuenta";
+          ? t("api.error.emailExists", lang)
+          : t("api.error.createAccount", lang);
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
@@ -116,7 +118,7 @@ export async function POST(req: NextRequest) {
         msg.includes("already") || msg.includes("exists") || authRes.status === 422;
 
       return NextResponse.json(
-        { error: isDuplicate ? "Este email ya está registrado" : "Error al crear la cuenta" },
+        { error: isDuplicate ? t("api.error.emailExists", lang) : t("api.error.createAccount", lang) },
         { status: 400 }
       );
     }
@@ -127,7 +129,7 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       console.error("[REGISTER] No user.id in response:", authData);
       return NextResponse.json(
-        { error: "Error al crear la cuenta" },
+        { error: t("api.error.createAccount", lang) },
         { status: 500 }
       );
     }
@@ -157,7 +159,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[REGISTER]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

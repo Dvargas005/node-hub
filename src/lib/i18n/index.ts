@@ -15,6 +15,11 @@ export function getLanguageName(code: string): string {
   return names[code] || code;
 }
 
+export function getLocale(lang: string): string {
+  const locales: Record<string, string> = { es: "es-MX", en: "en-US", pt: "pt-BR" };
+  return locales[lang] || "en-US";
+}
+
 export const LANGUAGES = [
   { code: "es", name: "Español", flag: "🇪🇸" },
   { code: "en", name: "English", flag: "🇺🇸" },

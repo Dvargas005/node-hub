@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(req: NextRequest) {
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
     // Step 1 required fields
     if (!businessName || !businessIndustry || !businessDescription) {
       return NextResponse.json(
-        { error: "Nombre, giro y descripción del negocio son requeridos" },
+        { error: t("api.error.profileFieldsRequired", lang) },
         { status: 400 }
       );
     }
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
     // Validate socialMedia size
     if (socialMedia && JSON.stringify(socialMedia).length > 2000) {
       return NextResponse.json(
-        { error: "Datos de redes sociales demasiado largos" },
+        { error: t("api.error.socialMediaTooLong", lang) },
         { status: 400 }
       );
     }
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[ONBOARDING]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

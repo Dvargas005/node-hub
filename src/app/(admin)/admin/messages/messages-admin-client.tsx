@@ -46,7 +46,7 @@ export function AdminMessagesView({
     try {
       const res = await fetch(`/api/messages/${c.userId}`);
       if (!res.ok) {
-        toast.error("Failed to load conversation");
+        toast.error(t("common.failedToLoad"));
         return;
       }
       const data = await res.json();
@@ -58,7 +58,7 @@ export function AdminMessagesView({
         prev.map((x: ConversationItem) => (x.userId === c.userId ? { ...x, unreadCount: 0 } : x)),
       );
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export function AdminMessagesView({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error || "Failed to send");
+        toast.error(data.error || t("common.failedToSend"));
         return;
       }
       const data = await res.json();
@@ -93,7 +93,7 @@ export function AdminMessagesView({
         ),
       );
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     } finally {
       setSending(false);
     }

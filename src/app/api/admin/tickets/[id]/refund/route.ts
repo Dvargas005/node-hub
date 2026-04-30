@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(
   req: NextRequest,
@@ -9,20 +10,22 @@ export async function POST(
   const { error, session } = await requireApiRole(["ADMIN", "PM"]);
   if (error) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   try {
     const { amount, reason } = await req.json();
     const ticketId = params.id;
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
-        { error: "El monto debe ser mayor a 0" },
+        { error: t("api.error.amountGreaterThanZero", lang) },
         { status: 400 }
       );
     }
 
     if (!reason || typeof reason !== "string") {
       return NextResponse.json(
-        { error: "La razón es requerida" },
+        { error: t("api.error.reasonRequired", lang) },
         { status: 400 }
       );
     }
@@ -72,13 +75,13 @@ export async function POST(
     const msg = err instanceof Error ? err.message : "";
     if (msg === "NOT_FOUND") {
       return NextResponse.json(
-        { error: "Ticket no encontrado" },
+        { error: t("api.error.ticketNotFound", lang) },
         { status: 404 }
       );
     }
     console.error("[TICKET_REFUND]", err);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: t("api.error.internal", lang) },
       { status: 500 }
     );
   }

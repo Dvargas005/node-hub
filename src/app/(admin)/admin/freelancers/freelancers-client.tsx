@@ -687,6 +687,7 @@ export function FreelancersClient({
 
 function PasswordReveal({ password }: { password: string | null }) {
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation();
   if (!password) return <span className="text-[rgba(245,246,252,0.3)] text-xs">Activo</span>;
   return (
     <div className="flex items-center gap-1.5">
@@ -694,7 +695,7 @@ function PasswordReveal({ password }: { password: string | null }) {
       <button onClick={() => setVisible(!visible)} className="text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]">
         {visible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
       </button>
-      <button onClick={() => { navigator.clipboard.writeText(password); toast.success("Copiado"); }} className="text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]">
+      <button onClick={() => { navigator.clipboard.writeText(password); toast.success(t("contact.copied")); }} className="text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)]">
         <Copy className="h-3.5 w-3.5" />
       </button>
     </div>

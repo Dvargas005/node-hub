@@ -21,6 +21,7 @@ import {
   freelancerRoleLabels,
 } from "@/lib/status-labels";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getLocale } from "@/lib/i18n";
 
 interface Metrics {
   activeClients: number;
@@ -60,7 +61,7 @@ export function OverviewClient({
   recentTickets: RecentTicket[];
   freelancers: FreelancerSummary[];
 }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const metricCards = [
     {
       label: t("admin.overview.activeClients"),
@@ -189,7 +190,7 @@ export function OverviewClient({
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(t.createdAt).toLocaleDateString("es-MX")}
+                      {new Date(t.createdAt).toLocaleDateString(getLocale(lang))}
                     </TableCell>
                   </TableRow>
                 ))}
