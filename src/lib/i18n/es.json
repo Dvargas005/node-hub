@@ -276,5 +276,21 @@
   "calendly.schedule": "Agendar",
   "calendly.noPm": "Podrás agendar reuniones después de que tu PM sea asignado.",
   "calendly.needToTalk": "¿Necesitas hablar?",
-  "calendly.saved": "URL de Calendly guardada"
+  "calendly.saved": "URL de Calendly guardada",
+  "earlyAdopters.title": "Early Adopters",
+  "earlyAdopters.subtitle": "Tu equipo digital. Una suscripción. Sin fee de activación.",
+  "earlyAdopters.price": "$91/mes",
+  "earlyAdopters.features.credits": "140 créditos por mes",
+  "earlyAdopters.features.requests": "2 solicitudes activas",
+  "earlyAdopters.features.delivery": "Entrega en 5 días",
+  "earlyAdopters.features.catalog": "Catálogo completo: diseño, web y marketing",
+  "earlyAdopters.features.pm": "Project Manager dedicado",
+  "earlyAdopters.features.noSetup": "Sin fee de activación — sin compromiso",
+  "earlyAdopters.cta": "Comenzar",
+  "earlyAdopters.subscribe": "Suscribirse ahora",
+  "earlyAdopters.subscribing": "Iniciando checkout...",
+  "earlyAdopters.login": "¿Ya tienes cuenta? Inicia sesión",
+  "earlyAdopters.alreadyActive": "Ya tienes un plan activo",
+  "earlyAdopters.goToDashboard": "Ir al panel",
+  "earlyAdopters.contactSupport": "Contacta a soporte para cambiar de plan"
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,8 @@ async function getRecaptchaToken(): Promise<string | null> {
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectAfter = searchParams.get("redirect");
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -113,13 +115,20 @@ export function RegisterForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Error creating account");
+        setError(data.error || t("common.errorCreatingAccount"));
         return;
+      }
+
+      // Stash the redirect for after onboarding completes
+      if (redirectAfter && redirectAfter.startsWith("/")) {
+        try {
+          localStorage.setItem("node-post-onboarding-redirect", redirectAfter);
+        } catch {}
       }
 
       router.push("/dashboard");
     } catch {
-      setError("Connection error");
+      setError(t("common.connectionError"));
     } finally {
       setLoading(false);
     }

@@ -11,7 +11,7 @@ export default async function BillingPage() {
 
   const [plans, rawSubscription, creditPacks, user] = await Promise.all([
     db.plan.findMany({
-      where: { isActive: true },
+      where: { isActive: true, isHidden: false },
       orderBy: { priceMonthly: "asc" },
     }),
     db.subscription.findUnique({

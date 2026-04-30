@@ -17,6 +17,9 @@ export function middleware(req: NextRequest) {
   // Landing page — always public
   if (pathname === "/") return NextResponse.next();
 
+  // Hidden Early Adopters landing — public (auth-aware in the page itself)
+  if (pathname === "/early-adopters") return NextResponse.next();
+
   // Auth pages — always allow (cookie may be expired)
   if (authPaths.includes(pathname)) return NextResponse.next();
 

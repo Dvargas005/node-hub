@@ -276,5 +276,21 @@
   "calendly.schedule": "Schedule",
   "calendly.noPm": "You'll be able to schedule meetings after your PM is assigned.",
   "calendly.needToTalk": "Need to talk?",
-  "calendly.saved": "Calendly URL saved"
+  "calendly.saved": "Calendly URL saved",
+  "earlyAdopters.title": "Early Adopters",
+  "earlyAdopters.subtitle": "Your digital team. One subscription. No setup fee.",
+  "earlyAdopters.price": "$91/mo",
+  "earlyAdopters.features.credits": "140 credits per month",
+  "earlyAdopters.features.requests": "2 active requests",
+  "earlyAdopters.features.delivery": "5-day delivery",
+  "earlyAdopters.features.catalog": "Full service catalog: design, web & marketing",
+  "earlyAdopters.features.pm": "Dedicated Project Manager",
+  "earlyAdopters.features.noSetup": "No setup fee — no commitment",
+  "earlyAdopters.cta": "Get started",
+  "earlyAdopters.subscribe": "Subscribe now",
+  "earlyAdopters.subscribing": "Starting checkout...",
+  "earlyAdopters.login": "Already have an account? Log in",
+  "earlyAdopters.alreadyActive": "You already have an active plan",
+  "earlyAdopters.goToDashboard": "Go to dashboard",
+  "earlyAdopters.contactSupport": "Contact support to switch plans"
 }

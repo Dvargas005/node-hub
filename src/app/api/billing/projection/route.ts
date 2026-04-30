@@ -44,7 +44,7 @@ export async function GET() {
         where: { id: userId },
         select: { priorities: true, companyAnalysis: true },
       }),
-      db.plan.findMany({ where: { isActive: true, isRecurring: true }, orderBy: { priceMonthly: "asc" } }),
+      db.plan.findMany({ where: { isActive: true, isRecurring: true, isHidden: false }, orderBy: { priceMonthly: "asc" } }),
       db.service.findMany({
         where: { isActive: true },
         include: { variants: { where: { isActive: true }, orderBy: { creditCost: "asc" } } },

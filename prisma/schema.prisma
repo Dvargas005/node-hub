@@ -132,6 +132,7 @@ model Plan {
   setupFeeStripePriceId  String?
   isActive               Boolean   @default(true)
   isRecurring            Boolean   @default(true)  // false = one-time payment, no auto-renew
+  isHidden               Boolean   @default(false) // true = exclude from public billing/landing
   createdAt       DateTime  @default(now())
 
   subscriptions   Subscription[]

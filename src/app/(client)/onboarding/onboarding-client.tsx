@@ -609,8 +609,16 @@ export function OnboardingClient({
           ? `✅ All set! Your profile is configured.\n\n🎁 You received ${data.welcomeCredits} welcome credits.\n\nRedirecting to your dashboard...`
           : "✅ All set! Your profile is configured.\n\nRedirecting to your dashboard..."
       );
+      let postRedirect = "/dashboard";
+      try {
+        const stored = localStorage.getItem("node-post-onboarding-redirect");
+        if (stored && stored.startsWith("/")) {
+          postRedirect = stored;
+          localStorage.removeItem("node-post-onboarding-redirect");
+        }
+      } catch {}
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = postRedirect;
       }, 2000);
     } catch {
       await pushBot("Connection error. Try again.");

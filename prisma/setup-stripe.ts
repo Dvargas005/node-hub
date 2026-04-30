@@ -42,6 +42,7 @@ interface PlanSeed {
   maxActiveReqs: number;
   deliveryDays: number;
   isRecurring: boolean;
+  isHidden?: boolean;
 }
 
 const plans: PlanSeed[] = [
@@ -93,6 +94,19 @@ const plans: PlanSeed[] = [
     deliveryDays: 2,
     isRecurring: true,
   },
+  {
+    slug: "early-adopters",
+    name: "N.O.D.E. Early Adopters",
+    description: "Exclusive plan: design, web and content with no setup fee.",
+    priceMonthly: 9100, // $91
+    setupFee: 0,
+    monthlyCredits: 140,
+    bonusCredits: 0,
+    maxActiveReqs: 2,
+    deliveryDays: 5,
+    isRecurring: true,
+    isHidden: true,
+  },
 ];
 
 interface ProvisionResult {
@@ -120,6 +134,7 @@ async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
           maxActiveReqs: plan.maxActiveReqs,
           deliveryDays: plan.deliveryDays,
           isRecurring: plan.isRecurring,
+          isHidden: plan.isHidden ?? false,
         },
       })
     : await prisma.plan.create({
@@ -133,6 +148,7 @@ async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
           maxActiveReqs: plan.maxActiveReqs,
           deliveryDays: plan.deliveryDays,
           isRecurring: plan.isRecurring,
+          isHidden: plan.isHidden ?? false,
         },
       });
 
