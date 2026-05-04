@@ -259,7 +259,10 @@ export function ClientsClient({
                 {filtered.map((c: any) => (
                   <TableRow
                     key={c.id}
-                    onClick={() => router.push(`/admin/clients/${c.id}`)}
+                    onClick={(e) => {
+                      if ((e.target as HTMLElement).closest("select, button, input, a, option")) return;
+                      router.push(`/admin/clients/${c.id}`);
+                    }}
                     className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer"
                   >
                     <TableCell className="text-[var(--ice-white)] font-medium">
@@ -271,7 +274,7 @@ export function ClientsClient({
                         <span className="text-[rgba(245,246,252,0.3)]">—</span>
                       )}
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell>
                       <ContactIcons
                         contact={{
                           email: c.email,
@@ -310,10 +313,7 @@ export function ClientsClient({
                         {isAdmin && (
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openCreditDialog(c);
-                            }}
+                            onClick={() => openCreditDialog(c)}
                             className="text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] transition-colors p-0.5"
                             title={t("admin.credits.adjust")}
                             aria-label={t("admin.credits.adjust")}
@@ -330,7 +330,6 @@ export function ClientsClient({
                       {isAdmin ? (
                         <select
                           value={c.assignedPmId || ""}
-                          onClick={(e) => e.stopPropagation()}
                           onChange={(e) => handleAssignPm(c.id, e.target.value || null)}
                           className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
                         >
