@@ -136,18 +136,23 @@ export function ClientsClient({
     }
   };
 
-  const handleAssignPm = async (clientId: string, pmId: string) => {
+  const handleAssignPm = async (clientId: string, pmId: string | null) => {
     try {
       const res = await fetch(`/api/admin/clients/${clientId}/assign-pm`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pmId }),
       });
-      if (res.ok) {
-        router.refresh();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.error || "Error assigning PM");
+        return;
       }
+      toast.success(pmId ? "PM assigned" : "PM unassigned");
+      router.refresh();
     } catch (err: any) {
       console.error("Error assigning PM", err);
+      toast.error("Connection error");
     }
   };
 
@@ -254,7 +259,8 @@ export function ClientsClient({
                 {filtered.map((c: any) => (
                   <TableRow
                     key={c.id}
-                    className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"
+                    onClick={() => router.push(`/admin/clients/${c.id}`)}
+                    className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer"
                   >
                     <TableCell className="text-[var(--ice-white)] font-medium">
                       <div>{c.name}</div>
@@ -265,7 +271,7 @@ export function ClientsClient({
                         <span className="text-[rgba(245,246,252,0.3)]">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <ContactIcons
                         contact={{
                           email: c.email,
@@ -304,7 +310,10 @@ export function ClientsClient({
                         {isAdmin && (
                           <button
                             type="button"
-                            onClick={() => openCreditDialog(c)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openCreditDialog(c);
+                            }}
                             className="text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] transition-colors p-0.5"
                             title={t("admin.credits.adjust")}
                             aria-label={t("admin.credits.adjust")}
@@ -321,9 +330,8 @@ export function ClientsClient({
                       {isAdmin ? (
                         <select
                           value={c.assignedPmId || ""}
-                          onChange={(e) => {
-                            if (e.target.value) handleAssignPm(c.id, e.target.value);
-                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => handleAssignPm(c.id, e.target.value || null)}
                           className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
                         >
                           <option value="">Unassigned</option>
