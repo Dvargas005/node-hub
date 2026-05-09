@@ -108,7 +108,9 @@ function Img({ desc, ratio = "16/9" }: { desc: string; ratio?: string }) {
 const C = {
   en: {
     nav: { join: "Get Started" },
-    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "SYSTEM_STATUS: OPERATIONAL // LATENCY: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", tagline: "Your Ally on Digital Development", lines: ["Increase your business revenue.", "Regain time in your day.", "Grow as you've wanted."], blPre: "SYSTEM_STATUS: OPERATIONAL // LATENCY: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
+    whatIs: { title: "What is N.O.D.E.?", para: "We're your digital creation and maintenance partner. That's why we focus on monthly plans instead of high one-time tickets. Better results, lower cost, stronger protection for your business." },
     svc: {
       label: "WHAT WE DELIVER",
       title: "Three service lines. Real deliverables.",
@@ -159,7 +161,9 @@ const C = {
   },
   es: {
     nav: { join: "Comenzar" },
-    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", blPre: "ESTADO_SISTEMA: OPERATIVO // LATENCIA: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", tagline: "Tu Aliado en Desarrollo Digital", lines: ["Aumenta los ingresos de tu negocio.", "Recupera tiempo en tu día.", "Crece como siempre quisiste."], blPre: "ESTADO_SISTEMA: OPERATIVO // LATENCIA: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
+    whatIs: { title: "¿Qué es N.O.D.E.?", para: "Somos tu aliado de creación y mantenimiento digital. Por eso nos enfocamos en planes mensuales en vez de altos tickets de una vez. Mayor resultado, menos costo, mejor protección para tu negocio." },
     svc: {
       label: "LO QUE ENTREGAMOS",
       title: "Tres líneas de servicio. Entregables reales.",
@@ -540,12 +544,68 @@ export default function Home() {
               N.O.D.E.
             </motion.h1>
           </RevealLine>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease, delay: 0.9 }}
+            className="font-[family-name:var(--font-atkinson)] mt-6"
+            style={{ fontSize: "1.2rem", color: "rgba(245,246,252,0.7)" }}
+          >
+            {t.hero.tagline}
+          </motion.p>
+          <div className="mt-10 flex flex-col gap-2">
+            {t.hero.lines.map((line, i) => (
+              <motion.p
+                key={line}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease, delay: 1.2 + i * 0.3 }}
+                className="font-[family-name:var(--font-lexend)] font-bold text-[#F5F6FC]"
+                style={{ fontSize: "1.3rem" }}
+              >
+                {line}
+              </motion.p>
+            ))}
+          </div>
         </div>
         {/* HUD bottom bar */}
         <div className="absolute bottom-8 left-0 right-0 px-6 md:px-8 flex justify-between font-[family-name:var(--font-atkinson)] text-[10px] uppercase tracking-[0.2em] text-[rgba(245,246,252,0.35)]" style={{ fontVariantNumeric: "tabular-nums" }}>
           <FadeUp delay={0.8}><span>{t.hero.blPre}{latency ?? "---"}MS</span></FadeUp>
           <FadeUp delay={1.0} className="hidden md:block"><span>{t.hero.bc}</span></FadeUp>
           <FadeUp delay={1.2}><span>{t.hero.br}</span></FadeUp>
+        </div>
+      </section>
+
+      {/* ═══ 1.5 SERVICES BANNER ═══ */}
+      <div
+        className="overflow-hidden py-5"
+        style={{
+          background: "rgba(255,201,25,0.06)",
+          borderTop: "1px solid rgba(255,201,25,0.15)",
+          borderBottom: "1px solid rgba(255,201,25,0.15)",
+        }}
+      >
+        <div className="flex justify-center items-center gap-3 md:gap-6 px-6 flex-wrap font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.18em] text-[#FFC919]">
+          {t.banner.map((s, i) => (
+            <span key={s} className="flex items-center gap-3 md:gap-6">
+              {i > 0 && <span className="text-[#FFC919]/40">|</span>}
+              <span>{s}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ 1.6 WHAT IS N.O.D.E. ═══ */}
+      <section className="py-24 px-6 md:px-12 bg-[#1B1B1B]">
+        <div className="max-w-[800px] mx-auto text-center">
+          <FadeUp>
+            <h2 className="font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.6rem,3vw,2.2rem)] uppercase text-[#F5F6FC] mb-6">{t.whatIs.title}</h2>
+          </FadeUp>
+          <FadeUp delay={0.15}>
+            <p className="font-[family-name:var(--font-atkinson)]" style={{ fontSize: "1.2rem", color: "rgba(245,246,252,0.7)", lineHeight: 1.8 }}>
+              {t.whatIs.para}
+            </p>
+          </FadeUp>
         </div>
       </section>
 
@@ -679,13 +739,21 @@ export default function Home() {
       {/* ═══ 8. FOOTER ═══ */}
       <footer className="py-16 px-6 md:px-12 bg-[#0a0504] border-t border-[#F5F6FC]/10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="font-[family-name:var(--font-lexend)] font-black text-2xl">N.O.D.E. <span className="text-[#F5F6FC]/40 font-normal text-sm">by Nouvos</span></div>
+          <div className="font-[family-name:var(--font-lexend)] font-black text-2xl flex items-center gap-2">
+            N.O.D.E.
+            <span className="text-[#F5F6FC]/40 font-normal text-sm">by</span>
+            <Image src="/logos/nouvos-one.svg" alt="Nouvos.ONE" width={118} height={20} style={{ height: 20, width: "auto", opacity: 0.6 }} />
+          </div>
           <div className="flex gap-8 font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/40">
             <a href="#" className="hover:text-[#FFC919] transition-colors">Twitter</a>
             <a href="#" className="hover:text-[#FFC919] transition-colors">LinkedIn</a>
             <a href="#" className="hover:text-[#FFC919] transition-colors">Instagram</a>
           </div>
           <p className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/30">{t.footer}</p>
+        </div>
+        <div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-[#F5F6FC]/5 flex justify-center items-center gap-3">
+          <span className="font-[family-name:var(--font-atkinson)] text-xs text-[#F5F6FC]/40 uppercase tracking-[0.2em]">Powered by</span>
+          <Image src="/logos/nouvos-one.svg" alt="Nouvos.ONE" width={118} height={20} style={{ height: 20, width: "auto", opacity: 0.6 }} />
         </div>
       </footer>
     </main>
