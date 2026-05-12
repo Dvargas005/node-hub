@@ -493,7 +493,26 @@ export default function Home() {
 
       {/* ── Nav (FIX 1: flags inside nav) ── */}
       <nav className={`fixed top-0 left-0 right-0 z-40 px-6 md:px-12 py-5 flex justify-between items-center transition-all duration-500 ${scrolled ? "nav-blur" : ""}`}>
-        <a href="#" className="font-[family-name:var(--font-lexend)] font-black text-xl tracking-tight">N.O.D.E.</a>
+        <div className="flex items-center gap-3">
+          <a href="#" className="font-[family-name:var(--font-lexend)] font-black text-xl tracking-tight">N.O.D.E.</a>
+          <a
+            href="https://nouvos.one"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="NOUVOS.ONE"
+            className="hidden sm:flex items-center gap-2 group"
+          >
+            <span className="font-[family-name:var(--font-atkinson)] text-[0.7rem] text-[#F5F6FC]/40 group-hover:text-[#F5F6FC]/70 transition-colors">by</span>
+            <Image
+              src="/logos/NOUVOS.ONE_white.svg"
+              alt="NOUVOS.ONE"
+              width={95}
+              height={16}
+              className="opacity-60 group-hover:opacity-90 transition-opacity"
+              style={{ height: 16, width: "auto" }}
+            />
+          </a>
+        </div>
         <div className="flex items-center gap-4">
           {/* Lang flags — desktop only, inside nav */}
           <div className="hidden md:flex items-center gap-1.5">
@@ -741,8 +760,23 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="font-[family-name:var(--font-lexend)] font-black text-2xl flex items-center gap-2">
             N.O.D.E.
-            <span className="text-[#F5F6FC]/40 font-normal text-sm">by</span>
-            <Image src="/logos/nouvos-one.svg" alt="Nouvos.ONE" width={118} height={20} style={{ height: 20, width: "auto", opacity: 0.6 }} />
+            <a
+              href="https://nouvos.one"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="NOUVOS.ONE"
+              className="flex items-center gap-2 group ml-1"
+            >
+              <span className="font-[family-name:var(--font-atkinson)] font-normal text-[0.7rem] text-[#F5F6FC]/40 group-hover:text-[#F5F6FC]/70 transition-colors">by</span>
+              <Image
+                src="/logos/NOUVOS.ONE_white.svg"
+                alt="NOUVOS.ONE"
+                width={95}
+                height={16}
+                className="opacity-60 group-hover:opacity-90 transition-opacity"
+                style={{ height: 16, width: "auto" }}
+              />
+            </a>
           </div>
           <div className="flex gap-8 font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/40">
             <a href="#" className="hover:text-[#FFC919] transition-colors">Twitter</a>
@@ -753,7 +787,22 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-[#F5F6FC]/5 flex justify-center items-center gap-3">
           <span className="font-[family-name:var(--font-atkinson)] text-xs text-[#F5F6FC]/40 uppercase tracking-[0.2em]">Powered by</span>
-          <Image src="/logos/nouvos-one.svg" alt="Nouvos.ONE" width={118} height={20} style={{ height: 20, width: "auto", opacity: 0.6 }} />
+          <a
+            href="https://nouvos.one"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="NOUVOS.ONE"
+            className="group inline-flex"
+          >
+            <Image
+              src="/logos/NOUVOS.ONE_white.svg"
+              alt="NOUVOS.ONE"
+              width={95}
+              height={16}
+              className="opacity-60 group-hover:opacity-90 transition-opacity"
+              style={{ height: 16, width: "auto" }}
+            />
+          </a>
         </div>
       </footer>
     </main>
