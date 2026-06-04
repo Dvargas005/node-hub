@@ -288,9 +288,10 @@ export function BillingClient({
 
       {showPricing && (
         <div>
-          <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
+          <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-1">
             {isCanceled || isExpired ? t("billing.reactivatePlan") : t("billing.choosePlan")}
           </h2>
+          <p className="mb-4 font-[var(--font-atkinson)] text-sm text-[var(--gold-bar)]">{t("billing.payAsYouGo")}</p>
           <div className="grid gap-6 md:grid-cols-3">
             {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;

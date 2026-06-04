@@ -64,6 +64,12 @@ export async function POST() {
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
+  // Fail fast (and BEFORE charging credits) if the AI provider isn't configured.
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("[ANALYSIS_OPTIONS] GEMINI_API_KEY is not configured");
+    return NextResponse.json({ error: t("api.error.aiUnavailable", lang) }, { status: 503 });
+  }
+
   const userId = session.user.id;
   let creditsDeducted = false;
   let freeDeducted = 0;
@@ -150,12 +156,13 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
 {"optionA":{"label":"...","description":"...","valueProposition":"...","tone":"..."},"optionB":{"label":"...","description":"...","valueProposition":"...","tone":"..."}}`;
 
     let options = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
+    for (const modelName of MODELS) {
       try {
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
         const model = genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
+          model: modelName,
           generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
         });
         const result = await model.generateContent(prompt);
@@ -163,7 +170,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
         options = parseGeminiJSON(text);
         if (options) break;
       } catch (e) {
-        console.error(`[ANALYSIS] Gemini attempt ${attempt + 1} failed:`, e);
+        console.error(`[ANALYSIS] Gemini model ${modelName} failed:`, e);
       }
     }
 
@@ -176,7 +183,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
           console.error("[ANALYSIS] CRITICAL: Refund failed!", refundErr);
         }
       }
-      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
+      return NextResponse.json({ error: t("api.error.aiFailed", lang) }, { status: 502 });
     }
 
     await db.user.update({

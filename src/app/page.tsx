@@ -107,8 +107,14 @@ function Img({ desc, ratio = "16/9" }: { desc: string; ratio?: string }) {
 
 const C = {
   en: {
-    nav: { join: "Get Started" },
+    nav: { join: "Get Started", register: "Register", login: "Log In" },
     hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", tagline: "Your Ally on Digital Development", lines: ["Increase your business revenue.", "Regain time in your day.", "Grow as you've wanted."], blPre: "SYSTEM_STATUS: OPERATIONAL // LATENCY: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    cap: {
+      eyebrow: "A DIGITAL DEVELOPMENT COMPANY",
+      title: "Everything your business needs to grow online — built in-house.",
+      sub: "N.O.D.E. is a full digital development studio. Design, web, apps, cloud, AI, and marketing — a real team of specialists delivering under one subscription.",
+      services: ["Custom Technology", "Web Development", "Mobile App Development", "Cloud Infrastructure", "MVP Development", "E-commerce Development", "AI Integration", "Business Spin-Off", "Innovation & Digital Transformation", "Agile Methodologies", "Business Consulting", "UX/UI Design", "Branding & Naming", "Digital Marketing", "Growth Marketing", "E-commerce Marketing", "SEO", "Automation"],
+    },
     banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
     whatIs: { title: "What is N.O.D.E.?", para: "We're your digital creation and maintenance partner. That's why we focus on monthly plans instead of high one-time tickets. Better results, lower cost, stronger protection for your business." },
     svc: {
@@ -150,6 +156,7 @@ const C = {
       lenLabel: "LEN Member Exclusive Rate",
       setup: "Setup",
       oneTime: "one-time",
+      payg: "…or pay as you go with 1:1 credits.",
       plans: [
         { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
         { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
@@ -160,8 +167,14 @@ const C = {
     footer: "© 2026 Nouvos Solutions LLC",
   },
   es: {
-    nav: { join: "Comenzar" },
+    nav: { join: "Comenzar", register: "Registrarse", login: "Iniciar Sesión" },
     hero: { label: "NETWORK ORGANIZED DELIVERY ENGINE", tagline: "Tu Aliado en Desarrollo Digital", lines: ["Aumenta los ingresos de tu negocio.", "Recupera tiempo en tu día.", "Crece como siempre quisiste."], blPre: "ESTADO_SISTEMA: OPERATIVO // LATENCIA: ", bc: "NETWORK ORGANIZED DELIVERY ENGINE — V2.0.26", br: "HQ EVANSTON_IL // 42.0478781 -87.6842666" },
+    cap: {
+      eyebrow: "UNA EMPRESA DE DESARROLLO DIGITAL",
+      title: "Todo lo que tu negocio necesita para crecer en línea — hecho en casa.",
+      sub: "N.O.D.E. es un estudio completo de desarrollo digital. Diseño, web, apps, cloud, AI y marketing — un equipo real de especialistas entregando bajo una sola suscripción.",
+      services: ["Tecnología a la Medida", "Desarrollo de Sitios Web", "Desarrollo de Aplicaciones Móviles", "Infraestructura Cloud", "Desarrollo MVP", "Desarrollo E-commerce", "Integración AI", "Spin Off Empresarial", "Innovación y Transformación Digital", "Metodologías Ágiles", "Consultoría de Negocios", "Diseño UX/UI", "Branding y Naming", "Marketing Digital", "Growth Marketing", "E-commerce Marketing", "SEO", "Automatización"],
+    },
     banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
     whatIs: { title: "¿Qué es N.O.D.E.?", para: "Somos tu aliado de creación y mantenimiento digital. Por eso nos enfocamos en planes mensuales en vez de altos tickets de una vez. Mayor resultado, menos costo, mejor protección para tu negocio." },
     svc: {
@@ -203,6 +216,7 @@ const C = {
       lenLabel: "Tarifa Exclusiva Miembros LEN",
       setup: "Configuración",
       oneTime: "única vez",
+      payg: "…o paga sobre la marcha con créditos 1:1.",
       plans: [
         { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
         { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
@@ -519,7 +533,8 @@ export default function Home() {
             <button onClick={() => setLang("en")} className={`lang-flag text-lg ${lang === "en" ? "active" : ""}`}>🇺🇸</button>
             <button onClick={() => setLang("es")} className={`lang-flag text-lg ${lang === "es" ? "active" : ""}`}>🇲🇽</button>
           </div>
-          <a href="/register" className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-5 py-2.5 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
+          <a href="/login" className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-5 py-2.5 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.login}</a>
+          <a href="/register" className="hidden md:block font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] bg-[#FFC919] text-[#130A06] px-5 py-2.5 hover:bg-[#F5F6FC] transition-all">{t.nav.register}</a>
           <button onClick={() => setMenuOpen(true)} aria-label="Menu">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
           </button>
@@ -533,7 +548,7 @@ export default function Home() {
             <button onClick={() => setMenuOpen(false)} className="absolute top-6 right-6" aria-label="Close">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
-            {[[lang === "es" ? "Servicios" : "Services", "#services"], [lang === "es" ? "Proceso" : "Process", "#process"], [lang === "es" ? "Planes" : "Plans", "#pricing"], [lang === "es" ? "Registrarse" : "Sign Up", "/register"]].map(([label, href]) => (
+            {[[lang === "es" ? "Servicios" : "Services", "#services"], [lang === "es" ? "Proceso" : "Process", "#process"], [lang === "es" ? "Planes" : "Plans", "#pricing"], [t.nav.login, "/login"], [t.nav.register, "/register"]].map(([label, href]) => (
               <a key={href} href={href} onClick={() => setMenuOpen(false)} className="font-[family-name:var(--font-lexend)] font-bold text-4xl md:text-5xl text-[#F5F6FC]/80 hover:text-[#FFC919] transition-colors">{label}</a>
             ))}
             {/* Lang flags in mobile menu */}
@@ -595,6 +610,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ 1.1 DIGITAL DEVELOPMENT CAPABILITIES (services-first) ═══ */}
+      <section
+        className="relative overflow-hidden py-24 px-6 md:px-12"
+        style={{ background: "linear-gradient(160deg, #130A06 0%, #1a1206 45%, #2a1d00 100%)" }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at 82% 0%, rgba(255,201,25,0.12) 0%, transparent 55%)" }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <FadeUp>
+            <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-4">{t.cap.eyebrow}</p>
+            <h2 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.9rem,4vw,3.2rem)] leading-[1.05] text-[#F5F6FC] max-w-4xl">{t.cap.title}</h2>
+            <p className="mt-6 font-[family-name:var(--font-atkinson)] text-[1.15rem] text-[#F5F6FC]/60 leading-[1.8] max-w-3xl">{t.cap.sub}</p>
+          </FadeUp>
+          <Stagger className="mt-12 flex flex-wrap gap-3">
+            {t.cap.services.map((s) => (
+              <motion.span
+                key={s}
+                variants={staggerChild}
+                className="px-4 py-2.5 border border-[#FFC919]/25 bg-[#FFC919]/[0.04] font-[family-name:var(--font-atkinson)] text-[0.95rem] text-[#F5F6FC]/85 hover:border-[#FFC919] hover:text-[#FFC919] hover:-translate-y-[2px] transition-all"
+              >
+                {s}
+              </motion.span>
+            ))}
+          </Stagger>
+          <FadeUp delay={0.2}>
+            <div className="mt-12 flex flex-wrap gap-4">
+              <a href="/register" className="bg-[#FFC919] text-[#130A06] font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.15em] px-8 py-3.5 hover:bg-[#F5F6FC] transition-all">{t.nav.register}</a>
+              <a href="/login" className="border border-[#F5F6FC]/30 text-[#F5F6FC] font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.15em] px-8 py-3.5 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.login}</a>
+            </div>
+          </FadeUp>
+        </div>
+      </section>
+
       {/* ═══ 1.5 SERVICES BANNER ═══ */}
       <div
         className="overflow-hidden py-5"
@@ -636,7 +686,7 @@ export default function Home() {
             <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#FFC919] mb-4">{t.svc.label}</p>
             <h2 className="font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.8rem,3vw,2.5rem)] uppercase leading-tight">{t.svc.title}</h2>
             <p className="mt-6 font-[family-name:var(--font-atkinson)] text-[1.05rem] text-[#F5F6FC]/50 leading-[1.8]">{t.svc.para}</p>
-            <a href="/register" className="inline-block mt-8 font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.join}</a>
+            <a href="/register" className="inline-block mt-8 font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] border border-[#F5F6FC]/30 px-6 py-3 hover:bg-[#F5F6FC] hover:text-[#130A06] transition-all">{t.nav.register}</a>
           </FadeUp>
           {/* Right column — accordions */}
           <FadeUp delay={0.15} className="lg:w-[60%]">
@@ -738,6 +788,9 @@ export default function Home() {
               </FadeUp>
             );
           })}
+          <FadeUp delay={0.1}>
+            <p className="pb-14 pt-2 font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.05rem,2vw,1.5rem)] text-[#130A06]">{t.pricing.payg}</p>
+          </FadeUp>
         </div>
       </section>
 

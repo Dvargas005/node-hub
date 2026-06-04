@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings, User, Menu, Bell } from "lucide-react";
 import { RoleSwitcher } from "./role-switcher";
+import { BackLink } from "./back-link";
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
@@ -89,16 +90,16 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] px-4 md:px-6">
-      {/* Hamburger — mobile only */}
-      <button
-        className="p-2 text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)] md:hidden"
-        onClick={onToggleSidebar}
-      >
-        <Menu className="h-5 w-5" />
-      </button>
-
-      {/* Spacer for desktop */}
-      <div className="hidden md:block" />
+      {/* Left: hamburger (mobile) + role-aware back link */}
+      <div className="flex items-center gap-2">
+        <button
+          className="p-2 text-[rgba(245,246,252,0.6)] hover:text-[var(--ice-white)] md:hidden"
+          onClick={onToggleSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <BackLink />
+      </div>
 
       <div className="flex items-center gap-3">
         {role === "ADMIN" && <RoleSwitcher userRole={role} />}

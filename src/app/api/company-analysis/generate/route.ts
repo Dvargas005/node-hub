@@ -7,6 +7,14 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("[ANALYSIS_GENERATE] GEMINI_API_KEY is not configured");
+    return NextResponse.json(
+      { error: "El análisis inteligente no está disponible temporalmente. Intenta más tarde." },
+      { status: 503 }
+    );
+  }
+
   try {
     const { option, feedback } = await req.json();
     if (option !== "A" && option !== "B") {
@@ -67,12 +75,13 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
 {"description":"...","valueProposition":"...","targetAudience":"...","competitors":["..."],"swot":{"strengths":["..."],"opportunities":["..."],"weaknesses":["..."],"threats":["..."]},"recommendations":["..."],"tone":"..."}`;
 
     let result = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
+    for (const modelName of MODELS) {
       try {
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
         const model = genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
+          model: modelName,
           generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
         });
         const genResult = await model.generateContent(prompt);
@@ -80,7 +89,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
         result = parseGeminiJSON(text);
         if (result) break;
       } catch (e) {
-        console.error(`[ANALYSIS_GENERATE] Attempt ${attempt + 1} failed:`, e);
+        console.error(`[ANALYSIS_GENERATE] Gemini model ${modelName} failed:`, e);
       }
     }
 
