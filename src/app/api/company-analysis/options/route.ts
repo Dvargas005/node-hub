@@ -163,7 +163,9 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
         const model = genAI.getGenerativeModel({
           model: modelName,
-          generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
+          // 8192: gemini-2.5-flash spends "thinking" tokens from this same budget,
+          // so a low cap truncates the actual JSON output mid-response.
+          generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
         });
         const result = await model.generateContent(prompt);
         const text = result.response.text();

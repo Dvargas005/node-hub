@@ -356,7 +356,9 @@ export async function POST(req: NextRequest) {
     });
 
     // S1: Use native systemInstruction instead of injecting as user message
-    const model = getGeminiModel({ systemInstruction: systemPrompt, maxOutputTokens: 1024 });
+    // 8192: gemini-2.5-flash spends "thinking" tokens from this same budget,
+    // so a low cap truncates the reply mid-response.
+    const model = getGeminiModel({ systemInstruction: systemPrompt, maxOutputTokens: 8192 });
 
     // Limit to last 10 messages + the new one to avoid token overflow
     const recentMessages = messages.slice(-11);
