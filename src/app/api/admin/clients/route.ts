@@ -11,7 +11,11 @@ export async function GET(req: NextRequest) {
 
     if (url.get("minimal") === "true") {
       const clients = await db.user.findMany({
-        where: { role: "CLIENT" },
+        where: {
+          role: "CLIENT",
+          userTag: null,
+          subscription: { status: "ACTIVE" },
+        },
         select: { id: true, name: true, businessName: true },
         orderBy: { name: "asc" },
       });
