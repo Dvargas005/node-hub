@@ -65,8 +65,23 @@ function buildSystemPrompt(opts: {
   deliveryLanguage: string;
   pmHasCalendly: boolean;
   lang: string;
+  formAnswers?: Record<string, unknown>;
+  serviceSlug?: string;
 }) {
-  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory, deliveryLanguage, pmHasCalendly, lang } = opts;
+  const { catalog, category, profile, history, businessName, planName, deliveryDays, totalCredits, activeTickets, maxActiveReqs, recommendations, cheapestInCategory, deliveryLanguage, pmHasCalendly, lang, formAnswers, serviceSlug } = opts;
+
+  let formAnswersBlock = "";
+  if (formAnswers && serviceSlug) {
+    const lines: string[] = [];
+    for (const [key, value] of Object.entries(formAnswers)) {
+      if (value !== undefined && value !== null && value !== "") {
+        lines.push(`- ${key}: ${Array.isArray(value) ? value.join(", ") : value}`);
+      }
+    }
+    if (lines.length > 0) {
+      formAnswersBlock = `\n\nCLIENT PRE-ORDER FORM (service: ${serviceSlug}):\n${lines.join("\n")}\nThe client already filled this structured form. Review their answers carefully. If the brief is complete enough, generate it immediately with :::BRIEF_JSON:::. Only ask ONE clarifying question if something CRITICAL is missing. Do NOT re-ask what they already answered.\n`;
+    }
+  }
 
   const recsBlock = recommendations.length > 0
     ? `\nPENDING RECOMMENDATIONS FROM AI ANALYSIS:\n${recommendations.map((r: any, i: number) => `${i + 1}. "${r}"`).join("\n")}\nIf what the client requests relates to any recommendation, mention it: "This aligns with a recommendation from your company analysis."\n`
@@ -94,7 +109,12 @@ If different from the conversation language, mention: "Your deliverables will be
 
 CLIENT HISTORY:
 ${history}
-${recsBlock}
+${recsBlock}${formAnswersBlock}
+
+QUICK REPLIES:
+When asking a question with clear answer options (Yes/No or a short list of choices), include quick reply suggestions at the END of your message using this exact format:
+:::QUICK_REPLIES:::["Option A", "Option B"]:::END_QUICK_REPLIES:::
+Use 2-3 options max. Do NOT use for open-ended questions. Place after your message text, before any BRIEF_JSON block.
 
 CRITICAL RULES:
 1. You already know the client and their business (see PROFILE above). Do NOT ask about business name, industry, audience, or branding — you already have it.
@@ -237,7 +257,7 @@ export async function POST(req: NextRequest) {
 
   const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
   try {
-    const { messages, category } = await req.json();
+    const { messages, category, formAnswers, serviceSlug } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: t("api.error.messagesRequired", lang) }, { status: 400 });
@@ -368,6 +388,8 @@ export async function POST(req: NextRequest) {
       deliveryLanguage: (user?.deliveryLanguage as string) || "es",
       pmHasCalendly,
       lang,
+      formAnswers: formAnswers as Record<string, unknown> | undefined,
+      serviceSlug,
     });
 
     // S1: Use native systemInstruction instead of injecting as user message

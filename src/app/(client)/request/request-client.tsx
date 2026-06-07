@@ -66,17 +66,6 @@ type Step = "category" | "form" | "chat" | "confirm" | "success";
 
 const STEP_INDEX: Record<Step, number> = { category: 0, form: 1, chat: 1, confirm: 2, success: 2 };
 
-function buildFormContext(answers: Record<string, unknown>, serviceSlug: string): string {
-  let context = `The client filled out a form for ${serviceSlug}:\n`;
-  for (const [key, value] of Object.entries(answers)) {
-    if (value) {
-      context += `- ${key}: ${Array.isArray(value) ? value.join(", ") : value}\n`;
-    }
-  }
-  context += "\nReview this information. If everything looks complete, generate the brief. If something critical is missing, ask ONE clarifying question.";
-  return context;
-}
-
 export function RequestClient({
   subscription,
   recommendations,
@@ -94,6 +83,7 @@ export function RequestClient({
   const [serviceSlug, setServiceSlug] = useState<string | undefined>();
   const [preselectedVariantId, setPreselectedVariantId] = useState<string | undefined>();
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
+  const [formAnswers, setFormAnswers] = useState<Record<string, unknown> | undefined>();
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [variant, setVariant] = useState<VariantInfo | null>(null);
@@ -142,8 +132,7 @@ export function RequestClient({
 
   const handleFormSubmit = (answers: Record<string, unknown>, chosenVariantId?: string) => {
     if (chosenVariantId) setPreselectedVariantId(chosenVariantId);
-    const context = buildFormContext(answers, serviceSlug || "");
-    setInitialMessage(context);
+    setFormAnswers(answers);
     setStep("chat");
   };
 
@@ -191,9 +180,12 @@ export function RequestClient({
 
   const handleAdjust = () => setStep("chat");
 
-  // Reset service variants when going back to category
+  // Reset service variants and form answers when going back to category
   useEffect(() => {
-    if (step === "category") setServiceVariants([]);
+    if (step === "category") {
+      setServiceVariants([]);
+      setFormAnswers(undefined);
+    }
   }, [step]);
 
   return (
@@ -257,6 +249,7 @@ export function RequestClient({
           category={category}
           serviceSlug={serviceSlug}
           initialMessage={initialMessage}
+          formAnswers={formAnswers}
           onBriefGenerated={handleBriefGenerated}
         />
       )}
