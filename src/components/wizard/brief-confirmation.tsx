@@ -179,6 +179,13 @@ export function BriefConfirmation({
             onEdit={(val) => updateBrief("deliverable", val)}
           />
         )}
+        {details?.content && details.content !== "Not mentioned" && details.content !== "No mencionado" && details.content !== "N/A" && (
+          <BriefSection
+            label={t("wizard.confirm.content")}
+            value={details.content}
+            onEdit={(val) => updateBrief("content", val)}
+          />
+        )}
         {details?.extras && details.extras !== "Not mentioned" && details.extras !== "No mencionado" && details.extras !== "N/A" && (
           <BriefSection
             label={t("wizard.confirm.extras")}

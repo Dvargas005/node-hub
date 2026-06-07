@@ -350,7 +350,7 @@ export function ServiceForm({
             industry={userProfile.businessIndustry}
           />
           {errors.has(q.id) && (
-            <p className="text-xs text-red-400">Required</p>
+            <p className="text-xs text-red-400">{t("common.required")}</p>
           )}
         </div>
       ))}

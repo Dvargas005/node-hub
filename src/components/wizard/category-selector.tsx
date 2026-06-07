@@ -47,7 +47,7 @@ const GROUPS: GroupDef[] = [
   {
     groupKey: "wizard.group.levelUp",
     cards: [
-      { labelKey: "wizard.card.refreshBrand",  category: "DESIGN", serviceSlug: "logo-design",            variantSlug: "full-brand-identity", icon: "✨", credits: 375 },
+      { labelKey: "wizard.card.refreshBrand",  category: "DESIGN", serviceSlug: "logo-design",            icon: "✨", credits: 375 },
       { labelKey: "wizard.card.presentation",  category: "DESIGN", serviceSlug: "presentation-design",    icon: "📊", credits: 195 },
     ],
   },

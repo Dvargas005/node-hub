@@ -202,7 +202,7 @@ export function ChatInterface({
   return (
     <div className="flex flex-col h-[calc(100vh-220px)] max-h-[600px]">
       <div className="flex items-center justify-between px-4 py-2 border-b border-[rgba(245,246,252,0.06)] text-xs text-[rgba(245,246,252,0.5)]">
-        <span>Estimate: {estimatedCost ? `${estimatedCost} credits` : "pending"}</span>
+        <span>{t("wizard.chat.estimate")}: {estimatedCost ? `${estimatedCost} ${t("wizard.credits")}` : t("wizard.chat.pending")}</span>
       </div>
 
       {/* Chat messages */}
@@ -265,7 +265,7 @@ export function ChatInterface({
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={t("wizard.chat.placeholder")}
             disabled={loading}
             className="flex-1 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] focus:border-[var(--gold-bar)]"
           />
