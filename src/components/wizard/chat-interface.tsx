@@ -62,11 +62,13 @@ function TypingIndicator() {
 
 export function ChatInterface({
   category,
+  serviceSlug,
   initialMessage,
   onBriefGenerated,
   variants,
 }: {
   category?: string;
+  serviceSlug?: string;
   initialMessage?: string;
   onBriefGenerated: (brief: BriefData, messages: ChatMessage[]) => void;
   variants?: Record<string, { name: string; creditCost: number }>;

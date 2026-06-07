@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { CategorySelector } from "@/components/wizard/category-selector";
+import { CategorySelector, type ServiceSelection } from "@/components/wizard/category-selector";
 import { ChatInterface } from "@/components/wizard/chat-interface";
 import { BriefConfirmation } from "@/components/wizard/brief-confirmation";
 import { TicketSuccess } from "@/components/wizard/ticket-success";
@@ -46,16 +46,21 @@ interface TicketInfo {
 
 type Step = "category" | "chat" | "confirm" | "success";
 
+const STEP_INDEX: Record<Step, number> = { category: 0, chat: 1, confirm: 2, success: 2 };
+
 export function RequestClient({
   subscription,
+  recommendations,
 }: {
   subscription: { creditsRemaining: number; planName: string; freeCredits?: number } | null;
+  recommendations?: string[];
 }) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
   const [step, setStep] = useState<Step>(initialCategory ? "chat" : "category");
   const [category, setCategory] = useState<string | undefined>(initialCategory || undefined);
+  const [serviceSlug, setServiceSlug] = useState<string | undefined>();
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -63,42 +68,37 @@ export function RequestClient({
   const [ticket, setTicket] = useState<TicketInfo | null>(null);
   const [error, setError] = useState("");
 
-  const handleCategorySelect = (cat: string) => {
-    setCategory(cat);
+  const steps = [
+    { key: "select", label: t("wizard.step.select") },
+    { key: "details", label: t("wizard.step.details") },
+    { key: "confirm", label: t("wizard.step.confirm") },
+  ];
+  const currentStep = STEP_INDEX[step];
+
+  const handleCategorySelect = (selection: ServiceSelection) => {
+    setCategory(selection.category);
+    setServiceSlug(selection.serviceSlug);
     setStep("chat");
   };
 
   const handleFreeText = (text: string) => {
     setInitialMessage(text);
+    setServiceSlug(undefined);
     setStep("chat");
   };
 
-  const handleBriefGenerated = async (
-    briefData: BriefData,
-    chatMessages: ChatMessage[]
-  ) => {
+  const handleBriefGenerated = async (briefData: BriefData, chatMessages: ChatMessage[]) => {
     setBrief(briefData);
     setMessages(chatMessages);
 
-    // Fetch variant info
     try {
       const res = await fetch("/api/wizard/catalog");
       const data = await res.json();
-
       if (data.services) {
         for (const service of data.services) {
-          const found = service.variants.find(
-            (v: { id: string }) => v.id === briefData.suggestedVariantId
-          );
+          const found = service.variants.find((v: { id: string }) => v.id === briefData.suggestedVariantId);
           if (found) {
-            setVariant({
-              id: found.id,
-              name: found.name,
-              creditCost: found.creditCost,
-              estimatedDays: found.estimatedDays,
-              serviceName: service.name,
-              serviceCategory: service.category,
-            });
+            setVariant({ id: found.id, name: found.name, creditCost: found.creditCost, estimatedDays: found.estimatedDays, serviceName: service.name, serviceCategory: service.category });
             break;
           }
         }
@@ -108,32 +108,20 @@ export function RequestClient({
       setStep("category");
       return;
     }
-
     setStep("confirm");
   };
 
   const handleConfirm = async () => {
     if (!brief || !variant) return;
     setError("");
-
     try {
       const res = await fetch("/api/wizard/create-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          briefStructured: brief,
-          conversationMessages: messages,
-          variantId: variant.id,
-        }),
+        body: JSON.stringify({ briefStructured: brief, conversationMessages: messages, variantId: variant.id }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Error creating ticket");
-        return;
-      }
-
+      if (!res.ok) { setError(data.error || "Error creating ticket"); return; }
       setTicket(data.ticket);
       setStep("success");
     } catch {
@@ -141,9 +129,7 @@ export function RequestClient({
     }
   };
 
-  const handleAdjust = () => {
-    setStep("chat");
-  };
+  const handleAdjust = () => setStep("chat");
 
   return (
     <div className="space-y-6">
@@ -151,24 +137,28 @@ export function RequestClient({
         {t("nav.request")}
       </h1>
 
-      {/* Step indicator */}
+      {/* Visual stepper */}
       {step !== "success" && (
-        <div className="flex items-center gap-2 text-xs text-[rgba(245,246,252,0.4)]">
-          <span className={step === "category" ? "text-[var(--gold-bar)]" : ""}>
-            {t("wizard.step.category")}
-          </span>
-          <span>→</span>
-          <span
-            className={step === "chat" ? "text-[var(--gold-bar)]" : ""}
-          >
-            {t("wizard.step.conversation")}
-          </span>
-          <span>→</span>
-          <span
-            className={step === "confirm" ? "text-[var(--gold-bar)]" : ""}
-          >
-            {t("wizard.step.confirmation")}
-          </span>
+        <div className="flex items-center gap-2 mb-2">
+          {steps.map((s, i) => (
+            <React.Fragment key={s.key}>
+              <div className={`flex items-center gap-2 ${currentStep >= i ? "text-[var(--gold-bar)]" : "text-[rgba(245,246,252,0.3)]"}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                  currentStep > i
+                    ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)]"
+                    : currentStep === i
+                      ? "border-2 border-[var(--gold-bar)] text-[var(--gold-bar)]"
+                      : "border border-[rgba(245,246,252,0.2)] text-[rgba(245,246,252,0.3)]"
+                }`}>
+                  {currentStep > i ? "✓" : i + 1}
+                </div>
+                <span className="text-sm hidden sm:inline">{s.label}</span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className={`flex-1 h-px ${currentStep > i ? "bg-[var(--gold-bar)]" : "bg-[rgba(245,246,252,0.1)]"}`} />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       )}
 
@@ -182,12 +172,14 @@ export function RequestClient({
         <CategorySelector
           onSelect={handleCategorySelect}
           onFreeText={handleFreeText}
+          recommendations={recommendations}
         />
       )}
 
       {step === "chat" && (
         <ChatInterface
           category={category}
+          serviceSlug={serviceSlug}
           initialMessage={initialMessage}
           onBriefGenerated={handleBriefGenerated}
         />
