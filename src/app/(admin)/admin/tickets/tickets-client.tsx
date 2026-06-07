@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserPlus } from "lucide-react";
+import { UserPlus, ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
 import {
   ticketStatusLabels,
   ticketStatusColors,
@@ -31,6 +32,209 @@ import {
   freelancerRoleLabels,
   categoryLabels,
 } from "@/lib/status-labels";
+
+interface AddedService {
+  id: string;
+  variants: { id: string; creditCost: number }[];
+}
+
+function AddServiceForm({
+  t,
+  selectClass,
+  onSave,
+  onCancel,
+}: {
+  t: (key: string) => string;
+  selectClass: string;
+  onSave: (service: AddedService) => void;
+  onCancel: () => void;
+}) {
+  const [category, setCategory] = useState("DESIGN");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [variantName, setVariantName] = useState("");
+  const [creditCost, setCreditCost] = useState(75);
+  const [estimatedDays, setEstimatedDays] = useState(5);
+  const [saving, setSaving] = useState(false);
+
+  const inputClass =
+    "w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 py-2 text-sm text-[var(--ice-white)] outline-none";
+
+  async function handleSave() {
+    if (!name.trim() || !variantName.trim() || creditCost < 1) return;
+    setSaving(true);
+    try {
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      const svcRes = await fetch("/api/admin/services", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          slug,
+          category,
+          description: description.trim() || name.trim(),
+          icon: "box",
+          isActive: true,
+        }),
+      });
+      const svc = await svcRes.json();
+      if (!svcRes.ok) throw new Error(svc.error || "Error creating service");
+
+      const varRes = await fetch(`/api/admin/services/${svc.id}/variants`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: variantName.trim(),
+          creditCost,
+          description: variantName.trim(),
+          estimatedDays,
+          isActive: true,
+          sortOrder: 1,
+        }),
+      });
+      const variant = await varRes.json();
+      if (!varRes.ok) throw new Error(variant.error || "Error creating variant");
+
+      onSave({ id: svc.id, variants: [{ id: variant.id, creditCost: variant.creditCost }] });
+    } catch (err: any) {
+      toast.error(err.message || "Error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="flex items-center gap-1 text-sm text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("admin.tickets.create.backToTicket")}
+      </button>
+      <h3 className="text-lg font-bold text-[var(--ice-white)] font-[var(--font-lexend)]">
+        {t("admin.tickets.create.addService")}
+      </h3>
+
+      {/* Category */}
+      <div className="space-y-1">
+        <label className="text-xs text-[rgba(245,246,252,0.5)]">
+          {t("admin.tickets.create.service.category")} *
+        </label>
+        <div className="flex gap-2 flex-wrap mt-1">
+          {["DESIGN", "WEB", "MARKETING"].map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                category === cat
+                  ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)]"
+                  : "border border-[rgba(245,246,252,0.2)] text-[rgba(245,246,252,0.6)] hover:border-[rgba(245,246,252,0.4)]"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Service name */}
+      <div className="space-y-1">
+        <label className="text-xs text-[rgba(245,246,252,0.5)]">
+          {t("admin.tickets.create.service.name")} *
+        </label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={inputClass}
+          placeholder="Video Editing"
+        />
+      </div>
+
+      {/* Description */}
+      <div className="space-y-1">
+        <label className="text-xs text-[rgba(245,246,252,0.5)]">
+          {t("admin.tickets.create.service.description")}
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={`${inputClass} resize-none`}
+          rows={2}
+        />
+      </div>
+
+      <hr className="border-[rgba(245,246,252,0.1)]" />
+      <p className="text-xs text-[rgba(245,246,252,0.5)]">
+        {t("admin.tickets.create.service.firstVariant")}
+      </p>
+
+      {/* Variant name */}
+      <div className="space-y-1">
+        <label className="text-xs text-[rgba(245,246,252,0.5)]">
+          {t("admin.tickets.createVariant")} *
+        </label>
+        <input
+          value={variantName}
+          onChange={(e) => setVariantName(e.target.value)}
+          className={inputClass}
+          placeholder="Basic"
+        />
+      </div>
+
+      {/* Credit cost + days */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-xs text-[rgba(245,246,252,0.5)]">
+            {t("admin.tickets.createCredits")} *
+          </label>
+          <input
+            type="number"
+            min={1}
+            value={creditCost}
+            onChange={(e) => setCreditCost(Number(e.target.value))}
+            className={inputClass}
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs text-[rgba(245,246,252,0.5)]">
+            {t("admin.tickets.create.service.days")} *
+          </label>
+          <input
+            type="number"
+            min={1}
+            value={estimatedDays}
+            onChange={(e) => setEstimatedDays(Number(e.target.value))}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-3 pt-1">
+        <Button
+          variant="ghost"
+          onClick={onCancel}
+          className="flex-1 border border-[rgba(245,246,252,0.2)] text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
+        >
+          {t("common.cancel")}
+        </Button>
+        <Button
+          disabled={saving || !name.trim() || !variantName.trim() || creditCost < 1}
+          onClick={handleSave}
+          className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm disabled:opacity-50"
+        >
+          {saving ? "..." : t("admin.tickets.create.saveAndBack")}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 interface TicketRow {
   id: string;
@@ -140,6 +344,7 @@ export function TicketsClient({
 
   // Create dialog
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showAddService, setShowAddService] = useState(false);
   const [createServices, setCreateServices] = useState<ServiceOption[]>([]);
   const [createForm, setCreateForm] = useState({
     userId: "",
@@ -159,11 +364,15 @@ export function TicketsClient({
       .then((data) => setClients(data.clients || []));
   }, []);
 
+  const refetchServices = async () => {
+    const r = await fetch("/api/admin/services");
+    const data = await r.json();
+    setCreateServices(data.services || []);
+  };
+
   useEffect(() => {
     if (!showCreateDialog) return;
-    fetch("/api/admin/services")
-      .then((r) => r.json())
-      .then((data) => setCreateServices(data.services || []));
+    refetchServices();
   }, [showCreateDialog]);
 
   const selectedService = useMemo(
@@ -538,6 +747,7 @@ export function TicketsClient({
         onOpenChange={(open) => {
           if (!open) {
             setShowCreateDialog(false);
+            setShowAddService(false);
             setCreateError("");
             setCreateForm({
               userId: "",
@@ -552,195 +762,223 @@ export function TicketsClient({
         }}
       >
         <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-[var(--font-lexend)]">
-              {t("admin.tickets.createTitle")}
-            </DialogTitle>
-            <DialogDescription className="text-[rgba(245,246,252,0.5)]">
-              {t("admin.tickets.createHint")}
-            </DialogDescription>
-          </DialogHeader>
+          {showAddService ? (
+            <AddServiceForm
+              t={t}
+              selectClass={selectClass}
+              onSave={async (newService) => {
+                await refetchServices();
+                setCreateForm((f) => ({
+                  ...f,
+                  serviceId: newService.id,
+                  variantId: newService.variants[0]?.id ?? "",
+                  creditsCharged: newService.variants[0]?.creditCost ?? 0,
+                }));
+                setShowAddService(false);
+                toast.success(t("admin.tickets.create.serviceCreated"));
+              }}
+              onCancel={() => setShowAddService(false)}
+            />
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-[var(--font-lexend)]">
+                  {t("admin.tickets.createTitle")}
+                </DialogTitle>
+                <DialogDescription className="text-[rgba(245,246,252,0.5)]">
+                  {t("admin.tickets.createHint")}
+                </DialogDescription>
+              </DialogHeader>
 
-          <div className="space-y-4">
-            {/* Client */}
-            <div className="space-y-1">
-              <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                {t("admin.tickets.createClient")} *
-              </label>
-              <select
-                value={createForm.userId}
-                onChange={(e) =>
-                  setCreateForm((f) => ({ ...f, userId: e.target.value }))
-                }
-                className={`${selectClass} w-full h-auto py-2`}
-              >
-                <option value="">{t("admin.tickets.allClients")}</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}{c.businessName ? ` — ${c.businessName}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div className="space-y-4">
+                {/* Client */}
+                <div className="space-y-1">
+                  <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                    {t("admin.tickets.createClient")} *
+                  </label>
+                  <select
+                    value={createForm.userId}
+                    onChange={(e) =>
+                      setCreateForm((f) => ({ ...f, userId: e.target.value }))
+                    }
+                    className={`${selectClass} w-full h-auto py-2`}
+                  >
+                    <option value="">{t("admin.tickets.allClients")}</option>
+                    {clients.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}{c.businessName ? ` — ${c.businessName}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Service */}
-            <div className="space-y-1">
-              <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                {t("admin.tickets.createService")} *
-              </label>
-              <select
-                value={createForm.serviceId}
-                onChange={(e) =>
-                  setCreateForm((f) => ({
-                    ...f,
-                    serviceId: e.target.value,
-                    variantId: "",
-                    creditsCharged: 0,
-                  }))
-                }
-                className={`${selectClass} w-full h-auto py-2`}
-              >
-                <option value="">—</option>
-                {createServices.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Service */}
+                <div className="space-y-1">
+                  <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                    {t("admin.tickets.createService")} *
+                  </label>
+                  <select
+                    value={createForm.serviceId}
+                    onChange={(e) =>
+                      setCreateForm((f) => ({
+                        ...f,
+                        serviceId: e.target.value,
+                        variantId: "",
+                        creditsCharged: 0,
+                      }))
+                    }
+                    className={`${selectClass} w-full h-auto py-2`}
+                  >
+                    <option value="">—</option>
+                    {createServices.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddService(true)}
+                    className="mt-1 text-sm text-[var(--gold-bar)] hover:underline"
+                  >
+                    + {t("admin.tickets.create.addService")}
+                  </button>
+                </div>
 
-            {/* Variant */}
-            {selectedService && (
-              <div className="space-y-1">
-                <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                  {t("admin.tickets.createVariant")} *
-                </label>
-                <select
-                  value={createForm.variantId}
-                  onChange={(e) => {
-                    const v = selectedService.variants.find(
-                      (vv) => vv.id === e.target.value
-                    );
-                    setCreateForm((f) => ({
-                      ...f,
-                      variantId: e.target.value,
-                      creditsCharged: v?.creditCost ?? 0,
-                    }));
-                  }}
-                  className={`${selectClass} w-full h-auto py-2`}
-                >
-                  <option value="">—</option>
-                  {selectedService.variants.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name} ({v.creditCost} cr)
-                    </option>
-                  ))}
-                </select>
+                {/* Variant */}
+                {selectedService && (
+                  <div className="space-y-1">
+                    <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                      {t("admin.tickets.createVariant")} *
+                    </label>
+                    <select
+                      value={createForm.variantId}
+                      onChange={(e) => {
+                        const v = selectedService.variants.find(
+                          (vv) => vv.id === e.target.value
+                        );
+                        setCreateForm((f) => ({
+                          ...f,
+                          variantId: e.target.value,
+                          creditsCharged: v?.creditCost ?? 0,
+                        }));
+                      }}
+                      className={`${selectClass} w-full h-auto py-2`}
+                    >
+                      <option value="">—</option>
+                      {selectedService.variants.map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.name} ({v.creditCost} cr)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Priority */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                      {t("admin.tickets.createPriority")}
+                    </label>
+                    <select
+                      value={createForm.priority}
+                      onChange={(e) =>
+                        setCreateForm((f) => ({ ...f, priority: e.target.value }))
+                      }
+                      className={`${selectClass} w-full h-auto py-2`}
+                    >
+                      {priorityOptions.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Status */}
+                  <div className="space-y-1">
+                    <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                      {t("admin.tickets.createStatus")}
+                    </label>
+                    <select
+                      value={createForm.status}
+                      onChange={(e) =>
+                        setCreateForm((f) => ({ ...f, status: e.target.value }))
+                      }
+                      className={`${selectClass} w-full h-auto py-2`}
+                    >
+                      {createStatusOptions.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Credits */}
+                <div className="space-y-1">
+                  <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                    {t("admin.tickets.createCredits")}
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={createForm.creditsCharged}
+                    onChange={(e) =>
+                      setCreateForm((f) => ({
+                        ...f,
+                        creditsCharged: Number(e.target.value),
+                      }))
+                    }
+                    className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] outline-none"
+                  />
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-1">
+                  <label className="text-xs text-[rgba(245,246,252,0.5)]">
+                    {t("admin.tickets.createNotes")}
+                  </label>
+                  <textarea
+                    value={createForm.clientNotes}
+                    onChange={(e) =>
+                      setCreateForm((f) => ({
+                        ...f,
+                        clientNotes: e.target.value,
+                      }))
+                    }
+                    rows={3}
+                    className="w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 py-2 text-sm text-[var(--ice-white)] outline-none resize-none"
+                  />
+                </div>
+
+                {createError && (
+                  <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-2">
+                    {createError}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-1">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowCreateDialog(false)}
+                    className="text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    disabled={creating}
+                    onClick={handleCreate}
+                    className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm"
+                  >
+                    {creating ? "..." : t("admin.tickets.createConfirm")}
+                  </Button>
+                </div>
               </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* Priority */}
-              <div className="space-y-1">
-                <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                  {t("admin.tickets.createPriority")}
-                </label>
-                <select
-                  value={createForm.priority}
-                  onChange={(e) =>
-                    setCreateForm((f) => ({ ...f, priority: e.target.value }))
-                  }
-                  className={`${selectClass} w-full h-auto py-2`}
-                >
-                  {priorityOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status */}
-              <div className="space-y-1">
-                <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                  {t("admin.tickets.createStatus")}
-                </label>
-                <select
-                  value={createForm.status}
-                  onChange={(e) =>
-                    setCreateForm((f) => ({ ...f, status: e.target.value }))
-                  }
-                  className={`${selectClass} w-full h-auto py-2`}
-                >
-                  {createStatusOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Credits */}
-            <div className="space-y-1">
-              <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                {t("admin.tickets.createCredits")}
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={createForm.creditsCharged}
-                onChange={(e) =>
-                  setCreateForm((f) => ({
-                    ...f,
-                    creditsCharged: Number(e.target.value),
-                  }))
-                }
-                className="h-9 w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] outline-none"
-              />
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-1">
-              <label className="text-xs text-[rgba(245,246,252,0.5)]">
-                {t("admin.tickets.createNotes")}
-              </label>
-              <textarea
-                value={createForm.clientNotes}
-                onChange={(e) =>
-                  setCreateForm((f) => ({
-                    ...f,
-                    clientNotes: e.target.value,
-                  }))
-                }
-                rows={3}
-                className="w-full rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 py-2 text-sm text-[var(--ice-white)] outline-none resize-none"
-              />
-            </div>
-
-            {createError && (
-              <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-2">
-                {createError}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2 pt-1">
-              <Button
-                variant="ghost"
-                onClick={() => setShowCreateDialog(false)}
-                className="text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
-              >
-                {t("common.cancel")}
-              </Button>
-              <Button
-                disabled={creating}
-                onClick={handleCreate}
-                className="bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold text-sm"
-              >
-                {creating ? "..." : t("admin.tickets.createConfirm")}
-              </Button>
-            </div>
-          </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
