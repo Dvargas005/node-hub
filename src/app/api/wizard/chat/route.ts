@@ -113,8 +113,8 @@ ${recsBlock}${formAnswersBlock}
 
 QUICK REPLIES:
 When asking a question with clear answer options (Yes/No or a short list of choices), include quick reply suggestions at the END of your message using this exact format:
-:::QUICK_REPLIES:::["Option A", "Option B"]:::END_QUICK_REPLIES:::
-Use 2-3 options max. Do NOT use for open-ended questions. Place after your message text, before any BRIEF_JSON block.
+:::QUICK_REPLIES:::["Option A", "Option B", "Option C"]:::END_QUICK:::
+Use maximum 4 options. Do NOT use for open-ended questions. Place after your message text, before any BRIEF_JSON block.
 
 CRITICAL RULES:
 1. You already know the client and their business (see PROFILE above). Do NOT ask about business name, industry, audience, or branding — you already have it.

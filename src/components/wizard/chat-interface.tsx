@@ -41,10 +41,10 @@ function parseBrief(text: string): BriefData | null {
 }
 
 function parseQuickReplies(text: string): string[] {
-  const match = text.match(/:::QUICK_REPLIES:::([\s\S]*?):::END_QUICK_REPLIES:::/);
+  const match = text.match(/:::QUICK_REPLIES:::\[(.+?)\]:::END_QUICK:::/);
   if (!match) return [];
   try {
-    const parsed = JSON.parse(match[1].trim());
+    const parsed = JSON.parse(`[${match[1]}]`);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
@@ -54,7 +54,7 @@ function parseQuickReplies(text: string): string[] {
 function stripMeta(text: string): string {
   return text
     .replace(/:::BRIEF_JSON:::[\s\S]*?:::END_BRIEF:::/, "")
-    .replace(/:::QUICK_REPLIES:::[\s\S]*?:::END_QUICK_REPLIES:::/, "")
+    .replace(/:::QUICK_REPLIES:::\[.+?\]:::END_QUICK:::/, "")
     .trim();
 }
 
@@ -248,7 +248,7 @@ export function ChatInterface({
             <button
               key={i}
               onClick={() => sendMessage(reply)}
-              className="px-3 py-1.5 text-xs border border-[var(--gold-bar)] text-[var(--gold-bar)] hover:bg-[var(--gold-bar)] hover:text-[var(--asphalt-black)] transition-colors rounded-none"
+              className="px-3 py-1 text-sm border border-[#FFC919] text-[#FFC919] rounded-full hover:bg-[#FFC919]/10 transition-colors"
             >
               {reply}
             </button>
