@@ -39,6 +39,7 @@ export default async function AdminTicketsPage() {
       tickets={tickets.map((t: any) => ({
         id: t.id,
         number: t.number,
+        userId: t.userId,
         clientName: t.user.name,
         clientBusiness: t.user.businessName,
         serviceName: t.variant.service.name,

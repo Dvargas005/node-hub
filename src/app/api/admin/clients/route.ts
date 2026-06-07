@@ -8,6 +8,16 @@ export async function GET(req: NextRequest) {
 
   try {
     const url = req.nextUrl.searchParams;
+
+    if (url.get("minimal") === "true") {
+      const clients = await db.user.findMany({
+        where: { role: "CLIENT" },
+        select: { id: true, name: true, businessName: true },
+        orderBy: { name: "asc" },
+      });
+      return NextResponse.json({ clients });
+    }
+
     const plan = url.get("plan");
     const alliance = url.get("alliance");
     const search = url.get("search");

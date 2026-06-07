@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     const status = url.get("status");
     const priority = url.get("priority");
     const category = url.get("category");
+    const clientId = url.get("clientId");
     const page = Math.max(1, parseInt(url.get("page") || "1"));
     const perPage = 20;
 
@@ -28,6 +29,9 @@ export async function GET(req: NextRequest) {
     }
     if (category && validCategories.includes(category)) {
       where.variant = { service: { category } };
+    }
+    if (clientId) {
+      where.userId = clientId;
     }
 
     const [tickets, total] = await Promise.all([
@@ -53,6 +57,42 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("[ADMIN_TICKETS]", err);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const { error } = await requireApiRole(["ADMIN", "PM"]);
+  if (error) return error;
+
+  try {
+    const body = await req.json();
+    const { userId, variantId, priority, status, clientNotes, pmNotes, creditsCharged } = body;
+
+    if (!userId || !variantId || creditsCharged === undefined || creditsCharged === null) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const variant = await db.serviceVariant.findUnique({ where: { id: variantId } });
+    if (!variant) {
+      return NextResponse.json({ error: "Variant not found" }, { status: 404 });
+    }
+
+    const ticket = await db.ticket.create({
+      data: {
+        userId,
+        variantId,
+        status: status && validStatuses.includes(status) ? status : "NEW",
+        priority: priority && validPriorities.includes(priority) ? priority : "NORMAL",
+        clientNotes: clientNotes || null,
+        pmNotes: pmNotes || null,
+        creditsCharged: Number(creditsCharged),
+      },
+    });
+
+    return NextResponse.json(ticket, { status: 201 });
+  } catch (err) {
+    console.error("[ADMIN_TICKETS_POST]", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

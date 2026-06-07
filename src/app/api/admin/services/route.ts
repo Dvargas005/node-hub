@@ -3,6 +3,29 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { t, DEFAULT_LANG } from "@/lib/i18n";
 
+export async function GET(req: NextRequest) {
+  const { error } = await requireApiRole(["ADMIN", "PM"]);
+  if (error) return error;
+
+  try {
+    const services = await db.service.findMany({
+      where: { isActive: true },
+      include: {
+        variants: {
+          where: { isActive: true },
+          select: { id: true, name: true, creditCost: true },
+          orderBy: { sortOrder: "asc" },
+        },
+      },
+      orderBy: { sortOrder: "asc" },
+    });
+    return NextResponse.json({ services });
+  } catch (err) {
+    console.error("[ADMIN_SERVICES_GET]", err);
+    return NextResponse.json({ error: t("api.error.internal", DEFAULT_LANG) }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const { error } = await requireApiRole(["ADMIN"]);
   if (error) return error;

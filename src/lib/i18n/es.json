@@ -589,5 +589,19 @@
   "wizard.success.step4": "Primer borrador listo",
   "wizard.success.step4Detail": "Estimado ~{days} días",
   "wizard.success.track": "Seguir tu solicitud",
-  "wizard.success.dashboard": "Ir al panel"
+  "wizard.success.dashboard": "Ir al panel",
+  "admin.tickets.allClients": "Todos los clientes",
+  "admin.tickets.filterClient": "Filtrar por cliente",
+  "admin.tickets.create": "Crear ticket",
+  "admin.tickets.createTitle": "Crear Ticket",
+  "admin.tickets.createHint": "Registra un ticket en nombre de un cliente.",
+  "admin.tickets.createClient": "Cliente",
+  "admin.tickets.createService": "Servicio",
+  "admin.tickets.createVariant": "Variante",
+  "admin.tickets.createPriority": "Prioridad",
+  "admin.tickets.createStatus": "Estado inicial",
+  "admin.tickets.createCredits": "Créditos a cobrar",
+  "admin.tickets.createNotes": "Notas",
+  "admin.tickets.createConfirm": "Crear",
+  "admin.tickets.createErrorRequired": "El cliente y la variante son requeridos."
 }
