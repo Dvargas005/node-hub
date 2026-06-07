@@ -331,6 +331,8 @@ export function ClientsClient({
                         <select
                           value={c.assignedPmId || ""}
                           onChange={(e) => handleAssignPm(c.id, e.target.value || null)}
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
                         >
                           <option value="">Unassigned</option>
