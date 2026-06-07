@@ -60,6 +60,7 @@ async function refundCredits(userId: string, freeDeducted: number, planDeducted:
 }
 
 export async function POST() {
+  console.log("[ANALYSIS] Step 1: Auth");
   const lang = (await cookies()).get("node-language")?.value || DEFAULT_LANG;
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
@@ -71,6 +72,7 @@ export async function POST() {
   }
 
   const userId = session.user.id;
+  console.log("[ANALYSIS] Step 2: Auth OK, userId:", userId.substring(0, 8) + "...");
   let creditsDeducted = false;
   let freeDeducted = 0;
   let planDeducted = 0;
@@ -78,16 +80,20 @@ export async function POST() {
 
   try {
     // Check if user already has pending options (don't charge again)
+    console.log("[ANALYSIS] Step 3: Checking existing analysis...");
     const existingUser = await db.user.findUnique({
       where: { id: userId },
       select: { companyAnalysis: true, companyAnalysisAt: true },
     });
     const existing = existingUser?.companyAnalysis as Record<string, unknown> | null;
     if (existing?.status === "pending_selection" && existing?.options) {
+      console.log("[ANALYSIS] Step 3: Returning cached pending options");
       return NextResponse.json({ options: existing.options });
     }
+    console.log("[ANALYSIS] Step 3: No cached options, proceeding");
 
     // Load user data for prompt
+    console.log("[ANALYSIS] Step 4: Loading user + subscription...");
     const userData = await db.user.findUnique({
       where: { id: userId },
       select: {
@@ -102,6 +108,7 @@ export async function POST() {
       select: { id: true, creditsRemaining: true, currentPeriodStart: true },
     });
     subscriptionId = subscription?.id;
+    console.log("[ANALYSIS] Step 4: User loaded, freeCredits:", userData?.freeCredits, "| subCredits:", subscription?.creditsRemaining ?? "no-sub");
 
     // Free renewal: if subscription renewed after last analysis
     const isFreeRenewal = !!(
@@ -109,14 +116,18 @@ export async function POST() {
       subscription?.currentPeriodStart &&
       new Date(subscription.currentPeriodStart) > new Date(userData.companyAnalysisAt)
     );
+    console.log("[ANALYSIS] Step 5: isFreeRenewal:", isFreeRenewal);
 
     // C10: Atomic balance check + deduction inside transaction
     if (!isFreeRenewal) {
+      console.log("[ANALYSIS] Step 6: Deducting credits...");
       await db.$transaction(async (tx: any) => {
         const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
         const sub = await tx.subscription.findUnique({ where: { userId }, select: { id: true, creditsRemaining: true } });
         const freeCredits = user?.freeCredits || 0;
         const planCredits = sub?.creditsRemaining || 0;
+
+        console.log("[ANALYSIS] Step 6: In tx — free:", freeCredits, "plan:", planCredits, "cost:", ANALYSIS_COST);
 
         if (freeCredits + planCredits < ANALYSIS_COST) {
           throw new Error(`INSUFFICIENT:${freeCredits + planCredits}`);
@@ -133,8 +144,10 @@ export async function POST() {
         }
       });
       creditsDeducted = true;
+      console.log("[ANALYSIS] Step 6: Credits deducted — free:", freeDeducted, "plan:", planDeducted);
     }
 
+    console.log("[ANALYSIS] Step 7: Fetching web content...");
     const webContent = userData?.website ? await fetchWebContent(userData.website as string) : "";
     const context = buildBusinessContext(userData as unknown as Record<string, unknown>, webContent);
 
@@ -165,6 +178,8 @@ IMPORTANT: Respond with pure JSON only. No markdown, no backticks, no additional
 
 LANGUAGE: ${languageInstruction}`;
 
+    console.log("[ANALYSIS] Step 8: Calling Gemini, prompt length:", prompt.length, "userLang:", userLang);
+
     let options = null;
     const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
     for (const modelName of MODELS) {
@@ -177,12 +192,16 @@ LANGUAGE: ${languageInstruction}`;
           // so a low cap truncates the actual JSON output mid-response.
           generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
         });
+        const t0 = Date.now();
         const result = await model.generateContent(prompt);
         const text = result.response.text();
+        const elapsed = Date.now() - t0;
+        console.log("[ANALYSIS] Step 8: Gemini", modelName, "responded in", elapsed, "ms, text length:", text.length, "finishReason:", result.response.candidates?.[0]?.finishReason);
         options = parseGeminiJSON(text);
+        console.log("[ANALYSIS] Step 8: parseGeminiJSON result:", options ? "OK, keys=" + Object.keys(options as object).join(",") : "NULL");
         if (options) break;
-      } catch (e) {
-        console.error(`[ANALYSIS] Gemini model ${modelName} failed:`, e);
+      } catch (e: any) {
+        console.error(`[ANALYSIS] Step 8: Gemini model ${modelName} failed — ${e.message} | status: ${e.status}`);
       }
     }
 
@@ -195,9 +214,11 @@ LANGUAGE: ${languageInstruction}`;
           console.error("[ANALYSIS] CRITICAL: Refund failed!", refundErr);
         }
       }
+      console.error("[ANALYSIS] Step 8: All models failed, returning 502");
       return NextResponse.json({ error: t("api.error.aiFailed", lang) }, { status: 502 });
     }
 
+    console.log("[ANALYSIS] Step 9: Saving analysis to DB...");
     await db.user.update({
       where: { id: userId },
       data: {
@@ -205,6 +226,7 @@ LANGUAGE: ${languageInstruction}`;
         companyAnalysisAt: new Date(),
       },
     });
+    console.log("[ANALYSIS] Step 9: Saved OK, returning options");
     return NextResponse.json({ options });
   } catch (err) {
     // C9: Always attempt refund in outer catch if credits were deducted
@@ -225,7 +247,7 @@ LANGUAGE: ${languageInstruction}`;
       );
     }
 
-    console.error("[ANALYSIS_OPTIONS]", err);
+    console.error("[ANALYSIS_OPTIONS] OUTER CATCH:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }
