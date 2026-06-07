@@ -52,6 +52,7 @@ interface TicketInfo {
   variantName: string;
   creditsCharged: number;
   serviceSlug?: string;
+  estimatedDays?: number;
 }
 
 interface UserProfile {

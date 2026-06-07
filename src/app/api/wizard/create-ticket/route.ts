@@ -180,6 +180,7 @@ export async function POST(req: NextRequest) {
         variantName: variant.name,
         creditsCharged: ticket.creditsCharged,
         serviceSlug: variant.service.slug,
+        estimatedDays: variant.estimatedDays,
       },
     });
   } catch (err) {
