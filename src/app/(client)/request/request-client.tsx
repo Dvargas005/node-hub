@@ -7,6 +7,8 @@ import { CategorySelector, type ServiceSelection } from "@/components/wizard/cat
 import { ChatInterface } from "@/components/wizard/chat-interface";
 import { BriefConfirmation } from "@/components/wizard/brief-confirmation";
 import { TicketSuccess } from "@/components/wizard/ticket-success";
+import { ServiceForm } from "@/components/wizard/service-form";
+import { getServiceForm } from "@/lib/wizard/service-forms";
 
 interface BriefData {
   suggestedServiceSlug: string;
@@ -35,6 +37,14 @@ interface VariantInfo {
   serviceCategory: string;
 }
 
+interface ServiceVariant {
+  id: string;
+  name: string;
+  creditCost: number;
+  estimatedDays: number;
+  description?: string | null;
+}
+
 interface TicketInfo {
   id: string;
   number: number;
@@ -44,16 +54,37 @@ interface TicketInfo {
   serviceSlug?: string;
 }
 
-type Step = "category" | "chat" | "confirm" | "success";
+interface UserProfile {
+  brandColors?: string | null;
+  brandStyle?: string | null;
+  businessIndustry?: string | null;
+  targetAudience?: string | null;
+  website?: string | null;
+}
 
-const STEP_INDEX: Record<Step, number> = { category: 0, chat: 1, confirm: 2, success: 2 };
+type Step = "category" | "form" | "chat" | "confirm" | "success";
+
+const STEP_INDEX: Record<Step, number> = { category: 0, form: 1, chat: 1, confirm: 2, success: 2 };
+
+function buildFormContext(answers: Record<string, unknown>, serviceSlug: string): string {
+  let context = `The client filled out a form for ${serviceSlug}:\n`;
+  for (const [key, value] of Object.entries(answers)) {
+    if (value) {
+      context += `- ${key}: ${Array.isArray(value) ? value.join(", ") : value}\n`;
+    }
+  }
+  context += "\nReview this information. If everything looks complete, generate the brief. If something critical is missing, ask ONE clarifying question.";
+  return context;
+}
 
 export function RequestClient({
   subscription,
   recommendations,
+  userProfile,
 }: {
   subscription: { creditsRemaining: number; planName: string; freeCredits?: number } | null;
   recommendations?: string[];
+  userProfile?: UserProfile;
 }) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -61,12 +92,14 @@ export function RequestClient({
   const [step, setStep] = useState<Step>(initialCategory ? "chat" : "category");
   const [category, setCategory] = useState<string | undefined>(initialCategory || undefined);
   const [serviceSlug, setServiceSlug] = useState<string | undefined>();
+  const [preselectedVariantId, setPreselectedVariantId] = useState<string | undefined>();
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [variant, setVariant] = useState<VariantInfo | null>(null);
   const [ticket, setTicket] = useState<TicketInfo | null>(null);
   const [error, setError] = useState("");
+  const [serviceVariants, setServiceVariants] = useState<ServiceVariant[]>([]);
 
   const steps = [
     { key: "select", label: t("wizard.step.select") },
@@ -75,15 +108,42 @@ export function RequestClient({
   ];
   const currentStep = STEP_INDEX[step];
 
+  const loadServiceVariants = async (slug: string) => {
+    try {
+      const res = await fetch("/api/wizard/catalog");
+      const data = await res.json();
+      if (data.services) {
+        const svc = data.services.find((s: { slug: string }) => s.slug === slug);
+        if (svc?.variants) setServiceVariants(svc.variants);
+      }
+    } catch {
+      // non-critical, form works without variants
+    }
+  };
+
   const handleCategorySelect = (selection: ServiceSelection) => {
     setCategory(selection.category);
     setServiceSlug(selection.serviceSlug);
-    setStep("chat");
+    setPreselectedVariantId(selection.variantSlug);
+
+    if (selection.serviceSlug && getServiceForm(selection.serviceSlug)) {
+      loadServiceVariants(selection.serviceSlug);
+      setStep("form");
+    } else {
+      setStep("chat");
+    }
   };
 
   const handleFreeText = (text: string) => {
     setInitialMessage(text);
     setServiceSlug(undefined);
+    setStep("chat");
+  };
+
+  const handleFormSubmit = (answers: Record<string, unknown>, chosenVariantId?: string) => {
+    if (chosenVariantId) setPreselectedVariantId(chosenVariantId);
+    const context = buildFormContext(answers, serviceSlug || "");
+    setInitialMessage(context);
     setStep("chat");
   };
 
@@ -131,6 +191,11 @@ export function RequestClient({
 
   const handleAdjust = () => setStep("chat");
 
+  // Reset service variants when going back to category
+  useEffect(() => {
+    if (step === "category") setServiceVariants([]);
+  }, [step]);
+
   return (
     <div className="space-y-6">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
@@ -173,6 +238,17 @@ export function RequestClient({
           onSelect={handleCategorySelect}
           onFreeText={handleFreeText}
           recommendations={recommendations}
+        />
+      )}
+
+      {step === "form" && serviceSlug && getServiceForm(serviceSlug) && (
+        <ServiceForm
+          config={getServiceForm(serviceSlug)!}
+          userProfile={userProfile || {}}
+          variants={serviceVariants.length > 1 ? serviceVariants : undefined}
+          preselectedVariantId={preselectedVariantId}
+          onSubmit={handleFormSubmit}
+          onBack={() => setStep("category")}
         />
       )}
 

@@ -13,7 +13,15 @@ export default async function RequestPage() {
   const [user, subscription] = await Promise.all([
     db.user.findUnique({
       where: { id: userId },
-      select: { freeCredits: true, companyAnalysis: true },
+      select: {
+        freeCredits: true,
+        companyAnalysis: true,
+        brandColors: true,
+        brandStyle: true,
+        businessIndustry: true,
+        targetAudience: true,
+        website: true,
+      },
     }),
     db.subscription.findUnique({
       where: { userId },
@@ -28,9 +36,18 @@ export default async function RequestPage() {
   const cookieStore = await cookies();
   const lang = cookieStore.get("node-language")?.value || DEFAULT_LANG;
 
+  const userProfile = {
+    brandColors: user?.brandColors || null,
+    brandStyle: user?.brandStyle || null,
+    businessIndustry: user?.businessIndustry || null,
+    targetAudience: user?.targetAudience || null,
+    website: user?.website || null,
+  };
+
   return (
     <RequestClient
       recommendations={recommendations}
+      userProfile={userProfile}
       subscription={
         subscription
           ? {
