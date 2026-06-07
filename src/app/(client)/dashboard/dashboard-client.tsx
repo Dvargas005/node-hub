@@ -72,6 +72,14 @@ function getGreeting(firstName: string, latestTicket: Props["latestTicket"], ana
   return { title: `Hello, ${firstName}!`, subtitle: msgs[latestTicket.status] || "Welcome back.", cta: null };
 }
 
+// ─── Lang detection ─────────────────────────────────
+function detectAnalysisLang(analysis: Record<string, unknown>): string {
+  const text = JSON.stringify(analysis).toLowerCase();
+  if (text.includes("fortalezas") || text.includes("debilidades")) return "es";
+  if (text.includes("forças") || text.includes("fraquezas")) return "pt";
+  return "en";
+}
+
 // ─── SWOT colors ────────────────────────────────────
 const swotConfig = [
   { key: "strengths", label: "Strengths", icon: ShieldCheck, color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" },
@@ -113,6 +121,14 @@ export function DashboardClient({
   const [feedbackA, setFeedbackA] = useState("");
   const [feedbackB, setFeedbackB] = useState("");
   const [localOptions, setLocalOptions] = useState(analysisOptions);
+  const [localAnalysis, setLocalAnalysis] = useState<Record<string, unknown> | null>(null);
+  const [analysisLang, setAnalysisLang] = useState("en");
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  // Detect analysis language on mount
+  useEffect(() => {
+    if (selectedProfile) setAnalysisLang(detectAnalysisLang(selectedProfile));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Verify Stripe checkout session as webhook fallback
   useEffect(() => {
@@ -148,6 +164,37 @@ export function DashboardClient({
       setLocalOptions(data.options);
       setShowOptions(true);
     } catch { setGenError(tr("common.connectionError")); } finally { setGenerating(false); }
+  };
+
+  const handleRegenerateAnalysis = async (newLang: string) => {
+    setIsRegenerating(true);
+    setGenError("");
+    try {
+      // Step 1: get fresh options in new language (free — isRegeneration)
+      const optRes = await fetch("/api/company-analysis/options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang: newLang }),
+      });
+      const optData = await optRes.json();
+      if (!optRes.ok) throw new Error(optData.error || tr("common.error"));
+
+      // Step 2: auto-generate with option A in new language
+      const genRes = await fetch("/api/company-analysis/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ option: "A", lang: newLang }),
+      });
+      const genData = await genRes.json();
+      if (!genRes.ok) throw new Error(genData.error || tr("common.error"));
+
+      setLocalAnalysis(genData.analysis);
+      toast.success(tr("dashboard.analysis.regenerated"));
+    } catch (err: any) {
+      toast.error(err.message || tr("dashboard.analysis.regenerateError"));
+    } finally {
+      setIsRegenerating(false);
+    }
   };
 
   const handleSelect = async (option: "A" | "B") => {
@@ -353,9 +400,27 @@ export function DashboardClient({
       )}
 
       {/* Selected analysis display — collapsable */}
-      {hasAnalysis && selectedProfile && (
+      {hasAnalysis && (selectedProfile || localAnalysis) && (() => {
+        const displayedProfile = localAnalysis || selectedProfile!;
+        return (
         <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
           <CardContent className="py-4">
+            {/* Language toggle */}
+            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[rgba(245,246,252,0.06)]">
+              <span className="text-xs text-[rgba(245,246,252,0.4)]">{tr("dashboard.analysis.language")}</span>
+              <select
+                value={analysisLang}
+                onChange={(e) => { setAnalysisLang(e.target.value); handleRegenerateAnalysis(e.target.value); }}
+                disabled={isRegenerating}
+                className="bg-transparent border border-[rgba(245,246,252,0.2)] rounded px-2 py-0.5 text-xs text-[var(--ice-white)] disabled:opacity-50"
+              >
+                <option value="en">🇺🇸 English</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="pt">🇧🇷 Português</option>
+              </select>
+              {isRegenerating && <span className="text-xs text-[var(--gold-bar)] flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" />{tr("dashboard.analysis.regenerating")}</span>}
+            </div>
+
             {/* Collapsed header — always visible */}
             <button
               onClick={() => setAnalysisExpanded(!analysisExpanded)}
@@ -366,14 +431,14 @@ export function DashboardClient({
                   <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">
                     Business analysis
                   </p>
-                  {selectedProfile.tone ? (
+                  {displayedProfile.tone ? (
                     <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] border-[rgba(245,246,252,0.1)] text-[10px]">
-                      {String(selectedProfile.tone)}
+                      {String(displayedProfile.tone)}
                     </Badge>
                   ) : null}
                 </div>
                 <p className="text-sm text-[rgba(245,246,252,0.5)] truncate">
-                  {selectedProfile.valueProposition as string}
+                  {displayedProfile.valueProposition as string}
                 </p>
               </div>
               {analysisExpanded ? (
@@ -386,16 +451,16 @@ export function DashboardClient({
             {/* Expanded content */}
             {analysisExpanded && (
               <div className="mt-4 space-y-4 border-t border-[rgba(245,246,252,0.06)] pt-4 overflow-hidden">
-                <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.description as string}</p>
+                <p className="text-sm text-[rgba(245,246,252,0.7)]">{displayedProfile.description as string}</p>
                 <div className="bg-[rgba(255,201,25,0.05)] border border-[var(--gold-bar)]/20 p-3">
                   <p className="text-xs text-[var(--gold-bar)] font-medium mb-1">Value proposition</p>
-                  <p className="text-sm text-[rgba(245,246,252,0.7)]">{selectedProfile.valueProposition as string}</p>
+                  <p className="text-sm text-[rgba(245,246,252,0.7)]">{displayedProfile.valueProposition as string}</p>
                 </div>
 
                 {/* SWOT */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {swotConfig.map((s: any) => {
-                    const swot = selectedProfile.swot as Record<string, string[]> | undefined;
+                    const swot = displayedProfile.swot as Record<string, string[]> | undefined;
                     const items = swot?.[s.key] || [];
                     return (
                       <div key={s.key} className={`border p-3 ${s.bg} overflow-hidden`}>
@@ -412,11 +477,11 @@ export function DashboardClient({
                 </div>
 
                 {/* Competitors */}
-                {(selectedProfile.competitors as string[] | undefined)?.length ? (
+                {(displayedProfile.competitors as string[] | undefined)?.length ? (
                   <div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Identified competitors</p>
                     <div className="flex flex-wrap gap-2">
-                      {(selectedProfile.competitors as string[]).map((c: any, i: number) => (
+                      {(displayedProfile.competitors as string[]).map((c: any, i: number) => (
                         <Badge key={i} className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.6)] border-[rgba(245,246,252,0.1)] break-words">{c}</Badge>
                       ))}
                     </div>
@@ -424,11 +489,11 @@ export function DashboardClient({
                 ) : null}
 
                 {/* Actionable recommendations */}
-                {(selectedProfile.recommendations as string[] | undefined)?.length ? (
+                {(displayedProfile.recommendations as string[] | undefined)?.length ? (
                   <div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)] mb-2">Recommendations</p>
                     <div className="flex flex-wrap gap-2">
-                      {(selectedProfile.recommendations as string[]).map((r: any, i: number) => {
+                      {(displayedProfile.recommendations as string[]).map((r: any, i: number) => {
                         const lower = r.toLowerCase();
                         let cat = "DESIGN";
                         let Icon = Palette;
@@ -450,7 +515,8 @@ export function DashboardClient({
             )}
           </CardContent>
         </Card>
-      )}
+        );
+      })()}
 
       {/* SECTION 4 — Active tickets */}
       <div>

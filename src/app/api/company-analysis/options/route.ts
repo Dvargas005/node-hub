@@ -5,6 +5,12 @@ import { parseGeminiJSON } from "@/lib/parse-gemini-json";
 import { cookies } from "next/headers";
 import { t, DEFAULT_LANG } from "@/lib/i18n";
 
+const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+  en: "You MUST respond entirely in English. All analysis, recommendations, and competitor names should be in English.",
+  es: "You MUST respond entirely in Spanish (Español). Todo el análisis, recomendaciones y nombres de competidores deben estar en español.",
+  pt: "You MUST respond entirely in Portuguese (Português). Toda a análise, recomendações e nomes de concorrentes devem estar em português.",
+};
+
 const ANALYSIS_COST = 10;
 
 // S3: Sanitize user inputs before injecting into prompts
@@ -59,20 +65,24 @@ async function refundCredits(userId: string, freeDeducted: number, planDeducted:
   });
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   console.log("[ANALYSIS] Step 1: Auth");
-  const lang = (await cookies()).get("node-language")?.value || DEFAULT_LANG;
+  const uiLang = (await cookies()).get("node-language")?.value || DEFAULT_LANG;
+  // lang from body overrides cookie; default always "en" for analysis content
+  const body = await req.json().catch(() => ({}));
+  const responseLang = (body.lang as string) in LANGUAGE_INSTRUCTIONS ? (body.lang as string) : "en";
+
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
   // Fail fast (and BEFORE charging credits) if the AI provider isn't configured.
   if (!process.env.GEMINI_API_KEY) {
     console.error("[ANALYSIS_OPTIONS] GEMINI_API_KEY is not configured");
-    return NextResponse.json({ error: t("api.error.aiUnavailable", lang) }, { status: 503 });
+    return NextResponse.json({ error: t("api.error.aiUnavailable", uiLang) }, { status: 503 });
   }
 
   const userId = session.user.id;
-  console.log("[ANALYSIS] Step 2: Auth OK, userId:", userId.substring(0, 8) + "...");
+  console.log("[ANALYSIS] Step 2: Auth OK, userId:", userId.substring(0, 8) + "... responseLang:", responseLang);
   let creditsDeducted = false;
   let freeDeducted = 0;
   let planDeducted = 0;
@@ -86,11 +96,17 @@ export async function POST() {
       select: { companyAnalysis: true, companyAnalysisAt: true },
     });
     const existing = existingUser?.companyAnalysis as Record<string, unknown> | null;
-    if (existing?.status === "pending_selection" && existing?.options) {
+
+    // Regeneration: user already has any analysis + client sent lang param → free, skip cache
+    const isRegeneration = !!existing && !!body.lang;
+    if (isRegeneration) {
+      console.log("[ANALYSIS] Step 3: Language regeneration detected, responseLang:", responseLang);
+    } else if (existing?.status === "pending_selection" && existing?.options) {
       console.log("[ANALYSIS] Step 3: Returning cached pending options");
       return NextResponse.json({ options: existing.options });
+    } else {
+      console.log("[ANALYSIS] Step 3: No cached options, proceeding");
     }
-    console.log("[ANALYSIS] Step 3: No cached options, proceeding");
 
     // Load user data for prompt
     console.log("[ANALYSIS] Step 4: Loading user + subscription...");
@@ -119,7 +135,8 @@ export async function POST() {
     console.log("[ANALYSIS] Step 5: isFreeRenewal:", isFreeRenewal);
 
     // C10: Atomic balance check + deduction inside transaction
-    if (!isFreeRenewal) {
+    // Skip credit deduction for language regenerations (analysis already paid)
+    if (!isFreeRenewal && !isRegeneration) {
       console.log("[ANALYSIS] Step 6: Deducting credits...");
       await db.$transaction(async (tx: any) => {
         const user = await tx.user.findUnique({ where: { id: userId }, select: { freeCredits: true } });
@@ -145,19 +162,13 @@ export async function POST() {
       });
       creditsDeducted = true;
       console.log("[ANALYSIS] Step 6: Credits deducted — free:", freeDeducted, "plan:", planDeducted);
+    } else if (isRegeneration) {
+      console.log("[ANALYSIS] Step 6: Language regeneration — no credit charge");
     }
 
     console.log("[ANALYSIS] Step 7: Fetching web content...");
     const webContent = userData?.website ? await fetchWebContent(userData.website as string) : "";
     const context = buildBusinessContext(userData as unknown as Record<string, unknown>, webContent);
-
-    const userLang = (userData?.language as string) || "en";
-    const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
-      en: "Respond entirely in English.",
-      es: "Respond entirely in Spanish (Responde completamente en español).",
-      pt: "Respond entirely in Portuguese (Responda completamente em português).",
-    };
-    const languageInstruction = LANGUAGE_INSTRUCTIONS[userLang] || LANGUAGE_INSTRUCTIONS.en;
 
     const prompt = `You are a business consultant expert in small Latino businesses in the United States.
 
@@ -176,9 +187,10 @@ OPTION B: Modern/bold approach
 IMPORTANT: Respond with pure JSON only. No markdown, no backticks, no additional text.
 {"optionA":{"label":"...","description":"...","valueProposition":"...","tone":"..."},"optionB":{"label":"...","description":"...","valueProposition":"...","tone":"..."}}
 
-LANGUAGE: ${languageInstruction}`;
+CRITICAL LANGUAGE REQUIREMENT:
+${LANGUAGE_INSTRUCTIONS[responseLang] || LANGUAGE_INSTRUCTIONS.en}`;
 
-    console.log("[ANALYSIS] Step 8: Calling Gemini, prompt length:", prompt.length, "userLang:", userLang);
+    console.log("[ANALYSIS] Step 8: Calling Gemini, prompt length:", prompt.length, "responseLang:", responseLang);
 
     let options = null;
     const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
@@ -215,7 +227,7 @@ LANGUAGE: ${languageInstruction}`;
         }
       }
       console.error("[ANALYSIS] Step 8: All models failed, returning 502");
-      return NextResponse.json({ error: t("api.error.aiFailed", lang) }, { status: 502 });
+      return NextResponse.json({ error: t("api.error.aiFailed", uiLang) }, { status: 502 });
     }
 
     console.log("[ANALYSIS] Step 9: Saving analysis to DB...");
@@ -242,12 +254,12 @@ LANGUAGE: ${languageInstruction}`;
     if (msg.startsWith("INSUFFICIENT:")) {
       const total = msg.split(":")[1];
       return NextResponse.json(
-        { error: t("api.error.needCredits", lang).replace("{cost}", String(ANALYSIS_COST)).replace("{total}", String(total)) },
+        { error: t("api.error.needCredits", uiLang).replace("{cost}", String(ANALYSIS_COST)).replace("{total}", String(total)) },
         { status: 400 }
       );
     }
 
     console.error("[ANALYSIS_OPTIONS] OUTER CATCH:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", uiLang) }, { status: 500 });
   }
 }

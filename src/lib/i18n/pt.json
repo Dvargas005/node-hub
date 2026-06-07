@@ -510,5 +510,9 @@
   "wizard.category.consulting.desc": "Agende reuniões e consultorias",
   "wizard.consulting": "Consultoria",
   "service.hourlyMeeting": "Reunião por hora",
-  "service.hourlyMeeting.desc": "Reunião individual com seu PM ou especialista. 1 hora mínimo."
+  "service.hourlyMeeting.desc": "Reunião individual com seu PM ou especialista. 1 hora mínimo.",
+  "dashboard.analysis.language": "Idioma da análise:",
+  "dashboard.analysis.regenerating": "Regenerando...",
+  "dashboard.analysis.regenerated": "Análise regenerada",
+  "dashboard.analysis.regenerateError": "Não foi possível regenerar. Tente novamente."
 }

@@ -510,5 +510,9 @@
   "wizard.category.consulting.desc": "Book meetings and consultations",
   "wizard.consulting": "Consulting",
   "service.hourlyMeeting": "Hourly Meeting",
-  "service.hourlyMeeting.desc": "One-on-one meeting with your PM or specialist. 1 hour minimum."
+  "service.hourlyMeeting.desc": "One-on-one meeting with your PM or specialist. 1 hour minimum.",
+  "dashboard.analysis.language": "Analysis language:",
+  "dashboard.analysis.regenerating": "Regenerating...",
+  "dashboard.analysis.regenerated": "Analysis regenerated",
+  "dashboard.analysis.regenerateError": "Could not regenerate. Try again."
 }

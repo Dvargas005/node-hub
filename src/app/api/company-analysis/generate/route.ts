@@ -4,6 +4,12 @@ import { requireApiRole } from "@/lib/api-auth";
 import { parseGeminiJSON } from "@/lib/parse-gemini-json";
 import { t, DEFAULT_LANG } from "@/lib/i18n";
 
+const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+  en: "You MUST respond entirely in English. All analysis, recommendations, and competitor names should be in English.",
+  es: "You MUST respond entirely in Spanish (Español). Todo el análisis, recomendaciones y nombres de competidores deben estar en español.",
+  pt: "You MUST respond entirely in Portuguese (Português). Toda a análise, recomendações e nomes de concorrentes devem estar em português.",
+};
+
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
@@ -16,10 +22,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { option, feedback } = await req.json();
-    if (option !== "A" && option !== "B") {
-      return NextResponse.json({ error: t("api.error.invalidCategory", lang) }, { status: 400 });
-    }
+    const body = await req.json();
+    // Support both option:"A"|"B" and profileIndex:0|1 for language regeneration
+    const profileIndex: number = body.profileIndex !== undefined ? Number(body.profileIndex) : (body.option === "B" ? 1 : 0);
+    const option: "A" | "B" = profileIndex === 1 ? "B" : "A";
+    const feedback: string | undefined = body.feedback;
+    // responseLang from body, default always "en"
+    const responseLang = (body.lang as string) in LANGUAGE_INSTRUCTIONS ? (body.lang as string) : "en";
 
     const userId = session.user.id;
     const user = await db.user.findUnique({
@@ -33,26 +42,24 @@ export async function POST(req: NextRequest) {
     });
 
     const analysis = user?.companyAnalysis as Record<string, unknown> | null;
-    if (analysis?.status !== "pending_selection" || !analysis?.options) {
+    // For language regeneration: analysis can be "complete". Accept both states.
+    const analysisOptions = (analysis?.options || (analysis?.status === "complete" ? analysis : null)) as Record<string, unknown> | null;
+    if (!analysisOptions) {
       return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
 
-    const options = analysis.options as Record<string, unknown>;
-    const chosen = (option === "A" ? options.optionA : options.optionB) as Record<string, unknown>;
-    if (!chosen) {
+    const options = analysisOptions as Record<string, unknown>;
+    // For regeneration from "complete" status, options may be under analysis.options
+    const storedOptions = (analysis?.options as Record<string, unknown> | null) || options;
+    const chosen = (option === "A" ? storedOptions.optionA : storedOptions.optionB) as Record<string, unknown> | undefined;
+    // If no stored option (language regeneration on complete), use analysis data itself as context
+    const profileContext = chosen || (analysis?.selected as Record<string, unknown> | undefined);
+    if (!profileContext) {
       return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
 
     const sm = user?.socialMedia as Record<string, string> | null;
     const socialStr = sm ? Object.entries(sm).map(([k, v]) => `${k}: ${v}`).join(", ") : "None";
-
-    const userLang = (user?.language as string) || "en";
-    const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
-      en: "Respond entirely in English.",
-      es: "Respond entirely in Spanish (Responde completamente en español).",
-      pt: "Respond entirely in Portuguese (Responda completamente em português).",
-    };
-    const languageInstruction = LANGUAGE_INSTRUCTIONS[userLang] || LANGUAGE_INSTRUCTIONS.en;
 
     const prompt = `You are a business consultant expert in small Latino businesses in the United States.
 
@@ -64,10 +71,10 @@ BRAND: ${user?.hasBranding ? "Yes" : "No"} / Colors: ${user?.brandColors || "N/A
 WEBSITE: ${user?.website || "None"} | SOCIAL MEDIA: ${socialStr}
 
 THE CLIENT CHOSE THIS PROFILE:
-- Label: ${chosen.label}
-- Description: ${chosen.description}
-- Value proposition: ${chosen.valueProposition}
-- Tone: ${chosen.tone}
+- Label: ${profileContext.label || ""}
+- Description: ${profileContext.description || ""}
+- Value proposition: ${profileContext.valueProposition || ""}
+- Tone: ${profileContext.tone || ""}
 ${feedback ? `\nCLIENT FEEDBACK: "${feedback}"` : ""}
 
 Now generate the COMPLETE ANALYSIS for this profile. Include:
@@ -82,7 +89,8 @@ Now generate the COMPLETE ANALYSIS for this profile. Include:
 IMPORTANT: Respond with pure JSON only. No markdown, no backticks.
 {"description":"...","valueProposition":"...","targetAudience":"...","competitors":["..."],"swot":{"strengths":["..."],"opportunities":["..."],"weaknesses":["..."],"threats":["..."]},"recommendations":["..."],"tone":"..."}
 
-LANGUAGE: ${languageInstruction}`;
+CRITICAL LANGUAGE REQUIREMENT:
+${LANGUAGE_INSTRUCTIONS[responseLang] || LANGUAGE_INSTRUCTIONS.en}`;
 
     let result = null;
     const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
@@ -110,16 +118,17 @@ LANGUAGE: ${languageInstruction}`;
     }
 
     // Merge chosen label/tone with full analysis
-    const fullAnalysis = { ...(result as Record<string, unknown>), label: chosen.label };
+    const fullAnalysis = { ...(result as Record<string, unknown>), label: profileContext.label };
 
     await db.user.update({
       where: { id: userId },
       data: {
         companyAnalysis: JSON.parse(JSON.stringify({
           status: "complete",
-          options: analysis.options,
+          options: analysis?.options || null,
           selectedOption: option,
           selected: fullAnalysis,
+          lang: responseLang,
         })),
       },
     });
