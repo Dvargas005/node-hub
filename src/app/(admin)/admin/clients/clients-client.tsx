@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -22,33 +28,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Coins, AlertTriangle } from "lucide-react";
+import { Search, Coins, AlertTriangle, MoreVertical } from "lucide-react";
 import { ContactIcons } from "@/components/admin/contact-links";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getLocale } from "@/lib/i18n";
 
-interface ClientRow {
+interface UserRow {
   id: string;
   name: string;
   email: string;
-  businessName: string | null;
-  planName: string | null;
-  planSlug: string | null;
-  creditsRemaining: number | null;
-  monthlyCredits: number | null;
-  activeTickets: number;
-  allianceName: string | null;
-  allianceCode: string | null;
-  assignedPmId: string | null;
-  assignedPmName: string | null;
+  businessName?: string | null;
+  planName?: string | null;
+  planSlug?: string | null;
+  subscriptionStatus?: string | null;
+  creditsRemaining?: number | null;
+  monthlyCredits?: number | null;
+  activeTickets?: number;
+  allianceName?: string | null;
+  allianceCode?: string | null;
+  assignedPmId?: string | null;
+  assignedPmName?: string | null;
   createdAt: string;
-  phone: string | null;
-  whatsappNumber: string | null;
-  telegramId: string | null;
-  linkedinUrl: string | null;
-  instagramHandle: string | null;
-  preferredContact: string | null;
+  phone?: string | null;
+  whatsappNumber?: string | null;
+  telegramId?: string | null;
+  linkedinUrl?: string | null;
+  instagramHandle?: string | null;
+  preferredContact?: string | null;
+  userTag?: string | null;
+  role?: string;
 }
+
+type Tab = "clients" | "prospects" | "team";
 
 const planColors: Record<string, string> = {
   member: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -56,25 +67,34 @@ const planColors: Record<string, string> = {
   pro: "bg-amber-500/20 text-amber-400 border-amber-500/30",
 };
 
+const selectClass =
+  "h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]";
+
 export function ClientsClient({
   clients,
+  prospects,
+  team,
   plans,
   isAdmin,
   pms,
 }: {
-  clients: ClientRow[];
+  clients: UserRow[];
+  prospects: UserRow[];
+  team: UserRow[];
   plans: { slug: string; name: string }[];
   isAdmin: boolean;
   pms: { id: string; name: string }[];
 }) {
   const router = useRouter();
   const { t, lang } = useTranslation();
+  const [activeTab, setActiveTab] = useState<Tab>("clients");
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("");
   const [filterAlliance, setFilterAlliance] = useState(false);
+  const [counts, setCounts] = useState({ clients: clients.length, prospects: prospects.length, team: team.length });
 
   // Credit adjustment dialog
-  const [creditTarget, setCreditTarget] = useState<ClientRow | null>(null);
+  const [creditTarget, setCreditTarget] = useState<UserRow | null>(null);
   const [creditMode, setCreditMode] = useState<"add" | "remove">("add");
   const [creditAmount, setCreditAmount] = useState<string>("");
   const [creditReason, setCreditReason] = useState("");
@@ -82,7 +102,52 @@ export function ClientsClient({
   const [creditSaving, setCreditSaving] = useState(false);
   const [creditError, setCreditError] = useState("");
 
-  const openCreditDialog = (client: ClientRow) => {
+  // Role change confirm dialog
+  const [roleTarget, setRoleTarget] = useState<UserRow | null>(null);
+  const [pendingRole, setPendingRole] = useState("");
+  const [roleChanging, setRoleChanging] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/clients/counts")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.clients !== undefined) setCounts(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const sourceData: Record<Tab, UserRow[]> = { clients, prospects, team };
+
+  const filtered = useMemo(() => {
+    const rows = sourceData[activeTab];
+    return rows.filter((c) => {
+      if (search) {
+        const q = search.toLowerCase();
+        if (
+          !c.name.toLowerCase().includes(q) &&
+          !c.email.toLowerCase().includes(q) &&
+          !(c.businessName || "").toLowerCase().includes(q)
+        )
+          return false;
+      }
+      if (activeTab === "clients" && filterPlan) {
+        if (filterPlan === "__none") {
+          if (c.planSlug !== null && c.planSlug !== undefined) return false;
+        } else if (c.planSlug !== filterPlan) return false;
+      }
+      if (activeTab === "clients" && filterAlliance && !c.allianceName) return false;
+      return true;
+    });
+  }, [sourceData, activeTab, search, filterPlan, filterAlliance]);
+
+  function getFollowUpStatus(createdAt: string) {
+    const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
+    if (days > 7) return { label: t("admin.clients.followUp.needed"), color: "text-red-400" };
+    if (days > 3) return { label: t("admin.clients.followUp.soon"), color: "text-yellow-400" };
+    return { label: t("admin.clients.followUp.new"), color: "text-green-400" };
+  }
+
+  const openCreditDialog = (client: UserRow) => {
     setCreditTarget(client);
     setCreditMode("add");
     setCreditAmount("");
@@ -150,37 +215,90 @@ export function ClientsClient({
       }
       toast.success(pmId ? "PM assigned" : "PM unassigned");
       router.refresh();
-    } catch (err: any) {
-      console.error("Error assigning PM", err);
+    } catch {
       toast.error(t("common.connectionError"));
     }
   };
 
-  const filtered = useMemo(() => {
-    return clients.filter((c: any) => {
-      if (search) {
-        const q = search.toLowerCase();
-        if (
-          !c.name.toLowerCase().includes(q) &&
-          !c.email.toLowerCase().includes(q) &&
-          !(c.businessName || "").toLowerCase().includes(q)
-        )
-          return false;
+  const handleMarkUser = async (userId: string, tag: string | null) => {
+    try {
+      const res = await fetch(`/api/admin/clients/${userId}/tag`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data?.error || "Error");
+        return;
       }
-      if (filterPlan) {
-        if (filterPlan === "__none") { if (c.planSlug !== null) return false; }
-        else if (c.planSlug !== filterPlan) return false;
+      toast.success(t("admin.clients.markAs.success"));
+      router.refresh();
+    } catch {
+      toast.error(t("common.connectionError"));
+    }
+  };
+
+  const confirmRoleChange = (user: UserRow, role: string) => {
+    setRoleTarget(user);
+    setPendingRole(role);
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTarget) return;
+    setRoleChanging(true);
+    try {
+      const res = await fetch(`/api/admin/clients/${roleTarget.id}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: pendingRole }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data?.error || "Error");
+        return;
       }
-      if (filterAlliance && !c.allianceName) return false;
-      return true;
-    });
-  }, [clients, search, filterPlan, filterAlliance]);
+      toast.success("Role updated");
+      setRoleTarget(null);
+      router.refresh();
+    } catch {
+      toast.error(t("common.connectionError"));
+    } finally {
+      setRoleChanging(false);
+    }
+  };
+
+  const tabLabel: Record<Tab, string> = {
+    clients: t("admin.clients.tab.clients"),
+    prospects: t("admin.clients.tab.prospects"),
+    team: t("admin.clients.tab.team"),
+  };
 
   return (
     <div className="space-y-6">
       <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-        Clients
+        {tabLabel[activeTab]} ({counts[activeTab]})
       </h1>
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-[rgba(245,246,252,0.1)]">
+        {(["clients", "prospects", "team"] as Tab[]).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => { setActiveTab(tab); setSearch(""); setFilterPlan(""); setFilterAlliance(false); }}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab
+                ? "border-[var(--gold-bar)] text-[var(--gold-bar)]"
+                : "border-transparent text-[rgba(245,246,252,0.4)] hover:text-[rgba(245,246,252,0.8)]"
+            }`}
+          >
+            {tabLabel[tab]}
+            <span className="ml-2 text-xs bg-[rgba(255,255,255,0.08)] px-2 py-0.5 rounded-full">
+              {counts[tab]}
+            </span>
+          </button>
+        ))}
+      </div>
 
       {/* Filters */}
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
@@ -195,29 +313,31 @@ export function ClientsClient({
                 className="pl-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)]"
               />
             </div>
-            <select
-              value={filterPlan}
-              onChange={(e) => setFilterPlan(e.target.value)}
-              className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
-            >
-              <option value="">All plans</option>
-              {plans.map((p: any) => (
-                <option key={p.slug} value={p.slug}>
-                  {p.name}
-                </option>
-              ))}
-              <option value="__none">No plan</option>
-            </select>
-            <button
-              onClick={() => setFilterAlliance(!filterAlliance)}
-              className={`h-9 rounded-md border px-3 text-sm transition-colors ${
-                filterAlliance
-                  ? "border-[var(--gold-bar)] bg-[rgba(255,201,25,0.1)] text-[var(--gold-bar)]"
-                  : "border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)]"
-              }`}
-            >
-              With alliance
-            </button>
+            {activeTab === "clients" && (
+              <>
+                <select
+                  value={filterPlan}
+                  onChange={(e) => setFilterPlan(e.target.value)}
+                  className={selectClass}
+                >
+                  <option value="">All plans</option>
+                  {plans.map((p) => (
+                    <option key={p.slug} value={p.slug}>{p.name}</option>
+                  ))}
+                  <option value="__none">No plan</option>
+                </select>
+                <button
+                  onClick={() => setFilterAlliance(!filterAlliance)}
+                  className={`h-9 rounded-md border px-3 text-sm transition-colors ${
+                    filterAlliance
+                      ? "border-[var(--gold-bar)] bg-[rgba(255,201,25,0.1)] text-[var(--gold-bar)]"
+                      : "border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)]"
+                  }`}
+                >
+                  With alliance
+                </button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -226,143 +346,238 @@ export function ClientsClient({
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
         <CardHeader>
           <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base">
-            {filtered.length} clients
+            {filtered.length} {tabLabel[activeTab].toLowerCase()}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Business</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Contact</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Plan</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Credits</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Tickets</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Alliance</TableHead>
-                  <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="text-center text-[rgba(245,246,252,0.4)] py-8"
-                    >
-                      No clients found
-                    </TableCell>
-                  </TableRow>
-                )}
-                {filtered.map((c: any) => (
-                  <TableRow
-                    key={c.id}
-                    onClick={(e) => {
-                      if ((e.target as HTMLElement).closest("select, button, input, a, option")) return;
-                      router.push(`/admin/clients/${c.id}`);
-                    }}
-                    className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer"
-                  >
-                    <TableCell className="text-[var(--ice-white)] font-medium">
-                      <div>{c.name}</div>
-                      <div className="text-xs text-[rgba(245,246,252,0.5)] font-normal">{c.email}</div>
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      {c.businessName || (
-                        <span className="text-[rgba(245,246,252,0.3)]">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <ContactIcons
-                        contact={{
-                          email: c.email,
-                          phone: c.phone,
-                          whatsappNumber: c.whatsappNumber,
-                          telegramId: c.telegramId,
-                          linkedinUrl: c.linkedinUrl,
-                          instagramHandle: c.instagramHandle,
-                          preferredContact: c.preferredContact,
+              {/* ── Clients tab ── */}
+              {activeTab === "clients" && (
+                <>
+                  <TableHeader>
+                    <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Business</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Contact</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Plan</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Credits</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Tickets</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">PM</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={9} className="text-center text-[rgba(245,246,252,0.4)] py-8">
+                          No clients found
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {filtered.map((c) => (
+                      <TableRow
+                        key={c.id}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest("select, button, input, a, option")) return;
+                          router.push(`/admin/clients/${c.id}`);
                         }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {c.planSlug ? (
-                        <Badge className={planColors[c.planSlug] || ""}>
-                          {c.planName}
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
-                          No plan
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      <div className="flex items-center gap-1.5">
-                        {c.creditsRemaining !== null ? (
-                          <span>
-                            <span className="text-[var(--ice-white)]">
-                              {c.creditsRemaining}
-                            </span>
-                            /{c.monthlyCredits}
-                          </span>
-                        ) : (
-                          <span className="text-[rgba(245,246,252,0.3)]">—</span>
-                        )}
-                        {isAdmin && (
-                          <button
-                            type="button"
-                            onClick={() => openCreditDialog(c)}
-                            className="text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] transition-colors p-0.5"
-                            title={t("admin.credits.adjust")}
-                            aria-label={t("admin.credits.adjust")}
-                          >
-                            <Coins className="h-3.5 w-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-[var(--ice-white)]">
-                      {c.activeTickets}
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      {isAdmin ? (
-                        <select
-                          value={c.assignedPmId || ""}
-                          onChange={(e) => handleAssignPm(c.id, e.target.value || null)}
-                          onClick={(e) => e.stopPropagation()}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          className="h-9 rounded-md border border-[rgba(245,246,252,0.2)] bg-[#1a1108] px-3 text-sm text-[var(--ice-white)] [&_option]:bg-[#1a1108] [&_option]:text-[var(--ice-white)]"
+                        className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer"
+                      >
+                        <TableCell className="text-[var(--ice-white)] font-medium">
+                          <div>{c.name}</div>
+                          <div className="text-xs text-[rgba(245,246,252,0.5)] font-normal">{c.email}</div>
+                        </TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                          {c.businessName || <span className="text-[rgba(245,246,252,0.3)]">—</span>}
+                        </TableCell>
+                        <TableCell>
+                          <ContactIcons contact={{ email: c.email, phone: c.phone ?? null, whatsappNumber: c.whatsappNumber ?? null, telegramId: c.telegramId ?? null, linkedinUrl: c.linkedinUrl ?? null, instagramHandle: c.instagramHandle ?? null, preferredContact: c.preferredContact ?? null }} />
+                        </TableCell>
+                        <TableCell>
+                          {c.planSlug ? (
+                            <Badge className={planColors[c.planSlug] || ""}>{c.planName}</Badge>
+                          ) : (
+                            <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">No plan</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                          <div className="flex items-center gap-1.5">
+                            {c.creditsRemaining !== null && c.creditsRemaining !== undefined ? (
+                              <span>
+                                <span className="text-[var(--ice-white)]">{c.creditsRemaining}</span>/{c.monthlyCredits}
+                              </span>
+                            ) : (
+                              <span className="text-[rgba(245,246,252,0.3)]">—</span>
+                            )}
+                            {isAdmin && (
+                              <button
+                                type="button"
+                                onClick={() => openCreditDialog(c)}
+                                className="text-[rgba(245,246,252,0.4)] hover:text-[var(--gold-bar)] transition-colors p-0.5"
+                                title={t("admin.credits.adjust")}
+                              >
+                                <Coins className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-[var(--ice-white)]">{c.activeTickets}</TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                          {isAdmin ? (
+                            <select
+                              value={c.assignedPmId || ""}
+                              onChange={(e) => handleAssignPm(c.id, e.target.value || null)}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              className={selectClass}
+                            >
+                              <option value="">Unassigned</option>
+                              {pms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                            </select>
+                          ) : (
+                            c.assignedPmName || <span className="text-[rgba(245,246,252,0.3)]">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
+                          {new Date(c.createdAt).toLocaleDateString(getLocale(lang))}
+                        </TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <MarkAsMenu user={c} onMark={handleMarkUser} t={t} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </>
+              )}
+
+              {/* ── Prospects tab ── */}
+              {activeTab === "prospects" && (
+                <>
+                  <TableHeader>
+                    <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Business</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Contact</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">{t("admin.clients.followUp")}</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-[rgba(245,246,252,0.4)] py-8">
+                          {t("admin.clients.noProspects")}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {filtered.map((c) => {
+                      const followUp = getFollowUpStatus(c.createdAt);
+                      return (
+                        <TableRow
+                          key={c.id}
+                          onClick={(e) => {
+                            if ((e.target as HTMLElement).closest("select, button, input, a, option")) return;
+                            router.push(`/admin/clients/${c.id}`);
+                          }}
+                          className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)] cursor-pointer"
                         >
-                          <option value="">Unassigned</option>
-                          {pms.map((p: any) => (
-                            <option key={p.id} value={p.id}>
-                              {p.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        c.assignedPmName || (
-                          <span className="text-[rgba(245,246,252,0.3)]">—</span>
-                        )
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
-                      {c.allianceName ? (
-                        <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-                          {c.allianceName}
-                        </Badge>
-                      ) : (
-                        <span className="text-[rgba(245,246,252,0.3)]">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
-                      {new Date(c.createdAt).toLocaleDateString(getLocale(lang))}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+                          <TableCell className="text-[var(--ice-white)] font-medium">
+                            <div>{c.name}</div>
+                            <div className="text-xs text-[rgba(245,246,252,0.5)] font-normal">{c.email}</div>
+                          </TableCell>
+                          <TableCell className="text-sm text-[rgba(245,246,252,0.6)]">
+                            {c.businessName || <span className="text-[rgba(245,246,252,0.3)]">—</span>}
+                          </TableCell>
+                          <TableCell>
+                            <ContactIcons contact={{ email: c.email, phone: c.phone ?? null, whatsappNumber: c.whatsappNumber ?? null, telegramId: c.telegramId ?? null, linkedinUrl: c.linkedinUrl ?? null, instagramHandle: c.instagramHandle ?? null, preferredContact: c.preferredContact ?? null }} />
+                          </TableCell>
+                          <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
+                            {new Date(c.createdAt).toLocaleDateString(getLocale(lang))}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`text-xs font-medium ${followUp.color}`}>{followUp.label}</span>
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <MarkAsMenu user={c} onMark={handleMarkUser} t={t} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </>
+              )}
+
+              {/* ── Team tab ── */}
+              {activeTab === "team" && (
+                <>
+                  <TableHeader>
+                    <TableRow className="border-[rgba(245,246,252,0.1)] hover:bg-transparent">
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Name</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Email</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Role</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Tag</TableHead>
+                      <TableHead className="text-[rgba(245,246,252,0.5)]">Registered</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-[rgba(245,246,252,0.4)] py-8">
+                          {t("admin.clients.noTeam")}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {filtered.map((u) => (
+                      <TableRow
+                        key={u.id}
+                        className="border-[rgba(245,246,252,0.06)] hover:bg-[rgba(255,255,255,0.03)]"
+                      >
+                        <TableCell className="text-[var(--ice-white)] font-medium">{u.name}</TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">{u.email}</TableCell>
+                        <TableCell>
+                          {isAdmin ? (
+                            <select
+                              value={u.role || "CLIENT"}
+                              onChange={(e) => confirmRoleChange(u, e.target.value)}
+                              className={selectClass}
+                            >
+                              <option value="ADMIN">ADMIN</option>
+                              <option value="PM">PM</option>
+                              <option value="FREELANCER">FREELANCER</option>
+                              <option value="CLIENT">CLIENT</option>
+                            </select>
+                          ) : (
+                            <Badge className="bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.7)]">
+                              {u.role}
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {u.userTag ? (
+                            <Badge className={u.userTag === "testing" ? "bg-orange-500/20 text-orange-400 border-orange-500/30" : "bg-blue-500/20 text-blue-400 border-blue-500/30"}>
+                              {u.userTag === "testing" ? "Testing" : "Internal"}
+                            </Badge>
+                          ) : (
+                            <span className="text-[rgba(245,246,252,0.3)]">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-[rgba(245,246,252,0.5)]">
+                          {new Date(u.createdAt).toLocaleDateString(getLocale(lang))}
+                        </TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          {u.userTag && (
+                            <MarkAsMenu user={u} onMark={handleMarkUser} t={t} />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </>
+              )}
             </Table>
           </div>
         </CardContent>
@@ -384,7 +599,6 @@ export function ClientsClient({
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Add / Remove toggle */}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -411,9 +625,7 @@ export function ClientsClient({
             </div>
 
             <div>
-              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-                {t("admin.credits.amount")}
-              </label>
+              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">{t("admin.credits.amount")}</label>
               <Input
                 type="number"
                 min={1}
@@ -426,9 +638,7 @@ export function ClientsClient({
             </div>
 
             <div>
-              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">
-                {t("admin.credits.reason")}
-              </label>
+              <label className="text-xs text-[rgba(245,246,252,0.5)] mb-1 block">{t("admin.credits.reason")}</label>
               <textarea
                 value={creditReason}
                 onChange={(e) => setCreditReason(e.target.value.slice(0, 500))}
@@ -456,21 +666,13 @@ export function ClientsClient({
             )}
 
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={closeCreditDialog}
-                className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
-              >
+              <Button variant="outline" onClick={closeCreditDialog} className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]">
                 {t("common.cancel")}
               </Button>
               <Button
                 onClick={handleAdjustCredits}
                 disabled={creditSaving}
-                className={`flex-1 font-bold ${
-                  creditConfirming
-                    ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90"
-                    : "bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)]"
-                }`}
+                className={`flex-1 font-bold ${creditConfirming ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90" : "bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)]"}`}
               >
                 {creditSaving ? "..." : creditConfirming ? t("admin.credits.confirm") : t("admin.credits.adjust")}
               </Button>
@@ -478,6 +680,63 @@ export function ClientsClient({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Role change confirm dialog */}
+      <Dialog open={!!roleTarget} onOpenChange={(open) => { if (!open) setRoleTarget(null); }}>
+        <DialogContent className="border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] text-[var(--ice-white)] sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-[var(--font-lexend)]">{t("admin.clients.changeRole")}</DialogTitle>
+            <DialogDescription className="text-[rgba(245,246,252,0.5)]">
+              {t("admin.clients.changeRole.confirm")
+                .replace("{name}", roleTarget?.name || "")
+                .replace("{role}", pendingRole)}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" onClick={() => setRoleTarget(null)} className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]">
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleRoleChange}
+              disabled={roleChanging}
+              className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+            >
+              {roleChanging ? "..." : "Confirm"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function MarkAsMenu({
+  user,
+  onMark,
+  t,
+}: {
+  user: UserRow;
+  onMark: (id: string, tag: string | null) => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="p-1 text-[rgba(245,246,252,0.4)] hover:text-[var(--ice-white)] transition-colors rounded">
+        <MoreVertical className="h-4 w-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="bg-[#1a1108] border-[rgba(245,246,252,0.15)] text-[var(--ice-white)]">
+        <DropdownMenuItem onClick={() => onMark(user.id, "testing")} className="cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+          {t("admin.clients.markAs.testing")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onMark(user.id, "internal")} className="cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+          {t("admin.clients.markAs.internal")}
+        </DropdownMenuItem>
+        {user.userTag && (
+          <DropdownMenuItem onClick={() => onMark(user.id, null)} className="cursor-pointer hover:bg-[rgba(255,255,255,0.05)] text-red-400">
+            {t("admin.clients.markAs.clear")}
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -603,5 +603,22 @@
   "admin.tickets.createCredits": "Créditos cobrados",
   "admin.tickets.createNotes": "Notas",
   "admin.tickets.createConfirm": "Criar",
-  "admin.tickets.createErrorRequired": "O cliente e a variante são obrigatórios."
+  "admin.tickets.createErrorRequired": "O cliente e a variante são obrigatórios.",
+  "admin.clients.tab.clients": "Clientes",
+  "admin.clients.tab.prospects": "Prospectos",
+  "admin.clients.tab.team": "Equipe",
+  "admin.clients.followUp.needed": "Precisa de follow-up",
+  "admin.clients.followUp.soon": "Follow-up em breve",
+  "admin.clients.followUp.new": "Novo",
+  "admin.clients.lastActive": "Última atividade",
+  "admin.clients.followUp": "Follow-up",
+  "admin.clients.markAs": "Marcar como",
+  "admin.clients.markAs.testing": "Marcar como Testing",
+  "admin.clients.markAs.internal": "Marcar como Interno/Equipe",
+  "admin.clients.markAs.clear": "Remover tag",
+  "admin.clients.markAs.success": "Usuário marcado",
+  "admin.clients.changeRole": "Mudar função",
+  "admin.clients.changeRole.confirm": "Mudar a função de {name} para {role}?",
+  "admin.clients.noProspects": "Sem prospectos ainda",
+  "admin.clients.noTeam": "Sem membros de equipe marcados"
 }

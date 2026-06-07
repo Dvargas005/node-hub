@@ -603,5 +603,22 @@
   "admin.tickets.createCredits": "Credits charged",
   "admin.tickets.createNotes": "Notes",
   "admin.tickets.createConfirm": "Create",
-  "admin.tickets.createErrorRequired": "Client and variant are required."
+  "admin.tickets.createErrorRequired": "Client and variant are required.",
+  "admin.clients.tab.clients": "Clients",
+  "admin.clients.tab.prospects": "Prospects",
+  "admin.clients.tab.team": "Team",
+  "admin.clients.followUp.needed": "Needs follow-up",
+  "admin.clients.followUp.soon": "Follow up soon",
+  "admin.clients.followUp.new": "New",
+  "admin.clients.lastActive": "Last active",
+  "admin.clients.followUp": "Follow-up",
+  "admin.clients.markAs": "Mark as",
+  "admin.clients.markAs.testing": "Mark as Testing",
+  "admin.clients.markAs.internal": "Mark as Internal/Team",
+  "admin.clients.markAs.clear": "Clear tag",
+  "admin.clients.markAs.success": "User tagged",
+  "admin.clients.changeRole": "Change role",
+  "admin.clients.changeRole.confirm": "Change {name}'s role to {role}?",
+  "admin.clients.noProspects": "No prospects yet",
+  "admin.clients.noTeam": "No team members tagged"
 }

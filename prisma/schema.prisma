@@ -39,6 +39,7 @@ model User {
   socialMedia         Json?
   onboardingCompleted Boolean   @default(false)
   freeCredits     Int       @default(0)
+  userTag         String?   // null | "testing" | "internal"
   priorities      Json?
   companyAnalysis    Json?
   companyAnalysisAt  DateTime?
