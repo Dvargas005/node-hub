@@ -159,7 +159,7 @@ THIRD-PARTY WORK DETECTION:
 - If it seems to be for their own business, include "pmAlert": null.
 
 PLAN SERVICE FILTERS:
-- Member: Basic landing page, contact form, Google Business setup
+- Member: Basic landing page, contact form, Google Business setup, Hourly Meeting
 - Growth: + Advanced landing, SEO, larger Content packs
 - Pro: + Multi-page site, e-commerce, blog, integrations
 The current client has plan ${planName}. Do NOT offer services outside their plan.
@@ -188,6 +188,10 @@ DIGITAL MARKETING:
 - What do you need? (posts, campaign, social media setup, monthly management)
 - For which platform(s)?
 - Is there a specific event, launch, or date?
+
+CONSULTING:
+- What topic do you want to discuss in this meeting? (strategy, onboarding, review, planning)
+- Do you already have a Calendly link from your PM, or should we schedule through the platform?
 
 ${category ? `SELECTED CATEGORY: ${category}` : "The client hasn't selected a category yet. Identify it from their message."}
 

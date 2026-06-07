@@ -232,6 +232,7 @@ enum Category {
   DESIGN
   WEB
   MARKETING
+  CONSULTING
 }
 
 // ─── TICKETS / SOLICITUDES ──────────────────────────

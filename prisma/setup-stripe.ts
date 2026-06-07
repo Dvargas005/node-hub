@@ -349,42 +349,9 @@ async function main() {
   console.log("\n=== Credit packs ===");
   await provisionCreditPacks();
 
-  console.log("\n=== Coupons ===");
-
-  const coupons = [
-    { id: "SOMOSLEN", percent_off: 30, duration: "forever" as const, name: "LEN Members 30% Off" },
-    { id: "NOUVOSVIP", percent_off: 7, duration: "forever" as const, name: "Nouvos VIP 7% Off" },
-  ];
-
-  for (const coupon of coupons) {
-    try {
-      await stripe.coupons.create(coupon);
-      console.log(`✅ Coupon: ${coupon.id} (${coupon.percent_off}% off)`);
-    } catch (err: any) {
-      if (err.code === "resource_already_exists") {
-        console.log(`⏭  Coupon ${coupon.id} already exists`);
-      } else {
-        console.error(`❌ Coupon ${coupon.id}: ${err.message}`);
-      }
-    }
-  }
-
-  for (const coupon of coupons) {
-    try {
-      await stripe.promotionCodes.create({
-        coupon: coupon.id,
-        code: coupon.id,
-        restrictions: { first_time_transaction: true },
-      });
-      console.log(`✅ Promo code: ${coupon.id}`);
-    } catch (err: any) {
-      if (String(err.message).includes("already exists") || err.code === "resource_already_exists") {
-        console.log(`⏭  Promo ${coupon.id} already exists`);
-      } else {
-        console.log(`Promo ${coupon.id}: ${err.message}`);
-      }
-    }
-  }
+  // Coupons disabled — LEN partnership paused
+  // console.log("\n=== Coupons ===");
+  // const coupons = [...]; // SOMOSLEN / NOUVOSVIP
 
   // Final summary table
   console.log("\n=== Final DB state (verified by re-read) ===\n");

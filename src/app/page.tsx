@@ -151,9 +151,6 @@ const C = {
       reveal: "N.O.D.E.",
     },
     pricing: {
-      lenBtn: "LEN Members",
-      lenPara: ["We proudly support the ", "Latino Entrepreneurial Network", " with exclusive pricing for their members."],
-      lenLabel: "LEN Member Exclusive Rate",
       setup: "Setup",
       oneTime: "one-time",
       payg: "…or pay as you go with 1:1 credits.",
@@ -211,9 +208,6 @@ const C = {
       reveal: "N.O.D.E.",
     },
     pricing: {
-      lenBtn: "Miembros LEN",
-      lenPara: ["Apoyamos con orgullo a la ", "Latino Entrepreneurial Network", " con precios exclusivos para sus miembros."],
-      lenLabel: "Tarifa Exclusiva Miembros LEN",
       setup: "Configuración",
       oneTime: "única vez",
       payg: "…o paga sobre la marcha con créditos 1:1.",
@@ -471,8 +465,6 @@ export default function Home() {
   const [wlEmail, setWlEmail] = useState("");
   const [wlSt, setWlSt] = useState<"idle" | "loading" | "ok" | "dup" | "err">("idle");
   const [latency, setLatency] = useState<number | null>(null);
-  const [alliance, setAlliance] = useState<string | null>(null);
-  const discount = alliance === "LEN" ? 0.7 : 1;
   const t = C[lang];
 
   useEffect(() => { const s = localStorage.getItem("node-locale"); if (s === "en" || s === "es") setLang(s); }, []);
@@ -743,26 +735,10 @@ export default function Home() {
       <section id="pricing" className="relative bg-[#FFC919] overflow-hidden">
         <div className="absolute inset-0 opacity-[0.12] mix-blend-multiply pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16">
-          {/* Alliance filter + LEN paragraph */}
-          <FadeUp>
-            <div className="flex flex-col md:flex-row md:items-center gap-4 pb-10">
-              <button
-                onClick={() => setAlliance(alliance === "LEN" ? null : "LEN")}
-                className={`shrink-0 font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.12em] px-5 py-2.5 transition-all ${alliance === "LEN" ? "bg-[#130A06] text-[#FFC919] border border-[#130A06]" : "bg-transparent text-[#130A06] border border-[#130A06]/30 hover:border-[#130A06]"}`}
-              >
-                {t.pricing.lenBtn}
-              </button>
-              <p className="font-[family-name:var(--font-atkinson)] text-[0.85rem] text-[#130A06]/60">
-                {t.pricing.lenPara[0]}
-                <a href="https://latinoentrepreneurialnetwork.org" target="_blank" rel="noopener noreferrer" className="text-[#130A06] underline decoration-[#130A06]/30 hover:decoration-[#130A06] transition-all font-bold">{t.pricing.lenPara[1]}</a>
-                {t.pricing.lenPara[2]}
-              </p>
-            </div>
-          </FadeUp>
 
           {t.pricing.plans.map((pl, i) => {
-            const price = Math.round(pl.front * discount);
-            const setup = Math.round(pl.setup * discount);
+            const price = pl.front;
+            const setup = pl.setup;
 
             return (
               <FadeUp key={pl.name} delay={i * 0.1}>
@@ -776,9 +752,6 @@ export default function Home() {
                     <p className="mt-1 font-[family-name:var(--font-atkinson)] text-[0.75rem] text-[#130A06]/50">
                       {t.pricing.setup}: <AnimatedSetup value={setup} className="inline" /> {t.pricing.oneTime}
                     </p>
-                    {alliance === "LEN" && (
-                      <p className="mt-1 font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] text-[#130A06]/70">{t.pricing.lenLabel}</p>
-                    )}
                   </div>
                   <div className="md:w-[55%]">
                     <h3 className="font-[family-name:var(--font-lexend)] font-bold text-[1.4rem] uppercase tracking-[0.1em] text-[#130A06]">{pl.name}</h3>

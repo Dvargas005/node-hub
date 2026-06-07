@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Palette, Monitor, Megaphone, ArrowRight } from "lucide-react";
+import { Palette, Monitor, Megaphone, Clock, ArrowRight } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const categories = [
   { key: "DESIGN", labelKey: "wizard.designBranding", icon: Palette },
   { key: "WEB", labelKey: "wizard.webDevelopment", icon: Monitor },
   { key: "MARKETING", labelKey: "wizard.digitalMarketing", icon: Megaphone },
+  { key: "CONSULTING", labelKey: "wizard.category.consulting", icon: Clock },
 ];
 
 export function CategorySelector({

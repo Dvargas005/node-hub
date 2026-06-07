@@ -194,7 +194,7 @@
   "auth.name": "Full name",
   "auth.businessName": "Business name",
   "auth.allianceCode": "Alliance code (optional)",
-  "auth.allianceCode.placeholder": "E.g.: LEN2026",
+  "auth.allianceCode.placeholder": "E.g.: PROMO2025",
   "auth.submit.login": "Sign in",
   "auth.submit.login.loading": "Signing in...",
   "auth.submit.register": "Sign up",
@@ -224,7 +224,7 @@
   "auth.placeholder.email": "your@email.com",
   "auth.placeholder.password": "Minimum 8 characters",
   "auth.placeholder.businessName": "My Business LLC",
-  "auth.placeholder.allianceCode": "E.g.: LEN2026",
+  "auth.placeholder.allianceCode": "E.g.: PROMO2025",
   "auth.placeholder.newPassword": "Minimum 8 characters",
   "auth.placeholder.confirmPassword": "Repeat your password",
   "settings.deliveryLanguage.saved": "Delivery language updated",
@@ -505,5 +505,10 @@
   "auth.alliance.label": "Alliance:",
   "auth.alliance.invalid": "Invalid code",
   "dashboard.analysis.choosing": "Analyzing...",
-  "dashboard.analysis.choose": "Choose this profile"
+  "dashboard.analysis.choose": "Choose this profile",
+  "wizard.category.consulting": "Consulting",
+  "wizard.category.consulting.desc": "Book meetings and consultations",
+  "wizard.consulting": "Consulting",
+  "service.hourlyMeeting": "Hourly Meeting",
+  "service.hourlyMeeting.desc": "One-on-one meeting with your PM or specialist. 1 hour minimum."
 }

@@ -194,7 +194,7 @@
   "auth.name": "Nombre completo",
   "auth.businessName": "Nombre de tu negocio",
   "auth.allianceCode": "Código de alianza (opcional)",
-  "auth.allianceCode.placeholder": "Ej: LEN2026",
+  "auth.allianceCode.placeholder": "Ej: PROMO2025",
   "auth.submit.login": "Entrar",
   "auth.submit.login.loading": "Entrando...",
   "auth.submit.register": "Registrarme",
@@ -224,7 +224,7 @@
   "auth.placeholder.email": "tu@email.com",
   "auth.placeholder.password": "Mínimo 8 caracteres",
   "auth.placeholder.businessName": "Mi Empresa S.A.",
-  "auth.placeholder.allianceCode": "Ej: LEN2026",
+  "auth.placeholder.allianceCode": "Ej: PROMO2025",
   "auth.placeholder.newPassword": "Mínimo 8 caracteres",
   "auth.placeholder.confirmPassword": "Repite tu contraseña",
   "settings.deliveryLanguage.saved": "Idioma de entregables actualizado",
@@ -505,5 +505,10 @@
   "auth.alliance.label": "Alianza:",
   "auth.alliance.invalid": "Código no válido",
   "dashboard.analysis.choosing": "Analizando...",
-  "dashboard.analysis.choose": "Elegir este perfil"
+  "dashboard.analysis.choose": "Elegir este perfil",
+  "wizard.category.consulting": "Consultoría",
+  "wizard.category.consulting.desc": "Agenda reuniones y consultorías",
+  "wizard.consulting": "Consultoría",
+  "service.hourlyMeeting": "Reunión por hora",
+  "service.hourlyMeeting.desc": "Reunión uno a uno con tu PM o especialista. 1 hora mínimo."
 }

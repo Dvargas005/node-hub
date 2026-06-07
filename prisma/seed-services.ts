@@ -1,14 +1,12 @@
 /**
- * Real service catalog seed — pricing benchmarked against Tigrenator
- * (Venezuela "Emprendimiento" tier, semi-senior, remote, unlimited revisions).
+ * Real service catalog seed — updated pricing (50% increase, min 75cr).
  *
- * Rule: N.O.D.E. credit cost ≤ Tigrenator USD price, rounded to multiples of 5.
  * 1 credit = $1 USD.
  *
  * Plan caps:
- *   Member  140 credits/mo · 5 day SLA  → "basic" variants
- *   Growth  350 credits/mo · 3 day SLA  → "standard" variants
- *   Pro     650 credits/mo · 2 day SLA  → "premium" variants
+ *   Member  140 credits/mo · 5 day SLA
+ *   Growth  350 credits/mo · 3 day SLA
+ *   Pro     650 credits/mo · 2 day SLA
  *
  * Wipes all existing services + variants. Safe only if there are 0 tickets.
  */
@@ -33,7 +31,7 @@ interface VariantSeed {
 interface ServiceSeed {
   name: string;
   slug: string;
-  category: "DESIGN" | "WEB" | "MARKETING";
+  category: "DESIGN" | "WEB" | "MARKETING" | "CONSULTING";
   description: string;
   icon: string | null;
   tags: string[];
@@ -42,6 +40,28 @@ interface ServiceSeed {
 }
 
 const services: ServiceSeed[] = [
+  // ═══ CONSULTING ═══════════════════════════════════
+  {
+    name: "Hourly Meeting",
+    slug: "hourly-meeting",
+    category: "CONSULTING",
+    description: "One-on-one meeting with your Project Manager or specialist. 1 hour minimum.",
+    icon: "clock",
+    tags: ["meeting", "consulting", "pm", "call"],
+    sortOrder: 0,
+    variants: [
+      {
+        name: "1-Hour Meeting",
+        creditCost: 75,
+        description: "One-on-one consultation with your PM or specialist. Scheduled via Calendly.",
+        estimatedDays: 1,
+        minPlan: null,
+        isPopular: true,
+        sortOrder: 1,
+      },
+    ],
+  },
+
   // ═══ DESIGN ═══════════════════════════════════════
   {
     name: "Logo Design",
@@ -54,7 +74,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Basic Logo",
-        creditCost: 60,
+        creditCost: 90,
         description: "2 concepts, clean and simple. PNG/SVG/PDF export.",
         estimatedDays: 3,
         minPlan: null,
@@ -63,7 +83,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Brand Starter",
-        creditCost: 120,
+        creditCost: 180,
         description: "Logo + color palette + typography + 1-page brand sheet.",
         estimatedDays: 5,
         minPlan: null,
@@ -71,7 +91,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Full Brand Identity",
-        creditCost: 250,
+        creditCost: 375,
         description: "Logo, palette, typography, mini brand book, business card and 3 social templates.",
         estimatedDays: 7,
         minPlan: "growth",
@@ -91,7 +111,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Template Pack",
-        creditCost: 80,
+        creditCost: 120,
         description: "10 editable post templates (Canva or Figma) in your brand style.",
         estimatedDays: 3,
         minPlan: null,
@@ -100,7 +120,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Full Social Kit",
-        creditCost: 180,
+        creditCost: 270,
         description: "20 templates + story templates + highlight covers + bio header.",
         estimatedDays: 5,
         minPlan: "growth",
@@ -119,7 +139,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Single Piece",
-        creditCost: 70,
+        creditCost: 105,
         description: "One print piece: flyer, business card, poster or postcard. Print-ready PDF.",
         estimatedDays: 2,
         minPlan: null,
@@ -128,7 +148,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Marketing Collateral Pack",
-        creditCost: 180,
+        creditCost: 270,
         description: "3 coordinated pieces (e.g. flyer + card + poster) with consistent branding.",
         estimatedDays: 5,
         minPlan: "growth",
@@ -147,7 +167,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Simple Illustration",
-        creditCost: 70,
+        creditCost: 105,
         description: "One custom illustration: spot art, character or icon. Vector + PNG.",
         estimatedDays: 3,
         minPlan: null,
@@ -155,7 +175,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Custom Illustration Pack",
-        creditCost: 200,
+        creditCost: 300,
         description: "3 cohesive illustrations in the same style. Source files included.",
         estimatedDays: 5,
         minPlan: "growth",
@@ -174,7 +194,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Pitch Deck",
-        creditCost: 130,
+        creditCost: 195,
         description: "10 slides, branded, ready to present. PowerPoint + PDF.",
         estimatedDays: 3,
         minPlan: null,
@@ -182,7 +202,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Corporate Presentation",
-        creditCost: 280,
+        creditCost: 420,
         description: "20+ slides with charts, data viz, custom layouts and animations.",
         estimatedDays: 5,
         minPlan: "growth",
@@ -203,7 +223,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Basic Landing",
-        creditCost: 100,
+        creditCost: 150,
         description: "Single-section landing with hero, features, contact form. Mobile responsive.",
         estimatedDays: 4,
         minPlan: null,
@@ -212,7 +232,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Advanced Landing with SEO",
-        creditCost: 220,
+        creditCost: 330,
         description: "Multi-section landing, SEO meta + structured data, performance optimized, analytics.",
         estimatedDays: 6,
         minPlan: null,
@@ -231,7 +251,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Single Page Site",
-        creditCost: 200,
+        creditCost: 300,
         description: "Single-page site with multiple sections, contact form and basic SEO.",
         estimatedDays: 5,
         minPlan: null,
@@ -239,7 +259,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Multi-page Website",
-        creditCost: 350,
+        creditCost: 525,
         description: "3–5 page site (home, about, services, contact). CMS optional.",
         estimatedDays: 7,
         minPlan: "growth",
@@ -259,7 +279,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Basic Store",
-        creditCost: 400,
+        creditCost: 600,
         description: "Up to 20 products, payment gateway, basic checkout. Shopify or WooCommerce.",
         estimatedDays: 8,
         minPlan: "growth",
@@ -267,7 +287,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Full Store",
-        creditCost: 600,
+        creditCost: 900,
         description: "Unlimited products, advanced checkout, integrations (CRM/email), custom theme.",
         estimatedDays: 10,
         minPlan: "pro",
@@ -286,7 +306,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Contact Form",
-        creditCost: 50,
+        creditCost: 75,
         description: "Branded contact form with email delivery. Embeddable anywhere.",
         estimatedDays: 2,
         minPlan: null,
@@ -294,7 +314,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Custom Web Tool",
-        creditCost: 250,
+        creditCost: 375,
         description: "Custom calculator, quote generator, booking widget or similar utility.",
         estimatedDays: 6,
         minPlan: "growth",
@@ -313,7 +333,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Google Business Setup",
-        creditCost: 60,
+        creditCost: 90,
         description: "Full GBP setup: categories, services, photos, hours, posts and Q&A seed.",
         estimatedDays: 2,
         minPlan: null,
@@ -322,7 +342,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Local SEO Pack",
-        creditCost: 150,
+        creditCost: 225,
         description: "GBP optimization + 10 citation listings + local schema markup + review strategy.",
         estimatedDays: 4,
         minPlan: null,
@@ -343,7 +363,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "4 Posts",
-        creditCost: 80,
+        creditCost: 120,
         description: "4 branded posts with copy + hashtags. Ready to schedule.",
         estimatedDays: 3,
         minPlan: null,
@@ -352,7 +372,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "8 Posts",
-        creditCost: 140,
+        creditCost: 210,
         description: "8 branded posts with copy + hashtags + 2 carousel ideas.",
         estimatedDays: 4,
         minPlan: null,
@@ -360,7 +380,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "12 Posts + Stories",
-        creditCost: 240,
+        creditCost: 360,
         description: "12 feed posts + 6 story templates + content calendar.",
         estimatedDays: 6,
         minPlan: "growth",
@@ -379,7 +399,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Basic Management",
-        creditCost: 180,
+        creditCost: 270,
         description: "1 month: scheduling + community responses + monthly report. Content from your library.",
         estimatedDays: 30,
         minPlan: "growth",
@@ -387,7 +407,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Full Management",
-        creditCost: 350,
+        creditCost: 525,
         description: "1 month: strategy + content creation (12 posts) + scheduling + community + monthly report.",
         estimatedDays: 30,
         minPlan: "growth",
@@ -406,7 +426,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "SEO Audit",
-        creditCost: 100,
+        creditCost: 150,
         description: "Full technical and on-page audit with prioritized action plan.",
         estimatedDays: 3,
         minPlan: null,
@@ -414,7 +434,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "SEO Foundation",
-        creditCost: 200,
+        creditCost: 300,
         description: "Audit + on-page fixes + meta tags + sitemap + 5 keyword targets.",
         estimatedDays: 5,
         minPlan: null,
@@ -423,7 +443,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Ongoing SEO",
-        creditCost: 400,
+        creditCost: 600,
         description: "1 month: technical maintenance + 2 optimized blog posts + backlink outreach + monthly report.",
         estimatedDays: 30,
         minPlan: "growth",
@@ -442,7 +462,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Organic Campaign",
-        creditCost: 150,
+        creditCost: 225,
         description: "3-week organic campaign: 6 posts + 6 stories + email + landing copy.",
         estimatedDays: 5,
         minPlan: null,
@@ -450,7 +470,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Paid Campaign Setup",
-        creditCost: 250,
+        creditCost: 375,
         description: "Meta or Google Ads setup: audiences, creatives (3 variants), copy, conversion tracking. Ad spend NOT included.",
         estimatedDays: 5,
         minPlan: "growth",
@@ -469,7 +489,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Template + Setup",
-        creditCost: 80,
+        creditCost: 120,
         description: "Branded email template + ESP setup (Mailchimp or similar) + welcome email.",
         estimatedDays: 3,
         minPlan: null,
@@ -477,7 +497,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Full Campaign",
-        creditCost: 250,
+        creditCost: 375,
         description: "5-email campaign with copy + automation flow + segmentation + reporting.",
         estimatedDays: 7,
         minPlan: "growth",
@@ -496,7 +516,7 @@ const services: ServiceSeed[] = [
     variants: [
       {
         name: "Setup",
-        creditCost: 60,
+        creditCost: 90,
         description: "WhatsApp Business profile setup with catalog, greetings and business hours.",
         estimatedDays: 2,
         minPlan: null,
@@ -504,7 +524,7 @@ const services: ServiceSeed[] = [
       },
       {
         name: "Setup + Auto-responses",
-        creditCost: 150,
+        creditCost: 225,
         description: "Full setup + 5 quick replies + greeting/away messages + catalog with up to 10 products.",
         estimatedDays: 4,
         minPlan: "growth",
@@ -515,9 +535,8 @@ const services: ServiceSeed[] = [
 ];
 
 async function main() {
-  console.log("🌱 Seeding service catalog (Tigrenator-benchmarked)...\n");
+  console.log("🌱 Seeding service catalog (50% price increase, min 75cr)...\n");
 
-  // Wipe existing
   const variantsBefore = await prisma.serviceVariant.count();
   const servicesBefore = await prisma.service.count();
   await prisma.serviceVariant.deleteMany({});
@@ -541,12 +560,11 @@ async function main() {
       totalVariants++;
     }
     console.log(
-      `✅ ${s.category.padEnd(9)} ${s.name.padEnd(28)} ${variants.length} variants  (${variants.map((v: VariantSeed) => v.creditCost + "cr").join(", ")})`,
+      `✅ ${s.category.padEnd(11)} ${s.name.padEnd(28)} ${variants.length} variants  (${variants.map((v: VariantSeed) => v.creditCost + "cr").join(", ")})`,
     );
   }
 
   console.log(`\n🎉 Done. ${services.length} services, ${totalVariants} variants.`);
-
   await prisma.$disconnect();
 }
 
