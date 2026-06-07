@@ -48,8 +48,8 @@ const goldBtn = "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-
 const outBtn = "border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)] text-xs";
 const secHdr = "font-[var(--font-lexend)] text-xs text-[rgba(245,246,252,0.5)] uppercase tracking-wider";
 
-const fmt = (iso: string) => new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-const fmtS = (iso: string) => new Date(iso).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+const fmt = (iso: string) => new Date(iso).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmtS = (iso: string) => new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
 export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket: TicketData; availableFreelancers: Freelancer[] }) {
   const router = useRouter();
@@ -64,7 +64,7 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
   const [pmNotes, setPmNotes] = useState(t.pmNotes || "");
   const [showAssign, setShowAssign] = useState(false);
   const [assigning, setAssigning] = useState(false);
-  const [showSurcharge, setShowSurcharge] = useState<"recargo" | "reembolso" | null>(null);
+  const [showSurcharge, setShowSurcharge] = useState<"surcharge" | "refund" | null>(null);
   const [surAmt, setSurAmt] = useState("");
   const [surReason, setSurReason] = useState("");
 
@@ -103,14 +103,14 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
   };
 
   const submitSurcharge = async () => {
-    const amount = showSurcharge === "reembolso" ? -Math.abs(Number(surAmt)) : Math.abs(Number(surAmt));
+    const amount = showSurcharge === "refund" ? -Math.abs(Number(surAmt)) : Math.abs(Number(surAmt));
     if (!amount || !surReason.trim()) return;
-    const endpoint = showSurcharge === "reembolso" ? `/api/admin/tickets/${t.id}/refund` : `/api/admin/tickets/${t.id}/surcharge`;
+    const endpoint = showSurcharge === "refund" ? `/api/admin/tickets/${t.id}/refund` : `/api/admin/tickets/${t.id}/surcharge`;
     const r = await api(endpoint, { method: "POST", body: JSON.stringify({ amount: Math.abs(Number(surAmt)), reason: surReason.trim() }) });
     if (r) { setSurAmt(""); setSurReason(""); setShowSurcharge(null); }
   };
 
-  const isPmAlert = t.pmNotes && (t.pmNotes.startsWith("[AUTO]") || t.pmNotes.startsWith("[SYSTEM]") || t.pmNotes.includes("alerta"));
+  const isPmAlert = t.pmNotes && (t.pmNotes.startsWith("[AUTO]") || t.pmNotes.startsWith("[SYSTEM]") || t.pmNotes.includes("alerta") || t.pmNotes.includes("alert"));
   const briefEntries = t.briefStructured ? Object.entries(t.briefStructured).filter(([k]: any) => k !== "pmAlert") : [];
 
   return (
@@ -303,12 +303,12 @@ export function TicketAdminClient({ ticket: t, availableFreelancers }: { ticket:
             <CardHeader className="pb-2"><CardTitle className={secHdr}>Adjustments</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "recargo" ? null : "recargo")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Surcharge</Button>
-                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "reembolso" ? null : "reembolso")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Refund</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "surcharge" ? null : "surcharge")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Surcharge</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSurcharge(showSurcharge === "refund" ? null : "refund")} className={`${outBtn} gap-1`}><DollarSign className="h-3 w-3" /> Refund</Button>
               </div>
               {showSurcharge && (
                 <div className="space-y-2 rounded-md border border-[rgba(245,246,252,0.1)] p-2">
-                  <label className={lbl}>{showSurcharge === "recargo" ? "Surcharge" : "Refund"}</label>
+                  <label className={lbl}>{showSurcharge === "surcharge" ? "Surcharge" : "Refund"}</label>
                   <input type="number" className={inp} placeholder="Amount (credits)" value={surAmt} onChange={(e) => setSurAmt(e.target.value)} />
                   <input className={inp} placeholder="Reason" value={surReason} onChange={(e) => setSurReason(e.target.value)} />
                   <Button size="sm" disabled={saving || !surAmt || !surReason.trim()} onClick={submitSurcharge} className={goldBtn}>Apply</Button>

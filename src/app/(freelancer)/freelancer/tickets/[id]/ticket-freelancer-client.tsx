@@ -30,8 +30,8 @@ const goldBtn = "bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-
 const dlvLabels: Record<string, string> = { PENDING_REVIEW: "Pending", PM_APPROVED: "PM Approved", SENT_TO_CLIENT: "Sent", CLIENT_APPROVED: "Client Approved", REVISION_REQUESTED: "Revision" };
 const dlvColors: Record<string, string> = { PENDING_REVIEW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", PM_APPROVED: "bg-blue-500/20 text-blue-400 border-blue-500/30", SENT_TO_CLIENT: "bg-purple-500/20 text-purple-400 border-purple-500/30", CLIENT_APPROVED: "bg-green-500/20 text-green-400 border-green-500/30", REVISION_REQUESTED: "bg-red-500/20 text-red-400 border-red-500/30" };
 const BRIEF_LABELS: Record<string, string> = { objective: "Objective", audience: "Audience", tone: "Tone", style: "Style", dimensions: "Dimensions", format: "Format", references: "References", extras: "Extras", description: "Description" };
-const fmt = (iso: string) => new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-const fmtD = (iso: string) => new Date(iso).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+const fmt = (iso: string) => new Date(iso).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmtD = (iso: string) => new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
 export function TicketFreelancerClient({ ticket: t }: { ticket: TicketData }) {
   const router = useRouter();

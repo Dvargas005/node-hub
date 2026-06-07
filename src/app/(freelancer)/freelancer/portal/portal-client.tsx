@@ -28,7 +28,7 @@ interface Props {
 
 const crd = "border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]";
 const sub = "text-sm text-[rgba(245,246,252,0.5)]";
-const fmt = (iso: string) => new Date(iso).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+const fmt = (iso: string) => new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 const AVAILABILITY_CYCLE = ["AVAILABLE", "BUSY", "ON_LEAVE"];
 
 export function PortalClient({ freelancer, activeTickets, completedTickets, activeCount, completedThisMonth }: Props) {

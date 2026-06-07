@@ -192,7 +192,7 @@ export function ClientDetailClient({
       toast.success(pmId ? "PM assigned" : "PM unassigned");
       router.refresh();
     } catch {
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     }
   };
 
@@ -731,7 +731,7 @@ export function ClientDetailClient({
                     : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                 }
               >
-                {client.emailVerified ? "Yes" : "No"}
+                {client.emailVerified ? t("common.yes") : t("common.no")}
               </Badge>
             </div>
           </CardContent>

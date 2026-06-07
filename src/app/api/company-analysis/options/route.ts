@@ -15,16 +15,16 @@ function sanitize(str: unknown): string {
 
 function buildBusinessContext(user: Record<string, unknown>, webContent: string) {
   const sm = user.socialMedia as Record<string, string> | null;
-  const socialStr = sm ? Object.entries(sm).map(([k, v]: [string, any]) => `${k}: ${sanitize(String(v))}`).join(", ") : "No tiene";
+  const socialStr = sm ? Object.entries(sm).map(([k, v]: [string, any]) => `${k}: ${sanitize(String(v))}`).join(", ") : "None";
 
-  return `- Nombre: ${sanitize(user.businessName) || "No especificado"}
-- Industria: ${sanitize(user.businessIndustry) || "No especificado"}
-- Descripción: ${sanitize(user.businessDescription) || "No especificado"}
-- Público: ${sanitize(user.targetAudience) || "No especificado"}
-- Marca existente: ${user.hasBranding ? "Sí" : "No"} / Colores: ${sanitize(user.brandColors) || "N/A"} / Estilo: ${sanitize(user.brandStyle) || "N/A"}
-- Sitio web: ${sanitize(user.website) || "No tiene"}
-- Redes: ${socialStr}
-${webContent ? `- Contenido del sitio web: ${webContent}` : ""}`;
+  return `- Name: ${sanitize(user.businessName) || "Not specified"}
+- Industry: ${sanitize(user.businessIndustry) || "Not specified"}
+- Description: ${sanitize(user.businessDescription) || "Not specified"}
+- Audience: ${sanitize(user.targetAudience) || "Not specified"}
+- Existing brand: ${user.hasBranding ? "Yes" : "No"} / Colors: ${sanitize(user.brandColors) || "N/A"} / Style: ${sanitize(user.brandStyle) || "N/A"}
+- Website: ${sanitize(user.website) || "None"}
+- Social media: ${socialStr}
+${webContent ? `- Website content: ${webContent}` : ""}`;
 }
 
 async function fetchWebContent(url: string): Promise<string> {
@@ -94,7 +94,7 @@ export async function POST() {
         freeCredits: true, businessName: true, businessDescription: true,
         businessIndustry: true, targetAudience: true, hasBranding: true,
         brandColors: true, brandStyle: true, website: true, socialMedia: true,
-        companyAnalysisAt: true,
+        companyAnalysisAt: true, language: true,
       },
     });
     const subscription = await db.subscription.findUnique({
@@ -138,22 +138,32 @@ export async function POST() {
     const webContent = userData?.website ? await fetchWebContent(userData.website as string) : "";
     const context = buildBusinessContext(userData as unknown as Record<string, unknown>, webContent);
 
-    const prompt = `Eres un consultor de negocios experto en pequeñas empresas latinas en Estados Unidos.
+    const userLang = (userData?.language as string) || "en";
+    const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+      en: "Respond entirely in English.",
+      es: "Respond entirely in Spanish (Responde completamente en español).",
+      pt: "Respond entirely in Portuguese (Responda completamente em português).",
+    };
+    const languageInstruction = LANGUAGE_INSTRUCTIONS[userLang] || LANGUAGE_INSTRUCTIONS.en;
 
-INFORMACIÓN DEL NEGOCIO:
+    const prompt = `You are a business consultant expert in small Latino businesses in the United States.
+
+BUSINESS INFORMATION:
 ${context}
 
-Genera DOS opciones de perfil de empresa. Cada opción tiene SOLO:
-- label: nombre del perfil
-- description: descripción ejecutiva en 3 oraciones
-- valueProposition: propuesta de valor en 1 oración
-- tone: tono de comunicación sugerido
+Generate TWO company profile options. Each option has ONLY:
+- label: profile name
+- description: executive description in 3 sentences
+- valueProposition: value proposition in 1 sentence
+- tone: suggested communication tone
 
-OPCIÓN A: Enfoque conservador/profesional
-OPCIÓN B: Enfoque moderno/atrevido
+OPTION A: Conservative/professional approach
+OPTION B: Modern/bold approach
 
-IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks, sin texto adicional.
-{"optionA":{"label":"...","description":"...","valueProposition":"...","tone":"..."},"optionB":{"label":"...","description":"...","valueProposition":"...","tone":"..."}}`;
+IMPORTANT: Respond with pure JSON only. No markdown, no backticks, no additional text.
+{"optionA":{"label":"...","description":"...","valueProposition":"...","tone":"..."},"optionB":{"label":"...","description":"...","valueProposition":"...","tone":"..."}}
+
+LANGUAGE: ${languageInstruction}`;
 
     let options = null;
     const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];

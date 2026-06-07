@@ -2,23 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import { parseGeminiJSON } from "@/lib/parse-gemini-json";
+import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT"]);
   if (error || !session) return error;
 
+  const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
+
   if (!process.env.GEMINI_API_KEY) {
     console.error("[ANALYSIS_GENERATE] GEMINI_API_KEY is not configured");
-    return NextResponse.json(
-      { error: "El análisis inteligente no está disponible temporalmente. Intenta más tarde." },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: t("api.error.aiUnavailable", lang) }, { status: 503 });
   }
 
   try {
     const { option, feedback } = await req.json();
     if (option !== "A" && option !== "B") {
-      return NextResponse.json({ error: "Opción inválida" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.invalidCategory", lang) }, { status: 400 });
     }
 
     const userId = session.user.id;
@@ -28,51 +28,61 @@ export async function POST(req: NextRequest) {
         companyAnalysis: true,
         businessName: true, businessDescription: true, businessIndustry: true,
         targetAudience: true, hasBranding: true, brandColors: true,
-        brandStyle: true, website: true, socialMedia: true,
+        brandStyle: true, website: true, socialMedia: true, language: true,
       },
     });
 
     const analysis = user?.companyAnalysis as Record<string, unknown> | null;
     if (analysis?.status !== "pending_selection" || !analysis?.options) {
-      return NextResponse.json({ error: "No tienes opciones pendientes" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
 
     const options = analysis.options as Record<string, unknown>;
     const chosen = (option === "A" ? options.optionA : options.optionB) as Record<string, unknown>;
     if (!chosen) {
-      return NextResponse.json({ error: "Opción no encontrada" }, { status: 400 });
+      return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
     }
 
     const sm = user?.socialMedia as Record<string, string> | null;
-    const socialStr = sm ? Object.entries(sm).map(([k, v]) => `${k}: ${v}`).join(", ") : "No tiene";
+    const socialStr = sm ? Object.entries(sm).map(([k, v]) => `${k}: ${v}`).join(", ") : "None";
 
-    const prompt = `Eres un consultor de negocios experto en pequeñas empresas latinas en Estados Unidos.
+    const userLang = (user?.language as string) || "en";
+    const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+      en: "Respond entirely in English.",
+      es: "Respond entirely in Spanish (Responde completamente en español).",
+      pt: "Respond entirely in Portuguese (Responda completamente em português).",
+    };
+    const languageInstruction = LANGUAGE_INSTRUCTIONS[userLang] || LANGUAGE_INSTRUCTIONS.en;
 
-NEGOCIO: ${user?.businessName || ""}
-INDUSTRIA: ${user?.businessIndustry || ""}
-DESCRIPCIÓN: ${user?.businessDescription || ""}
-PÚBLICO: ${user?.targetAudience || ""}
-MARCA: ${user?.hasBranding ? "Sí" : "No"} / Colores: ${user?.brandColors || "N/A"} / Estilo: ${user?.brandStyle || "N/A"}
-WEB: ${user?.website || "No tiene"} | REDES: ${socialStr}
+    const prompt = `You are a business consultant expert in small Latino businesses in the United States.
 
-EL CLIENTE ELIGIÓ ESTE PERFIL:
+BUSINESS: ${user?.businessName || ""}
+INDUSTRY: ${user?.businessIndustry || ""}
+DESCRIPTION: ${user?.businessDescription || ""}
+AUDIENCE: ${user?.targetAudience || ""}
+BRAND: ${user?.hasBranding ? "Yes" : "No"} / Colors: ${user?.brandColors || "N/A"} / Style: ${user?.brandStyle || "N/A"}
+WEBSITE: ${user?.website || "None"} | SOCIAL MEDIA: ${socialStr}
+
+THE CLIENT CHOSE THIS PROFILE:
 - Label: ${chosen.label}
-- Descripción: ${chosen.description}
-- Propuesta de valor: ${chosen.valueProposition}
-- Tono: ${chosen.tone}
-${feedback ? `\nFEEDBACK DEL CLIENTE: "${feedback}"` : ""}
+- Description: ${chosen.description}
+- Value proposition: ${chosen.valueProposition}
+- Tone: ${chosen.tone}
+${feedback ? `\nCLIENT FEEDBACK: "${feedback}"` : ""}
 
-Ahora genera el ANÁLISIS COMPLETO de este perfil. Incluye:
-1. description: descripción ejecutiva expandida (4-5 oraciones)
-2. valueProposition: propuesta de valor detallada
-3. targetAudience: público objetivo detallado (demografía, psicografía)
-4. competitors: 3-5 competidores del mismo mercado
-5. swot: análisis FODA centrado en presencia digital (strengths, opportunities, weaknesses, threats — 3 items cada uno)
-6. recommendations: 3 acciones prioritarias en diseño, web y marketing
-7. tone: tono de comunicación
+Now generate the COMPLETE ANALYSIS for this profile. Include:
+1. description: expanded executive description (4-5 sentences)
+2. valueProposition: detailed value proposition
+3. targetAudience: detailed target audience (demographics, psychographics)
+4. competitors: 3-5 competitors in the same market
+5. swot: SWOT analysis focused on digital presence (strengths, opportunities, weaknesses, threats — 3 items each)
+6. recommendations: 3 priority actions in design, web, and marketing
+7. tone: communication tone
 
-IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
-{"description":"...","valueProposition":"...","targetAudience":"...","competitors":["..."],"swot":{"strengths":["..."],"opportunities":["..."],"weaknesses":["..."],"threats":["..."]},"recommendations":["..."],"tone":"..."}`;
+IMPORTANT: Respond with pure JSON only. No markdown, no backticks.
+{"description":"...","valueProposition":"...","targetAudience":"...","competitors":["..."],"swot":{"strengths":["..."],"opportunities":["..."],"weaknesses":["..."],"threats":["..."]},"recommendations":["..."],"tone":"..."}
+
+LANGUAGE: ${languageInstruction}`;
 
     let result = null;
     const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
@@ -96,7 +106,7 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
     }
 
     if (!result) {
-      return NextResponse.json({ error: "No se pudo completar el análisis. Intenta de nuevo." }, { status: 500 });
+      return NextResponse.json({ error: t("api.error.aiFailed", lang) }, { status: 502 });
     }
 
     // Merge chosen label/tone with full analysis
@@ -117,6 +127,6 @@ IMPORTANTE: Responde ÚNICAMENTE con JSON puro. Sin markdown, sin backticks.
     return NextResponse.json({ analysis: fullAnalysis });
   } catch (err) {
     console.error("[ANALYSIS_GENERATE]", err);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 500 });
   }
 }

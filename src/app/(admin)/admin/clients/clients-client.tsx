@@ -102,11 +102,11 @@ export function ClientsClient({
     setCreditError("");
     const amountNum = parseInt(creditAmount, 10);
     if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      setCreditError("Invalid amount");
+      setCreditError(t("api.error.amountGreaterThanZero"));
       return;
     }
     if (creditReason.trim().length < 3) {
-      setCreditError("Reason required (min 3 chars)");
+      setCreditError(t("api.error.reasonRequired"));
       return;
     }
     if (!creditConfirming) {
@@ -152,7 +152,7 @@ export function ClientsClient({
       router.refresh();
     } catch (err: any) {
       console.error("Error assigning PM", err);
-      toast.error("Connection error");
+      toast.error(t("common.connectionError"));
     }
   };
 

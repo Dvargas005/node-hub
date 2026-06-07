@@ -69,7 +69,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[var(--ice-white)]">
-          Códigos Promocionales
+          Promo Codes
         </h1>
         <button
           onClick={() => setShowDialog(true)}
@@ -85,12 +85,12 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
         <table className="w-full text-sm text-[var(--ice-white)]">
           <thead>
             <tr className="border-b border-[rgba(245,246,252,0.1)] text-left text-xs uppercase text-[rgba(245,246,252,0.5)]">
-              <th className="px-4 py-3">Código</th>
-              <th className="px-4 py-3">Tipo</th>
-              <th className="px-4 py-3">Valor</th>
-              <th className="px-4 py-3">Usos</th>
-              <th className="px-4 py-3">Válido desde</th>
-              <th className="px-4 py-3">Válido hasta</th>
+              <th className="px-4 py-3">Code</th>
+              <th className="px-4 py-3">Type</th>
+              <th className="px-4 py-3">Value</th>
+              <th className="px-4 py-3">Uses</th>
+              <th className="px-4 py-3">Valid from</th>
+              <th className="px-4 py-3">Valid until</th>
               <th className="px-4 py-3">Active</th>
             </tr>
           </thead>
@@ -142,7 +142,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                   colSpan={7}
                   className="px-4 py-8 text-center text-[rgba(245,246,252,0.4)]"
                 >
-                  No hay códigos promocionales
+                  No promo codes
                 </td>
               </tr>
             )}
@@ -155,7 +155,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="w-full max-w-md rounded-lg border border-[rgba(245,246,252,0.1)] bg-[var(--asphalt-black)] p-6 text-[var(--ice-white)]">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold">New code promocional</h2>
+              <h2 className="text-lg font-bold">New promo code</h2>
               <button
                 onClick={() => setShowDialog(false)}
                 className="text-[rgba(245,246,252,0.5)] hover:text-[var(--ice-white)]"
@@ -167,7 +167,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
             <div className="space-y-3">
               <div>
                 <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                  Código
+                  Code
                 </label>
                 <input
                   value={form.code}
@@ -182,7 +182,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                    Tipo
+                    Type
                   </label>
                   <select
                     value={form.type}
@@ -196,7 +196,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                    Valor
+                    Value
                   </label>
                   <input
                     type="number"
@@ -210,7 +210,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
 
               <div>
                 <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                  Usos máximos (vacío = ilimitado)
+                  Max uses (empty = unlimited)
                 </label>
                 <input
                   type="number"
@@ -226,7 +226,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                    Válido desde
+                    Valid from
                   </label>
                   <input
                     type="date"
@@ -239,7 +239,7 @@ export function PromosClient({ initialPromos }: { initialPromos: any[] }) {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs text-[rgba(245,246,252,0.5)]">
-                    Válido hasta
+                    Valid until
                   </label>
                   <input
                     type="date"

@@ -235,7 +235,7 @@ export function ServicesClient({
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="font-[var(--font-lexend)] text-2xl font-bold text-[var(--ice-white)]">
-          Catalogo de Servicios
+          Service Catalog
         </h1>
         {isAdmin && (
           <Button className={goldBtn} onClick={openNewService}>
@@ -399,7 +399,7 @@ export function ServicesClient({
                             onClick={() => openNewVariant(service.id)}
                             className="flex items-center gap-1 text-xs text-[var(--gold-bar)] hover:opacity-80 pt-1"
                           >
-                            <Plus className="h-3 w-3" /> Nueva variante
+                            <Plus className="h-3 w-3" /> New variant
                           </button>
                         )}
                       </div>
@@ -414,7 +414,7 @@ export function ServicesClient({
 
       {filtered.length === 0 && (
         <p className="text-sm text-[rgba(245,246,252,0.4)] text-center py-12">
-          No se encontraron servicios.
+          No services found.
         </p>
       )}
 
@@ -435,7 +435,7 @@ export function ServicesClient({
             )}
 
             <div>
-              <label className={lbl}>Nombre</label>
+              <label className={lbl}>Name</label>
               <input
                 className={inp}
                 value={svcForm.name}
@@ -460,20 +460,20 @@ export function ServicesClient({
             </div>
 
             <div>
-              <label className={lbl}>Categoria</label>
+              <label className={lbl}>Category</label>
               <select
                 className={sel}
                 value={svcForm.category}
                 onChange={(e) => setSvcForm((f) => ({ ...f, category: e.target.value }))}
               >
-                <option value="DESIGN">Diseno</option>
+                <option value="DESIGN">Design</option>
                 <option value="WEB">Web</option>
                 <option value="MARKETING">Marketing</option>
               </select>
             </div>
 
             <div>
-              <label className={lbl}>Descripcion</label>
+              <label className={lbl}>Description</label>
               <textarea
                 className={`${inp} min-h-[60px] resize-y`}
                 value={svcForm.description}
@@ -482,7 +482,7 @@ export function ServicesClient({
             </div>
 
             <div>
-              <label className={lbl}>Descripcion larga</label>
+              <label className={lbl}>Long description</label>
               <textarea
                 className={`${inp} min-h-[60px] resize-y`}
                 value={svcForm.longDescription}
@@ -545,7 +545,7 @@ export function ServicesClient({
                 className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)] text-xs"
                 onClick={() => setSvcOpen(false)}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button className={goldBtn} size="sm" onClick={saveService} disabled={saving}>
                 {saving ? "Saving..." : "Save"}
@@ -572,7 +572,7 @@ export function ServicesClient({
             )}
 
             <div>
-              <label className={lbl}>Nombre</label>
+              <label className={lbl}>Name</label>
               <input
                 className={inp}
                 value={varForm.name}
@@ -582,7 +582,7 @@ export function ServicesClient({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={lbl}>Creditos</label>
+                <label className={lbl}>Credits</label>
                 <input
                   type="number"
                   className={inp}
@@ -591,7 +591,7 @@ export function ServicesClient({
                 />
               </div>
               <div>
-                <label className={lbl}>Dias estimados</label>
+                <label className={lbl}>Est. days</label>
                 <input
                   type="number"
                   className={inp}
@@ -602,7 +602,7 @@ export function ServicesClient({
             </div>
 
             <div>
-              <label className={lbl}>Descripcion</label>
+              <label className={lbl}>Description</label>
               <textarea
                 className={`${inp} min-h-[60px] resize-y`}
                 value={varForm.description}
@@ -612,7 +612,7 @@ export function ServicesClient({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={lbl}>Plan minimo</label>
+                <label className={lbl}>Min plan</label>
                 <select
                   className={sel}
                   value={varForm.minPlan}
@@ -624,7 +624,7 @@ export function ServicesClient({
                 </select>
               </div>
               <div>
-                <label className={lbl}>Orden</label>
+                <label className={lbl}>Order</label>
                 <input
                   type="number"
                   className={inp}

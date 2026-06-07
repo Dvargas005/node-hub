@@ -64,7 +64,7 @@ export function TicketDetailClient({
   ticket: TicketData; messages: Message[]; deliveries: Delivery[];
 }) {
   const router = useRouter();
-  const { lang } = useTranslation();
+  const { lang, t } = useTranslation();
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -252,7 +252,7 @@ export function TicketDetailClient({
                     <textarea
                       value={revisionFeedback}
                       onChange={(e) => setRevisionFeedback(e.target.value)}
-                      placeholder="What adjustments do you need?"
+                      placeholder={t("api.error.describeAdjustments")}
                       rows={3}
                       className="w-full border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] p-2 text-sm resize-none"
                     />
@@ -289,7 +289,7 @@ export function TicketDetailClient({
                     }`}>
                       <p className="whitespace-pre-wrap">{m.content}</p>
                       <p className={`text-[10px] mt-1 ${m.senderRole === "CLIENT" ? "text-[rgba(19,10,6,0.5)]" : "text-[rgba(245,246,252,0.3)]"}`}>
-                        {new Date(m.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(m.createdAt).toLocaleString("en-US", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
                       {m.attachments.map((a: any) => (
                         <a key={a.url} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs mt-1 underline">
@@ -307,7 +307,7 @@ export function TicketDetailClient({
                   <textarea
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Write a message..."
+                    placeholder={t("tickets.messagePlaceholder")}
                     rows={1}
                     className="flex-1 border border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] px-3 py-2 text-sm resize-none"
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())}

@@ -245,12 +245,12 @@ export function RegisterForm() {
             </div>
             {allianceValid === true && (
               <p className="text-xs text-green-400">
-                Alianza: {allianceName}
+                {t("auth.alliance.label")} {allianceName}
               </p>
             )}
             {allianceValid === false && allianceCode && (
               <p className="text-xs text-red-400">
-                Código no válido
+                {t("auth.alliance.invalid")}
               </p>
             )}
           </div>

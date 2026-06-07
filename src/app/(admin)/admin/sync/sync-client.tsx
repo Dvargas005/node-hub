@@ -26,7 +26,7 @@ const thCls = "text-left text-xs font-medium text-[rgba(245,246,252,0.5)] pb-2";
 const tdCls = "py-1.5 text-sm text-[var(--ice-white)]";
 
 function fmt(iso: string) {
-  return new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
 export function SyncClient({ reports }: { reports: SyncReport[] }) {
@@ -52,7 +52,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
 
   function reportSummary(r: SyncReport) {
     const d = r.data as any;
-    return `${d?.outdatedPrices?.length || 0} precios, ${d?.newSuggestions?.length || 0} nuevos, ${d?.noMatch?.length || 0} sin match`;
+    return `${d?.outdatedPrices?.length || 0} prices, ${d?.newSuggestions?.length || 0} new, ${d?.noMatch?.length || 0} no match`;
   }
 
   return (
@@ -71,12 +71,12 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
         <div className="space-y-4">
           {/* Outdated Prices */}
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Precios desactualizados ({prices.length})</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>Outdated prices ({prices.length})</CardTitle></CardHeader>
             <CardContent>
               {prices.length === 0 ? <p className={sub}>All prices are up to date</p> : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead><tr><th className={thCls}>Servicio</th><th className={thCls}>Variante</th><th className={thCls}>Actual</th><th className={thCls}>Tigrenator</th><th className={thCls}>Diferencia</th></tr></thead>
+                    <thead><tr><th className={thCls}>Service</th><th className={thCls}>Variant</th><th className={thCls}>Current</th><th className={thCls}>Tigrenator</th><th className={thCls}>Difference</th></tr></thead>
                     <tbody>
                       {prices.map((p: any, i: number) => (
                         <tr key={i} className="border-t border-[rgba(245,246,252,0.05)]">
@@ -96,7 +96,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
 
           {/* New Suggestions */}
           <Card className={crd}>
-            <CardHeader className="pb-2"><CardTitle className={secHdr}>Servicios nuevos sugeridos ({suggestions.length})</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className={secHdr}>New suggested services ({suggestions.length})</CardTitle></CardHeader>
             <CardContent>
               {suggestions.length === 0 ? <p className={sub}>No new suggestions</p> : (
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -106,7 +106,7 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
                         <span className="text-sm font-medium text-[var(--ice-white)]">{s.name}</span>
                         <Badge className={categoryColors[s.category] || ""}>{categoryLabels[s.category] || s.category}</Badge>
                       </div>
-                      <p className="text-xs text-[rgba(245,246,252,0.5)]">Avg: {s.avgPrice} cr &middot; Rango: {s.minPrice}-{s.maxPrice} cr &middot; Muestra: {s.sampleSize}</p>
+                      <p className="text-xs text-[rgba(245,246,252,0.5)]">Avg: {s.avgPrice} cr &middot; Range: {s.minPrice}-{s.maxPrice} cr &middot; Sample: {s.sampleSize}</p>
                     </div>
                   ))}
                 </div>
@@ -130,14 +130,14 @@ export function SyncClient({ reports }: { reports: SyncReport[] }) {
 
       {/* History */}
       <Card className={crd}>
-        <CardHeader className="pb-2"><CardTitle className={secHdr}>Historial de syncs</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className={secHdr}>Sync history</CardTitle></CardHeader>
         <CardContent className="space-y-2">
           {reports.length === 0 ? <p className={sub}>No history</p> : reports.map((r: any) => (
             <div key={r.id} className="rounded-md border border-[rgba(245,246,252,0.05)] p-2">
               <button className="w-full flex items-center justify-between text-left" onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}>
                 <span className="text-sm text-[var(--ice-white)]">{fmt(r.createdAt)}</span>
                 <div className="flex items-center gap-2">
-                  {r.appliedAt && <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">Aplicado</Badge>}
+                  {r.appliedAt && <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">Applied</Badge>}
                   {expandedId === r.id ? <ChevronUp className="h-4 w-4 text-[rgba(245,246,252,0.4)]" /> : <ChevronDown className="h-4 w-4 text-[rgba(245,246,252,0.4)]" />}
                 </div>
               </button>

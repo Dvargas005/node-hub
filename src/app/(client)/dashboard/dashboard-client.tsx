@@ -327,7 +327,7 @@ export function DashboardClient({
                       className="w-full rounded-md border border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] resize-none"
                     />
                     <Button onClick={() => handleSelect(isA ? "A" : "B")} disabled={completing} className="w-full bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold disabled:opacity-50">
-                      {completing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Generating analysis...</> : "Choose this profile"}
+                      {completing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{tr("dashboard.analysis.choosing")}</> : tr("dashboard.analysis.choose")}
                     </Button>
                   </CardContent>
                 </Card>

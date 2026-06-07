@@ -71,7 +71,7 @@ export function TeamClient({ team }: { team: TeamMember[] }) {
     if (!editingCalendly) return;
     const value = calendlyDraft.trim();
     if (value && !value.startsWith("https://calendly.com/")) {
-      toast.error("URL must start with https://calendly.com/");
+      toast.error("Invalid URL — must start with https://calendly.com/");
       return;
     }
     setSavingCalendly(true);

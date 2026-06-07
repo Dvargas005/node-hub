@@ -366,13 +366,20 @@ export function BillingClient({
                 size="sm"
                 disabled={!promoCode.trim()}
                 onClick={async () => {
-                  // Validate by checking known codes client-side (Stripe validates at checkout)
-                  const knownCodes: Record<string, number> = { SOMOSLEN: 30, NOUVOSVIP: 7 };
-                  const discount = knownCodes[promoCode.trim()];
-                  if (discount) {
-                    setPromoApplied(true);
-                    setPromoDiscount(discount);
-                  } else {
+                  try {
+                    const res = await fetch("/api/billing/validate-promo", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ code: promoCode.trim() }),
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.valid && data.type === "PERCENT_OFF" && data.value > 0) {
+                      setPromoApplied(true);
+                      setPromoDiscount(data.value);
+                    } else {
+                      setError(t("billing.invalidCode"));
+                    }
+                  } catch {
                     setError(t("billing.invalidCode"));
                   }
                 }}

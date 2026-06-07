@@ -142,7 +142,7 @@ export function TicketsClient({ tickets }: { tickets: TicketRow[] }) {
                 <div className="flex flex-wrap gap-4 mt-3 text-xs text-[rgba(245,246,252,0.4)]">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    {new Date(t.createdAt).toLocaleDateString("es-MX", {
+                    {new Date(t.createdAt).toLocaleDateString("en-US", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",

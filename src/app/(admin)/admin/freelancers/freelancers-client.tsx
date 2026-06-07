@@ -688,7 +688,7 @@ export function FreelancersClient({
 function PasswordReveal({ password }: { password: string | null }) {
   const [visible, setVisible] = useState(false);
   const { t } = useTranslation();
-  if (!password) return <span className="text-[rgba(245,246,252,0.3)] text-xs">Activo</span>;
+  if (!password) return <span className="text-[rgba(245,246,252,0.3)] text-xs">{t("common.active")}</span>;
   return (
     <div className="flex items-center gap-1.5">
       <code className="text-xs text-[rgba(245,246,252,0.6)]">{visible ? password : "••••••••••••"}</code>
