@@ -122,9 +122,9 @@ const C = {
       title: "Three service lines. Real deliverables.",
       para: "Design, web development, and digital marketing — all under one subscription. Every deliverable produced by a real team of specialists.",
       accordions: [
-        { name: "Design & Branding", items: [["Brand Starter", "from $120 credits"], ["Social Pack", "from $80 credits"], ["Flyer / Poster", "from $70 credits"], ["Business Kit", "from $250 credits"]] },
-        { name: "Web Development", items: [["Landing Page", "from $100 credits"], ["SEO Foundation", "from $200 credits"], ["Google Business", "from $60 credits"], ["Contact Form", "from $50 credits"]] },
-        { name: "Digital Marketing", items: [["Content Pack (4 posts)", "from $80 credits"], ["Content Pack (8 posts)", "from $140 credits"], ["Promo Campaign", "from $150 credits"], ["WhatsApp Business", "from $60 credits"]] },
+        { name: "Design & Branding", items: [["Brand Starter", "from $180 credits"], ["Social Pack", "from $120 credits"], ["Flyer / Poster", "from $105 credits"], ["Business Kit", "from $375 credits"]] },
+        { name: "Web Development", items: [["Landing Page", "from $150 credits"], ["SEO Foundation", "from $300 credits"], ["Google Business", "from $90 credits"], ["Contact Form", "from $75 credits"]] },
+        { name: "Digital Marketing", items: [["Content Pack (4 posts)", "from $120 credits"], ["Content Pack (8 posts)", "from $210 credits"], ["Promo Campaign", "from $225 credits"], ["WhatsApp Business", "from $90 credits"]] },
       ],
     },
     proc: [
@@ -179,9 +179,9 @@ const C = {
       title: "Tres líneas de servicio. Entregables reales.",
       para: "Diseño, desarrollo web y marketing digital — todo bajo una sola suscripción. Cada entregable producido por un equipo real de especialistas.",
       accordions: [
-        { name: "Diseño & Branding", items: [["Brand Starter", "desde $120 créditos"], ["Social Pack", "desde $80 créditos"], ["Flyer / Poster", "desde $70 créditos"], ["Business Kit", "desde $250 créditos"]] },
-        { name: "Desarrollo Web", items: [["Landing Page", "desde $100 créditos"], ["SEO Foundation", "desde $200 créditos"], ["Google Business", "desde $60 créditos"], ["Formulario de Contacto", "desde $50 créditos"]] },
-        { name: "Marketing Digital", items: [["Content Pack (4 posts)", "desde $80 créditos"], ["Content Pack (8 posts)", "desde $140 créditos"], ["Campaña Promocional", "desde $150 créditos"], ["WhatsApp Business", "desde $60 créditos"]] },
+        { name: "Diseño & Branding", items: [["Brand Starter", "desde $180 créditos"], ["Social Pack", "desde $120 créditos"], ["Flyer / Poster", "desde $105 créditos"], ["Business Kit", "desde $375 créditos"]] },
+        { name: "Desarrollo Web", items: [["Landing Page", "desde $150 créditos"], ["SEO Foundation", "desde $300 créditos"], ["Google Business", "desde $90 créditos"], ["Formulario de Contacto", "desde $75 créditos"]] },
+        { name: "Marketing Digital", items: [["Content Pack (4 posts)", "desde $120 créditos"], ["Content Pack (8 posts)", "desde $210 créditos"], ["Campaña Promocional", "desde $225 créditos"], ["WhatsApp Business", "desde $90 créditos"]] },
       ],
     },
     proc: [
