@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
+import ServiceChapters from "@/components/ServiceChapters";
 import {
   motion,
   useScroll,
@@ -10,6 +11,7 @@ import {
   useMotionValueEvent,
   useSpring,
   AnimatePresence,
+  useInView,
 } from "framer-motion";
 import Image from "next/image";
 import { MixIcon, CodeIcon, RocketIcon, PlusIcon, MinusIcon } from "@radix-ui/react-icons";
@@ -54,10 +56,17 @@ function CustomCursor() {
 
 const ease = [0.23, 1, 0.32, 1] as const;
 
+/* Reveal helpers driven by useInView (latches `true` on first view and keeps
+ * it across re-renders). Using `animate` bound to that latched flag — instead
+ * of framer's `whileInView` — means a re-render (e.g. the EN⇄ES language
+ * switch) can never reset an already-revealed block back to its hidden
+ * `initial` state, which was making sections vanish on language change. */
 function RevealLine({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
   return (
     <div className="reveal-line">
-      <motion.div initial={{ y: "100%" }} whileInView={{ y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, ease, delay }}>
+      <motion.div ref={ref} initial={{ y: "100%" }} animate={inView ? { y: 0 } : { y: "100%" }} transition={{ duration: 0.8, ease, delay }}>
         {children}
       </motion.div>
     </div>
@@ -65,16 +74,20 @@ function RevealLine({ children, delay = 0 }: { children: React.ReactNode; delay?
 }
 
 function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
   return (
-    <motion.div initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.9, ease, delay }} className={className}>
+    <motion.div ref={ref} initial={{ opacity: 0, y: 60 }} animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }} transition={{ duration: 0.9, ease, delay }} className={className}>
       {children}
     </motion.div>
   );
 }
 
 function Stagger({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
   return (
-    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ visible: { transition: { staggerChildren: 0.05 } } }} className={className}>
+    <motion.div ref={ref} initial="hidden" animate={inView ? "visible" : "hidden"} variants={{ visible: { transition: { staggerChildren: 0.05 } } }} className={className}>
       {children}
     </motion.div>
   );
@@ -617,17 +630,8 @@ export default function Home() {
             <h2 className="font-[family-name:var(--font-lexend)] font-black text-[clamp(1.9rem,4vw,3.2rem)] leading-[1.05] text-[#F5F6FC] max-w-4xl">{t.cap.title}</h2>
             <p className="mt-6 font-[family-name:var(--font-atkinson)] text-[1.15rem] text-[#F5F6FC]/60 leading-[1.8] max-w-3xl">{t.cap.sub}</p>
           </FadeUp>
-          <Stagger className="mt-12 flex flex-wrap gap-3">
-            {t.cap.services.map((s) => (
-              <motion.span
-                key={s}
-                variants={staggerChild}
-                className="px-4 py-2.5 border border-[#FFC919]/25 bg-[#FFC919]/[0.04] font-[family-name:var(--font-atkinson)] text-[0.95rem] text-[#F5F6FC]/85 hover:border-[#FFC919] hover:text-[#FFC919] hover:-translate-y-[2px] transition-all"
-              >
-                {s}
-              </motion.span>
-            ))}
-          </Stagger>
+          {/* Marc-Friedman-style chapter arc carousel of the work we do */}
+          <ServiceChapters lang={lang} />
           <FadeUp delay={0.2}>
             <div className="mt-12 flex flex-wrap gap-4">
               <a href="/register" className="bg-[#FFC919] text-[#130A06] font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.15em] px-8 py-3.5 hover:bg-[#F5F6FC] transition-all">{t.nav.register}</a>
