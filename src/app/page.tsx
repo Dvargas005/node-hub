@@ -21,33 +21,75 @@ import { MixIcon, CodeIcon, RocketIcon, PlusIcon, MinusIcon } from "@radix-ui/re
    CUSTOM CURSOR
    ═══════════════════════════════════════════ */
 
-function CustomCursor() {
+/* Targeting-reticle cursor: a precise gold center dot that tracks instantly
+ * plus four corner brackets that trail with a light spring and tighten +
+ * rotate when hovering an interactive element (a HUD "target lock"). Renders
+ * only for fine pointers (mouse/trackpad) — touch devices keep their native
+ * behaviour and the cursor-hiding class is a no-op there. */
+function TechCursor() {
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const [hovering, setHovering] = useState(false);
-  const sx = useSpring(x, { damping: 25, stiffness: 250 });
-  const sy = useSpring(y, { damping: 25, stiffness: 250 });
+  const [down, setDown] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  // ring trails with a light, snappy spring; the dot is bound to x/y directly
+  const rx = useSpring(x, { damping: 26, stiffness: 520, mass: 0.4 });
+  const ry = useSpring(y, { damping: 26, stiffness: 520, mass: 0.4 });
 
   useEffect(() => {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    setEnabled(true);
     const move = (e: MouseEvent) => { x.set(e.clientX); y.set(e.clientY); };
     const over = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("a,button,.acc-trigger,.list-row,.price-row,.lang-flag")) setHovering(true);
+      setHovering(!!t.closest("a,button,[role='button'],.acc-trigger,.list-row,.price-row,.lang-flag"));
     };
-    const out = () => setHovering(false);
+    const dn = () => setDown(true);
+    const up = () => setDown(false);
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseover", over);
-    window.addEventListener("mouseout", out);
-    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", over); window.removeEventListener("mouseout", out); };
+    window.addEventListener("mousedown", dn);
+    window.addEventListener("mouseup", up);
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseover", over);
+      window.removeEventListener("mousedown", dn);
+      window.removeEventListener("mouseup", up);
+    };
   }, [x, y]);
 
+  if (!enabled) return null;
+
   return (
-    <motion.div
-      className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full bg-[#FFC919] mix-blend-difference"
-      style={{ x: sx, y: sy, translateX: "-50%", translateY: "-50%" }}
-      animate={{ width: hovering ? 40 : 20, height: hovering ? 40 : 20 }}
-      transition={{ type: "spring", damping: 20, stiffness: 300 }}
-    />
+    <>
+      {/* precise center dot — instant tracking */}
+      <motion.div
+        className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full bg-[#FFC919]"
+        style={{ x, y, translateX: "-50%", translateY: "-50%" }}
+        animate={{ width: down ? 3 : 5, height: down ? 3 : 5, opacity: hovering ? 0 : 1 }}
+        transition={{ duration: 0.12 }}
+      />
+      {/* trailing reticle — corner brackets that lock on hover */}
+      <motion.div
+        className="fixed top-0 left-0 z-[9999] pointer-events-none"
+        style={{ x: rx, y: ry, translateX: "-50%", translateY: "-50%" }}
+        animate={{
+          width: hovering ? 46 : 28,
+          height: hovering ? 46 : 28,
+          rotate: hovering ? 45 : 0,
+          scale: down ? 0.82 : 1,
+          opacity: hovering ? 1 : 0.7,
+        }}
+        transition={{ type: "spring", damping: 22, stiffness: 320 }}
+      >
+        <svg viewBox="0 0 100 100" width="100%" height="100%" fill="none" stroke="#FFC919" strokeWidth="7" strokeLinecap="square">
+          <path d="M8 26 V8 H26" />
+          <path d="M74 8 H92 V26" />
+          <path d="M92 74 V92 H74" />
+          <path d="M26 92 H8 V74" />
+        </svg>
+      </motion.div>
+    </>
   );
 }
 
@@ -509,7 +551,7 @@ export default function Home() {
   return (
     <SmoothScroll>
     <main className="grain landing-cursor-none">
-      <CustomCursor />
+      <TechCursor />
 
       {/* ── Nav (FIX 1: flags inside nav) ── */}
       <nav className={`fixed top-0 left-0 right-0 z-40 px-6 md:px-12 py-5 flex justify-between items-center transition-all duration-500 ${scrolled ? "nav-blur" : ""}`}>
