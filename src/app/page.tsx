@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
+import HeroHud from "@/components/HeroHud";
 import {
   motion,
   useScroll,
@@ -573,6 +574,8 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay z-[2]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         {/* Layer 3: Radial gradient darken — ABOVE noise */}
         <div className="absolute inset-0 pointer-events-none z-[3]" style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(19,10,6,0.4) 50%, rgba(19,10,6,0.8) 100%)" }} />
+        {/* Layer 4: animated telemetry HUD (perfect loops) — frames the robot + wordmark */}
+        <HeroHud />
         <div className="relative z-10 text-center px-6">
           <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6">{t.hero.label}</p></RevealLine>
           <RevealLine delay={0.4}>
