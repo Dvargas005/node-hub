@@ -4,6 +4,7 @@ import { requireApiRole } from "@/lib/api-auth";
 import { sendEmail } from "@/lib/email";
 import { ticketCreatedEmail } from "@/lib/email-templates";
 import { createNotification } from "@/lib/notifications";
+import { composeDraft, genAgreementToken } from "@/lib/agreement";
 import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
@@ -162,6 +163,26 @@ export async function POST(req: NextRequest) {
 
       return newTicket;
     });
+
+    // Auto-draft a service agreement (statement of work). A PM reviews/edits
+    // the scope, then sends it for the client's e-signature. Best-effort —
+    // never block ticket creation if this fails.
+    try {
+      const draft = composeDraft({
+        serviceName: variant.service.name,
+        variantName: variant.name,
+        variantDescription: variant.description,
+        estimatedDays: variant.estimatedDays,
+        priceCredits: ticket.creditsCharged,
+        briefDeliverable: (briefStructured as { details?: { deliverable?: unknown } })?.details?.deliverable,
+        from: ticket.createdAt,
+      });
+      await db.agreement.create({
+        data: { ticketId: ticket.id, token: genAgreementToken(), status: "DRAFT", ...draft },
+      });
+    } catch (agErr) {
+      console.error("[CREATE_TICKET] agreement draft failed", agErr);
+    }
 
     const emailTpl = ticketCreatedEmail(session.user.name, ticket.number, variant.service.name);
     sendEmail(session.user.email, emailTpl.subject, emailTpl.html);

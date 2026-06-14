@@ -15,8 +15,21 @@ export async function POST(
   const lang = req.cookies.get("node-language")?.value || DEFAULT_LANG;
 
   try {
-    const { freelancerId } = await req.json();
+    const { freelancerId, override } = await req.json();
     const ticketId = params.id;
+
+    // Gate: work can't start until the service agreement is signed. If an
+    // agreement exists and isn't signed, block (unless an admin overrides).
+    // Tickets without an agreement (legacy / draft failed) are not blocked.
+    if (!override) {
+      const ag = await db.agreement.findUnique({ where: { ticketId }, select: { status: true } });
+      if (ag && ag.status !== "SIGNED") {
+        return NextResponse.json(
+          { error: "AGREEMENT_NOT_SIGNED", message: "The service agreement isn't signed yet — send it for signature, or override to assign anyway." },
+          { status: 409 },
+        );
+      }
+    }
 
     // C13: Atomic assignment with WHERE condition to prevent TOCTOU
     await db.$transaction(async (tx: any) => {

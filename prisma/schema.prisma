@@ -266,6 +266,7 @@ model Ticket {
   files       TicketFile[]
   deliveries  Delivery[]
   surcharges  TicketSurcharge[]
+  agreement   Agreement?
 
   @@map("tickets")
 }
@@ -279,6 +280,49 @@ enum TicketStatus {
   REVISION
   COMPLETED
   CANCELED
+}
+
+// Service agreement (statement of work) generated per request. A PM reviews/
+// edits the auto-drafted scope, then sends it; the client e-signs it (typed
+// name + intent) via a tokenized public link. Work can't start until SIGNED.
+model Agreement {
+  id            String          @id @default(cuid())
+  ticketId      String          @unique
+  token         String          @unique
+  status        AgreementStatus @default(DRAFT)
+
+  // What / how / when / results — the contract body.
+  title         String
+  scope         String          // what will be provided (overview)
+  deliverables  String[]        // concrete line items (e.g. "About page", "Order page")
+  method        String          // how it will be provided
+  timelineDays  Int             // estimated working days
+  targetDate    DateTime?       // estimated completion (createdAt + timelineDays)
+  requestedDate DateTime?       // date the CLIENT requests it by (set at signing)
+  priceCredits  Int             // price snapshot (1 credit = $1)
+
+  // Signature record (in-house typed e-signature — ESIGN/UETA).
+  signerName    String?
+  signerEmail   String?
+  signedAt      DateTime?
+  signerIp      String?
+
+  sentAt        DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  ticket        Ticket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("agreements")
+}
+
+enum AgreementStatus {
+  DRAFT
+  SENT
+  SIGNED
+  DECLINED
+  EXPIRED
 }
 
 enum Priority {

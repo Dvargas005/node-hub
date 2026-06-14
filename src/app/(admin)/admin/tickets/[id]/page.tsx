@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireRole } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { TicketAdminClient } from "./ticket-admin-client";
+import { AgreementAdminPanel } from "./agreement-admin-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export default async function AdminTicketDetailPage({
         deliveries: { orderBy: { round: "asc" } },
         surcharges: { orderBy: { createdAt: "desc" } },
         files: true,
+        agreement: true,
       },
     }),
     db.freelancer.findMany({
@@ -138,20 +140,42 @@ export default async function AdminTicketDetailPage({
       reason: s.reason,
       createdAt: s.createdAt.toISOString(),
     })) || [],
+    agreement: ticket.agreement
+      ? {
+          id: ticket.agreement.id,
+          status: ticket.agreement.status,
+          title: ticket.agreement.title,
+          scope: ticket.agreement.scope,
+          deliverables: ticket.agreement.deliverables,
+          method: ticket.agreement.method,
+          timelineDays: ticket.agreement.timelineDays,
+          priceCredits: ticket.agreement.priceCredits,
+          token: ticket.agreement.token,
+          signerName: ticket.agreement.signerName,
+          signedAt: ticket.agreement.signedAt?.toISOString() || null,
+          sentAt: ticket.agreement.sentAt?.toISOString() || null,
+          requestedDate: ticket.agreement.requestedDate?.toISOString() || null,
+        }
+      : null,
   };
 
   return (
-    <TicketAdminClient
-      ticket={serialized}
-      availableFreelancers={freelancers.map((f: any) => ({
-        id: f.id,
-        name: f.name,
-        role: f.role,
-        skills: f.skills,
-        skillTags: f.skillTags,
-        currentLoad: f.currentLoad,
-        clientCapacity: f.clientCapacity,
-      }))}
-    />
+    <>
+      <TicketAdminClient
+        ticket={serialized}
+        availableFreelancers={freelancers.map((f: any) => ({
+          id: f.id,
+          name: f.name,
+          role: f.role,
+          skills: f.skills,
+          skillTags: f.skillTags,
+          currentLoad: f.currentLoad,
+          clientCapacity: f.clientCapacity,
+        }))}
+      />
+      <div className="mx-auto mt-6 max-w-5xl px-4 pb-12 sm:px-6 lg:px-8">
+        <AgreementAdminPanel agreement={serialized.agreement} />
+      </div>
+    </>
   );
 }

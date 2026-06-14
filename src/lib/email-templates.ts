@@ -39,3 +39,11 @@ export function pmNewTicketEmail(pmName: string, num: number, client: string, sv
 export function freelancerNewAssignmentEmail(flName: string, num: number, svc: string) {
   return { subject: `New assignment — Ticket #${num}`, html: wrap("New task assigned", `<p>Hi ${flName}, you've been assigned ticket <strong>#${num}</strong> for <strong>${svc}</strong>.</p><p>Review the brief and your PM's instructions.</p>`, "/freelancer/portal", "View my tickets →") };
 }
+
+export function agreementToSignEmail(name: string, num: number, svc: string, token: string) {
+  return { subject: `Please review & sign — ${svc} (Request #${num})`, html: wrap("Your service agreement is ready", `<p>Hi ${name}, here is the service agreement for your request <strong>#${num}</strong> (<strong>${svc}</strong>).</p><p>It lays out exactly what we'll deliver, how, the timeline, and the results. Review it, set your requested completion date, and sign electronically. <strong>Work begins once it's signed.</strong></p>`, `/sign-agreement?token=${token}`, "Review & sign agreement →") };
+}
+
+export function agreementSignedEmail(name: string, num: number, svc: string) {
+  return { subject: `Agreement signed — Request #${num}`, html: wrap("Thanks — we're on it!", `<p>Hi ${name}, your service agreement for <strong>${svc}</strong> (request <strong>#${num}</strong>) is signed. We'll begin work and keep you posted in your dashboard.</p>`, "/tickets", "View my request →") };
+}

@@ -20,6 +20,9 @@ export function middleware(req: NextRequest) {
   // Hidden Early Adopters landing — public (auth-aware in the page itself)
   if (pathname === "/early-adopters") return NextResponse.next();
 
+  // Public agreement signing (token-gated in the page/API itself)
+  if (pathname.startsWith("/sign-agreement")) return NextResponse.next();
+
   // Auth pages — always allow (cookie may be expired)
   if (authPaths.includes(pathname)) return NextResponse.next();
 
