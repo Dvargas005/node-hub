@@ -217,6 +217,26 @@ export function BillingClient({
         </p>
       </div>
 
+      {/* Dedicated Growth retainers — link to the managed-services sell page */}
+      <Link href="/dedicated" className="block group">
+        <Card className="border-[var(--gold-bar)]/30 bg-gradient-to-r from-[rgba(255,201,25,0.06)] to-transparent transition-colors hover:border-[var(--gold-bar)]/60">
+          <CardContent className="py-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Crown className="h-6 w-6 text-[var(--gold-bar)] shrink-0" />
+              <div>
+                <p className="font-[var(--font-lexend)] font-semibold text-[var(--ice-white)]">Dedicated Growth</p>
+                <p className="text-xs text-[rgba(245,246,252,0.5)]">
+                  Fully-managed Web, Design &amp; Graphics retainers, billed monthly. From $3,000/mo.
+                </p>
+              </div>
+            </div>
+            <span className="flex items-center gap-1 text-sm font-medium text-[var(--gold-bar)] whitespace-nowrap">
+              View plans <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </CardContent>
+        </Card>
+      </Link>
+
       {error && (
         <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3">{error}</div>
       )}
