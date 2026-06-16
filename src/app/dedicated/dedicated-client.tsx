@@ -21,6 +21,12 @@ const TAGLINE: Record<string, string> = {
   "dedicated-pro": "Maximum throughput — your dedicated creative engine.",
 };
 
+const TURNAROUND: Record<string, string> = {
+  "dedicated-light": "24-hour turnaround",
+  "dedicated-jump": "24-hour turnaround",
+  "dedicated-pro": "Continuous delivery",
+};
+
 export function DedicatedClient({
   isLoggedIn,
   activePlanName,
@@ -128,7 +134,9 @@ export function DedicatedClient({
                       ? "Unlimited active requests"
                       : `${plan.maxActiveReqs} active requests`}
                   </FeatureItem>
-                  <FeatureItem>{plan.deliveryDays}-day turnaround</FeatureItem>
+                  <FeatureItem>
+                    {TURNAROUND[plan.slug] ?? `${plan.deliveryDays}-day turnaround`}
+                  </FeatureItem>
                   <FeatureItem>Web, Design & Graphics — fully managed</FeatureItem>
                   <FeatureItem>{plan.minTermMonths}-month minimum commitment</FeatureItem>
                 </ul>
