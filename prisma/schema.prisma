@@ -134,6 +134,7 @@ model Plan {
   isActive               Boolean   @default(true)
   isRecurring            Boolean   @default(true)  // false = one-time payment, no auto-renew
   isHidden               Boolean   @default(false) // true = exclude from public billing/landing
+  minTermMonths          Int       @default(0)     // minimum commitment in months (e.g. 3 = 3-month minimum); 0 = none
   createdAt       DateTime  @default(now())
 
   subscriptions   Subscription[]
@@ -152,6 +153,7 @@ model Subscription {
   currentPeriodEnd     DateTime
   creditsRemaining     Int
   canceledAt           DateTime?
+  minTermEndsAt        DateTime?  // earliest date the subscription may be canceled (minimum commitment)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 

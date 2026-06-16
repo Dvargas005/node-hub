@@ -158,6 +158,13 @@ export async function POST(req: NextRequest) {
         const carryCredits = parseInt(metadata?.carryCredits || "0") || 0;
         const startingCredits = plan.monthlyCredits + plan.bonusCredits + carryCredits;
 
+        // Minimum commitment: earliest cancel date = period start + N months
+        let minTermEndsAt: Date | null = null;
+        if (plan.minTermMonths > 0) {
+          minTermEndsAt = new Date(periodStart);
+          minTermEndsAt.setMonth(minTermEndsAt.getMonth() + plan.minTermMonths);
+        }
+
         await db.subscription.upsert({
           where: { userId },
           update: {
@@ -169,6 +176,7 @@ export async function POST(req: NextRequest) {
             currentPeriodEnd: periodEnd,
             creditsRemaining: startingCredits,
             canceledAt: null,
+            minTermEndsAt,
           },
           create: {
             userId,
@@ -179,6 +187,7 @@ export async function POST(req: NextRequest) {
             currentPeriodStart: periodStart,
             currentPeriodEnd: periodEnd,
             creditsRemaining: startingCredits,
+            minTermEndsAt,
           },
         });
         if (carryCredits > 0) {

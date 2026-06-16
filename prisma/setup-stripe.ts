@@ -43,6 +43,7 @@ interface PlanSeed {
   deliveryDays: number;
   isRecurring: boolean;
   isHidden?: boolean;
+  minTermMonths?: number;
 }
 
 const plans: PlanSeed[] = [
@@ -107,6 +108,49 @@ const plans: PlanSeed[] = [
     isRecurring: true,
     isHidden: true,
   },
+  // ── Dedicated Growth retainers (managed Web/Design/Graphics, monthly, 3-month minimum) ──
+  {
+    slug: "dedicated-light",
+    name: "Dedicated Light",
+    description: "Managed Web, Design & Graphics retainer — Light. Monthly, 3-month minimum commitment.",
+    priceMonthly: 300000, // $3,000
+    setupFee: 0,
+    monthlyCredits: 3000, // 1:1 — $3,000 of managed work per month
+    bonusCredits: 0,
+    maxActiveReqs: 5,
+    deliveryDays: 4,
+    isRecurring: true,
+    isHidden: true,
+    minTermMonths: 3,
+  },
+  {
+    slug: "dedicated-jump",
+    name: "Dedicated Jump",
+    description: "Managed Web, Design & Graphics retainer — Jump. Monthly, 3-month minimum commitment.",
+    priceMonthly: 600000, // $6,000
+    setupFee: 0,
+    monthlyCredits: 6000,
+    bonusCredits: 0,
+    maxActiveReqs: 10,
+    deliveryDays: 3,
+    isRecurring: true,
+    isHidden: true,
+    minTermMonths: 3,
+  },
+  {
+    slug: "dedicated-pro",
+    name: "Dedicated Pro",
+    description: "Managed Web, Design & Graphics retainer — Pro. Monthly, 3-month minimum commitment.",
+    priceMonthly: 1900000, // $19,000
+    setupFee: 0,
+    monthlyCredits: 19000,
+    bonusCredits: 0,
+    maxActiveReqs: 999, // unlimited
+    deliveryDays: 2,
+    isRecurring: true,
+    isHidden: true,
+    minTermMonths: 3,
+  },
 ];
 
 interface ProvisionResult {
@@ -135,6 +179,7 @@ async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
           deliveryDays: plan.deliveryDays,
           isRecurring: plan.isRecurring,
           isHidden: plan.isHidden ?? false,
+          minTermMonths: plan.minTermMonths ?? 0,
         },
       })
     : await prisma.plan.create({
@@ -149,6 +194,7 @@ async function provisionPlan(plan: PlanSeed): Promise<ProvisionResult> {
           deliveryDays: plan.deliveryDays,
           isRecurring: plan.isRecurring,
           isHidden: plan.isHidden ?? false,
+          minTermMonths: plan.minTermMonths ?? 0,
         },
       });
 
