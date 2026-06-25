@@ -27,6 +27,11 @@ const TURNAROUND: Record<string, string> = {
   "dedicated-pro": "Continuous delivery",
 };
 
+const SEO_FEATURE: Record<string, string> = {
+  "dedicated-jump": "SEO Starter included",
+  "dedicated-pro": "Full SEO included",
+};
+
 export function DedicatedClient({
   isLoggedIn,
   activePlanName,
@@ -138,6 +143,9 @@ export function DedicatedClient({
                     {TURNAROUND[plan.slug] ?? `${plan.deliveryDays}-day turnaround`}
                   </FeatureItem>
                   <FeatureItem>Web, Design & Graphics — fully managed</FeatureItem>
+                  {SEO_FEATURE[plan.slug] && (
+                    <FeatureItem>{SEO_FEATURE[plan.slug]}</FeatureItem>
+                  )}
                   <FeatureItem>{plan.minTermMonths}-month minimum commitment</FeatureItem>
                 </ul>
 

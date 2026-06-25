@@ -210,6 +210,9 @@ const C = {
       setup: "Setup",
       oneTime: "one-time",
       payg: "…or pay as you go with 1:1 credits.",
+      note: "Each minimum plan shown here has a small cap to help small and midsize businesses.",
+      noteCta: "For more comprehensive plans visit",
+      noteLink: "Dedicated Growth",
       plans: [
         { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
         { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
@@ -218,6 +221,7 @@ const C = {
     },
     wl: { title: "Ready to start?", sub: "Sign up today and get 10 free credits to explore the platform.", cta: "Start for free", login: "Already have an account?" },
     footer: "© 2026 Nouvos Solutions LLC",
+    corpWhatsApp: "Corporate line — WhatsApp: +1 224-640-1785",
   },
   es: {
     nav: { join: "Comenzar", register: "Registrarse", login: "Iniciar Sesión" },
@@ -267,6 +271,9 @@ const C = {
       setup: "Configuración",
       oneTime: "única vez",
       payg: "…o paga sobre la marcha con créditos 1:1.",
+      note: "Cada plan mínimo que se muestra aquí tiene un límite reducido para ayudar a pequeñas y medianas empresas.",
+      noteCta: "Para planes más completos visita",
+      noteLink: "Dedicated Growth",
       plans: [
         { name: "Member", front: 130, setup: 260, real: 100, realSetup: 200, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
         { name: "Growth", front: 247, setup: 910, real: 190, realSetup: 700, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
@@ -275,6 +282,7 @@ const C = {
     },
     wl: { title: "Listo para empezar?", sub: "Regístrate hoy y recibe 10 créditos gratis para explorar la plataforma.", cta: "Comenzar gratis", login: "¿Ya tienes cuenta?" },
     footer: "© 2026 Nouvos Solutions LLC",
+    corpWhatsApp: "Línea corporativa — WhatsApp: +1 224-640-1785",
   },
 };
 
@@ -811,7 +819,14 @@ export default function Home() {
             );
           })}
           <FadeUp delay={0.1}>
-            <p className="pb-14 pt-2 font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.05rem,2vw,1.5rem)] text-[#130A06]">{t.pricing.payg}</p>
+            <p className="pb-3 pt-2 font-[family-name:var(--font-lexend)] font-bold text-[clamp(1.05rem,2vw,1.5rem)] text-[#130A06]">{t.pricing.payg}</p>
+          </FadeUp>
+          <FadeUp delay={0.15}>
+            <p className="pb-14 font-[family-name:var(--font-atkinson)] text-[0.95rem] leading-relaxed text-[#130A06]/70 max-w-3xl">
+              {t.pricing.note}{" "}
+              {t.pricing.noteCta}{" "}
+              <a href="/dedicated" className="font-bold underline decoration-[#130A06]/40 underline-offset-2 hover:decoration-[#130A06] transition-colors">{t.pricing.noteLink} →</a>
+            </p>
           </FadeUp>
         </div>
       </section>
@@ -859,6 +874,16 @@ export default function Home() {
             <a href="#" className="hover:text-[#FFC919] transition-colors">Instagram</a>
           </div>
           <p className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/30">{t.footer}</p>
+        </div>
+        <div className="max-w-7xl mx-auto mt-8 text-center">
+          <a
+            href="https://wa.me/12246401785"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/40 hover:text-[#FFC919] transition-colors"
+          >
+            {t.corpWhatsApp}
+          </a>
         </div>
         <div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-[#F5F6FC]/5 flex justify-center items-center gap-3">
           <span className="font-[family-name:var(--font-atkinson)] text-xs text-[#F5F6FC]/40 uppercase tracking-[0.2em]">Powered by</span>

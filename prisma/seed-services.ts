@@ -443,11 +443,14 @@ const services: ServiceSeed[] = [
         sortOrder: 2,
       },
       {
+        // Ungated: buyable individually by anyone. Bundled as "Full SEO" in the
+        // Dedicated Pro retainer (see /dedicated); "SEO Starter" (SEO Foundation)
+        // is bundled starting at Dedicated Jump.
         name: "Ongoing SEO",
         creditCost: 3000,
         description: "Monthly SEO retainer ($3,000/mo): technical maintenance, content, internal linking, backlink outreach and monthly reporting. Billed monthly — 3-month minimum commitment.",
         estimatedDays: 30,
-        minPlan: "growth",
+        minPlan: null,
         sortOrder: 3,
       },
     ],

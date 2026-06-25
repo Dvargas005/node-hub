@@ -5,6 +5,7 @@ import { sendEmail } from "@/lib/email";
 import { ticketCreatedEmail } from "@/lib/email-templates";
 import { createNotification } from "@/lib/notifications";
 import { composeDraft, genAgreementToken } from "@/lib/agreement";
+import { meetsMinPlan } from "@/lib/plan-rank";
 import { t, DEFAULT_LANG } from "@/lib/i18n";
 
 const ACTIVE_STATUSES = ["NEW", "REVIEWING", "ASSIGNED", "IN_PROGRESS", "DELIVERED", "REVISION"];
@@ -57,8 +58,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 403 });
     }
     if (variant.minPlan && subCheck) {
-      const planOrder = ["member", "growth", "pro"];
-      if (planOrder.indexOf(subCheck.plan.slug) < planOrder.indexOf(variant.minPlan)) {
+      // Ranks dedicated retainers as premium tiers (see plan-rank.ts) so a
+      // dedicated subscriber isn't wrongly blocked from gated services.
+      if (!meetsMinPlan(subCheck.plan.slug, variant.minPlan)) {
         return NextResponse.json({ error: t("api.error.internal", lang) }, { status: 400 });
       }
     }
