@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
 import HeroHud from "@/components/HeroHud";
+import HeroNetwork from "@/components/HeroNetwork";
 import {
   motion,
   useScroll,
@@ -540,8 +541,10 @@ export default function Home() {
 
       {/* ═══ 1. HERO ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,201,25,0.08) 0%, rgba(255,140,0,0.04) 30%, #130A06 70%)" }}>
-        {/* Layer 1: Hero background image */}
-        <Image src="/img/hero.png" alt="" fill priority className="object-cover opacity-25 pointer-events-none z-[1]" />
+        {/* Layer 1: code-generated living delivery network (replaces hero.png) */}
+        <div className="absolute inset-0 z-[1] pointer-events-none">
+          <HeroNetwork />
+        </div>
         {/* Layer 2: Noise/grain overlay — ABOVE image */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay z-[2]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         {/* Layer 3: Radial gradient darken — ABOVE noise */}
@@ -549,10 +552,10 @@ export default function Home() {
         {/* Layer 4: animated telemetry HUD (perfect loops) — frames the robot + wordmark */}
         <HeroHud />
         <div className="relative z-10 text-center px-6">
-          <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6">{t.hero.label}</p></RevealLine>
+          <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6" style={{ textShadow: "0 1px 14px rgba(19,10,6,0.95)" }}>{t.hero.label}</p></RevealLine>
           <RevealLine delay={0.4}>
             <motion.h1
-              style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
+              style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]), textShadow: "0 4px 40px rgba(19,10,6,0.6)" }}
               className="font-[family-name:var(--font-lexend)] font-black text-[clamp(6rem,15vw,12rem)] leading-[0.85] tracking-[-0.03em] text-[#F5F6FC]"
             >
               N.O.D.E.
@@ -563,7 +566,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.9 }}
             className="font-[family-name:var(--font-atkinson)] mt-6"
-            style={{ fontSize: "1.2rem", color: "rgba(245,246,252,0.7)" }}
+            style={{ fontSize: "1.2rem", color: "rgba(245,246,252,0.9)", textShadow: "0 1px 16px rgba(19,10,6,0.95)" }}
           >
             {t.hero.tagline}
           </motion.p>
@@ -575,7 +578,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease, delay: 1.2 + i * 0.3 }}
                 className="font-[family-name:var(--font-lexend)] font-bold text-[#F5F6FC]"
-                style={{ fontSize: "1.3rem" }}
+                style={{ fontSize: "1.3rem", textShadow: "0 1px 16px rgba(19,10,6,0.95)" }}
               >
                 {line}
               </motion.p>
