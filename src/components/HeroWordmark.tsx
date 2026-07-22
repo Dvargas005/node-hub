@@ -65,8 +65,8 @@ export default function HeroWordmark() {
       // Fit the word to ~94% of the container width, capped for large screens.
       ctx!.font = `900 100px ${displayFam}`;
       const ratio = Math.max(1, ctx!.measureText(WORD).width) / 100;
-      const targetW = containerW * 0.95;
-      fontSize = Math.min(340, Math.max(56, targetW / ratio));
+      const targetW = containerW * 0.62;
+      fontSize = Math.min(220, Math.max(52, targetW / ratio));
       cssW = containerW;
       cssH = Math.round(fontSize * 1.06);
       step = Math.max(6, Math.round(fontSize * 0.055));

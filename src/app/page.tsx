@@ -559,7 +559,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease, delay: 0.4 }}
             style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
-            className="w-full min-h-[clamp(5rem,26vw,22rem)]"
+            className="w-full min-h-[clamp(4rem,16vw,14rem)]"
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
