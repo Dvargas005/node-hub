@@ -552,14 +552,14 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none z-[3]" style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(19,10,6,0.4) 50%, rgba(19,10,6,0.8) 100%)" }} />
         {/* Layer 4: animated telemetry HUD (perfect loops) — frames the robot + wordmark */}
         <HeroHud />
-        <div className="relative z-10 text-center px-6">
+        <div className="relative z-10 text-center px-6 w-full">
           <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6" style={{ textShadow: "0 1px 14px rgba(19,10,6,0.95)" }}>{t.hero.label}</p></RevealLine>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease, delay: 0.4 }}
             style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
-            className="w-full min-h-[clamp(6rem,15vw,12rem)]"
+            className="w-full min-h-[clamp(5rem,26vw,22rem)]"
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
