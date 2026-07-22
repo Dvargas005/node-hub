@@ -5,6 +5,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
 import HeroHud from "@/components/HeroHud";
 import HeroNetwork from "@/components/HeroNetwork";
+import HeroWordmark from "@/components/HeroWordmark";
 import {
   motion,
   useScroll,
@@ -553,14 +554,18 @@ export default function Home() {
         <HeroHud />
         <div className="relative z-10 text-center px-6">
           <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6" style={{ textShadow: "0 1px 14px rgba(19,10,6,0.95)" }}>{t.hero.label}</p></RevealLine>
-          <RevealLine delay={0.4}>
-            <motion.h1
-              style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]), textShadow: "0 4px 40px rgba(19,10,6,0.6)" }}
-              className="font-[family-name:var(--font-lexend)] font-black text-[clamp(6rem,15vw,12rem)] leading-[0.85] tracking-[-0.03em] text-[#F5F6FC]"
-            >
-              N.O.D.E.
-            </motion.h1>
-          </RevealLine>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease, delay: 0.4 }}
+            style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
+            className="w-full min-h-[clamp(6rem,15vw,12rem)]"
+          >
+            {/* Accessible heading for screen readers / SEO; the visible wordmark
+                is rendered as live code glyphs on the canvas below. */}
+            <h1 className="sr-only">N.O.D.E.</h1>
+            <HeroWordmark />
+          </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
