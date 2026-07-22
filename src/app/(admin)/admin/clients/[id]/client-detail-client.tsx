@@ -39,6 +39,9 @@ import {
   ShieldAlert,
   Lightbulb,
   TrendingUp,
+  CreditCard,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getLocale } from "@/lib/i18n";
@@ -59,6 +62,7 @@ interface ClientDetail {
   name: string;
   email: string;
   emailVerified: boolean;
+  stripeCustomerId: string | null;
   createdAt: string;
   updatedAt: string;
   businessName: string | null;
@@ -193,6 +197,49 @@ export function ClientDetailClient({
       router.refresh();
     } catch {
       toast.error(t("common.connectionError"));
+    }
+  };
+
+  // Payment-link state (super-user card setup — no card data ever touches this app)
+  const [linkLoading, setLinkLoading] = useState<"portal" | "setup" | null>(null);
+  const [paymentLink, setPaymentLink] = useState<{ url: string; type: "portal" | "setup" } | null>(null);
+
+  const handleGenerateLink = async (type: "portal" | "setup") => {
+    setLinkLoading(type);
+    setPaymentLink(null);
+    try {
+      const res = await fetch(`/api/admin/clients/${client.id}/payment-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.url) {
+        toast.error(data?.error || "Could not create link");
+        return;
+      }
+      setPaymentLink({ url: data.url, type });
+      // Best-effort copy so the super user can paste it straight into an email/DM
+      try {
+        await navigator.clipboard.writeText(data.url);
+        toast.success("Link created and copied to clipboard");
+      } catch {
+        toast.success("Link created");
+      }
+    } catch {
+      toast.error(t("common.connectionError"));
+    } finally {
+      setLinkLoading(null);
+    }
+  };
+
+  const copyLink = async () => {
+    if (!paymentLink) return;
+    try {
+      await navigator.clipboard.writeText(paymentLink.url);
+      toast.success("Copied");
+    } catch {
+      toast.error("Copy failed — select and copy manually");
     }
   };
 
@@ -737,6 +784,100 @@ export function ClientDetailClient({
           </CardContent>
         </Card>
       </div>
+
+      {/* Billing & Payments (super-user only) */}
+      {isAdmin && (
+        <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+          <CardHeader>
+            <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)] text-base flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-[var(--gold-bar)]" />
+              Billing &amp; payments
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[rgba(245,246,252,0.5)]">Stripe customer</span>
+              {client.stripeCustomerId ? (
+                <span className="font-mono text-xs text-[rgba(245,246,252,0.7)]">
+                  {client.stripeCustomerId}
+                </span>
+              ) : (
+                <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                  Not linked yet
+                </Badge>
+              )}
+            </div>
+
+            <p className="text-xs text-[rgba(245,246,252,0.5)] leading-relaxed">
+              Generate a secure Stripe-hosted link and send it to the client so they enter
+              their card themselves. The card is stored safely by Stripe — it never touches
+              this app. If no Stripe customer exists yet, one is created and linked automatically.
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => handleGenerateLink("portal")}
+                disabled={linkLoading !== null}
+                variant="outline"
+                className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
+              >
+                {linkLoading === "portal" ? "..." : "Update payment method"}
+              </Button>
+              <Button
+                onClick={() => handleGenerateLink("setup")}
+                disabled={linkLoading !== null}
+                variant="outline"
+                className="border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
+              >
+                {linkLoading === "setup" ? "..." : "Save card on file"}
+              </Button>
+            </div>
+
+            <p className="text-[11px] text-[rgba(245,246,252,0.35)] leading-relaxed">
+              <strong className="text-[rgba(245,246,252,0.5)]">Update payment method</strong> opens the
+              Stripe billing portal — best when there&apos;s an active plan (sets the new card as default
+              and retries unpaid invoices). <strong className="text-[rgba(245,246,252,0.5)]">Save card on
+              file</strong> saves a card for a customer with no active plan yet.
+            </p>
+
+            {paymentLink && (
+              <div className="space-y-2 rounded-md border border-[var(--gold-bar)]/30 bg-[var(--gold-bar)]/10 p-3">
+                <p className="text-xs font-medium text-[var(--gold-bar)]">
+                  {paymentLink.type === "portal" ? "Billing portal link" : "Card setup link"} — send to the client
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={paymentLink.url}
+                    onFocus={(e) => e.currentTarget.select()}
+                    className="flex-1 min-w-0 rounded-md border border-[rgba(245,246,252,0.2)] bg-[rgba(0,0,0,0.3)] px-2 py-1.5 font-mono text-xs text-[rgba(245,246,252,0.8)] focus:outline-none focus:border-[var(--gold-bar)]"
+                  />
+                  <Button
+                    onClick={copyLink}
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                  <a
+                    href={paymentLink.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 inline-flex items-center gap-1 rounded-md border border-[rgba(245,246,252,0.2)] px-2.5 py-1.5 text-xs text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Open
+                  </a>
+                </div>
+                <p className="text-[11px] text-[rgba(245,246,252,0.4)]">
+                  Links expire — generate a fresh one if it stops working.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent Tickets */}
       <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">

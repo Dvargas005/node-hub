@@ -52,6 +52,7 @@ export default async function ClientDetailPage({
         name: client.name,
         email: client.email,
         emailVerified: client.emailVerified,
+        stripeCustomerId: client.stripeCustomerId,
         createdAt: client.createdAt.toISOString(),
         updatedAt: client.updatedAt.toISOString(),
         // Business profile
