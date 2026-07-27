@@ -4,8 +4,15 @@ import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
 import HeroHud from "@/components/HeroHud";
-import HeroNetwork from "@/components/HeroNetwork";
 import HeroWordmark from "@/components/HeroWordmark";
+import dynamic from "next/dynamic";
+
+// Three.js is a ~150KB dependency and the field is purely decorative, so it is
+// split into its own chunk and never server-rendered. HeroGlyphField itself
+// falls back to the 2D HeroNetwork canvas when WebGL is unavailable.
+const HeroGlyphField = dynamic(() => import("@/components/HeroGlyphField"), {
+  ssr: false,
+});
 import {
   motion,
   useScroll,
@@ -542,9 +549,11 @@ export default function Home() {
 
       {/* ═══ 1. HERO ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,201,25,0.08) 0%, rgba(255,140,0,0.04) 30%, #130A06 70%)" }}>
-        {/* Layer 1: code-generated living delivery network (replaces hero.png) */}
+        {/* Layer 1: 3D glyph particle field — a point cloud of code characters
+            whose depth reads as atmosphere and whose noise reacts to pointer
+            velocity. Degrades to the 2D HeroNetwork canvas without WebGL. */}
         <div className="absolute inset-0 z-[1] pointer-events-none">
-          <HeroNetwork />
+          <HeroGlyphField />
         </div>
         {/* Layer 2: Noise/grain overlay — ABOVE image */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay z-[2]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
