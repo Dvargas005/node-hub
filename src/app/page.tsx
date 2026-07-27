@@ -440,9 +440,27 @@ function AnimatedPrice({ value, className }: { value: number; className?: string
   return <motion.span className={className}>{display}</motion.span>;
 }
 
+/* Pinned locale, created once.
+ *
+ * `toLocaleString()` with no argument formats using the *runtime's* locale, so
+ * the server and the browser can disagree. Locales whose CLDR data sets
+ * minimumGroupingDigits=2 (Spanish, German, Polish, …) leave four-digit numbers
+ * ungrouped, which made Node emit "$1,300" while a Spanish-locale browser
+ * emitted "$1300". React then failed to hydrate the pricing section and fell
+ * back to client rendering for the whole root, remounting the page and
+ * restarting the hero's entrance animations.
+ *
+ * Pinning en-US keeps both sides byte-identical and preserves the grouping the
+ * page already ships. Hoisting it also avoids rebuilding the formatter on every
+ * spring frame. */
+const SETUP_PRICE_FORMAT = new Intl.NumberFormat("en-US");
+
 function AnimatedSetup({ value, className }: { value: number; className?: string }) {
   const spring = useSpring(value, { damping: 30, stiffness: 120 });
-  const display = useTransform(spring, (v) => `$${Math.round(v).toLocaleString()}`);
+  const display = useTransform(
+    spring,
+    (v) => `$${SETUP_PRICE_FORMAT.format(Math.round(v))}`
+  );
   useEffect(() => { spring.set(value); }, [value, spring]);
   return <motion.span className={className}>{display}</motion.span>;
 }
