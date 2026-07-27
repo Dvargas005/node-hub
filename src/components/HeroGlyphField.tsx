@@ -33,14 +33,29 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import * as THREE from "three";
+import {
+  ATLAS_GRID,
+  COLOR_ACCENT,
+  COLOR_CORE,
+  COLOR_FOG,
+  GLYPH_FRAGMENT_SHADER,
+  GLYPH_VERTEX_SHADER,
+  buildGlyphAtlas,
+  cappedDpr,
+  createPointerTracker,
+  prefersReduced,
+  supportsWebGL,
+} from "./hero-glyph-core";
 
 /* ═══════════════════════════════════════════════════════════════
    TUNABLES — everything you'd want to adjust lives in this block.
    ═══════════════════════════════════════════════════════════════ */
 
-/** Particle count. Mobile gets the smaller budget. */
-const POINTS_DESKTOP = 1800;
-const POINTS_MOBILE = 1100;
+/** Particle count. Mobile gets the smaller budget.
+ *  Trimmed ~36% from the original 1800/1100: the field was competing with the
+ *  wordmark and the HUD instead of reading as atmosphere behind them. */
+const POINTS_DESKTOP = 1150;
+const POINTS_MOBILE = 680;
 /** Viewport width (px) at or below which the mobile budget applies. */
 const MOBILE_BREAKPOINT = 640;
 
@@ -61,16 +76,20 @@ const RESEED_ASPECT_FACTOR = 1.6;
 /** Depth fade window in world units. Below NEAR = fully present,
  *  above FAR = fully dissolved into COLOR_FOG. */
 const DEPTH_NEAR = 10;
-const DEPTH_FAR = 46;
+/** Pulled in from 46 so the mid-field dissolves sooner and the depth gradient
+ *  does more of the work of pushing this layer behind the wordmark. */
+const DEPTH_FAR = 34;
 /** Floor on how present the furthest glyphs stay (0 = invisible). */
 const DEPTH_FLOOR = 0.1;
 
-/** Base glyph size in px (before perspective + DPR scaling), and its cap. */
+/** Base glyph size in px (before perspective + DPR scaling), and its cap.
+ *  The ceiling is well under the wordmark's, so a near field glyph can never be
+ *  mistaken for part of the logo. */
 const GLYPH_SIZE = 11;
-const GLYPH_SIZE_MAX = 40;
+const GLYPH_SIZE_MAX = 26;
 
 /** Overall field opacity — the single dial for "too loud / too tenuous". */
-const FIELD_OPACITY = 0.8;
+const FIELD_OPACITY = 0.68;
 
 /** Centre clear-out, so the wordmark and headline stay high contrast. The zone
  *  is an ellipse in normalised-device units (0 = screen centre, 1 = edge), so
@@ -82,13 +101,13 @@ const CENTER_CLEAR_RY = 1.0;
 /** Portrait viewports are tall and narrow, so a circular NDC zone would clear
  *  almost the whole screen. Tighten the vertical reach there instead. */
 const CENTER_CLEAR_RY_PORTRAIT = 0.5;
-/** How much of the field is removed at the very centre (0 = none, 1 = all). */
-const CENTER_CLEAR_STRENGTH = 0.72;
+/** How much of the field is removed at the very centre (0 = none, 1 = all).
+ *  Was 0.72 when the wordmark was a flat 2D canvas that needed the help. The 3D
+ *  wordmark now carries itself on density and brightness, so this is dialled
+ *  back to a gentle focal vignette rather than a hole in the field. 0 removes it
+ *  entirely; both extremes are captured in the PR for comparison. */
+const CENTER_CLEAR_STRENGTH = 0.35;
 
-/** Palette — N.O.D.E. brand tokens. */
-const COLOR_CORE = "#F5F6FC"; // ice white — most glyphs
-const COLOR_ACCENT = "#FFC919"; // gold bar — accent glyphs
-const COLOR_FOG = "#130A06"; // asphalt black — what distance dissolves into
 /** Share of glyphs rendered in the gold accent (0..1). */
 const ACCENT_RATIO = 0.26;
 
@@ -107,11 +126,8 @@ const DRIFT_SPEED = 0.05;
 /** Camera parallax reach in world units, following the pointer. */
 const PARALLAX = 1.6;
 
-/** Glyph atlas: grid size and per-cell resolution in px. */
-const ATLAS_GRID = 8; // 8 × 8 = 64 distinct glyphs
-const ATLAS_CELL = 64;
-/** Character pool — matches the code-stream vocabulary used elsewhere. */
-const GLYPH_CHARS = "0123456789ABCDEF{}<>[]/=+*;:#%$&|";
+/** The glyph atlas, palette and shader pair live in ./hero-glyph-core, shared
+ *  with HeroWordmark3D so the two clouds stay visually consistent. */
 
 /** Optional wireframe node-network accent layered into the field. */
 const ENABLE_NODE_ACCENT = true;
@@ -140,70 +156,8 @@ const NODE_ACCENT_REFERENCE_ASPECT = 1.5;
 
 /* ═══════════════════════════════════════════════════════════════ */
 
-const MONO =
-  'ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace';
-
 /** Previous hero backdrop, loaded only if WebGL is missing. */
 const HeroNetwork = dynamic(() => import("./HeroNetwork"), { ssr: false });
-
-function prefersReduced() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
-/** Cheap, non-throwing WebGL probe. */
-function supportsWebGL() {
-  if (typeof window === "undefined") return false;
-  if (!("WebGLRenderingContext" in window)) return false;
-  try {
-    const c = document.createElement("canvas");
-    return !!(
-      c.getContext("webgl2") ||
-      c.getContext("webgl") ||
-      c.getContext("experimental-webgl")
-    );
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Build the glyph atlas: ATLAS_GRID² cells, one random character each, drawn
- * white-on-transparent so the fragment shader can tint it freely.
- */
-function buildAtlas() {
-  const size = ATLAS_GRID * ATLAS_CELL;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-
-  ctx.clearRect(0, 0, size, size);
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.font = `bold ${Math.round(ATLAS_CELL * 0.72)}px ${MONO}`;
-
-  for (let row = 0; row < ATLAS_GRID; row++) {
-    for (let col = 0; col < ATLAS_GRID; col++) {
-      const ch = GLYPH_CHARS[Math.floor(Math.random() * GLYPH_CHARS.length)];
-      ctx.fillText(
-        ch,
-        col * ATLAS_CELL + ATLAS_CELL / 2,
-        row * ATLAS_CELL + ATLAS_CELL / 2
-      );
-    }
-  }
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.generateMipmaps = false;
-  return tex;
-}
 
 /** Small radial glow, generated in canvas, for the travelling link sprites. */
 function buildGlowTexture() {
@@ -225,189 +179,6 @@ function buildGlowTexture() {
   tex.generateMipmaps = false;
   return tex;
 }
-
-/* ── Shaders ─────────────────────────────────────────────────── */
-
-/** Ashima / Stefan Gustavson 3D simplex noise (webgl-noise, MIT). */
-const SIMPLEX_3D = /* glsl */ `
-vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
-vec4 mod289(vec4 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
-vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
-vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
-
-float snoise(vec3 v){
-  const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-
-  vec3 i  = floor(v + dot(v, C.yyy));
-  vec3 x0 = v - i + dot(i, C.xxx);
-
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min(g.xyz, l.zxy);
-  vec3 i2 = max(g.xyz, l.zxy);
-
-  vec3 x1 = x0 - i1 + C.xxx;
-  vec3 x2 = x0 - i2 + C.yyy;
-  vec3 x3 = x0 - D.yyy;
-
-  i = mod289(i);
-  vec4 p = permute(permute(permute(
-             i.z + vec4(0.0, i1.z, i2.z, 1.0))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-
-  float n_ = 0.142857142857;
-  vec3 ns = n_ * D.wyz - D.xzx;
-
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_);
-
-  vec4 x = x_ * ns.x + ns.yyyy;
-  vec4 y = y_ * ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-
-  vec4 b0 = vec4(x.xy, y.xy);
-  vec4 b1 = vec4(x.zw, y.zw);
-
-  vec4 s0 = floor(b0) * 2.0 + 1.0;
-  vec4 s1 = floor(b1) * 2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-
-  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
-  vec3 p0 = vec3(a0.xy, h.x);
-  vec3 p1 = vec3(a0.zw, h.y);
-  vec3 p2 = vec3(a1.xy, h.z);
-  vec3 p3 = vec3(a1.zw, h.w);
-
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
-  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
-}
-`;
-
-const VERTEX_SHADER = /* glsl */ `
-attribute float aChar;
-attribute float aSeed;
-attribute float aAccent;
-attribute float aSizeMul;
-
-uniform float uTime;
-uniform float uNoiseStrength;
-uniform float uNoiseScale;
-uniform float uNoiseAmp;
-uniform float uDrift;
-uniform float uPixelRatio;
-uniform float uSize;
-uniform float uSizeMax;
-uniform float uDepthNear;
-uniform float uDepthFar;
-
-varying float vChar;
-varying float vFade;
-varying float vAccent;
-varying float vTwinkle;
-varying vec2 vNdc;
-
-${SIMPLEX_3D}
-
-void main() {
-  vec3 p = position;
-
-  // Slow ambient drift so the field breathes even when the pointer is still.
-  p.y += sin(uTime * uDrift * 2.4 + aSeed * 6.2831853) * 0.5;
-
-  // Mouse-reactive simplex displacement; the noise field itself scrolls slowly
-  // so glyphs appear to recompute rather than sit in a frozen pattern.
-  vec3 np = p * uNoiseScale + vec3(0.0, 0.0, uTime * uDrift);
-  vec3 disp = vec3(
-    snoise(np),
-    snoise(np + vec3(31.4, 0.0, 0.0)),
-    snoise(np + vec3(0.0, 17.7, 0.0))
-  );
-  p += disp * uNoiseAmp * uNoiseStrength;
-
-  vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
-
-  // Depth drives both alpha and fog blend in the fragment stage.
-  float viewDepth = -mvPosition.z;
-  vFade = 1.0 - smoothstep(uDepthNear, uDepthFar, viewDepth);
-
-  vChar = aChar;
-  vAccent = aAccent;
-  vTwinkle = 0.72 + 0.28 * sin(uTime * 0.9 + aSeed * 12.9898);
-
-  gl_Position = projectionMatrix * mvPosition;
-
-  // Screen-space position, so the fragment stage can carve out the centre where
-  // the wordmark and headline live.
-  vNdc = gl_Position.xy / max(gl_Position.w, 0.0001);
-
-  // Perspective-correct point size, clamped so near glyphs don't blow up.
-  float size = uSize * aSizeMul * uPixelRatio * (30.0 / max(viewDepth, 0.001));
-  gl_PointSize = clamp(size, 1.0, uSizeMax * uPixelRatio);
-}
-`;
-
-const FRAGMENT_SHADER = /* glsl */ `
-uniform sampler2D uAtlas;
-uniform float uGrid;
-uniform vec3 uCore;
-uniform vec3 uAccent;
-uniform vec3 uFog;
-uniform float uDepthFloor;
-uniform float uOpacity;
-uniform float uClearInner;
-uniform float uClearOuter;
-uniform float uClearStrength;
-uniform vec2 uClearRadii;
-
-varying float vChar;
-varying float vFade;
-varying float vAccent;
-varying float vTwinkle;
-varying vec2 vNdc;
-
-void main() {
-  // Map this point's glyph index to its atlas cell. CanvasTexture is flipY, so
-  // the V coordinate is mirrored to keep glyphs upright.
-  float idx = floor(vChar + 0.5);
-  float col = mod(idx, uGrid);
-  float row = floor(idx / uGrid);
-  vec2 uv = vec2(
-    (col + gl_PointCoord.x) / uGrid,
-    1.0 - (row + gl_PointCoord.y) / uGrid
-  );
-
-  float mask = texture2D(uAtlas, uv).a;
-  if (mask < 0.08) discard;
-
-  vec3 base = mix(uCore, uAccent, vAccent);
-
-  // Distance reads as atmosphere: colour sinks toward the fog tone as well as
-  // losing alpha, rather than going flatly transparent.
-  float presence = uDepthFloor + (1.0 - uDepthFloor) * vFade;
-  vec3 tinted = mix(uFog, base, 0.25 + 0.75 * vFade);
-
-  // Calm centre: glyphs thin out toward the middle of the viewport so the
-  // wordmark stays legible, then recover their full weight out at the edges.
-  float radial = length(vNdc / uClearRadii);
-  float clear = mix(
-    1.0 - uClearStrength,
-    1.0,
-    smoothstep(uClearInner, uClearOuter, radial)
-  );
-
-  gl_FragColor = vec4(tinted, mask * presence * vTwinkle * clear * uOpacity);
-}
-`;
 
 /* ── Component ───────────────────────────────────────────────── */
 
@@ -433,14 +204,17 @@ export default function HeroGlyphField() {
         alpha: true,
         antialias: false,
         powerPreference: "high-performance",
+        // Reduced-motion draws a single frame and stops; WebGL discards the
+        // drawing buffer after compositing unless told otherwise, which would
+        // leave those users with a blank field.
+        preserveDrawingBuffer: reduced,
       });
     } catch {
       setNoWebGL(true);
       return;
     }
 
-    const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
-    renderer.setPixelRatio(dpr());
+    renderer.setPixelRatio(cappedDpr());
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.setAttribute("aria-hidden", "true");
     renderer.domElement.style.cssText =
@@ -452,7 +226,7 @@ export default function HeroGlyphField() {
     camera.position.z = CAMERA_Z;
 
     /* ── glyph cloud ── */
-    const atlas = buildAtlas();
+    const atlas = buildGlyphAtlas();
     const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
     const count = isMobile ? POINTS_MOBILE : POINTS_DESKTOP;
 
@@ -506,7 +280,7 @@ export default function HeroGlyphField() {
       uNoiseScale: { value: NOISE_SCALE },
       uNoiseAmp: { value: NOISE_AMP },
       uDrift: { value: DRIFT_SPEED },
-      uPixelRatio: { value: dpr() },
+      uPixelRatio: { value: cappedDpr() },
       uSize: { value: GLYPH_SIZE },
       uSizeMax: { value: GLYPH_SIZE_MAX },
       uDepthNear: { value: DEPTH_NEAR },
@@ -528,8 +302,8 @@ export default function HeroGlyphField() {
 
     const material = new THREE.ShaderMaterial({
       uniforms,
-      vertexShader: VERTEX_SHADER,
-      fragmentShader: FRAGMENT_SHADER,
+      vertexShader: GLYPH_VERTEX_SHADER,
+      fragmentShader: GLYPH_FRAGMENT_SHADER,
       transparent: true,
       depthWrite: false,
       blending: THREE.NormalBlending,
@@ -641,56 +415,24 @@ export default function HeroGlyphField() {
       scene.add(accentGroup);
     }
 
-    /* ── pointer: velocity drives noise, position drives parallax ── */
-    const pointer = {
-      x: 0,
-      y: 0,
-      lastX: 0,
-      lastY: 0,
-      lastT: 0,
-      seen: false,
-      /** 0..1 impulse from pointer speed, decays exponentially. */
-      energy: 0,
-      parallaxX: 0,
-      parallaxY: 0,
-      targetX: 0,
-      targetY: 0,
-    };
-
-    function onPointerMove(e: PointerEvent) {
-      const now = performance.now();
-      pointer.x = e.clientX;
-      pointer.y = e.clientY;
-
-      if (pointer.seen) {
-        const dt = Math.max(now - pointer.lastT, 1) / 1000;
-        const dist = Math.hypot(
-          pointer.x - pointer.lastX,
-          pointer.y - pointer.lastY
-        );
-        const speed = dist / dt; // px per second
-        const impulse = Math.min(speed / MOUSE_SPEED_FULL, 1);
-        pointer.energy = Math.min(pointer.energy + impulse * MOUSE_GAIN, 1);
-      }
-
-      pointer.lastX = pointer.x;
-      pointer.lastY = pointer.y;
-      pointer.lastT = now;
-      pointer.seen = true;
-
-      const rect = host!.getBoundingClientRect();
-      pointer.targetX = ((pointer.x - rect.left) / rect.width - 0.5) * PARALLAX;
-      pointer.targetY = -((pointer.y - rect.top) / rect.height - 0.5) * PARALLAX;
-    }
+    /* ── pointer: velocity drives noise, position drives parallax ──
+       Shared with HeroWordmark3D so both clouds answer the same gesture. */
+    const pointer = createPointerTracker({
+      gain: MOUSE_GAIN,
+      decay: MOUSE_DECAY,
+      speedFull: MOUSE_SPEED_FULL,
+      parallax: PARALLAX,
+      host,
+    });
 
     /* ── sizing ── */
     function resize() {
       const rect = host!.getBoundingClientRect();
       const w = Math.max(1, rect.width);
       const h = Math.max(1, rect.height);
-      renderer.setPixelRatio(dpr());
+      renderer.setPixelRatio(cappedDpr());
       renderer.setSize(w, h, false);
-      uniforms.uPixelRatio.value = dpr();
+      uniforms.uPixelRatio.value = cappedDpr();
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
 
@@ -722,14 +464,12 @@ export default function HeroGlyphField() {
       uniforms.uTime.value += dt;
 
       // Exponential decay back to the idle baseline.
-      pointer.energy *= Math.exp(-MOUSE_DECAY * dt);
+      pointer.step(dt);
       uniforms.uNoiseStrength.value =
-        NOISE_IDLE + pointer.energy * (1 - NOISE_IDLE);
+        NOISE_IDLE + pointer.state.energy * (1 - NOISE_IDLE);
 
-      pointer.parallaxX += (pointer.targetX - pointer.parallaxX) * 0.04;
-      pointer.parallaxY += (pointer.targetY - pointer.parallaxY) * 0.04;
-      camera.position.x = pointer.parallaxX;
-      camera.position.y = pointer.parallaxY;
+      camera.position.x = pointer.state.parallaxX;
+      camera.position.y = pointer.state.parallaxY;
       camera.lookAt(0, 0, 0);
 
       for (const tr of travellers) {
@@ -780,7 +520,7 @@ export default function HeroGlyphField() {
     document.addEventListener("visibilitychange", onVisibility);
 
     if (!reduced) {
-      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      pointer.attach();
       start();
     }
 
@@ -790,7 +530,7 @@ export default function HeroGlyphField() {
       io.disconnect();
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pointermove", onPointerMove);
+      pointer.detach();
 
       geometry.dispose();
       material.dispose();
