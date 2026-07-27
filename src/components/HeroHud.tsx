@@ -16,6 +16,48 @@ import { motion, animate } from "framer-motion";
 const GOLD = "#FFC919";
 const ICE = "#F5F6FC";
 
+/* ═══════════════════════════════════════════════════════════════
+   TUNABLES — widget sizing. Everything below scales the RENDERED size
+   of each SVG while leaving its internal viewBox geometry alone, so one
+   number rescales a whole widget with no risk of distorting it.
+
+   Note the split: the graphics are ambience and shrink hard, while the
+   numeric readouts are the actual information and shrink far less. That
+   is deliberate — the graph is decoration, the number is the data.
+   ═══════════════════════════════════════════════════════════════ */
+
+/** Global multiplier for the decorative telemetry graphics. */
+const WIDGET_SCALE = 0.65;
+/** Applied on top of WIDGET_SCALE to text living INSIDE a scaled SVG, to claw
+ *  back legibility the outer scale would otherwise cost. */
+const IN_SVG_TEXT_COMPENSATION = 1.28;
+
+/** Throughput line graph (top-left). Internal viewBox units. */
+const GRAPH_VB_W = 300;
+const GRAPH_VB_H = 70;
+const GRAPH_CYCLES = 6;
+const GRAPH_AMP = 18;
+
+/** Compute bar chart (top-right). Internal viewBox units. */
+const BARS_VB_W = 160;
+const BARS_VB_H = 70;
+
+/** Uptime radial gauge (left-middle). Internal viewBox units. */
+const GAUGE_VB = 110;
+/** Gauge label/value font sizes, in viewBox units, pre-compensation. */
+const GAUGE_VALUE_FONT = 20;
+const GAUGE_LABEL_FONT = 8;
+
+/** Corner bracket size in px. */
+const BRACKET_PX = 26;
+
+/* Derived rendered sizes — nothing below needs touching to retune. */
+const GRAPH_W = Math.round(GRAPH_VB_W * WIDGET_SCALE);
+const GRAPH_H = Math.round(GRAPH_VB_H * WIDGET_SCALE);
+const BARS_W = Math.round(BARS_VB_W * WIDGET_SCALE);
+const BARS_H = Math.round(BARS_VB_H * WIDGET_SCALE);
+const GAUGE_PX = Math.round(GAUGE_VB * WIDGET_SCALE);
+
 const reduce = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,12 +119,14 @@ function wavePath(width: number, height: number, cycles: number, amp: number) {
 const PANEL =
   "absolute hidden md:block font-[family-name:var(--font-lexend)] select-none";
 const LABEL =
-  "font-bold text-[0.55rem] uppercase tracking-[0.28em] text-[rgba(245,246,252,0.4)] mb-2";
-const VALUE = "font-black text-[1.1rem] tracking-tight";
+  "font-bold text-[0.5rem] uppercase tracking-[0.28em] text-[rgba(245,246,252,0.4)] mb-1";
+/** Readouts step down only slightly (1.1rem -> 0.95rem): the value is the data. */
+const VALUE = "font-black text-[0.95rem] tracking-tight";
 
 export default function HeroHud() {
-  const W = 300; // visible viewBox width for the line graph
-  const path = wavePath(W * 2, 70, 6, 18); // 2 tiles wide, shift by W = seamless
+  const W = GRAPH_VB_W; // visible viewBox width for the line graph
+  // 2 tiles wide, shift by exactly W = seamless loop
+  const path = wavePath(W * 2, GRAPH_VB_H, GRAPH_CYCLES, GRAPH_AMP);
   const reduced = useRef(false);
   useEffect(() => {
     reduced.current = reduce();
@@ -99,15 +143,20 @@ export default function HeroHud() {
       ].map((c) => (
         <div
           key={c}
-          className={`absolute hidden md:block h-8 w-8 ${c}`}
-          style={{ borderColor: "rgba(255,201,25,0.25)" }}
+          className={`absolute hidden md:block ${c}`}
+          style={{ borderColor: "rgba(255,201,25,0.25)", height: BRACKET_PX, width: BRACKET_PX }}
         />
       ))}
 
       {/* ── TOP-LEFT: scrolling line graph ── */}
-      <div className={`${PANEL} top-[12%] left-[5%] w-[300px]`}>
+      <div className={`${PANEL} top-[12%] left-[5%]`} style={{ width: GRAPH_W }}>
         <div className={LABEL}>Throughput // live</div>
-        <svg viewBox={`0 0 ${W} 70`} width={W} height={70} className="overflow-visible">
+        <svg
+          viewBox={`0 0 ${W} ${GRAPH_VB_H}`}
+          width={GRAPH_W}
+          height={GRAPH_H}
+          className="overflow-visible"
+        >
           <defs>
             <linearGradient id="hud-area" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={GOLD} stopOpacity="0.22" />
@@ -122,7 +171,10 @@ export default function HeroHud() {
             animate={reduced.current ? {} : { x: [0, -W] }}
             transition={{ duration: 7, ease: "linear", repeat: Infinity }}
           >
-            <path d={`${path} L${W * 2},70 L0,70 Z`} fill="url(#hud-area)" />
+            <path
+              d={`${path} L${W * 2},${GRAPH_VB_H} L0,${GRAPH_VB_H} Z`}
+              fill="url(#hud-area)"
+            />
             <path d={path} fill="none" stroke={GOLD} strokeWidth="1.6" strokeOpacity="0.85" />
           </motion.g>
           {/* leading pulse dot at the live edge */}
@@ -146,7 +198,7 @@ export default function HeroHud() {
       {/* ── TOP-RIGHT: oscillating bar chart ── */}
       <div className={`${PANEL} top-[13%] right-[5%] text-right`}>
         <div className={LABEL}>Compute // nodes</div>
-        <svg viewBox="0 0 160 70" width={160} height={70}>
+        <svg viewBox={`0 0 ${BARS_VB_W} ${BARS_VB_H}`} width={BARS_W} height={BARS_H}>
           {Array.from({ length: 9 }).map((_, i) => {
             const x = i * 18 + 4;
             const seq = [0.35, 1, 0.55, 0.85, 0.4, 0.7, 0.35]; // start === end → loop
@@ -182,7 +234,7 @@ export default function HeroHud() {
 
       {/* ── LEFT-MID: radial gauge ── */}
       <div className={`${PANEL} top-1/2 left-[6%] -translate-y-1/2`}>
-        <svg viewBox="0 0 110 110" width={110} height={110}>
+        <svg viewBox={`0 0 ${GAUGE_VB} ${GAUGE_VB}`} width={GAUGE_PX} height={GAUGE_PX}>
           <circle cx="55" cy="55" r="46" fill="none" stroke={ICE} strokeOpacity="0.08" strokeWidth="6" />
           <motion.circle
             cx="55"
@@ -201,21 +253,23 @@ export default function HeroHud() {
             }
             transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
           />
-          <text x="55" y="52" textAnchor="middle" fill={ICE} className="font-[family-name:var(--font-lexend)]" fontWeight="900" fontSize="20">
+          <text x="55" y="52" textAnchor="middle" fill={ICE} className="font-[family-name:var(--font-lexend)]" fontWeight="900"
+            fontSize={GAUGE_VALUE_FONT * IN_SVG_TEXT_COMPENSATION}
+          >
             <Counter from={61} to={98} duration={5} />
           </text>
-          <text x="55" y="68" textAnchor="middle" fill={GOLD} fontSize="8" letterSpacing="2" className="font-[family-name:var(--font-lexend)]" fontWeight="700">UPTIME</text>
+          <text x="55" y="70" textAnchor="middle" fill={GOLD} fontSize={GAUGE_LABEL_FONT * IN_SVG_TEXT_COMPENSATION} letterSpacing="1.6" className="font-[family-name:var(--font-lexend)]" fontWeight="700">UPTIME</text>
         </svg>
       </div>
 
       {/* ── RIGHT-MID: telemetry rows ── */}
-      <div className={`${PANEL} top-1/2 right-[6%] -translate-y-1/2 text-right w-[150px]`}>
+      <div className={`${PANEL} top-1/2 right-[6%] -translate-y-1/2 text-right w-[132px]`}>
         {[
           { k: "Latency", from: 8, to: 24, suffix: "ms", d: 4 },
           { k: "Queue", from: 0, to: 12, suffix: "", d: 5.5 },
           { k: "Tasks/min", from: 120, to: 340, suffix: "", d: 6.5 },
         ].map((r) => (
-          <div key={r.k} className="mb-3">
+          <div key={r.k} className="mb-2">
             <div className="text-[0.5rem] uppercase tracking-[0.25em] text-[rgba(245,246,252,0.4)]">{r.k}</div>
             <div className="font-black text-[1rem]" style={{ color: ICE }}>
               <Counter from={r.from} to={r.to} duration={r.d} suffix={r.suffix} />
