@@ -44,6 +44,7 @@ import {
   COLOR_FOG,
   GLYPH_FRAGMENT_SHADER,
   GLYPH_VERTEX_SHADER,
+  SIMPLEX_3D,
   buildGlyphAtlas,
   cappedDpr,
   createPointerTracker,
@@ -120,36 +121,42 @@ const MOUSE_SPEED_FULL = 2200;
 const DRIFT_SPEED = 0.05;
 
 /* ── Letter outline ───────────────────────────────────────────
-   A denser, brighter band of glyphs along every letter contour — including the
-   O and D counters — so closed letters have a defined edge instead of dissolving
-   into a blob of characters. The fill supplies the texture, the outline supplies
-   the letterform. */
+   A hairline wireframe tracing every letter contour — including the O and D
+   counters — so closed letters have a hard edge instead of dissolving into a
+   blob of characters. It is real line geometry, NOT a band of particles: an
+   earlier attempt scattered glyphs along the contour, which just added more
+   particle mass and buried the letterforms further.
+
+   GL line width is effectively locked to 1 device pixel (drivers ignore
+   linewidth > 1), which here is exactly the point: at DPR 2 that renders as
+   half a CSS pixel. The fill keeps every one of its particles; this only adds
+   the edge that tells you where each letter stops. */
 
 /** Master switch for the outline. */
 const ENABLE_OUTLINE = true;
-/** Spacing between outline glyphs along a contour, in world units.
- *  Lower = denser = more solid-looking edge.
+/** Length of one wireframe segment in world units. Larger = fewer, longer
+ *  facets, so the curves read as a faceted polygonal mesh rather than as smooth
+ *  vector curves — deliberate, and consistent with the wireframe node accent
+ *  already in the hero. */
+const OUTLINE_FACET_LENGTH = 0.85;
+/** Line opacity — the only weight dial there is, since GL linewidth is pinned at
+ *  1 device pixel. A hairline needs a fairly high value to register at all, so
+ *  this is not on the same scale as a fill opacity.
  *
- *  Split by breakpoint for the same reason the fill count is: the contour length
- *  is a world-space constant, so a single spacing yields the SAME number of
- *  outline glyphs at every size — while the fill drops from 1900 to 720. That
- *  made the outline roughly 2.7x more dominant on a phone, burying the glyph
- *  texture under what looked like a plain outline drawing. */
-const OUTLINE_SPACING_DESKTOP = 0.34;
-const OUTLINE_SPACING_MOBILE = 0.8;
-/** Half-width of the band the outline points scatter across, in world units.
- *  This is the "thickness" dial: 0 pins every glyph exactly on the path (finest
- *  possible edge), larger values read as a thicker stroke. Push it too far and
- *  the wordmark flattens into an outline drawing and loses the glyph texture. */
-const OUTLINE_BAND = 0.04;
-/** Outline glyph size relative to the fill's. Finer glyphs read as a line
- *  rather than as more fill. */
-const OUTLINE_GLYPH_RATIO = 0.78;
+ *  Split by breakpoint, and for a sharper reason than the usual responsive
+ *  tweak: the line is one PIXEL wide no matter how large the word is drawn,
+ *  while the word itself goes from ~130px tall on desktop to ~35px on a phone.
+ *  The stroke is therefore ~4x heavier relative to the letterform on mobile —
+ *  and it lands on a fill that has simultaneously dropped from 1900 points to
+ *  720. Held at the desktop value it stops reading as an edge around a glyph
+ *  texture and starts reading as a line drawing with some glyphs scattered in
+ *  it, which loses exactly the quality the wordmark is for. */
+const OUTLINE_OPACITY_DESKTOP = 0.72;
+const OUTLINE_OPACITY_MOBILE = 0.46;
 /** Outline noise relative to the fill's — deliberately lower. If the edge
- *  shimmers more than the interior it stops reading as a border at all. */
-const OUTLINE_NOISE_FACTOR = 0.35;
-/** The outline should hold its presence through depth rather than fading out
- *  the way the fill does, so it keeps defining the shape. */
+ *  travels more than the interior it stops reading as a border at all. */
+const OUTLINE_NOISE_FACTOR = 0.3;
+/** How much presence the outline keeps at depth (0 = fades out entirely). */
 const OUTLINE_DEPTH_FLOOR = 0.55;
 
 /** Pointer-driven tilt, in radians — this is what makes the extrusion visible.
@@ -162,6 +169,59 @@ const TILT_MAX = 0.13;
 const TILT_STATIC = 0.085;
 
 /* ═══════════════════════════════════════════════════════════════ */
+
+/* The outline can't use the point-cloud shader — that one is built around
+ * gl_PointSize and atlas sampling. It shares the noise field and the depth-fade
+ * model, and nothing else. Crucially it omits the per-point random Y jitter the
+ * fill applies via aSeed: that is fine for scattered particles but would tear a
+ * connected line into confetti. Simplex noise is spatially coherent, so
+ * neighbouring vertices displace together and the outline flexes as one piece. */
+const OUTLINE_VERTEX_SHADER = /* glsl */ `
+uniform float uTime;
+uniform float uNoiseStrength;
+uniform float uNoiseScale;
+uniform float uNoiseAmp;
+uniform float uDrift;
+uniform float uDepthNear;
+uniform float uDepthFar;
+
+varying float vFade;
+
+${SIMPLEX_3D}
+
+void main() {
+  vec3 p = position;
+
+  vec3 np = p * uNoiseScale + vec3(0.0, 0.0, uTime * uDrift);
+  vec3 disp = vec3(
+    snoise(np),
+    snoise(np + vec3(31.4, 0.0, 0.0)),
+    snoise(np + vec3(0.0, 17.7, 0.0))
+  );
+  p += disp * uNoiseAmp * uNoiseStrength;
+
+  vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+  float viewDepth = -mvPosition.z;
+  vFade = 1.0 - smoothstep(uDepthNear, uDepthFar, viewDepth);
+
+  gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const OUTLINE_FRAGMENT_SHADER = /* glsl */ `
+uniform vec3 uColor;
+uniform vec3 uFog;
+uniform float uOpacity;
+uniform float uDepthFloor;
+
+varying float vFade;
+
+void main() {
+  vec3 tinted = mix(uFog, uColor, 0.35 + 0.65 * vFade);
+  float presence = uDepthFloor + (1.0 - uDepthFloor) * vFade;
+  gl_FragColor = vec4(tinted, uOpacity * presence);
+}
+`;
 
 /** Original flat wordmark, loaded only if WebGL is unavailable. */
 const HeroWordmark2D = dynamic(() => import("./HeroWordmark"), { ssr: false });
@@ -241,19 +301,22 @@ export default function HeroWordmark3D() {
       uFog: { value: new THREE.Color(COLOR_FOG) },
     };
 
-    // The outline reuses the same shader but needs its own uniform set: brighter,
-    // steadier, finer glyphs, and it must not fade with depth like the fill.
     const outlineUniforms = {
-      ...uniforms,
+      uTime: { value: 0 },
       uNoiseStrength: {
-        value: reduced ? 0 : NOISE_IDLE * WORDMARK_NOISE_FACTOR * OUTLINE_NOISE_FACTOR,
+        value: reduced
+          ? 0
+          : NOISE_IDLE * WORDMARK_NOISE_FACTOR * OUTLINE_NOISE_FACTOR,
       },
-      uSize: { value: 1 },
-      uSizeMax: { value: GLYPH_PX_MAX },
+      uNoiseScale: { value: NOISE_SCALE },
+      uNoiseAmp: { value: NOISE_AMP },
+      uDrift: { value: DRIFT_SPEED },
       uDepthNear: { value: 1 },
       uDepthFar: { value: 2 },
       uDepthFloor: { value: OUTLINE_DEPTH_FLOOR },
-      uTime: { value: 0 },
+      uOpacity: { value: OUTLINE_OPACITY_DESKTOP },
+      uColor: { value: new THREE.Color(COLOR_ACCENT) },
+      uFog: { value: new THREE.Color(COLOR_FOG) },
     };
 
     const material = new THREE.ShaderMaterial({
@@ -267,8 +330,8 @@ export default function HeroWordmark3D() {
 
     const outlineMaterial = new THREE.ShaderMaterial({
       uniforms: outlineUniforms,
-      vertexShader: GLYPH_VERTEX_SHADER,
-      fragmentShader: GLYPH_FRAGMENT_SHADER,
+      vertexShader: OUTLINE_VERTEX_SHADER,
+      fragmentShader: OUTLINE_FRAGMENT_SHADER,
       transparent: true,
       depthWrite: false,
       blending: THREE.NormalBlending,
@@ -276,7 +339,7 @@ export default function HeroWordmark3D() {
 
     let pointCloud: THREE.Points | null = null;
     let cloudGeometry: THREE.BufferGeometry | null = null;
-    let outlinePoints: THREE.Points | null = null;
+    let outlineLines: THREE.LineSegments | null = null;
     let outlineGeometry: THREE.BufferGeometry | null = null;
 
     const pointer = createPointerTracker({
@@ -299,9 +362,9 @@ export default function HeroWordmark3D() {
       const aspect = w / h;
       camera.aspect = aspect;
 
+      const isNarrow = w <= MOBILE_BREAKPOINT;
       const tanHalfFov = Math.tan((CAMERA_FOV * Math.PI) / 360);
-      const marginX =
-        w <= MOBILE_BREAKPOINT ? FIT_MARGIN_X_MOBILE : FIT_MARGIN_X_DESKTOP;
+      const marginX = isNarrow ? FIT_MARGIN_X_MOBILE : FIT_MARGIN_X_DESKTOP;
       // Distance needed for the word's height, and for its width at this aspect.
       const distForY = (halfExtent.y * FIT_MARGIN_Y) / tanHalfFov;
       const distForX = (halfExtent.x * marginX) / (tanHalfFov * aspect);
@@ -327,13 +390,13 @@ export default function HeroWordmark3D() {
       uniforms.uSize.value = (glyphPx * dist) / 30;
       uniforms.uSizeMax.value = glyphPx * 1.7;
 
-      // Outline tracks the same framing, at its own finer glyph size.
-      const outlinePx = glyphPx * OUTLINE_GLYPH_RATIO;
-      outlineUniforms.uPixelRatio.value = cappedDpr();
+      // The hairline has no glyph size to solve; it shares the depth window and
+      // re-picks its weight, since a resize can cross the breakpoint.
       outlineUniforms.uDepthNear.value = uniforms.uDepthNear.value;
       outlineUniforms.uDepthFar.value = uniforms.uDepthFar.value;
-      outlineUniforms.uSize.value = (outlinePx * dist) / 30;
-      outlineUniforms.uSizeMax.value = outlinePx * 1.7;
+      outlineUniforms.uOpacity.value = isNarrow
+        ? OUTLINE_OPACITY_MOBILE
+        : OUTLINE_OPACITY_DESKTOP;
 
       renderer.render(scene, camera);
     }
@@ -429,21 +492,17 @@ export default function HeroWordmark3D() {
     }
 
     /**
-     * Trace every letter contour as a band of glyphs.
+     * Trace every letter contour as a hairline wireframe.
      *
      * `font.generateShapes` hands back the same THREE.Shapes that TextGeometry
      * extrudes, each carrying its holes — which is exactly what the O and D need,
-     * since their inner edge matters as much as their outer one. Points are
-     * spaced by arc length so a long straight edge and a tight curve end up with
-     * the same density, then jittered along the contour normal to give the stroke
-     * its thickness.
+     * since their inner edge defines the letter as much as the outer one.
+     *
+     * Everything goes into ONE LineSegments: a LineLoop per contour would mean a
+     * draw call per contour, and the word has ten of them.
      */
     function buildOutline(font: Font, offX: number, offY: number) {
       const shapes = font.generateShapes(WORD, TEXT_SIZE);
-      const spacing =
-        window.innerWidth <= MOBILE_BREAKPOINT
-          ? OUTLINE_SPACING_MOBILE
-          : OUTLINE_SPACING_DESKTOP;
 
       // Outer contours and holes are treated identically.
       const contours: THREE.Path[] = [];
@@ -452,68 +511,42 @@ export default function HeroWordmark3D() {
         for (const hole of shape.holes) contours.push(hole);
       }
 
-      // Sit on the front face, matching where the fill's front-face samples are.
-      const frontZ = TEXT_DEPTH / 2;
+      // Sit slightly in front of the front face so the hairline is never buried
+      // inside the particle mass it is meant to delimit.
+      const frontZ = TEXT_DEPTH / 2 + 0.02;
       const coords: number[] = [];
 
       for (const contour of contours) {
         const length = contour.getLength();
         if (!Number.isFinite(length) || length <= 0) continue;
-        const n = Math.max(8, Math.round(length / spacing));
-        const pts = contour.getSpacedPoints(n);
-        const count = pts.length;
-        if (count < 3) continue;
 
-        for (let i = 0; i < count; i++) {
-          const prev = pts[(i - 1 + count) % count];
-          const next = pts[(i + 1) % count];
-          // Contour normal from the local tangent, so the band follows the edge
-          // instead of smearing in a fixed direction.
-          let nx = -(next.y - prev.y);
-          let ny = next.x - prev.x;
-          const len = Math.hypot(nx, ny) || 1;
-          nx /= len;
-          ny /= len;
-          const jitter = (Math.random() * 2 - 1) * OUTLINE_BAND;
-          coords.push(
-            pts[i].x + offX + nx * jitter,
-            pts[i].y + offY + ny * jitter,
-            frontZ
-          );
+        // Segment count from arc length, so a long stem and a tight curve get
+        // facets of the same size rather than the same COUNT.
+        const segments = Math.max(3, Math.round(length / OUTLINE_FACET_LENGTH));
+        const pts = contour.getSpacedPoints(segments);
+        if (pts.length < 2) continue;
+
+        // Explicit vertex pairs, closing the loop on the last segment.
+        for (let i = 0; i < pts.length; i++) {
+          const a = pts[i];
+          const b = pts[(i + 1) % pts.length];
+          coords.push(a.x + offX, a.y + offY, frontZ);
+          coords.push(b.x + offX, b.y + offY, frontZ);
         }
       }
 
-      const total = coords.length / 3;
-      if (total === 0) return;
-
-      const chars = new Float32Array(total);
-      const seeds = new Float32Array(total);
-      const accents = new Float32Array(total);
-      const sizeMuls = new Float32Array(total);
-      const cells = ATLAS_GRID * ATLAS_GRID;
-      for (let i = 0; i < total; i++) {
-        chars[i] = Math.floor(Math.random() * cells);
-        seeds[i] = Math.random();
-        // Entirely the brand accent, so the edge reads as one deliberate line.
-        accents[i] = 1;
-        // Uniform, unlike the fill: a stroke of varying weight looks accidental.
-        sizeMuls[i] = 1;
-      }
+      if (coords.length === 0) return;
 
       const geo = new THREE.BufferGeometry();
       geo.setAttribute(
         "position",
         new THREE.BufferAttribute(new Float32Array(coords), 3)
       );
-      geo.setAttribute("aChar", new THREE.BufferAttribute(chars, 1));
-      geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
-      geo.setAttribute("aAccent", new THREE.BufferAttribute(accents, 1));
-      geo.setAttribute("aSizeMul", new THREE.BufferAttribute(sizeMuls, 1));
 
       outlineGeometry = geo;
-      outlinePoints = new THREE.Points(geo, outlineMaterial);
-      outlinePoints.frustumCulled = false;
-      group.add(outlinePoints);
+      outlineLines = new THREE.LineSegments(geo, outlineMaterial);
+      outlineLines.frustumCulled = false;
+      group.add(outlineLines);
     }
 
     /* ── loop ── */

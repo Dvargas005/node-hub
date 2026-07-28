@@ -173,8 +173,11 @@ export function createPointerTracker(opts: PointerTrackerOptions) {
 
 /* ── Shaders ─────────────────────────────────────────────────── */
 
-/** Ashima / Stefan Gustavson 3D simplex noise (webgl-noise, MIT). */
-const SIMPLEX_3D = /* glsl */ `
+/** Ashima / Stefan Gustavson 3D simplex noise (webgl-noise, MIT).
+ *  Exported so the wordmark's outline shader can deform on the SAME noise field
+ *  as the point clouds — being spatially coherent, adjacent line vertices move
+ *  together, so the outline flexes as one piece instead of tearing apart. */
+export const SIMPLEX_3D = /* glsl */ `
 vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
 vec4 mod289(vec4 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
 vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
