@@ -4,22 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
 import HeroHud from "@/components/HeroHud";
-import dynamic from "next/dynamic";
-
-// Three.js is a ~150KB dependency and the field is purely decorative, so it is
-// split into its own chunk and never server-rendered. HeroGlyphField itself
-// falls back to the 2D HeroNetwork canvas when WebGL is unavailable.
-const HeroGlyphField = dynamic(() => import("@/components/HeroGlyphField"), {
-  ssr: false,
-});
-
-// The wordmark is now real 3D letter geometry sampled into a glyph point cloud,
-// so it pulls in three plus TextGeometry/MeshSurfaceSampler. Dynamic + ssr:false
-// keeps all of that out of the landing route's initial chunk; the component
-// falls back to the flat 2D HeroWordmark when WebGL is unavailable.
-const HeroWordmark3D = dynamic(() => import("@/components/HeroWordmark3D"), {
-  ssr: false,
-});
+import HeroNetwork from "@/components/HeroNetwork";
+import HeroWordmark from "@/components/HeroWordmark";
 import {
   motion,
   useScroll,
@@ -574,11 +560,9 @@ export default function Home() {
 
       {/* ═══ 1. HERO ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(255,201,25,0.08) 0%, rgba(255,140,0,0.04) 30%, #130A06 70%)" }}>
-        {/* Layer 1: 3D glyph particle field — a point cloud of code characters
-            whose depth reads as atmosphere and whose noise reacts to pointer
-            velocity. Degrades to the 2D HeroNetwork canvas without WebGL. */}
+        {/* Layer 1: code-generated living delivery network (replaces hero.png) */}
         <div className="absolute inset-0 z-[1] pointer-events-none">
-          <HeroGlyphField />
+          <HeroNetwork />
         </div>
         {/* Layer 2: Noise/grain overlay — ABOVE image */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay z-[2]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
@@ -593,12 +577,12 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease, delay: 0.4 }}
             style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
-            className="relative w-full min-h-[clamp(4rem,16vw,14rem)]"
+            className="w-full min-h-[clamp(4rem,16vw,14rem)]"
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
             <h1 className="sr-only">N.O.D.E.</h1>
-            <HeroWordmark3D />
+            <HeroWordmark />
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
