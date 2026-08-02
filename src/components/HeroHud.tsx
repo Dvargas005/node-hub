@@ -155,14 +155,7 @@ export default function HeroHud() {
           viewBox={`0 0 ${W} ${GRAPH_VB_H}`}
           width={GRAPH_W}
           height={GRAPH_H}
-          // Clipped, not overflow-visible. The path is two tiles wide and slides
-          // by exactly one tile, so with overflow visible a GRAPH_W-wide graph
-          // actually drew 2x GRAPH_W and ran off the left edge of the viewport
-          // partway through every cycle — WIDGET_SCALE was sizing a box the
-          // graph did not stay inside. Clipping to the viewBox makes the
-          // rendered width genuinely GRAPH_W and turns the shift into what it
-          // was always meant to be: a scrolling window onto a continuous trace.
-          className="overflow-hidden"
+          className="overflow-visible"
         >
           <defs>
             <linearGradient id="hud-area" x1="0" y1="0" x2="0" y2="1">
@@ -186,9 +179,7 @@ export default function HeroHud() {
           </motion.g>
           {/* leading pulse dot at the live edge */}
           <motion.circle
-            // Inset by its own animated max radius (4.5) so the clip above
-            // never shaves the pulse at the live edge.
-            cx={W - 6}
+            cx={W - 2}
             cy={35}
             r="3"
             fill={GOLD}
