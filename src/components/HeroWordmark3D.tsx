@@ -119,39 +119,6 @@ const MOUSE_DECAY = 2.6;
 const MOUSE_SPEED_FULL = 2200;
 const DRIFT_SPEED = 0.05;
 
-/* ── Letter outline ───────────────────────────────────────────
-   A denser, brighter band of glyphs along every letter contour — including the
-   O and D counters — so closed letters have a defined edge instead of dissolving
-   into a blob of characters. The fill supplies the texture, the outline supplies
-   the letterform. */
-
-/** Master switch for the outline. */
-const ENABLE_OUTLINE = true;
-/** Spacing between outline glyphs along a contour, in world units.
- *  Lower = denser = more solid-looking edge.
- *
- *  Split by breakpoint for the same reason the fill count is: the contour length
- *  is a world-space constant, so a single spacing yields the SAME number of
- *  outline glyphs at every size — while the fill drops from 1900 to 720. That
- *  made the outline roughly 2.7x more dominant on a phone, burying the glyph
- *  texture under what looked like a plain outline drawing. */
-const OUTLINE_SPACING_DESKTOP = 0.34;
-const OUTLINE_SPACING_MOBILE = 0.8;
-/** Half-width of the band the outline points scatter across, in world units.
- *  This is the "thickness" dial: 0 pins every glyph exactly on the path (finest
- *  possible edge), larger values read as a thicker stroke. Push it too far and
- *  the wordmark flattens into an outline drawing and loses the glyph texture. */
-const OUTLINE_BAND = 0.04;
-/** Outline glyph size relative to the fill's. Finer glyphs read as a line
- *  rather than as more fill. */
-const OUTLINE_GLYPH_RATIO = 0.78;
-/** Outline noise relative to the fill's — deliberately lower. If the edge
- *  shimmers more than the interior it stops reading as a border at all. */
-const OUTLINE_NOISE_FACTOR = 0.35;
-/** The outline should hold its presence through depth rather than fading out
- *  the way the fill does, so it keeps defining the shape. */
-const OUTLINE_DEPTH_FLOOR = 0.55;
-
 /** Pointer-driven tilt, in radians — this is what makes the extrusion visible.
  *  Kept small: the word is ~4x wider than it is tall, so at this camera distance
  *  even a modest yaw swings the near end far enough out to break the framing.
@@ -241,21 +208,6 @@ export default function HeroWordmark3D() {
       uFog: { value: new THREE.Color(COLOR_FOG) },
     };
 
-    // The outline reuses the same shader but needs its own uniform set: brighter,
-    // steadier, finer glyphs, and it must not fade with depth like the fill.
-    const outlineUniforms = {
-      ...uniforms,
-      uNoiseStrength: {
-        value: reduced ? 0 : NOISE_IDLE * WORDMARK_NOISE_FACTOR * OUTLINE_NOISE_FACTOR,
-      },
-      uSize: { value: 1 },
-      uSizeMax: { value: GLYPH_PX_MAX },
-      uDepthNear: { value: 1 },
-      uDepthFar: { value: 2 },
-      uDepthFloor: { value: OUTLINE_DEPTH_FLOOR },
-      uTime: { value: 0 },
-    };
-
     const material = new THREE.ShaderMaterial({
       uniforms,
       vertexShader: GLYPH_VERTEX_SHADER,
@@ -265,19 +217,8 @@ export default function HeroWordmark3D() {
       blending: THREE.NormalBlending,
     });
 
-    const outlineMaterial = new THREE.ShaderMaterial({
-      uniforms: outlineUniforms,
-      vertexShader: GLYPH_VERTEX_SHADER,
-      fragmentShader: GLYPH_FRAGMENT_SHADER,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.NormalBlending,
-    });
-
     let pointCloud: THREE.Points | null = null;
     let cloudGeometry: THREE.BufferGeometry | null = null;
-    let outlinePoints: THREE.Points | null = null;
-    let outlineGeometry: THREE.BufferGeometry | null = null;
 
     const pointer = createPointerTracker({
       gain: MOUSE_GAIN,
@@ -327,14 +268,6 @@ export default function HeroWordmark3D() {
       uniforms.uSize.value = (glyphPx * dist) / 30;
       uniforms.uSizeMax.value = glyphPx * 1.7;
 
-      // Outline tracks the same framing, at its own finer glyph size.
-      const outlinePx = glyphPx * OUTLINE_GLYPH_RATIO;
-      outlineUniforms.uPixelRatio.value = cappedDpr();
-      outlineUniforms.uDepthNear.value = uniforms.uDepthNear.value;
-      outlineUniforms.uDepthFar.value = uniforms.uDepthFar.value;
-      outlineUniforms.uSize.value = (outlinePx * dist) / 30;
-      outlineUniforms.uSizeMax.value = outlinePx * 1.7;
-
       renderer.render(scene, camera);
     }
 
@@ -356,19 +289,13 @@ export default function HeroWordmark3D() {
       const bb = textGeo.boundingBox!;
       // TextGeometry lays the word out from the origin along +X and sits it on
       // the baseline; recentre it so the model rotates about its own middle.
-      // Read the offsets out BEFORE translating: translate() runs through
-      // applyMatrix4, which recomputes boundingBox in place, so `bb` would then
-      // describe the already-centred geometry. The outline is generated from the
-      // font's own shapes in the untranslated space and needs these same offsets.
-      const offX = -(bb.max.x + bb.min.x) / 2;
-      const offY = -(bb.max.y + bb.min.y) / 2;
-      const offZ = -(bb.max.z + bb.min.z) / 2;
-      const sizeX = bb.max.x - bb.min.x;
-      const sizeY = bb.max.y - bb.min.y;
-
-      textGeo.translate(offX, offY, offZ);
-      halfExtent.x = sizeX / 2;
-      halfExtent.y = sizeY / 2;
+      textGeo.translate(
+        -(bb.max.x + bb.min.x) / 2,
+        -(bb.max.y + bb.min.y) / 2,
+        -(bb.max.z + bb.min.z) / 2
+      );
+      halfExtent.x = (bb.max.x - bb.min.x) / 2;
+      halfExtent.y = (bb.max.y - bb.min.y) / 2;
 
       // MeshSurfaceSampler needs a Mesh, and an index-free, non-morphed geometry.
       const sampler = new MeshSurfaceSampler(
@@ -424,96 +351,6 @@ export default function HeroWordmark3D() {
 
       // The sampler and the source mesh are no longer needed on the GPU/CPU.
       textGeo.dispose();
-
-      if (ENABLE_OUTLINE) buildOutline(font, offX, offY);
-    }
-
-    /**
-     * Trace every letter contour as a band of glyphs.
-     *
-     * `font.generateShapes` hands back the same THREE.Shapes that TextGeometry
-     * extrudes, each carrying its holes — which is exactly what the O and D need,
-     * since their inner edge matters as much as their outer one. Points are
-     * spaced by arc length so a long straight edge and a tight curve end up with
-     * the same density, then jittered along the contour normal to give the stroke
-     * its thickness.
-     */
-    function buildOutline(font: Font, offX: number, offY: number) {
-      const shapes = font.generateShapes(WORD, TEXT_SIZE);
-      const spacing =
-        window.innerWidth <= MOBILE_BREAKPOINT
-          ? OUTLINE_SPACING_MOBILE
-          : OUTLINE_SPACING_DESKTOP;
-
-      // Outer contours and holes are treated identically.
-      const contours: THREE.Path[] = [];
-      for (const shape of shapes) {
-        contours.push(shape);
-        for (const hole of shape.holes) contours.push(hole);
-      }
-
-      // Sit on the front face, matching where the fill's front-face samples are.
-      const frontZ = TEXT_DEPTH / 2;
-      const coords: number[] = [];
-
-      for (const contour of contours) {
-        const length = contour.getLength();
-        if (!Number.isFinite(length) || length <= 0) continue;
-        const n = Math.max(8, Math.round(length / spacing));
-        const pts = contour.getSpacedPoints(n);
-        const count = pts.length;
-        if (count < 3) continue;
-
-        for (let i = 0; i < count; i++) {
-          const prev = pts[(i - 1 + count) % count];
-          const next = pts[(i + 1) % count];
-          // Contour normal from the local tangent, so the band follows the edge
-          // instead of smearing in a fixed direction.
-          let nx = -(next.y - prev.y);
-          let ny = next.x - prev.x;
-          const len = Math.hypot(nx, ny) || 1;
-          nx /= len;
-          ny /= len;
-          const jitter = (Math.random() * 2 - 1) * OUTLINE_BAND;
-          coords.push(
-            pts[i].x + offX + nx * jitter,
-            pts[i].y + offY + ny * jitter,
-            frontZ
-          );
-        }
-      }
-
-      const total = coords.length / 3;
-      if (total === 0) return;
-
-      const chars = new Float32Array(total);
-      const seeds = new Float32Array(total);
-      const accents = new Float32Array(total);
-      const sizeMuls = new Float32Array(total);
-      const cells = ATLAS_GRID * ATLAS_GRID;
-      for (let i = 0; i < total; i++) {
-        chars[i] = Math.floor(Math.random() * cells);
-        seeds[i] = Math.random();
-        // Entirely the brand accent, so the edge reads as one deliberate line.
-        accents[i] = 1;
-        // Uniform, unlike the fill: a stroke of varying weight looks accidental.
-        sizeMuls[i] = 1;
-      }
-
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute(
-        "position",
-        new THREE.BufferAttribute(new Float32Array(coords), 3)
-      );
-      geo.setAttribute("aChar", new THREE.BufferAttribute(chars, 1));
-      geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
-      geo.setAttribute("aAccent", new THREE.BufferAttribute(accents, 1));
-      geo.setAttribute("aSizeMul", new THREE.BufferAttribute(sizeMuls, 1));
-
-      outlineGeometry = geo;
-      outlinePoints = new THREE.Points(geo, outlineMaterial);
-      outlinePoints.frustumCulled = false;
-      group.add(outlinePoints);
     }
 
     /* ── loop ── */
@@ -529,13 +366,9 @@ export default function HeroWordmark3D() {
       uniforms.uTime.value += dt;
       pointer.step(dt);
 
-      const wordmarkNoise =
+      uniforms.uNoiseStrength.value =
         (NOISE_IDLE + pointer.state.energy * (1 - NOISE_IDLE)) *
         WORDMARK_NOISE_FACTOR;
-      uniforms.uNoiseStrength.value = wordmarkNoise;
-      // The edge moves with the fill but far less, so it still reads as a border.
-      outlineUniforms.uTime.value = uniforms.uTime.value;
-      outlineUniforms.uNoiseStrength.value = wordmarkNoise * OUTLINE_NOISE_FACTOR;
 
       // Tilt is what reveals the extrusion — without it a head-on point cloud
       // of extruded text is indistinguishable from a flat one.
@@ -613,9 +446,7 @@ export default function HeroWordmark3D() {
       pointer.detach();
 
       cloudGeometry?.dispose();
-      outlineGeometry?.dispose();
       material.dispose();
-      outlineMaterial.dispose();
       atlas?.dispose();
       scene.clear();
       renderer.dispose();
