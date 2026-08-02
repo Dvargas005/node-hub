@@ -114,29 +114,8 @@ const ATLAS_CELL = 64;
 const GLYPH_CHARS = "0123456789ABCDEF{}<>[]/=+*;:#%$&|";
 
 /** Optional wireframe node-network accent layered into the field. */
-const ENABLE_NODE_ACCENT = true;
+const ENABLE_NODE_ACCENT = false;
 const NODE_ACCENT_COUNT = 4;
-/** Wireframe solid opacity, link-tube opacity, and travelling glow opacity. */
-const NODE_ACCENT_OPACITY = 0.3;
-const NODE_LINK_OPACITY = 0.07;
-const NODE_GLOW_OPACITY = 0.45;
-/** Radius of the wireframe solids in world units. */
-const NODE_ACCENT_RADIUS = 0.9;
-/** The accent sits as one small off-centre cluster rather than being scattered
- *  across the field: scattered nodes chained in sequence produce link tubes
- *  that cut clean across the hero, and the accent layer is not subject to the
- *  points shader's centre clear-out, so those lines crossed the wordmark. */
-/* The hero is crowded: the HUD owns the top-left sparkline and top-right node
- * bars, the telemetry rows own the middle-right, the uptime ring the mid-left,
- * and the wordmark the centre. The lower-left quadrant is the one genuinely
- * free pocket, so the cluster lives there. */
-const NODE_CLUSTER_AT = { x: -0.42, y: -0.45 }; // fraction of the field extents
-const NODE_CLUSTER_SPREAD = 6; // world units around that anchor
-/** The camera's visible half-height is fixed, so a fixed world-unit cluster
- *  renders at the same PIXEL size on every viewport — which made it dominate a
- *  narrow phone screen while reading as a small detail on desktop. Scale the
- *  accent down with the aspect ratio so it stays a detail everywhere. */
-const NODE_ACCENT_REFERENCE_ASPECT = 1.5;
 
 /* ═══════════════════════════════════════════════════════════════ */
 
@@ -553,41 +532,30 @@ export default function HeroGlyphField() {
     if (ENABLE_NODE_ACCENT) {
       accentGroup = new THREE.Group();
       const glow = buildGlowTexture();
-      const accentScale = Math.min(
-        1,
-        seededAspect / NODE_ACCENT_REFERENCE_ASPECT
-      );
-      const nodeRadius = NODE_ACCENT_RADIUS * accentScale;
-      const clusterSpread = NODE_CLUSTER_SPREAD * accentScale;
       const nodeGeoms = [
-        new THREE.IcosahedronGeometry(nodeRadius, 0),
-        new THREE.DodecahedronGeometry(nodeRadius * 0.93, 0),
+        new THREE.IcosahedronGeometry(1.5, 0),
+        new THREE.DodecahedronGeometry(1.4, 0),
       ];
       const wireMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(COLOR_ACCENT),
         wireframe: true,
         transparent: true,
-        opacity: NODE_ACCENT_OPACITY,
+        opacity: 0.45,
       });
       const linkMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(COLOR_ACCENT),
         transparent: true,
-        opacity: NODE_LINK_OPACITY,
+        opacity: 0.14,
       });
       accentDisposables.push(wireMat, linkMat, ...nodeGeoms);
       if (glow) accentDisposables.push(glow);
 
-      const anchor = new THREE.Vector3(
-        NODE_CLUSTER_AT.x * fieldX,
-        NODE_CLUSTER_AT.y * fieldY,
-        0
-      );
       const centres: THREE.Vector3[] = [];
       for (let i = 0; i < NODE_ACCENT_COUNT; i++) {
         const pos = new THREE.Vector3(
-          anchor.x + (Math.random() * 2 - 1) * clusterSpread,
-          anchor.y + (Math.random() * 2 - 1) * clusterSpread * 0.7,
-          (Math.random() * 2 - 1) * FIELD_Z * 0.35
+          (Math.random() * 2 - 1) * fieldX * 0.7,
+          (Math.random() * 2 - 1) * fieldY * 0.7,
+          (Math.random() * 2 - 1) * FIELD_Z * 0.5
         );
         centres.push(pos);
         const mesh = new THREE.Mesh(nodeGeoms[i % nodeGeoms.length], wireMat);
@@ -600,8 +568,7 @@ export default function HeroGlyphField() {
         const a = centres[i];
         const b = centres[i + 1];
         const len = a.distanceTo(b);
-        const tubeR = 0.035 * accentScale;
-        const geo = new THREE.CylinderGeometry(tubeR, tubeR, len, 5, 1, true);
+        const geo = new THREE.CylinderGeometry(0.035, 0.035, len, 5, 1, true);
         accentDisposables.push(geo);
         const tube = new THREE.Mesh(geo, linkMat);
         tube.position.copy(a).add(b).multiplyScalar(0.5);
@@ -617,22 +584,17 @@ export default function HeroGlyphField() {
             transparent: true,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
-            opacity: NODE_GLOW_OPACITY,
+            opacity: 0.7,
           });
           accentDisposables.push(spriteMat);
           const sprite = new THREE.Sprite(spriteMat);
-          sprite.scale.setScalar(2.2 * accentScale);
+          sprite.scale.setScalar(2.2);
           accentGroup.add(sprite);
-          const startT = Math.random();
-          // Seed the position too: without this the sprite sits at the origin
-          // until the first animation frame, which is visible in the static
-          // frame drawn for reduced-motion and for the initial paint.
-          sprite.position.lerpVectors(a, b, startT);
           travellers.push({
             sprite,
             a: a.clone(),
             b: b.clone(),
-            t: startT,
+            t: Math.random(),
             speed: 0.12 + Math.random() * 0.12,
           });
         }
