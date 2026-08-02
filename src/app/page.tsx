@@ -4,20 +4,13 @@ import { useEffect, useState, useRef } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import ServiceChapters from "@/components/ServiceChapters";
 import HeroHud from "@/components/HeroHud";
+import HeroWordmark from "@/components/HeroWordmark";
 import dynamic from "next/dynamic";
 
 // Three.js is a ~150KB dependency and the field is purely decorative, so it is
 // split into its own chunk and never server-rendered. HeroGlyphField itself
 // falls back to the 2D HeroNetwork canvas when WebGL is unavailable.
 const HeroGlyphField = dynamic(() => import("@/components/HeroGlyphField"), {
-  ssr: false,
-});
-
-// The wordmark is now real 3D letter geometry sampled into a glyph point cloud,
-// so it pulls in three plus TextGeometry/MeshSurfaceSampler. Dynamic + ssr:false
-// keeps all of that out of the landing route's initial chunk; the component
-// falls back to the flat 2D HeroWordmark when WebGL is unavailable.
-const HeroWordmark3D = dynamic(() => import("@/components/HeroWordmark3D"), {
   ssr: false,
 });
 import {
@@ -593,12 +586,12 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease, delay: 0.4 }}
             style={{ y: useTransform(useScroll().scrollY, [0, 500], [0, -30]) }}
-            className="relative w-full min-h-[clamp(4rem,16vw,14rem)]"
+            className="w-full min-h-[clamp(4rem,16vw,14rem)]"
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
             <h1 className="sr-only">N.O.D.E.</h1>
-            <HeroWordmark3D />
+            <HeroWordmark />
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
