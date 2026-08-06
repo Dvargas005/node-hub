@@ -22,8 +22,8 @@ const TAGLINE: Record<string, string> = {
 };
 
 const TURNAROUND: Record<string, string> = {
-  "dedicated-light": "24-hour turnaround",
-  "dedicated-jump": "24-hour turnaround",
+  "dedicated-light": "Next business day response",
+  "dedicated-jump": "Next business day response",
   "dedicated-pro": "Continuous delivery",
 };
 
