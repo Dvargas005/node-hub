@@ -99,7 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ use
     });
 
     // Email — fire and forget (sendEmail itself is non-blocking on missing key)
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://node.nouvos.one";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://nodedev.one";
     sendEmail(
       target.email,
       `New message from ${senderName} on N.O.D.E.`,
