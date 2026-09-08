@@ -1,6 +1,6 @@
 # N.O.D.E. — Landing Page
 
-Landing page para **nodedev.one**. Diseño, desarrollo y marketing por suscripción.
+Landing page para **www.nodedev.one**. Diseño, desarrollo y marketing por suscripción.
 
 ## Stack
 
@@ -29,4 +29,4 @@ KV_REST_API_TOKEN=
 
 ## Deploy
 
-Conectar repo a Vercel. Framework preset: Next.js. Dominio: `nodedev.one`.
+Conectar repo a Vercel. Framework preset: Next.js. Dominio: `www.nodedev.one`.

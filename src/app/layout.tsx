@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "N.O.D.E. — Network Organized Delivery Engine",
     description:
       "Design, web development and marketing by subscription. Powered by Nouvos.",
-    url: "https://nodedev.one",
+    url: "https://www.nodedev.one",
     siteName: "N.O.D.E. by Nouvos",
     locale: "en_US",
     type: "website",

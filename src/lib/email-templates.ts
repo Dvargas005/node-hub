@@ -1,7 +1,7 @@
 const base = "font-family:'Helvetica Neue',Arial,sans-serif;background-color:#130A06;color:#F5F6FC;padding:40px;";
 const btn = "display:inline-block;background-color:#FFC919;color:#130A06;padding:12px 24px;text-decoration:none;font-weight:bold;";
 const foot = '<p style="margin-top:30px;opacity:0.6;font-size:12px;">N.O.D.E. — Powered by Nouvos</p>';
-const APP = "https://nodedev.one";
+const APP = "https://www.nodedev.one";
 
 function wrap(title: string, body: string, link: string, linkText: string) {
   return `<div style="${base}"><h1 style="color:#FFC919;">${title}</h1>${body}<a href="${APP}${link}" style="${btn}">${linkText}</a>${foot}</div>`;
