@@ -51,7 +51,7 @@ const plans: PlanSeed[] = [
     slug: "starter",
     name: "N.O.D.E. On demand",
     description: "1-month pay-as-you-go. No credits included — buy 1:1 as you need them.",
-    priceMonthly: 500, // $5
+    priceMonthly: 600, // $6
     setupFee: 0,
     monthlyCredits: 0,
     bonusCredits: 0,
@@ -63,8 +63,8 @@ const plans: PlanSeed[] = [
     slug: "member",
     name: "N.O.D.E. Member",
     description: "Entry plan: design and content essentials for your business.",
-    priceMonthly: 13000, // $130
-    setupFee: 26000, // $260
+    priceMonthly: 15600, // $156
+    setupFee: 31200, // $312
     monthlyCredits: 140,
     bonusCredits: 0,
     maxActiveReqs: 2,
@@ -75,8 +75,8 @@ const plans: PlanSeed[] = [
     slug: "growth",
     name: "N.O.D.E. Growth",
     description: "Full creative power: design, web and content with priority.",
-    priceMonthly: 24700, // $247
-    setupFee: 91000, // $910
+    priceMonthly: 29600, // $296
+    setupFee: 109200, // $1,092
     monthlyCredits: 350,
     bonusCredits: 0,
     maxActiveReqs: 5,
@@ -87,8 +87,8 @@ const plans: PlanSeed[] = [
     slug: "pro",
     name: "N.O.D.E. Pro",
     description: "Premium: all services, dedicated PM, 24-48h turnaround.",
-    priceMonthly: 42900, // $429
-    setupFee: 130000, // $1300
+    priceMonthly: 51500, // $515
+    setupFee: 156000, // $1,560
     monthlyCredits: 650,
     bonusCredits: 0,
     maxActiveReqs: 999, // unlimited (display fallback maps 999 → ∞)
