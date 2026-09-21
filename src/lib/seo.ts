@@ -55,10 +55,24 @@ export const SERVICES = [
   },
   {
     slug: "seo",
-    name: "SEO, GEO & AEO",
-    title: "SEO, GEO and AEO Services",
+    name: "SEO",
+    title: "SEO Services",
     summary:
-      "Search engine, generative engine, and answer engine optimization so your business is found by Google, Bing, and AI assistants alike.",
+      "Technical, local, and on-page search engine optimization so your business ranks on Google and Bing for the searches that bring customers.",
+  },
+  {
+    slug: "generative-engine-optimization",
+    name: "Generative Engine Optimization (GEO)",
+    title: "Generative Engine Optimization (GEO) Services",
+    summary:
+      "Get your business named and cited when people ask ChatGPT, Perplexity, Gemini, Claude, or Copilot for a recommendation.",
+  },
+  {
+    slug: "answer-engine-optimization",
+    name: "Answer Engine Optimization (AEO)",
+    title: "Answer Engine Optimization (AEO) Services",
+    summary:
+      "Structure your content so search engines, AI assistants, and voice assistants can lift your answer directly into their results.",
   },
 ] as const;
 

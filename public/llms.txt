@@ -10,7 +10,9 @@
 - [Web Development](https://www.nodedev.one/services/web-development): Custom websites and web applications built on Next.js and TypeScript.
 - [App Development](https://www.nodedev.one/services/app-development): iOS and Android apps from one shared codebase, through store submission.
 - [Software Development](https://www.nodedev.one/services/software-development): Multi-tenant SaaS platforms, internal tools, and system integrations.
-- [SEO, GEO & AEO](https://www.nodedev.one/services/seo): Search engine, generative engine, and answer engine optimization.
+- [SEO](https://www.nodedev.one/services/seo): Technical, local, and on-page search engine optimization for Google and Bing.
+- [Generative Engine Optimization (GEO)](https://www.nodedev.one/services/generative-engine-optimization): Getting a business named and cited in answers from ChatGPT, Perplexity, Gemini, Claude, and Copilot.
+- [Answer Engine Optimization (AEO)](https://www.nodedev.one/services/answer-engine-optimization): Structuring content so search engines, AI assistants, and voice assistants can quote it as a direct answer.
 
 ## Pricing
 Flat monthly subscriptions, billed in USD. Each plan includes a monthly credit
