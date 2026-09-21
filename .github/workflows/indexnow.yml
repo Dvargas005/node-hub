@@ -1,0 +1,19 @@
+name: IndexNow
+
+# Vercel's GitHub integration reports every deployment back to GitHub. After a
+# successful production deploy, tell Bing & co. which URLs changed.
+on: deployment_status
+
+jobs:
+  ping:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/indexnow.mjs
