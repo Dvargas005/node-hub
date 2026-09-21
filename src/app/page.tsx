@@ -17,6 +17,7 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import { MixIcon, CodeIcon, RocketIcon, PlusIcon, MinusIcon } from "@radix-ui/react-icons";
+import { CITIES, SERVICES } from "@/lib/seo";
 
 /* ═══════════════════════════════════════════
    MOTION HELPERS
@@ -581,7 +582,7 @@ export default function Home() {
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
-            <h1 className="sr-only">N.O.D.E.</h1>
+            <h1 className="sr-only">N.O.D.E., your ally on digital development</h1>
             <HeroWordmark />
           </motion.div>
           <motion.p
@@ -823,6 +824,15 @@ export default function Home() {
           </div>
           <p className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/30">{t.footer}</p>
         </div>
+        {/* Crawlable links to the SEO pages; without them /services and /locations are orphans. */}
+        <nav aria-label="Services and locations" className="max-w-7xl mx-auto mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3 font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/60">
+          {SERVICES.map((s) => (
+            <a key={s.slug} href={`/services/${s.slug}`} className="hover:text-[#FFC919] transition-colors">{s.name}</a>
+          ))}
+          {CITIES.map((c) => (
+            <a key={c.slug} href={`/locations/${c.slug}`} className="hover:text-[#FFC919] transition-colors">{c.city}, {c.stateCode}</a>
+          ))}
+        </nav>
         <div className="max-w-7xl mx-auto mt-8 text-center">
           <a
             href="https://wa.me/12246401785"
