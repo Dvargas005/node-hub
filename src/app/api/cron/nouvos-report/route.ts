@@ -98,14 +98,18 @@ export async function GET(req: Request) {
 
   const to = process.env.REPORT_EMAIL ?? "erich@nouvos.one";
   const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+  let emailed = false;
   if (resend) {
-    await resend.emails.send({
+    // Resend returns { error } instead of throwing; report it, don't claim success.
+    const { error } = await resend.emails.send({
       from: process.env.FROM_EMAIL || "N.O.D.E. <noreply@mail.nodedev.one>",
       to,
       subject: `Nouvos weekly report — ${money(totalMrr)} MRR`,
       html
     });
+    if (error) console.error("[NOUVOS_REPORT] Email failed:", to, error);
+    else emailed = true;
   }
 
-  return NextResponse.json({ ok: true, totalMrr, emailed: !!resend, products: all.map((s) => s?.product ?? "unreachable") });
+  return NextResponse.json({ ok: true, totalMrr, emailed, products: all.map((s) => s?.product ?? "unreachable") });
 }

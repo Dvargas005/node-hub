@@ -13,7 +13,15 @@ const FROM_EMAIL = process.env.FROM_EMAIL || "N.O.D.E. <noreply@mail.nodedev.one
 export function sendEmail(to: string, subject: string, html: string) {
   const resend = getResend();
   if (!resend) return;
-  resend.emails.send({ from: FROM_EMAIL, to, subject, html }).catch((err: any) => {
-    console.error("[EMAIL] Failed:", subject, "→", to, err);
-  });
+  // Resend reports API failures (unverified sender domain, bad recipient, rate
+  // limit) in the resolved `{ error }` rather than by rejecting, so a .catch()
+  // alone silently drops them. .catch() still covers network failures.
+  resend.emails
+    .send({ from: FROM_EMAIL, to, subject, html })
+    .then(({ error }) => {
+      if (error) console.error("[EMAIL] Failed:", subject, "→", to, error);
+    })
+    .catch((err: unknown) => {
+      console.error("[EMAIL] Failed:", subject, "→", to, err);
+    });
 }
