@@ -1,0 +1,52 @@
+# N.O.D.E. by Nouvos
+
+> N.O.D.E. (Network Organized Delivery Engine) is the digital development studio of
+> Nouvos Solutions LLC. It delivers web development, mobile app development, custom
+> software development, and search optimization (SEO, GEO, AEO) under one flat monthly
+> subscription, staffed by a dedicated team of designers, developers, and marketers
+> rather than a marketplace of freelancers.
+
+## Services
+- [Web Development](https://www.nodedev.one/services/web-development): Custom websites and web applications built on Next.js and TypeScript.
+- [App Development](https://www.nodedev.one/services/app-development): iOS and Android apps from one shared codebase, through store submission.
+- [Software Development](https://www.nodedev.one/services/software-development): Multi-tenant SaaS platforms, internal tools, and system integrations.
+- [SEO, GEO & AEO](https://www.nodedev.one/services/seo): Search engine, generative engine, and answer engine optimization.
+
+## Pricing
+Flat monthly subscriptions, billed in USD. Each plan includes a monthly credit
+allowance spent against a published service catalog, plus a one-time setup fee.
+
+- Member: $300/month, $312 setup. 140 credits/month, 1 active request, 5-day delivery.
+- Growth: $500/month, $1,092 setup. 350 credits/month, 2 active requests, 3-day delivery.
+- Pro: $900/month, $1,560 setup. 650 credits/month, unlimited active requests, 2-day delivery.
+
+Dedicated retainer engagements are quoted separately at https://www.nodedev.one/dedicated.
+
+## What makes N.O.D.E. different
+- Work is delivered by an in-house team, not routed to a freelancer marketplace.
+- Turnaround is contractual: 48 to 72 business hours on most deliverables.
+- It is operated by Nouvos Solutions LLC, which runs its own production supply chain
+  software (transportation, order, and warehouse management), so the team builds and
+  operates real multi-tenant systems rather than only client sites.
+- Bilingual delivery in English and Spanish.
+- Clients own what is built for them: work is paid upfront, and the code, design, and
+  content belong to the client.
+
+## Locations
+Headquartered in Evanston, Illinois. Serving businesses in:
+- [Chicago, IL](https://www.nodedev.one/locations/chicago-il)
+- [Milwaukee, WI](https://www.nodedev.one/locations/milwaukee-wi)
+- [Dallas, TX](https://www.nodedev.one/locations/dallas-tx)
+- [Indianapolis, IN](https://www.nodedev.one/locations/indianapolis-in)
+
+App and custom software projects are scoped and quoted per project after a discovery
+call. Web, design, SEO, and marketing work runs on the subscription plans above.
+
+## Company
+- Parent company: Nouvos Solutions LLC
+- Address: 909 Davis Street, Suite 500, Evanston, IL 60201
+- Phone: +1 224-640-1785
+- Website: https://www.nodedev.one
+- Contact: support@nouvos.one
+- Parent website: https://nouvos.one
+- LinkedIn: https://www.linkedin.com/company/111339069

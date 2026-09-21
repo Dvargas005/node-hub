@@ -23,6 +23,11 @@ export function middleware(req: NextRequest) {
   // Hidden Dedicated Growth retainers landing — public (auth-aware in the page itself)
   if (pathname === "/dedicated") return NextResponse.next();
 
+  // SEO marketing pages (/services, /services/*, /locations, /locations/*).
+  // Must stay public: without a session cookie these would 302 to /login, and
+  // crawlers never carry one. Exact segment match so "/servicesX" stays gated.
+  if (/^\/(services|locations)(\/[^/]+)?\/?$/.test(pathname)) return NextResponse.next();
+
   // Public agreement signing (token-gated in the page/API itself)
   if (pathname.startsWith("/sign-agreement")) return NextResponse.next();
 
