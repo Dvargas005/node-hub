@@ -15,8 +15,8 @@ async function main() {
     create: {
       name: "Member",
       slug: "member",
-      priceMonthly: 10000, // $100
-      setupFee: 20000, // $200
+      priceMonthly: 30000, // $300
+      setupFee: 31200, // $312
       monthlyCredits: 140,
       maxActiveReqs: 1,
       deliveryDays: 5,
@@ -29,8 +29,8 @@ async function main() {
     create: {
       name: "Growth",
       slug: "growth",
-      priceMonthly: 19000, // $190
-      setupFee: 70000, // $700
+      priceMonthly: 50000, // $500
+      setupFee: 109200, // $1,092
       monthlyCredits: 350,
       maxActiveReqs: 2,
       deliveryDays: 3,
@@ -43,8 +43,8 @@ async function main() {
     create: {
       name: "Pro",
       slug: "pro",
-      priceMonthly: 33000, // $330
-      setupFee: 100000, // $1000
+      priceMonthly: 90000, // $900
+      setupFee: 156000, // $1,560
       monthlyCredits: 650,
       maxActiveReqs: 999,
       deliveryDays: 2,

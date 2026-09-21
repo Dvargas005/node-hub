@@ -63,7 +63,7 @@ const plans: PlanSeed[] = [
     slug: "member",
     name: "N.O.D.E. Member",
     description: "Entry plan: design and content essentials for your business.",
-    priceMonthly: 15600, // $156
+    priceMonthly: 30000, // $300
     setupFee: 31200, // $312
     monthlyCredits: 140,
     bonusCredits: 0,
@@ -75,7 +75,7 @@ const plans: PlanSeed[] = [
     slug: "growth",
     name: "N.O.D.E. Growth",
     description: "Full creative power: design, web and content with priority.",
-    priceMonthly: 29600, // $296
+    priceMonthly: 50000, // $500
     setupFee: 109200, // $1,092
     monthlyCredits: 350,
     bonusCredits: 0,
@@ -87,7 +87,7 @@ const plans: PlanSeed[] = [
     slug: "pro",
     name: "N.O.D.E. Pro",
     description: "Premium: all services, dedicated PM, 24-48h turnaround.",
-    priceMonthly: 51500, // $515
+    priceMonthly: 90000, // $900
     setupFee: 156000, // $1,560
     monthlyCredits: 650,
     bonusCredits: 0,
