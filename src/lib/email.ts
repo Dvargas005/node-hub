@@ -8,7 +8,7 @@ function getResend(): Resend | null {
   return resendClient;
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || "N.O.D.E. <noreply@node.nouvos.one>";
+const FROM_EMAIL = process.env.FROM_EMAIL || "N.O.D.E. <noreply@mail.nodedev.one>";
 
 export function sendEmail(to: string, subject: string, html: string) {
   const resend = getResend();

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     try {
       const res = await fetch(fullUrl, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; NODEBot/1.0; +https://node.nouvos.one)",
+          "User-Agent": "Mozilla/5.0 (compatible; NODEBot/1.0; +https://www.nodedev.one)",
           "Accept": "text/html,application/xhtml+xml",
         },
         signal: AbortSignal.timeout(10000),

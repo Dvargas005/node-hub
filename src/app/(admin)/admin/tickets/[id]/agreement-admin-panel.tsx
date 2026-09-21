@@ -43,7 +43,7 @@ export function AgreementAdminPanel({ agreement }: { agreement: Agreement | null
     );
   }
 
-  const signUrl = `https://node.nouvos.one/sign-agreement?token=${agreement.token}`;
+  const signUrl = `https://www.nodedev.one/sign-agreement?token=${agreement.token}`;
   const locked = status === "SIGNED";
 
   async function save() {

@@ -100,7 +100,7 @@ export async function GET(req: Request) {
   const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
   if (resend) {
     await resend.emails.send({
-      from: process.env.FROM_EMAIL || "N.O.D.E. <noreply@node.nouvos.one>",
+      from: process.env.FROM_EMAIL || "N.O.D.E. <noreply@mail.nodedev.one>",
       to,
       subject: `Nouvos weekly report — ${money(totalMrr)} MRR`,
       html
