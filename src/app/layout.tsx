@@ -45,6 +45,17 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: ORG_NAME,
+  // The site had no favicon at all (favicon.ico 404), so Google results and
+  // Safari showed a generic globe. apple-touch-icon is what iOS uses for
+  // home-screen shortcuts, bookmarks, and Siri/Spotlight suggestions.
+  // icon-192/512 are also what public/manifest.json has always pointed at.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   alternates: { canonical: "/" },
   robots: {
     index: true,
