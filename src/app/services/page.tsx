@@ -40,7 +40,7 @@ export default function ServicesIndex() {
           Everything your business needs to grow online, built in-house
         </h1>
         <p className="mt-8 max-w-3xl font-[family-name:var(--font-atkinson)] text-lg leading-relaxed text-[#F5F6FC]/80">
-          Four service lines, one team. Web and SEO work runs on a monthly subscription; app and
+          Six services, one team. Web, SEO, GEO, and AEO work runs on a monthly subscription; app and
           custom software projects are scoped and quoted after a discovery call.
         </p>
       </section>

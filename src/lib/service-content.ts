@@ -239,14 +239,14 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
   seo: {
     slug: "seo",
     serviceType: "Search engine optimization",
-    h1: "SEO, GEO, and AEO services",
-    metaTitle: "SEO, GEO and AEO Services",
+    h1: "SEO services",
+    metaTitle: "SEO Services: Technical, Local and On-Page SEO",
     metaDescription:
-      "Get found on Google, Bing, and in AI answers from ChatGPT, Perplexity, Claude, and Gemini. Technical SEO, local SEO, structured data, and answer engine optimization on a monthly plan.",
-    eyebrow: "SEO / GEO / AEO",
+      "Rank on Google and Bing for the searches that bring customers. Technical SEO, local SEO, structured data, and ongoing content on a flat monthly plan from $300.",
+    eyebrow: "SEO",
     lead: [
-      "Search has split in two. People still search Google and Bing, but more and more of them ask ChatGPT, Perplexity, Claude, or Gemini and get an answer instead of a list of links. SEO gets you ranked in the first. GEO (generative engine optimization) and AEO (answer engine optimization) get you named in the second.",
-      "They share a foundation: a site that crawlers can read, clear facts about your business stated the same way everywhere, and structured data that tells machines exactly what you do and where. N.O.D.E. builds that foundation and keeps it current as a monthly service.",
+      "Most small and midsize businesses rank for their own name and nothing else. Search engine optimization closes that gap: it gets the pages that describe what you sell in front of the people searching for it on Google and Bing.",
+      "N.O.D.E. starts with the foundation that search engines need to read your site, fixes what keeps pages out of the index, and then builds the pages and content that target the searches your customers actually make. It runs as a monthly service, so it keeps up as results change.",
     ],
     model: "plan",
     deliverables: [
@@ -260,42 +260,38 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         title: "Local SEO",
-        body: "Google Business Profile, consistent name, address, and phone across the web, and location pages for the areas you serve.",
+        body: "Consistent name, address, and phone across the web, Google Business Profile where you have a location customers visit, and pages for the areas you serve.",
       },
       {
         title: "Structured data",
-        body: "Schema.org markup for your business, services, products, and FAQs, which powers rich results and gives AI systems facts they can quote.",
+        body: "Schema.org markup for your business, services, products, and FAQs, which powers rich results and gives search engines unambiguous facts.",
       },
       {
-        title: "GEO and AEO",
-        body: "Making your site readable to AI crawlers, publishing an llms.txt, answering the questions your customers actually ask, and building the third-party mentions that AI assistants cite.",
+        title: "Keyword-targeted pages",
+        body: "Service and location pages written for the specific phrases your customers search, one clear topic per page so they do not compete with each other.",
       },
       {
         title: "Ongoing SEO",
-        body: "Monthly content, new pages, and fixes as search results and AI answers change, with Search Console and Bing Webmaster Tools monitored for you.",
+        body: "Monthly content, new pages, and fixes as results change, with Google Search Console and Bing Webmaster Tools monitored for you and IndexNow so Bing sees updates within minutes.",
       },
     ],
     fit: [
       "Customers cannot find you when they search for what you sell.",
       "You rank for your name but not for the services you offer.",
-      "You want to show up when someone asks an AI assistant for a recommendation in your field.",
+      "Your site was built without anyone checking how search engines read it.",
     ],
     faqs: [
       {
         q: "What is the difference between SEO, GEO, and AEO?",
-        a: "SEO (search engine optimization) improves how your site ranks in search engines like Google and Bing. GEO (generative engine optimization) improves how often AI tools such as ChatGPT, Perplexity, Claude, and Gemini mention your business in generated answers. AEO (answer engine optimization) structures your content so it can be pulled directly into answers, featured snippets, and voice results. They rely on the same foundation, so we do them together.",
+        a: "SEO (search engine optimization) improves how your site ranks in search engines like Google and Bing. GEO (generative engine optimization) improves how often AI tools such as ChatGPT, Perplexity, Claude, and Gemini name your business in their answers. AEO (answer engine optimization) structures your content so engines can lift it directly into answers, featured snippets, and voice results. They share a foundation, and N.O.D.E. offers all three; see the GEO and AEO pages for how each works.",
       },
       {
         q: "How long does SEO take to work?",
-        a: "Technical fixes and indexing can show results in weeks. Ranking for competitive terms usually takes several months and depends on your market and your competitors. Local and branded searches typically move first.",
+        a: "Technical fixes and indexing can show results in weeks. Ranking for competitive terms usually takes several months and depends on your market and your competitors. Branded and local searches typically move first.",
       },
       {
         q: "Do you guarantee first-page rankings?",
-        a: "No. Nobody controls Google's or an AI system's results, and any agency promising a guaranteed position is guessing. We commit to the work that moves rankings and report what changed.",
-      },
-      {
-        q: "How do I get my business mentioned by ChatGPT or Perplexity?",
-        a: "AI assistants favor sources they can read and verify. That means a site their crawlers can access, clear and consistent facts about your business, structured data, direct answers to common questions, and mentions on reputable third-party sites. We work on all of those.",
+        a: "No. Nobody controls Google's results, and any agency promising a guaranteed position is guessing. We commit to the work that moves rankings and report what changed.",
       },
       {
         q: "Does this help with Bing, Safari, and Firefox too?",
@@ -304,6 +300,146 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       {
         q: "How much do SEO services cost?",
         a: "SEO work is part of the subscription plans: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Audits, foundations, local SEO, and ongoing SEO are items in the service catalog.",
+      },
+    ],
+  },
+
+  "generative-engine-optimization": {
+    slug: "generative-engine-optimization",
+    serviceType: "Generative engine optimization",
+    h1: "Generative engine optimization (GEO) agency",
+    metaTitle: "Generative Engine Optimization (GEO) Agency & Services",
+    metaDescription:
+      "GEO services that get your business named and cited by ChatGPT, Perplexity, Gemini, Claude, and Copilot. AI visibility audits, entity and structured data work, and monthly monitoring from $300.",
+    eyebrow: "GENERATIVE ENGINE OPTIMIZATION",
+    lead: [
+      "Generative engine optimization (GEO) is the practice of making your business the one an AI assistant names when someone asks it for a recommendation. When a buyer asks ChatGPT, Perplexity, Gemini, Claude, or Copilot which company to hire, the assistant writes an answer from sources it can read and trust. GEO makes sure your business is one of those sources.",
+      "It is different from ranking a page. An AI answer has room for a few names, not ten blue links, and it is assembled from your own site plus what the rest of the web says about you. N.O.D.E. works on both sides: what AI crawlers can read on your site, and the third-party sources they cite.",
+    ],
+    model: "plan",
+    deliverables: [
+      {
+        title: "AI visibility audit",
+        body: "We ask ChatGPT, Perplexity, Gemini, Claude, and Copilot the questions your buyers ask, and record whether you are named, how you are described, and which sources they cite instead of you.",
+      },
+      {
+        title: "AI crawler access",
+        body: "Robots rules that let GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, and Applebot-Extended in, and pages rendered on the server so crawlers that never run JavaScript still read them.",
+      },
+      {
+        title: "Entity clarity",
+        body: "One consistent description of who you are, what you sell, and where, stated the same way on your site, in structured data, and on the profiles AI systems cross-check.",
+      },
+      {
+        title: "llms.txt and structured data",
+        body: "A plain-language llms.txt summary for AI systems, plus Organization, Service, and FAQ schema so the facts about your business are machine-readable.",
+      },
+      {
+        title: "Citation-worthy content",
+        body: "Pages that answer the specific questions buyers ask assistants, with concrete facts such as pricing, scope, and comparisons that an AI can quote.",
+      },
+      {
+        title: "Third-party mentions and monitoring",
+        body: "Directory profiles, reviews, and industry mentions that assistants cite, re-checked monthly against the same questions and against the AI reports in Bing Webmaster Tools and Google Search Console.",
+      },
+    ],
+    fit: [
+      "Buyers in your market ask ChatGPT or Perplexity for recommendations, and your competitors get named instead of you.",
+      "Your site ranks on Google but AI assistants describe your business wrongly or not at all.",
+      "You want to be early in a channel where the answers are still being decided.",
+    ],
+    faqs: [
+      {
+        q: "What is generative engine optimization (GEO)?",
+        a: "Generative engine optimization is the work of getting a business mentioned, described accurately, and cited in answers generated by AI systems such as ChatGPT, Perplexity, Google Gemini and AI Overviews, Claude, and Microsoft Copilot. It covers what AI crawlers can read on your own site and the third-party sources those systems rely on.",
+      },
+      {
+        q: "How is GEO different from SEO?",
+        a: "SEO ranks a page in a list of results. GEO earns a mention inside a single written answer, which usually names only a handful of businesses and draws on several sources at once, including sites you do not control. Good SEO helps GEO, but ranking well is not enough on its own.",
+      },
+      {
+        q: "Can you guarantee ChatGPT will recommend my business?",
+        a: "No. AI answers change with the question, the model, and the day, and no agency controls them. We commit to the work that makes your business readable, consistent, and cited, and we measure how often you appear against a fixed set of buyer questions.",
+      },
+      {
+        q: "How do you measure GEO results?",
+        a: "We track a fixed set of questions your buyers ask across the major assistants and record whether you are named and cited, month over month. We also use the AI performance reports in Bing Webmaster Tools and Google Search Console where they are available for your site.",
+      },
+      {
+        q: "How long does GEO take?",
+        a: "Crawler access, structured data, and llms.txt take effect as soon as the assistants re-read your site, often within weeks. Changing how an assistant describes you depends on third-party sources and usually takes months.",
+      },
+      {
+        q: "How much do GEO services cost?",
+        a: "GEO runs on the same subscription plans as the rest of N.O.D.E.: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee.",
+      },
+    ],
+  },
+
+  "answer-engine-optimization": {
+    slug: "answer-engine-optimization",
+    serviceType: "Answer engine optimization",
+    h1: "Answer engine optimization (AEO)",
+    metaTitle: "Answer Engine Optimization (AEO) Services",
+    metaDescription:
+      "What is AEO? Answer engine optimization structures your content so Google, Bing, AI assistants, and voice assistants can lift your answer directly into their results. AEO services from $300 a month.",
+    eyebrow: "ANSWER ENGINE OPTIMIZATION",
+    lead: [
+      "Answer engine optimization (AEO) means structuring your content so that search engines and assistants can take your answer and show it directly: in a featured snippet, an AI Overview, a ChatGPT or Perplexity answer, or a response read aloud by a voice assistant. The searcher gets the answer without clicking through a list of links, and your business is the one that supplied it.",
+      "AEO is about format as much as content. Engines favor a clear question, a direct answer in the first sentence or two, and supporting detail they can parse. N.O.D.E. finds the questions your customers ask and rebuilds the pages that should answer them.",
+    ],
+    model: "plan",
+    deliverables: [
+      {
+        title: "Question research",
+        body: "The questions your customers actually ask, collected from your Search Console queries, the questions search engines surface for your topic, and what buyers ask AI assistants.",
+      },
+      {
+        title: "Answer-first content",
+        body: "Each question gets a heading and a direct answer in its opening sentences, followed by the detail, so engines can quote the answer on its own.",
+      },
+      {
+        title: "FAQ and structured data",
+        body: "FAQ, service, and organization schema that label your questions and answers explicitly for search engines and AI systems.",
+      },
+      {
+        title: "Extractable formatting",
+        body: "Lists, steps, and tables where they fit the question, which engines lift into snippets far more readily than long paragraphs.",
+      },
+      {
+        title: "Page and site structure",
+        body: "One clear topic per page and internal links between related answers, so engines understand which page answers which question.",
+      },
+      {
+        title: "Measurement",
+        body: "Tracking of which questions you now appear for, in Google Search Console, Bing Webmaster Tools, and across the major AI assistants.",
+      },
+    ],
+    fit: [
+      "Your customers ask the same questions over and over, and your site does not answer them clearly.",
+      "Competitors show up in featured snippets and AI answers for questions you know better than they do.",
+      "You want your expertise to be the answer people hear, not just one of ten links.",
+    ],
+    faqs: [
+      {
+        q: "What is AEO?",
+        a: "AEO stands for answer engine optimization: structuring content so search engines, AI assistants, and voice assistants can pull a direct answer from your page and show or read it to the person asking. It targets featured snippets, AI Overviews, AI assistant answers, and voice results rather than only a ranked link.",
+      },
+      {
+        q: "What is an answer engine?",
+        a: "An answer engine is any system that responds to a question with an answer instead of a list of links: Google's featured snippets and AI Overviews, ChatGPT, Perplexity, Microsoft Copilot, and voice assistants all work this way.",
+      },
+      {
+        q: "What is the difference between AEO, GEO, and SEO?",
+        a: "SEO ranks your pages in search results. AEO makes your content easy to lift as a direct answer to a specific question. GEO focuses on how AI systems describe and recommend your business as a whole. AEO sits between the two, and all three share the same technical foundation.",
+      },
+      {
+        q: "Does AEO help with voice search?",
+        a: "Yes. Voice assistants read out a single answer, and they take it from content that states the answer clearly and briefly. The same answer-first structure that wins featured snippets is what they use.",
+      },
+      {
+        q: "How much do AEO services cost?",
+        a: "AEO runs on the same subscription plans as the rest of N.O.D.E.: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee.",
       },
     ],
   },
