@@ -86,6 +86,10 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
         a: "Our default stack is Next.js with TypeScript, which produces fast, search-friendly pages. We pick the stack that fits the project, and existing sites can be maintained where they are.",
       },
       {
+        q: "Who owns my website?",
+        a: "You do. Work is paid upfront, so the code, design, and content we build for your business belong to you once delivered. If you ever move on, you keep everything.",
+      },
+      {
         q: "Can you work on my existing website?",
         a: "Yes. Updates, fixes, new pages, and SEO work on an existing site are all normal requests on a plan.",
       },
@@ -154,6 +158,10 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
         a: "Yes. We prepare the listings, submit for review, and handle reviewer feedback. We also design around store payment rules, which decide how an app is allowed to charge users.",
       },
       {
+        q: "Who owns the app and the code?",
+        a: "You do. App projects are paid upfront, so the code, the designs, and the store listings belong to your business. If you ever move on, you keep everything.",
+      },
+      {
         q: "Can you build an MVP first?",
         a: "Yes. An MVP with the smallest set of features that proves the idea is often the right first release, and it is how we scope most new apps.",
       },
@@ -216,6 +224,10 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       {
         q: "Can you take over an existing codebase?",
         a: "Yes. We review it, stabilize what is fragile, and then extend it. A rewrite is a last resort, not a default.",
+      },
+      {
+        q: "Who owns the code?",
+        a: "You do. Projects are paid upfront, so custom software built for your business, including its source code, belongs to your business.",
       },
       {
         q: "Do you build AI features?",

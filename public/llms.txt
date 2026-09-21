@@ -29,6 +29,8 @@ Dedicated retainer engagements are quoted separately at https://www.nodedev.one/
   software (transportation, order, and warehouse management), so the team builds and
   operates real multi-tenant systems rather than only client sites.
 - Bilingual delivery in English and Spanish.
+- Clients own what is built for them: work is paid upfront, and the code, design, and
+  content belong to the client.
 
 ## Locations
 Headquartered in Evanston, Illinois. Serving businesses in:
