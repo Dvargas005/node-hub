@@ -29,7 +29,7 @@ const TURNAROUND: Record<string, string> = {
 
 const SEO_FEATURE: Record<string, string> = {
   "dedicated-jump": "SEO Starter included",
-  "dedicated-pro": "Full SEO included",
+  "dedicated-pro": "Full SEO, GEO, and AEO included",
 };
 
 export function DedicatedClient({

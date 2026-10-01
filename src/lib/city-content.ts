@@ -26,7 +26,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       "Chicago web development, app development, custom software, and SEO from N.O.D.E., headquartered in Evanston, IL. Flat monthly plans from $300.",
     h1: "Web, app, and software development in Chicago",
     lead: [
-      "N.O.D.E. is headquartered in Evanston, just north of Chicago, which makes Chicagoland our home market. We build websites, mobile apps, and custom software for Chicago businesses, and we handle the SEO that gets them found, all under one monthly subscription.",
+      "N.O.D.E. is headquartered in Evanston, just north of Chicago, which makes Chicagoland our home market. We build websites, mobile apps, and custom software for Chicago businesses, and we offer the SEO that gets them found as an add-on to any plan.",
       "Our parent company, Nouvos Solutions, builds software for transportation, orders, and warehouses. Chicago is the center of the country's freight rail network and one of its largest logistics markets, so we know the operations side of the businesses we build for here, not only the marketing side.",
     ],
     faqs: [
@@ -36,7 +36,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do you work with small businesses in Chicago?",
-        a: "Yes. The subscription plans are built for small and midsize businesses: $300 per month on Member, $500 on Growth, and $900 on Pro, with a monthly credit allowance for web, design, SEO, and marketing work.",
+        a: "Yes. The subscription plans are built for small and midsize businesses: $300 per month on Member, $500 on Growth, and $900 on Pro, with a monthly credit allowance for web, design, and marketing work. SEO, GEO, and AEO are add-ons.",
       },
       {
         q: "Can you help my Chicago business show up in local search?",
@@ -70,7 +70,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "How much does a website cost for a Milwaukee business?",
-        a: "Subscription plans are $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Each plan includes monthly credits for web, design, SEO, and marketing work.",
+        a: "Subscription plans are $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Each plan includes monthly credits for web, design, and marketing work. SEO, GEO, and AEO are add-ons.",
       },
       {
         q: "Do we need to meet in person?",
@@ -100,7 +100,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "How much does app or software development cost?",
-        a: "App and custom software work is scoped per project. After a discovery call we send a written scope and a quote. Website, SEO, and marketing work runs on monthly plans from $300.",
+        a: "App and custom software work is scoped per project. After a discovery call we send a written scope and a quote. Website and marketing work runs on monthly plans from $300, and SEO is an add-on from $1,250 a month.",
       },
       {
         q: "Do we need to meet in person?",
@@ -130,7 +130,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "How much does a website cost for an Indianapolis business?",
-        a: "Subscription plans are $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Each plan includes monthly credits for web, design, SEO, and marketing work.",
+        a: "Subscription plans are $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Each plan includes monthly credits for web, design, and marketing work. SEO, GEO, and AEO are add-ons.",
       },
       {
         q: "Can you help us get found in local search?",

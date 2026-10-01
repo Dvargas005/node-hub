@@ -45,6 +45,13 @@ Vigentes desde 2026-09-21: **$300 / $500 / $900 al mes**, setup unico **$312 / $
 - No usar `prisma/setup-stripe.ts --force`: duplica los Products de los 8 planes.
 - Suscriptores existentes quedan en su precio (grandfathered). El script no toca suscripciones.
 
+## SEO / GEO / AEO = add-on (desde 2026-10-01)
+NO estan incluidos en Member / Growth / Pro ni en Dedicated Light. Add-on a cualquier plan:
+**Starter SEO $1,250/mes** · **Full SEO $2,500/mes** · **Full SEO + GEO + AEO $4,000/mes**.
+Dedicated Jump incluye Starter SEO; Dedicated Pro ($19,000/mes) incluye Full SEO, GEO y AEO.
+El copy publico (FAQs, meta descriptions, city pages, llms.txt) no debe decir que el SEO va
+dentro de los planes de $300/$500/$900. Los add-ons aun no tienen Stripe Price: se cotizan.
+
 ## Contexto WAIPAX
 VECTOR / ARC / CITADEL se están consolidando bajo la marca pública www.waipax.com.
 Verificar la dirección de marca vigente antes de agregar o renombrar páginas de producto.

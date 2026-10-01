@@ -105,7 +105,7 @@ const C = {
       para: "Design, web development, and digital marketing — all under one subscription. Every deliverable produced by a real team of specialists.",
       accordions: [
         { name: "Design & Branding", items: [["Brand Starter", "from $180 credits"], ["Social Pack", "from $120 credits"], ["Flyer / Poster", "from $105 credits"], ["Business Kit", "from $375 credits"]] },
-        { name: "Web Development", items: [["Landing Page", "from $150 credits"], ["SEO Foundation", "from $300 credits"], ["Google Business", "from $90 credits"], ["Contact Form", "from $75 credits"]] },
+        { name: "Web Development", items: [["Landing Page", "from $150 credits"], ["SEO, GEO & AEO", "add-on from $1,250/mo"], ["Google Business", "from $90 credits"], ["Contact Form", "from $75 credits"]] },
         { name: "Digital Marketing", items: [["Content Pack (4 posts)", "from $120 credits"], ["Content Pack (8 posts)", "from $210 credits"], ["Promo Campaign", "from $225 credits"], ["WhatsApp Business", "from $90 credits"]] },
       ],
     },
@@ -139,10 +139,11 @@ const C = {
       note: "Each minimum plan shown here has a small cap to help small and midsize businesses.",
       noteCta: "For more comprehensive plans visit",
       noteLink: "Dedicated Growth",
+      seoAddon: "SEO, GEO, and AEO are add-ons to any plan: Starter SEO is $1,250/mo, Full SEO is $2,500/mo, and Full SEO, GEO, and AEO is $4,000/mo. Dedicated Jump includes Starter SEO. Dedicated Pro includes Full SEO, GEO, and AEO.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
         { name: "Growth", front: 500, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited scale. All services, dedicated PM, fastest turnaround.", ft: false },
+        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited scale. All plan services, dedicated PM, fastest turnaround.", ft: false },
       ],
     },
     wl: { title: "Ready to start?", sub: "Sign up today and get 10 free credits to explore the platform.", cta: "Start for free", login: "Already have an account?" },
@@ -166,7 +167,7 @@ const C = {
       para: "Diseño, desarrollo web y marketing digital — todo bajo una sola suscripción. Cada entregable producido por un equipo real de especialistas.",
       accordions: [
         { name: "Diseño & Branding", items: [["Brand Starter", "desde $180 créditos"], ["Social Pack", "desde $120 créditos"], ["Flyer / Poster", "desde $105 créditos"], ["Business Kit", "desde $375 créditos"]] },
-        { name: "Desarrollo Web", items: [["Landing Page", "desde $150 créditos"], ["SEO Foundation", "desde $300 créditos"], ["Google Business", "desde $90 créditos"], ["Formulario de Contacto", "desde $75 créditos"]] },
+        { name: "Desarrollo Web", items: [["Landing Page", "desde $150 créditos"], ["SEO, GEO y AEO", "complemento desde $1,250/mes"], ["Google Business", "desde $90 créditos"], ["Formulario de Contacto", "desde $75 créditos"]] },
         { name: "Marketing Digital", items: [["Content Pack (4 posts)", "desde $120 créditos"], ["Content Pack (8 posts)", "desde $210 créditos"], ["Campaña Promocional", "desde $225 créditos"], ["WhatsApp Business", "desde $90 créditos"]] },
       ],
     },
@@ -200,10 +201,11 @@ const C = {
       note: "Cada plan mínimo que se muestra aquí tiene un límite reducido para ayudar a pequeñas y medianas empresas.",
       noteCta: "Para planes más completos visita",
       noteLink: "Dedicated Growth",
+      seoAddon: "SEO, GEO y AEO son complementos para cualquier plan: SEO Starter cuesta $1,250/mes, SEO completo $2,500/mes, y SEO, GEO y AEO completos $4,000/mes. Dedicated Jump incluye SEO Starter. Dedicated Pro incluye SEO, GEO y AEO completos.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
         { name: "Growth", front: 500, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Escala ilimitada. Todos los servicios, PM dedicado, turnaround más rápido.", ft: false },
+        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Escala ilimitada. Todos los servicios del plan, PM dedicado, turnaround más rápido.", ft: false },
       ],
     },
     wl: { title: "Listo para empezar?", sub: "Regístrate hoy y recibe 10 créditos gratis para explorar la plataforma.", cta: "Comenzar gratis", login: "¿Ya tienes cuenta?" },
@@ -775,6 +777,9 @@ export default function Home() {
               {t.pricing.note}{" "}
               {t.pricing.noteCta}{" "}
               <a href="/dedicated" className="font-bold underline decoration-[#130A06]/40 underline-offset-2 hover:decoration-[#130A06] transition-colors">{t.pricing.noteLink} →</a>
+            </p>
+            <p className="-mt-10 pb-14 font-[family-name:var(--font-atkinson)] text-[0.95rem] leading-relaxed text-[#130A06]/70 max-w-3xl">
+              {t.pricing.seoAddon}
             </p>
           </FadeUp>
         </div>
