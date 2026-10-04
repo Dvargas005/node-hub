@@ -186,7 +186,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           </h2>
           <p className="mt-4 max-w-3xl font-[family-name:var(--font-atkinson)] text-lg text-[#F5F6FC]/75">
             Every plan includes a monthly credit allowance you spend on items from the service catalog.
-            No long contracts.
+            Plans are month to month.
           </p>
           <div className="mt-10">
             <PricingStrip plans={plans} />

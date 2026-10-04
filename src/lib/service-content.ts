@@ -34,7 +34,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Web development on a monthly subscription",
     metaTitle: "Web Development Services by Subscription",
     metaDescription:
-      "Landing pages, business websites, online stores, and custom web tools built by an in-house team. Flat monthly plans from $300, delivered in 48 to 72 business hours.",
+      "Landing pages, business websites, online stores, and custom web tools built by an in-house team. Flat monthly plans from $300, delivered in 2 to 5 business days.",
     eyebrow: "WEB DEVELOPMENT",
     lead: [
       "Most small and midsize businesses buy a website once, pay a large invoice, and then watch it go stale because every change is a new quote. N.O.D.E. works the other way: one monthly plan, a team that already knows your site, and changes delivered in days instead of billed by the hour.",
@@ -79,7 +79,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "How fast is a website delivered?",
-        a: "Most deliverables arrive in 48 to 72 business hours. Plan tiers set the delivery window: 5 business days on Member, 3 on Growth, and 2 on Pro. Larger multi-page builds are split into requests so you see progress throughout.",
+        a: "Your plan sets the delivery window: 5 business days on Member, 3 on Growth, and 2 on Pro. Larger multi-page builds are split into requests so you see progress throughout.",
       },
       {
         q: "What technology do you build with?",
@@ -95,7 +95,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "Are there long contracts?",
-        a: "No. Plans are monthly with no long contracts. Dedicated engagements for larger teams can carry a minimum term, which is stated up front.",
+        a: "No. Member, Growth, and Pro are month to month. SEO add-ons and Dedicated engagements carry a 3-month minimum, which is stated up front.",
       },
     ],
   },
@@ -457,7 +457,7 @@ export const PROCESS_STEPS = [
   },
   {
     title: "Your team builds it",
-    body: "A project manager assigns the work to in-house designers and developers. Most deliverables arrive in 48 to 72 business hours.",
+    body: "A project manager assigns the work to in-house designers and developers. Delivery takes 2 to 5 business days, depending on your plan.",
   },
   {
     title: "Approve or revise",

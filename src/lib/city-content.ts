@@ -83,7 +83,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "dallas-tx",
     metaTitle: "Web, App & Software Development in Dallas, TX",
     metaDescription:
-      "Dallas web development, app development, custom software, and SEO from N.O.D.E., on Central Time. Flat monthly plans from $300, delivered in 48 to 72 business hours.",
+      "Dallas web development, app development, custom software, and SEO from N.O.D.E., on Central Time. Flat monthly plans from $300, delivered in 2 to 5 business days.",
     h1: "Web, app, and software development in Dallas",
     lead: [
       "N.O.D.E. builds websites, mobile apps, and custom software for businesses in Dallas and across the Dallas-Fort Worth metroplex, and runs the SEO that gets them found. We are based on Central Time, the same as you, and work through video calls and our own delivery platform.",
@@ -113,7 +113,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "indianapolis-in",
     metaTitle: "Web, App & Software Development in Indianapolis, IN",
     metaDescription:
-      "Indianapolis web development, app development, custom software, and SEO from N.O.D.E. Flat monthly plans from $300, delivered in 48 to 72 business hours.",
+      "Indianapolis web development, app development, custom software, and SEO from N.O.D.E. Flat monthly plans from $300, delivered in 2 to 5 business days.",
     h1: "Web, app, and software development in Indianapolis",
     lead: [
       "N.O.D.E. builds websites, mobile apps, and custom software for Indianapolis businesses, and runs the SEO that gets them found. We are based in the Chicago area and work remotely with clients across central Indiana.",

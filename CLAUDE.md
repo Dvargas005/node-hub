@@ -58,3 +58,10 @@ Verificar la dirección de marca vigente antes de agregar o renombrar páginas d
 
 ## Contacto
 CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
+
+## Datos de plan que el copy debe repetir igual (verificado en prod 2026-10-03)
+- Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
+  No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
+- On demand cuesta $5 (pago unico). Member / Growth / Pro son mes a mes; los add-ons de SEO
+  y los planes Dedicated tienen minimo de 3 meses.
+- Nouvos se fundo en 2024: no escribir "anos de experiencia".
