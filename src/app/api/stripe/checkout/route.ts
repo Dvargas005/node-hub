@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
     if (!plan) {
       return NextResponse.json({ error: `Plan "${planSlug}" not found` }, { status: 404 });
     }
+    // Early Adopters is retired: existing subscribers keep renewing through Stripe,
+    // but nobody can start or switch to it through checkout.
+    if (plan.slug === "early-adopters") {
+      return NextResponse.json({ error: "This plan is no longer available." }, { status: 410 });
+    }
     if (!plan.stripePriceId) {
       return NextResponse.json(
         { error: `Plan "${plan.name}" has no Stripe price configured. Run setup-stripe.ts.` },
