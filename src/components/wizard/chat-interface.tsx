@@ -23,7 +23,6 @@ interface BriefData {
     extras: string;
   };
   pmAlert?: string | null;
-  discount?: { percent: number; extendedDays: number; originalDays: number } | null;
   firstRoundBonus?: number;
   insufficientCredits?: boolean;
 }

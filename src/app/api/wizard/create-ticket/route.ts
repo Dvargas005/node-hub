@@ -76,11 +76,8 @@ export async function POST(req: NextRequest) {
       const planCredits = (subscription?.status === "ACTIVE" ? subscription.creditsRemaining : 0);
       const totalCredits = freeCredits + planCredits;
 
-      const discount = briefStructured?.discount;
-      const cappedPercent = discount?.percent ? Math.min(discount.percent, 4.5) : 0;
-      const finalCost = cappedPercent > 0
-        ? Math.round(variant.creditCost * (1 - cappedPercent / 100))
-        : variant.creditCost;
+      // No discounts: a ticket always costs the variant's catalog price.
+      const finalCost = variant.creditCost;
 
       if (totalCredits < finalCost) {
         throw new Error(`INSUFFICIENT_CREDITS:${finalCost}:${totalCredits}`);
@@ -132,7 +129,6 @@ export async function POST(req: NextRequest) {
           briefRaw: conversationMessages || [],
           briefStructured,
           creditsCharged: finalCost,
-          discountApplied: discount || undefined,
           pmNotes: pmAlert,
         },
       });

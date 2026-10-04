@@ -65,3 +65,7 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 - On demand cuesta $5 (pago unico). Member / Growth / Pro son mes a mes; los add-ons de SEO
   y los planes Dedicated tienen minimo de 3 meses.
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
+- Sin descuentos de ningun tipo (2026-10-03): el wizard no ofrece ni aplica descuentos; un ticket cuesta
+  siempre el `creditCost` del catalogo. No reintroducir el descuento por plazo extendido.
+- Soporte: solo Dedicated Pro es 24/7. Todos los demas planes: confirmacion de recibido al siguiente
+  dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes.
