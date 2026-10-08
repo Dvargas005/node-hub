@@ -637,6 +637,13 @@
   "billing.addon.current": "SEO add-on",
   "billing.addon.currentNone": "No SEO add-on on your plan yet.",
   "billing.addon.minTerm": "3-month minimum: it can be removed or moved to a lower tier after {date}.",
+  "billing.commitment.until": "{months}-month commitment through",
+  "billing.commitment.planLine": "{months}-month commitment, billed monthly",
+  "billing.commitment.locked": "Your plan is inside its minimum commitment and can be canceled after {date}. To end it earlier, write to support@nouvos.one.",
+  "billing.cancel.button": "Cancel plan",
+  "billing.cancel.confirm": "Your plan stays active until {date} and will not renew after that. Unused credits are not refunded.",
+  "billing.cancel.yes": "Yes, cancel at period end",
+  "billing.cancel.done": "Cancellation scheduled: your plan ends on {date}. To reverse it, write to support@nouvos.one.",
   "billing.addon.billedNow": "Adding or upgrading is invoiced today, prorated to your renewal date. Removing takes effect right away with no refund for the current month.",
   "billing.addon.update": "Update SEO add-on",
   "billing.addon.updated": "SEO add-on updated"

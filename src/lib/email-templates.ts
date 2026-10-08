@@ -1,3 +1,5 @@
+import { commitmentNotice } from "@/lib/commitment";
+
 const base = "font-family:'Helvetica Neue',Arial,sans-serif;background-color:#130A06;color:#F5F6FC;padding:40px;";
 const btn = "display:inline-block;background-color:#FFC919;color:#130A06;padding:12px 24px;text-decoration:none;font-weight:bold;";
 const foot = '<p style="margin-top:30px;opacity:0.6;font-size:12px;">N.O.D.E. — Powered by Nouvos</p>';
@@ -28,8 +30,8 @@ export function ticketCompletedEmail(name: string, num: number, svc: string, bon
   return { subject: `Request #${num} completed`, html: wrap("Request completed!", `<p>Hi ${name}, your request <strong>#${num}</strong> (<strong>${svc}</strong>) has been completed.</p>${bonusLine}<p>Ready for your next project?</p>`, "/request", "New request →") };
 }
 
-export function subscriptionActiveEmail(name: string, plan: string, credits: number) {
-  return { subject: `${plan} plan activated — ${credits} credits available`, html: wrap("Your plan is active!", `<p>Hi ${name}, your <strong>${plan}</strong> plan has been activated. You have <strong>${credits} credits</strong> available.</p><p>Create your first request and put your digital team to work.</p>`, "/request", "Create request →") };
+export function subscriptionActiveEmail(name: string, plan: string, credits: number, minTermMonths = 0) {
+  return { subject: `${plan} plan activated — ${credits} credits available`, html: wrap("Your plan is active!", `<p>Hi ${name}, your <strong>${plan}</strong> plan has been activated. You have <strong>${credits} credits</strong> available.</p>${minTermMonths > 0 ? `<p>${commitmentNotice(minTermMonths)}</p>` : ""}<p>Create your first request and put your digital team to work.</p>`, "/request", "Create request →") };
 }
 
 export function pmNewTicketEmail(pmName: string, num: number, client: string, svc: string) {

@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { requireApiRole } from "@/lib/api-auth";
 import Stripe from "stripe";
 import { syncAddOnFromStripe } from "@/lib/addons";
+import { minTermEndFor } from "@/lib/commitment";
 
 export async function GET(req: Request) {
   try {
@@ -81,6 +82,9 @@ export async function GET(req: Request) {
       }
     }
 
+    // Minimum commitment, same rule as the webhook (whichever runs first sets it)
+    const minTermEndsAt = minTermEndFor(periodStart, plan.minTermMonths);
+
     await db.subscription.upsert({
       where: { userId },
       create: {
@@ -92,6 +96,7 @@ export async function GET(req: Request) {
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
         creditsRemaining: plan.monthlyCredits + plan.bonusCredits,
+        minTermEndsAt,
       },
       update: {
         status: "ACTIVE",
@@ -99,6 +104,7 @@ export async function GET(req: Request) {
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
         canceledAt: null,
+        minTermEndsAt,
       },
     });
 

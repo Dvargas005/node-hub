@@ -84,6 +84,7 @@ export default async function ClientDetailPage({
               creditsRemaining: client.subscription.creditsRemaining,
               currentPeriodStart: client.subscription.currentPeriodStart.toISOString(),
               currentPeriodEnd: client.subscription.currentPeriodEnd.toISOString(),
+              minTermEndsAt: client.subscription.minTermEndsAt?.toISOString() ?? null,
               plan: {
                 name: client.subscription.plan.name,
                 slug: client.subscription.plan.slug,

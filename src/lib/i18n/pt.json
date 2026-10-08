@@ -637,6 +637,13 @@
   "billing.addon.current": "Complemento de SEO",
   "billing.addon.currentNone": "Seu plano ainda não tem complemento de SEO.",
   "billing.addon.minTerm": "Mínimo de 3 meses: pode ser removido ou rebaixado depois de {date}.",
+  "billing.commitment.until": "Compromisso de {months} meses até",
+  "billing.commitment.planLine": "Compromisso de {months} meses, com pagamento mensal",
+  "billing.commitment.locked": "Seu plano está dentro do compromisso mínimo e pode ser cancelado depois de {date}. Para encerrar antes, escreva para support@nouvos.one.",
+  "billing.cancel.button": "Cancelar plano",
+  "billing.cancel.confirm": "Seu plano continua ativo até {date} e não será renovado depois. Créditos não usados não são reembolsados.",
+  "billing.cancel.yes": "Sim, cancelar no fim do período",
+  "billing.cancel.done": "Cancelamento agendado: seu plano termina em {date}. Para reverter, escreva para support@nouvos.one.",
   "billing.addon.billedNow": "Adicionar ou subir de nível é faturado hoje, proporcional até a data de renovação. A remoção vale na hora, sem reembolso do mês atual.",
   "billing.addon.update": "Atualizar complemento de SEO",
   "billing.addon.updated": "Complemento de SEO atualizado"

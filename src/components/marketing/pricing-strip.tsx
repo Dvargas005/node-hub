@@ -24,6 +24,7 @@ export function PricingStrip({ plans }: { plans: PublicPlan[] }) {
             <li>{formatUsd(p.setupFee)} one-time setup</li>
             <li>{p.monthlyCredits} credits per month</li>
             <li>{p.deliveryDays}-business-day delivery</li>
+            {p.minTermMonths > 0 && <li>{p.minTermMonths}-month commitment, billed monthly</li>}
           </ul>
         </div>
       ))}

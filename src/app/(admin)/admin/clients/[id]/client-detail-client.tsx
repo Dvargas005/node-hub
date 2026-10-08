@@ -89,6 +89,7 @@ interface ClientDetail {
     creditsRemaining: number;
     currentPeriodStart: string;
     currentPeriodEnd: string;
+    minTermEndsAt: string | null;
     plan: { name: string; slug: string; priceMonthly: number; monthlyCredits: number };
     addOn: { name: string; minTermEndsAt: string | null } | null;
   } | null;
@@ -713,6 +714,14 @@ export function ClientDetailClient({
                     {new Date(client.subscription.currentPeriodEnd).toLocaleDateString(locale)}
                   </span>
                 </div>
+                {client.subscription.minTermEndsAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[rgba(245,246,252,0.5)]">Commitment ends</span>
+                    <span className="text-[rgba(245,246,252,0.7)]">
+                      {new Date(client.subscription.minTermEndsAt).toLocaleDateString(locale)}
+                    </span>
+                  </div>
+                )}
                 {client.freeCredits > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-[rgba(245,246,252,0.5)]">Free credits</span>

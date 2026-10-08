@@ -27,6 +27,7 @@ interface Plan {
   setupFee: number; monthlyCredits: number; maxActiveReqs: number;
   deliveryDays: number; stripePriceId: string | null;
   isRecurring: boolean;
+  minTermMonths: number;
   addOnCharges: Record<string, number | null>;
 }
 
@@ -38,6 +39,7 @@ interface Sub {
   currentPeriodEnd: string; hasStripeCustomer: boolean;
   canHaveAddOn: boolean; addOnSlug: string | null; addOnName: string | null;
   addOnMinTermEndsAt: string | null; addOnCharges: Record<string, number | null>;
+  canCancel: boolean; minTermMonths: number; minTermEndsAt: string | null;
 }
 
 interface CreditPack {
@@ -91,6 +93,10 @@ export function BillingClient({
   const [selectedAddOn, setSelectedAddOn] = useState<string | null>(null);
   const [addOnChoice, setAddOnChoice] = useState<string | null>(subscription?.addOnSlug ?? null);
   const [addOnSaving, setAddOnSaving] = useState(false);
+  // Plan cancellation: locked while the minimum commitment (or the add-on minimum) is running
+  const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [canceling, setCanceling] = useState(false);
+  const [cancelEndsAt, setCancelEndsAt] = useState<string | null>(null);
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -137,6 +143,22 @@ export function BillingClient({
 
   const addOnName = (slug: string | null) => addOns.find((a) => a.slug === slug)?.name ?? "";
   const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US")}`;
+
+  const lockDates = [subscription?.minTermEndsAt, subscription?.addOnSlug ? subscription.addOnMinTermEndsAt : null]
+    .filter((d): d is string => !!d && new Date(d) > new Date())
+    .sort();
+  const cancelLockedUntil = lockDates.length ? lockDates[lockDates.length - 1] : null;
+
+  const handleCancelPlan = async () => {
+    setError("");
+    setCanceling(true);
+    try {
+      const res = await fetch("/api/stripe/cancel", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.endsAt) { setCancelEndsAt(data.endsAt); setCancelConfirm(false); return; }
+      setError(data.error || t("common.connectionError"));
+    } catch { setError(t("common.connectionError")); } finally { setCanceling(false); }
+  };
 
   const handlePortal = async () => {
     setError("");
@@ -307,6 +329,12 @@ export function BillingClient({
               <span>{t("billing.nextRenewal")}</span>
               <span>{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</span>
             </div>
+            {subscription.minTermEndsAt && new Date(subscription.minTermEndsAt) > new Date() && (
+              <div className="flex items-center justify-between text-sm text-[rgba(245,246,252,0.5)]">
+                <span>{t("billing.commitment.until").replace("{months}", String(subscription.minTermMonths))}</span>
+                <span>{new Date(subscription.minTermEndsAt).toLocaleDateString()}</span>
+              </div>
+            )}
             {/* Low credits warning */}
             {subscription.creditsRemaining < subscription.monthlyCredits * 0.2 && (
               <div className="flex items-center gap-2 bg-yellow-500/5 border border-yellow-500/20 p-2 text-xs text-yellow-400">
@@ -318,6 +346,29 @@ export function BillingClient({
               <Button onClick={handlePortal} variant="outline" className="w-full border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.05)]">
                 {t("billing.manageStripe")}
               </Button>
+            )}
+            {subscription.canCancel && (
+              cancelEndsAt ? (
+                <p className="text-xs text-[rgba(245,246,252,0.5)]">{t("billing.cancel.done").replace("{date}", new Date(cancelEndsAt).toLocaleDateString())}</p>
+              ) : cancelLockedUntil ? (
+                <p className="text-xs text-[rgba(245,246,252,0.5)]">{t("billing.commitment.locked").replace("{date}", new Date(cancelLockedUntil).toLocaleDateString())}</p>
+              ) : !cancelConfirm ? (
+                <Button onClick={() => setCancelConfirm(true)} variant="outline" className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10">
+                  {t("billing.cancel.button")}
+                </Button>
+              ) : (
+                <div className="space-y-2 border border-red-500/20 bg-red-500/5 p-3">
+                  <p className="text-xs text-[rgba(245,246,252,0.7)]">{t("billing.cancel.confirm").replace("{date}", new Date(subscription.currentPeriodEnd).toLocaleDateString())}</p>
+                  <div className="flex gap-2">
+                    <Button onClick={handleCancelPlan} disabled={canceling} className="flex-1 bg-red-600 text-white hover:bg-red-700 text-sm disabled:opacity-50">
+                      {canceling ? <Loader2 className="h-3 w-3 animate-spin" /> : t("billing.cancel.yes")}
+                    </Button>
+                    <Button onClick={() => setCancelConfirm(false)} variant="outline" className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)] text-sm">
+                      {t("common.cancel")}
+                    </Button>
+                  </div>
+                </div>
+              )
             )}
           </CardContent>
         </Card>
@@ -427,6 +478,11 @@ export function BillingClient({
                           <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t(key)}
                         </li>
                       ))}
+                      {plan.minTermMonths > 0 && (
+                        <li className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t("billing.commitment.planLine").replace("{months}", String(plan.minTermMonths))}
+                        </li>
+                      )}
                     </ul>
                     <Button
                       onClick={() => handleSubscribe(plan.slug)}
@@ -549,6 +605,11 @@ export function BillingClient({
                           <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t(key)}
                         </li>
                       ))}
+                      {plan.minTermMonths > 0 && (
+                        <li className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t("billing.commitment.planLine").replace("{months}", String(plan.minTermMonths))}
+                        </li>
+                      )}
                     </ul>
                     {isCurrent ? (
                       <Button disabled className="w-full bg-[rgba(255,255,255,0.05)] text-[rgba(245,246,252,0.5)] cursor-default">
