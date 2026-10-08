@@ -62,7 +62,9 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 ## Datos de plan que el copy debe repetir igual (verificado en prod 2026-10-03)
 - Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
   No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
-- On demand cuesta $5 (pago unico). Member / Growth / Pro son mes a mes; los add-ons de SEO
+- On demand cuesta $5 (pago unico). Member / Growth / Pro tienen compromiso de 12 meses con pago
+  mensual (Erich, 2026-10-08; aun NO se aplica en codigo: `minTermMonths` es 0 en esos planes). No escribir
+  "mes a mes" ni "sin contratos largos". La tarifa de $150/hora se publica solo en Clutch. Los add-ons de SEO
   y los planes Dedicated tienen minimo de 3 meses.
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
 - Sin descuentos de ningun tipo (2026-10-03): el wizard no ofrece ni aplica descuentos; un ticket cuesta

@@ -123,7 +123,7 @@ const organizationSchema = {
   // Must match the Google Business Profile service areas exactly.
   areaServed: AREA_SERVED,
   knowsLanguage: ["en", "es"],
-  sameAs: ["https://nouvos.one", "https://www.linkedin.com/company/111339069"],
+  sameAs: ["https://nouvos.one", "https://www.linkedin.com/company/111339069", "https://clutch.co/profile/nouvos-solutions"],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "N.O.D.E. Services",

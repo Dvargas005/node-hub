@@ -94,8 +94,8 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
         a: "Yes. Updates, fixes, and new pages on an existing site are all normal requests on a plan. Ongoing SEO, GEO, and AEO are add-ons.",
       },
       {
-        q: "Are there long contracts?",
-        a: "No. Member, Growth, and Pro are month to month. SEO add-ons and Dedicated engagements carry a 3-month minimum, which is stated up front.",
+        q: "Is there a minimum commitment?",
+        a: "Yes. Member, Growth, and Pro run on a 12-month commitment, billed monthly. SEO add-ons and Dedicated engagements carry a 3-month minimum. Every term is stated up front.",
       },
     ],
   },

@@ -17,6 +17,7 @@
 ## Pricing
 Flat monthly subscriptions, billed in USD. Each plan includes a monthly credit
 allowance spent against a published service catalog, plus a one-time setup fee.
+Member, Growth, and Pro run on a 12-month commitment, billed monthly.
 
 - Member: $300/month, $312 setup. 140 credits/month, 2 active requests, 5-business-day delivery.
 - Growth: $500/month, $1,092 setup. 350 credits/month, 5 active requests, 3-business-day delivery.
