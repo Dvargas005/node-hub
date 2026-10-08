@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { subscriptionActiveEmail } from "@/lib/email-templates";
 import { syncAddOnFromStripe } from "@/lib/addons";
+import { minTermEndFor } from "@/lib/commitment";
 import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
@@ -161,11 +162,7 @@ export async function POST(req: NextRequest) {
         const startingCredits = plan.monthlyCredits + plan.bonusCredits + carryCredits;
 
         // Minimum commitment: earliest cancel date = period start + N months
-        let minTermEndsAt: Date | null = null;
-        if (plan.minTermMonths > 0) {
-          minTermEndsAt = new Date(periodStart);
-          minTermEndsAt.setMonth(minTermEndsAt.getMonth() + plan.minTermMonths);
-        }
+        const minTermEndsAt = minTermEndFor(periodStart, plan.minTermMonths);
 
         await db.subscription.upsert({
           where: { userId },
@@ -216,7 +213,7 @@ export async function POST(req: NextRequest) {
 
         const subUser = await db.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
         if (subUser) {
-          const tpl = subscriptionActiveEmail(subUser.name, plan.name, plan.monthlyCredits + plan.bonusCredits);
+          const tpl = subscriptionActiveEmail(subUser.name, plan.name, plan.monthlyCredits + plan.bonusCredits, plan.minTermMonths);
           sendEmail(subUser.email, tpl.subject, tpl.html);
         }
 

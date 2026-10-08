@@ -3,6 +3,7 @@ import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import Stripe from "stripe";
+import { commitmentNotice } from "@/lib/commitment";
 import { addOnChargeFor, addOnStripePrice, reconcileAddOnAfterPlanChange, splitSubscriptionItems } from "@/lib/addons";
 
 export async function POST(req: NextRequest) {
@@ -214,6 +215,7 @@ export async function POST(req: NextRequest) {
     const subscriptionMetadata: Record<string, string> = { userId, planSlug };
     if (addOn) subscriptionMetadata.addOnSlug = addOn.slug;
     if (carryCredits > 0) subscriptionMetadata.carryCredits = String(carryCredits);
+    if (plan.minTermMonths > 0) subscriptionMetadata.minTermMonths = String(plan.minTermMonths);
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
@@ -228,6 +230,11 @@ export async function POST(req: NextRequest) {
     };
 
     // Promo codes are retired (2026-10-01): no discounts, and Checkout shows no code field.
+
+    // Minimum commitment is stated next to the pay button, before the client pays.
+    if (plan.minTermMonths > 0) {
+      checkoutParams.custom_text = { submit: { message: commitmentNotice(plan.minTermMonths) } };
+    }
 
     const checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
 

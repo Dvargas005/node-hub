@@ -20,6 +20,7 @@ async function main() {
       monthlyCredits: 140,
       maxActiveReqs: 2,
       deliveryDays: 5,
+      minTermMonths: 12,
     },
   });
 
@@ -34,6 +35,7 @@ async function main() {
       monthlyCredits: 350,
       maxActiveReqs: 5,
       deliveryDays: 3,
+      minTermMonths: 12,
     },
   });
 
@@ -48,6 +50,7 @@ async function main() {
       monthlyCredits: 650,
       maxActiveReqs: 999,
       deliveryDays: 2,
+      minTermMonths: 12,
     },
   });
 

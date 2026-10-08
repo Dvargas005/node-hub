@@ -8,6 +8,8 @@ export interface PublicPlan {
   setupFee: number;
   monthlyCredits: number;
   deliveryDays: number;
+  /** Minimum commitment in months; 0 = none. */
+  minTermMonths: number;
 }
 
 const PUBLIC_SLUGS = ["member", "growth", "pro"] as const;
@@ -34,6 +36,7 @@ export async function getPublicPlans(): Promise<PublicPlan[]> {
         setupFee: r.setupFee / 100,
         monthlyCredits: r.monthlyCredits,
         deliveryDays: r.deliveryDays,
+        minTermMonths: r.minTermMonths,
       }));
   } catch (err) {
     console.error("[PUBLIC_PLANS] Failed to load plans:", err);

@@ -76,7 +76,7 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 - Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
   No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
 - On demand cuesta $5 (pago unico). Member / Growth / Pro tienen compromiso de 12 meses con pago
-  mensual (Erich, 2026-10-08; aun NO se aplica en codigo: `minTermMonths` es 0 en esos planes). No escribir
+  mensual (Erich, 2026-10-08; ver "Compromiso minimo" abajo). No escribir
   "mes a mes" ni "sin contratos largos". La tarifa de $150/hora se publica solo en Clutch. Los add-ons de SEO
   y los planes Dedicated tienen minimo de 3 meses.
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
@@ -84,3 +84,15 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   siempre el `creditCost` del catalogo. No reintroducir el descuento por plazo extendido.
 - Soporte: solo Dedicated Pro es 24/7. Todos los demas planes: confirmacion de recibido al siguiente
   dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes.
+
+## Compromiso minimo (12 meses en Member / Growth / Pro, 3 en Dedicated)
+- Regla (Erich, 2026-10-08): 12 meses con pago mensual; despues sigue mes a mes y se cancela cuando quiera.
+  Salida anticipada: NO es autoservicio, el cliente escribe a soporte y nosotros decidimos.
+- `Plan.minTermMonths` -> `Subscription.minTermEndsAt`, calculado en `src/lib/commitment.ts`. Lo fijan el webhook
+  Y `verify-session` (cualquiera puede correr primero). Un upgrade conserva la fecha original.
+- Cancelar: solo `POST /api/stripe/cancel` (cancela al fin del periodo y revisa el plazo del plan y del add-on).
+  La cancelacion esta APAGADA en el portal de Stripe; no volver a encenderla o el plazo deja de aplicarse.
+- Checkout muestra el compromiso junto al boton de pago (`custom_text.submit`). No hay pagina de Terminos todavia.
+- Datos fuera del codigo: `npx tsx scripts/set-plan-commitment.ts` (dry run) y luego `--apply`
+  (minTermMonths en la DB, descripcion de los Products, portal sin cancelar). No toca suscripciones existentes.
+- Test: `npx tsx --test src/lib/commitment.test.ts`. `npm run lint` no esta configurado (pide setup interactivo).

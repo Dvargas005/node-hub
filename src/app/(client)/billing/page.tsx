@@ -51,6 +51,7 @@ export default async function BillingPage() {
         deliveryDays: p.deliveryDays,
         stripePriceId: p.stripePriceId,
         isRecurring: p.isRecurring,
+        minTermMonths: p.minTermMonths,
         addOnCharges: chargesFor(p),
       }))}
       addOns={addOns.map((a) => ({ slug: a.slug, name: a.name }))}
@@ -66,6 +67,9 @@ export default async function BillingPage() {
               currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
               hasStripeCustomer: !!subscription.stripeCustomerId,
               canHaveAddOn: !!subscription.stripeSubscriptionId && subscription.plan.isRecurring,
+              canCancel: !!subscription.stripeSubscriptionId && subscription.plan.isRecurring,
+              minTermMonths: subscription.plan.minTermMonths,
+              minTermEndsAt: subscription.minTermEndsAt?.toISOString() ?? null,
               addOnSlug: subscription.addOn?.slug ?? null,
               addOnName: subscription.addOn?.name ?? null,
               addOnMinTermEndsAt: subscription.addOnMinTermEndsAt?.toISOString() ?? null,
