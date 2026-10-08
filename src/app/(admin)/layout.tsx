@@ -9,7 +9,6 @@ import {
   UserCog,
   Package,
   Handshake,
-  Gift,
   BarChart3,
   RefreshCw,
   MessageCircle,
@@ -25,7 +24,6 @@ const baseNav: NavItem[] = [
   { label: "Team", href: "/admin/team", icon: UserCog },
   { label: "Services", href: "/admin/services", icon: Package },
   { label: "Alliances", href: "/admin/alliances", icon: Handshake },
-  { label: "Promos", href: "/admin/promos", icon: Gift },
   { label: "Metrics", href: "/admin/metrics", icon: BarChart3 },
   { label: "Sync", href: "/admin/sync", icon: RefreshCw },
 ];

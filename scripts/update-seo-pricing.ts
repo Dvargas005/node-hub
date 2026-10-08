@@ -10,10 +10,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const UPDATES: { match: string; creditCost: number; description: string; estimatedDays: number }[] = [
-  { match: "SEO Audit", creditCost: 0, description: "Free full technical & on-page SEO audit with a prioritized action plan — no cost, no commitment.", estimatedDays: 3 },
-  { match: "SEO Foundation", creditCost: 1000, description: "One-time foundation ($1,000): full audit + on-page fixes + technical SEO + metadata + XML sitemap + structured data (JSON-LD) + keyword/landing strategy.", estimatedDays: 7 },
-  { match: "Ongoing SEO", creditCost: 3000, description: "Monthly SEO retainer ($3,000/mo): technical maintenance, content, internal linking, backlink outreach and monthly reporting. Billed monthly — 3-month minimum commitment.", estimatedDays: 30 },
+// Foundation + Ongoing retired 2026-10-01: SEO is now a recurring add-on (scripts/setup-seo-addons.ts),
+// not a credit item. The free audit stays as a lead magnet.
+const UPDATES: { match: string; creditCost: number; description: string; estimatedDays: number; isActive: boolean }[] = [
+  { match: "SEO Audit", creditCost: 0, description: "Free full technical & on-page SEO audit with a prioritized action plan — no cost, no commitment.", estimatedDays: 3, isActive: true },
+  { match: "SEO Foundation", creditCost: 1000, description: "One-time foundation ($1,000): full audit + on-page fixes + technical SEO + metadata + XML sitemap + structured data (JSON-LD) + keyword/landing strategy.", estimatedDays: 7, isActive: false },
+  { match: "Ongoing SEO", creditCost: 3000, description: "Monthly SEO retainer ($3,000/mo): technical maintenance, content, internal linking, backlink outreach and monthly reporting. Billed monthly — 3-month minimum commitment.", estimatedDays: 30, isActive: false },
 ];
 
 async function main() {
@@ -32,10 +34,10 @@ async function main() {
       console.warn(`  ! variant not found, skipped: ${u.match}`);
       continue;
     }
-    console.log(`  ${u.match}: ${v.creditCost}cr -> ${u.creditCost}cr`);
+    console.log(`  ${u.match}: ${v.creditCost}cr -> ${u.creditCost}cr, active ${v.isActive} -> ${u.isActive}`);
     await prisma.serviceVariant.update({
       where: { id: v.id },
-      data: { creditCost: u.creditCost, description: u.description, estimatedDays: u.estimatedDays, isActive: true },
+      data: { creditCost: u.creditCost, description: u.description, estimatedDays: u.estimatedDays, isActive: u.isActive },
     });
   }
 

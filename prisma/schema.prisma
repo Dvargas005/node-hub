@@ -135,9 +135,11 @@ model Plan {
   isRecurring            Boolean   @default(true)  // false = one-time payment, no auto-renew
   isHidden               Boolean   @default(false) // true = exclude from public billing/landing
   minTermMonths          Int       @default(0)     // minimum commitment in months (e.g. 3 = 3-month minimum); 0 = none
+  includedAddOnId        String?   // add-on tier bundled in the plan price (Dedicated Jump = Starter SEO, Dedicated Pro = Full SEO + GEO + AEO)
   createdAt       DateTime  @default(now())
 
   subscriptions   Subscription[]
+  includedAddOn   AddOn?    @relation("PlanIncludedAddOn", fields: [includedAddOnId], references: [id])
 
   @@map("plans")
 }
@@ -154,11 +156,15 @@ model Subscription {
   creditsRemaining     Int
   canceledAt           DateTime?
   minTermEndsAt        DateTime?  // earliest date the subscription may be canceled (minimum commitment)
+  addOnId              String?    // SEO add-on tier billed as a 2nd line on the same Stripe subscription
+  addOnStripeItemId    String?
+  addOnMinTermEndsAt   DateTime?  // earliest date the add-on may be removed or downgraded
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
   user    User  @relation(fields: [userId], references: [id])
   plan    Plan  @relation(fields: [planId], references: [id])
+  addOn   AddOn? @relation("SubscriptionAddOn", fields: [addOnId], references: [id])
 
   @@map("subscriptions")
 }
@@ -169,6 +175,25 @@ enum SubStatus {
   CANCELED
   PAUSED
   EXPIRED
+}
+
+// Recurring add-ons sold on top of a plan (SEO tiers). Requires an active recurring plan.
+model AddOn {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  priceMonthly    Int      // centavos: 125000 = $1,250
+  rank            Int      // tier order: higher rank includes everything below it
+  minTermMonths   Int      @default(3)
+  stripeProductId String?
+  stripePriceId   String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  includedInPlans Plan[]         @relation("PlanIncludedAddOn")
+  subscriptions   Subscription[] @relation("SubscriptionAddOn")
+
+  @@map("add_ons")
 }
 
 model CreditPack {

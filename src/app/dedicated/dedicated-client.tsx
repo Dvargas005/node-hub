@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SeoAddOnPicker } from "@/components/seo-addon-picker";
 
 interface PlanInfo {
   name: string;
@@ -13,7 +14,10 @@ interface PlanInfo {
   deliveryDays: number;
   minTermMonths: number;
   configured: boolean;
+  addOnCharges: Record<string, number | null>;
 }
+
+const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US")}`;
 
 const TAGLINE: Record<string, string> = {
   "dedicated-light": "For teams getting started with managed creative.",
@@ -36,12 +40,16 @@ export function DedicatedClient({
   isLoggedIn,
   activePlanName,
   plans,
+  addOns,
 }: {
   isLoggedIn: boolean;
   activePlanName: string | null;
   plans: PlanInfo[];
+  addOns: { slug: string; name: string }[];
 }) {
   const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
+  const [addOn, setAddOn] = useState<string | null>(null);
+  const addOnName = addOns.find((a) => a.slug === addOn)?.name ?? "";
   const [error, setError] = useState("");
 
   const handleSubscribe = async (slug: string) => {
@@ -51,7 +59,10 @@ export function DedicatedClient({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planSlug: slug }),
+        body: JSON.stringify({
+          planSlug: slug,
+          addOnSlug: addOn && plans.find((p) => p.slug === slug)?.addOnCharges[addOn] != null ? addOn : undefined,
+        }),
       });
       const data = await res.json();
       if (data.url) {
@@ -101,8 +112,29 @@ export function DedicatedClient({
           <div className="mb-6 text-sm text-red-400 text-center">{error}</div>
         )}
 
+        {addOns.length > 0 && (
+          <div className="mb-8 w-full max-w-5xl space-y-2">
+            <p className="font-[var(--font-lexend)] text-base font-semibold text-[var(--ice-white)]">Add SEO</p>
+            <p className="font-[var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.6)]">
+              Optional, billed with your plan each month. No setup fee, 3-month minimum. Dedicated Jump
+              includes Starter SEO and pays only the difference to upgrade; Dedicated Pro includes Full SEO,
+              GEO, and AEO.
+            </p>
+            <SeoAddOnPicker
+              name="addon-dedicated"
+              options={addOns.map((a) => ({ slug: a.slug, name: a.name, chargeCents: plans[0]?.addOnCharges[a.slug] ?? null }))}
+              value={addOn}
+              onChange={setAddOn}
+              noneLabel="No SEO add-on"
+              perMonth="/mo"
+              includedLabel="Included"
+            />
+          </div>
+        )}
+
         <div className="grid w-full max-w-5xl gap-6 md:grid-cols-3">
           {plans.map((plan) => {
+            const addOnCharge = addOn ? plan.addOnCharges[addOn] : null;
             const highlight = plan.slug === "dedicated-jump";
             return (
               <div
@@ -126,6 +158,14 @@ export function DedicatedClient({
                     /mo
                   </span>
                 </div>
+
+                {addOn && (
+                  <p className="mt-2 font-[var(--font-atkinson)] text-xs font-semibold text-[var(--gold-bar)]">
+                    {addOnCharge == null
+                      ? `${addOnName} included`
+                      : `+ ${addOnName} ${money(addOnCharge)}/mo = ${money(plan.priceMonthly + addOnCharge)}/mo`}
+                  </p>
+                )}
 
                 <div className="border-t border-[rgba(255,201,25,0.2)] my-6" />
 

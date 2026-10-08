@@ -90,6 +90,7 @@ interface ClientDetail {
     currentPeriodStart: string;
     currentPeriodEnd: string;
     plan: { name: string; slug: string; priceMonthly: number; monthlyCredits: number };
+    addOn: { name: string; minTermEndsAt: string | null } | null;
   } | null;
   freeCredits: number;
   assignedPm: { id: string; name: string; email: string } | null;
@@ -672,6 +673,14 @@ export function ClientDetailClient({
                       {formatPrice(client.subscription.plan.priceMonthly)}/mo
                     </span>
                   </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[rgba(245,246,252,0.5)]">SEO add-on</span>
+                  <span className="text-[rgba(245,246,252,0.7)] text-xs text-right">
+                    {client.subscription.addOn
+                      ? `${client.subscription.addOn.name}${client.subscription.addOn.minTermEndsAt ? ` (min. term to ${new Date(client.subscription.addOn.minTermEndsAt).toLocaleDateString()})` : ""}`
+                      : "None"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[rgba(245,246,252,0.5)]">Status</span>
