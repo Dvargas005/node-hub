@@ -105,17 +105,17 @@ const C = {
       para: "Design, web development, and digital marketing — all under one subscription. Every deliverable produced by a real team of specialists.",
       accordions: [
         { name: "Design & Branding", items: [["Brand Starter", "from $180 credits"], ["Social Pack", "from $120 credits"], ["Flyer / Poster", "from $105 credits"], ["Business Kit", "from $375 credits"]] },
-        { name: "Web Development", items: [["Landing Page", "from $150 credits"], ["SEO Foundation", "from $300 credits"], ["Google Business", "from $90 credits"], ["Contact Form", "from $75 credits"]] },
+        { name: "Web Development", items: [["Landing Page", "from $150 credits"], ["SEO, GEO & AEO", "add-on from $1,250/mo"], ["Google Business", "from $90 credits"], ["Contact Form", "from $75 credits"]] },
         { name: "Digital Marketing", items: [["Content Pack (4 posts)", "from $120 credits"], ["Content Pack (8 posts)", "from $210 credits"], ["Promo Campaign", "from $225 credits"], ["WhatsApp Business", "from $90 credits"]] },
       ],
     },
     proc: [
-      { num: "01", label: "// 01", title: "START IN UNDER 24 HOURS", para: "Pick the plan that fits your business. No long contracts, no fine print, no surprises. Your digital team activates the moment you subscribe. One monthly payment gives you access to dedicated designers, developers, and marketers.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Custom Projects", "04"]] },
+      { num: "01", label: "// 01", title: "START IN UNDER 24 HOURS", para: "Pick the plan that fits your business. Plans are month to month, with no fine print and no surprises. Your digital team activates the moment you subscribe. One monthly payment gives you access to dedicated designers, developers, and marketers.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Custom Projects", "04"]] },
       { num: "02", label: "// 02", title: "AI-GUIDED BRIEFING SYSTEM", para: "You don't need to know design or tech to request what you need. Our smart assistant guides you step by step to articulate your request. The result is a professional brief your team can execute without back and forth.", list: [["Smart Wizard", "01"], ["Auto-categorization", "02"], ["File Attachments", "03"], ["Brief Generation", "04"], ["PM Escalation", "05"]] },
-      { num: "03", label: "// 03", title: "YOUR DEDICATED CREATIVE TEAM", para: "Behind every request is a real team. Graphic designers, AI-assisted developers, and specialized community managers. Your project manager coordinates everything — you just receive finished work in 48 to 72 business hours.", list: [["Graphic Design", "01"], ["AI-Assisted Development", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
+      { num: "03", label: "// 03", title: "YOUR DEDICATED CREATIVE TEAM", para: "Behind every request is a real team. Graphic designers, AI-assisted developers, and specialized community managers. Your project manager coordinates everything — you just receive finished work in 2 to 5 business days, depending on your plan.", list: [["Graphic Design", "01"], ["AI-Assisted Development", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
       { num: "04", label: "// 04", title: "APPROVE, ITERATE, SCALE", para: "Receive ready-to-use deliverables. Need adjustments? Request unlimited revisions. Approve on first round and earn bonus credits. As your business grows, your plan grows with you — more credits, more speed, more services.", list: [["Unlimited Revisions", "01"], ["First-Round Bonus", "02"], ["Credit Packs", "03"], ["Plan Upgrades", "04"]] },
     ],
-    about: { title: "Why N.O.D.E. exists", para: "N.O.D.E. is born from Nouvos Solutions — a logistics technology company that has spent years building systems for the global supply chain. We know what it means to operate with distributed teams, manage deliveries with real deadlines, and scale operations without losing quality. We apply exactly that mindset to creative services: clear processes, predictable deliveries, technology that amplifies human talent." },
+    about: { title: "Why N.O.D.E. exists", para: "N.O.D.E. is born from Nouvos Solutions — a logistics technology company that builds and runs systems for the global supply chain. We know what it means to operate with distributed teams, manage deliveries with real deadlines, and scale operations without losing quality. We apply exactly that mindset to creative services: clear processes, predictable deliveries, technology that amplifies human talent." },
     manifesto: {
       lines: [
         "WE RUN CREATIVE",
@@ -139,10 +139,11 @@ const C = {
       note: "Each minimum plan shown here has a small cap to help small and midsize businesses.",
       noteCta: "For more comprehensive plans visit",
       noteLink: "Dedicated Growth",
+      seoAddon: "SEO, GEO, and AEO are add-ons to any plan: Starter SEO is $1,250/mo, Full SEO is $2,500/mo, and Full SEO, GEO, and AEO is $4,000/mo. Dedicated Jump includes Starter SEO. Dedicated Pro includes Full SEO, GEO, and AEO.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
         { name: "Growth", front: 500, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited scale. All services, dedicated PM, fastest turnaround.", ft: false },
+        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited scale. All plan services, dedicated PM, fastest turnaround.", ft: false },
       ],
     },
     wl: { title: "Ready to start?", sub: "Sign up today and get 10 free credits to explore the platform.", cta: "Start for free", login: "Already have an account?" },
@@ -166,17 +167,17 @@ const C = {
       para: "Diseño, desarrollo web y marketing digital — todo bajo una sola suscripción. Cada entregable producido por un equipo real de especialistas.",
       accordions: [
         { name: "Diseño & Branding", items: [["Brand Starter", "desde $180 créditos"], ["Social Pack", "desde $120 créditos"], ["Flyer / Poster", "desde $105 créditos"], ["Business Kit", "desde $375 créditos"]] },
-        { name: "Desarrollo Web", items: [["Landing Page", "desde $150 créditos"], ["SEO Foundation", "desde $300 créditos"], ["Google Business", "desde $90 créditos"], ["Formulario de Contacto", "desde $75 créditos"]] },
+        { name: "Desarrollo Web", items: [["Landing Page", "desde $150 créditos"], ["SEO, GEO y AEO", "complemento desde $1,250/mes"], ["Google Business", "desde $90 créditos"], ["Formulario de Contacto", "desde $75 créditos"]] },
         { name: "Marketing Digital", items: [["Content Pack (4 posts)", "desde $120 créditos"], ["Content Pack (8 posts)", "desde $210 créditos"], ["Campaña Promocional", "desde $225 créditos"], ["WhatsApp Business", "desde $90 créditos"]] },
       ],
     },
     proc: [
-      { num: "01", label: "// 01", title: "ACTÍVATE EN MENOS DE 24 HORAS", para: "Elige el plan que se ajuste a tu negocio. Sin contratos largos, sin letra chica, sin sorpresas. Tu equipo digital se activa desde el momento en que te suscribes. Un solo pago mensual te da acceso a diseñadores, developers y marketers dedicados.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Proyectos Custom", "04"]] },
+      { num: "01", label: "// 01", title: "ACTÍVATE EN MENOS DE 24 HORAS", para: "Elige el plan que se ajuste a tu negocio. Los planes son mes a mes, sin letra chica y sin sorpresas. Tu equipo digital se activa desde el momento en que te suscribes. Un solo pago mensual te da acceso a diseñadores, developers y marketers dedicados.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Proyectos Custom", "04"]] },
       { num: "02", label: "// 02", title: "SISTEMA DE BRIEFING GUIADO POR AI", para: "No necesitas saber de diseño ni de tecnología para pedir lo que necesitas. Nuestro asistente inteligente te guía paso a paso para articular tu solicitud. El resultado es un brief profesional que nuestro equipo puede ejecutar sin idas y vueltas.", list: [["Smart Wizard", "01"], ["Auto-categorización", "02"], ["Adjuntos de Archivos", "03"], ["Generación de Brief", "04"], ["Escalación a PM", "05"]] },
-      { num: "03", label: "// 03", title: "TU EQUIPO CREATIVO DEDICADO", para: "Detrás de cada solicitud hay un equipo real. Diseñadores gráficos, desarrolladores asistidos por AI, y community managers especializados. Tu project manager coordina todo — tú solo recibes el trabajo terminado en 48 a 72 horas hábiles.", list: [["Diseño Gráfico", "01"], ["Desarrollo AI-Asistido", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
+      { num: "03", label: "// 03", title: "TU EQUIPO CREATIVO DEDICADO", para: "Detrás de cada solicitud hay un equipo real. Diseñadores gráficos, desarrolladores asistidos por AI, y community managers especializados. Tu project manager coordina todo — tú solo recibes el trabajo terminado en 2 a 5 días hábiles, según tu plan.", list: [["Diseño Gráfico", "01"], ["Desarrollo AI-Asistido", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
       { num: "04", label: "// 04", title: "APRUEBA, ITERA, ESCALA", para: "Recibe entregas listas para usar. Si necesitas ajustes, pide revisiones ilimitadas. Aprueba a la primera y gana créditos bonus. A medida que tu negocio crece, tu plan crece contigo — más créditos, más velocidad, más servicios.", list: [["Revisiones Ilimitadas", "01"], ["Bonus Primera Ronda", "02"], ["Packs de Créditos", "03"], ["Upgrades de Plan", "04"]] },
     ],
-    about: { title: "Por qué existe N.O.D.E.", para: "N.O.D.E. nace de Nouvos Solutions — una empresa de tecnología logística que lleva años construyendo sistemas para la cadena de suministro global. Sabemos lo que significa operar con equipos distribuidos, gestionar entregas con deadlines reales, y escalar operaciones sin perder calidad. Aplicamos exactamente esa mentalidad a los servicios creativos: procesos claros, entregas predecibles, tecnología que amplifica al talento humano." },
+    about: { title: "Por qué existe N.O.D.E.", para: "N.O.D.E. nace de Nouvos Solutions — una empresa de tecnología logística que construye y opera sistemas para la cadena de suministro global. Sabemos lo que significa operar con equipos distribuidos, gestionar entregas con deadlines reales, y escalar operaciones sin perder calidad. Aplicamos exactamente esa mentalidad a los servicios creativos: procesos claros, entregas predecibles, tecnología que amplifica al talento humano." },
     manifesto: {
       lines: [
         "OPERAMOS LO CREATIVO",
@@ -200,10 +201,11 @@ const C = {
       note: "Cada plan mínimo que se muestra aquí tiene un límite reducido para ayudar a pequeñas y medianas empresas.",
       noteCta: "Para planes más completos visita",
       noteLink: "Dedicated Growth",
+      seoAddon: "SEO, GEO y AEO son complementos para cualquier plan: SEO Starter cuesta $1,250/mes, SEO completo $2,500/mes, y SEO, GEO y AEO completos $4,000/mes. Dedicated Jump incluye SEO Starter. Dedicated Pro incluye SEO, GEO y AEO completos.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
         { name: "Growth", front: 500, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Escala ilimitada. Todos los servicios, PM dedicado, turnaround más rápido.", ft: false },
+        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Escala ilimitada. Todos los servicios del plan, PM dedicado, turnaround más rápido.", ft: false },
       ],
     },
     wl: { title: "Listo para empezar?", sub: "Regístrate hoy y recibe 10 créditos gratis para explorar la plataforma.", cta: "Comenzar gratis", login: "¿Ya tienes cuenta?" },
@@ -775,6 +777,9 @@ export default function Home() {
               {t.pricing.note}{" "}
               {t.pricing.noteCta}{" "}
               <a href="/dedicated" className="font-bold underline decoration-[#130A06]/40 underline-offset-2 hover:decoration-[#130A06] transition-colors">{t.pricing.noteLink} →</a>
+            </p>
+            <p className="-mt-10 pb-14 font-[family-name:var(--font-atkinson)] text-[0.95rem] leading-relaxed text-[#130A06]/70 max-w-3xl">
+              {t.pricing.seoAddon}
             </p>
           </FadeUp>
         </div>

@@ -18,7 +18,7 @@ async function main() {
       priceMonthly: 30000, // $300
       setupFee: 31200, // $312
       monthlyCredits: 140,
-      maxActiveReqs: 1,
+      maxActiveReqs: 2,
       deliveryDays: 5,
     },
   });
@@ -32,7 +32,7 @@ async function main() {
       priceMonthly: 50000, // $500
       setupFee: 109200, // $1,092
       monthlyCredits: 350,
-      maxActiveReqs: 2,
+      maxActiveReqs: 5,
       deliveryDays: 3,
     },
   });

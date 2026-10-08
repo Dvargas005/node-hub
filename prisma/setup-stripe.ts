@@ -51,7 +51,7 @@ const plans: PlanSeed[] = [
     slug: "starter",
     name: "N.O.D.E. On demand",
     description: "1-month pay-as-you-go. No credits included — buy 1:1 as you need them.",
-    priceMonthly: 600, // $6
+    priceMonthly: 500, // $5
     setupFee: 0,
     monthlyCredits: 0,
     bonusCredits: 0,
@@ -86,7 +86,7 @@ const plans: PlanSeed[] = [
   {
     slug: "pro",
     name: "N.O.D.E. Pro",
-    description: "Premium: all services, dedicated PM, 24-48h turnaround.",
+    description: "Premium: all services, dedicated PM, 2-business-day turnaround.",
     priceMonthly: 90000, // $900
     setupFee: 156000, // $1,560
     monthlyCredits: 650,

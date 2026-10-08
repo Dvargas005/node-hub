@@ -34,7 +34,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Web development on a monthly subscription",
     metaTitle: "Web Development Services by Subscription",
     metaDescription:
-      "Landing pages, business websites, online stores, and custom web tools built by an in-house team. Flat monthly plans from $300, delivered in 48 to 72 business hours.",
+      "Landing pages, business websites, online stores, and custom web tools built by an in-house team. Flat monthly plans from $300, delivered in 2 to 5 business days.",
     eyebrow: "WEB DEVELOPMENT",
     lead: [
       "Most small and midsize businesses buy a website once, pay a large invoice, and then watch it go stale because every change is a new quote. N.O.D.E. works the other way: one monthly plan, a team that already knows your site, and changes delivered in days instead of billed by the hour.",
@@ -79,7 +79,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "How fast is a website delivered?",
-        a: "Most deliverables arrive in 48 to 72 business hours. Plan tiers set the delivery window: 5 business days on Member, 3 on Growth, and 2 on Pro. Larger multi-page builds are split into requests so you see progress throughout.",
+        a: "Your plan sets the delivery window: 5 business days on Member, 3 on Growth, and 2 on Pro. Larger multi-page builds are split into requests so you see progress throughout.",
       },
       {
         q: "What technology do you build with?",
@@ -91,11 +91,11 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "Can you work on my existing website?",
-        a: "Yes. Updates, fixes, new pages, and SEO work on an existing site are all normal requests on a plan.",
+        a: "Yes. Updates, fixes, and new pages on an existing site are all normal requests on a plan. Ongoing SEO, GEO, and AEO are add-ons.",
       },
       {
         q: "Are there long contracts?",
-        a: "No. Plans are monthly with no long contracts. Dedicated engagements for larger teams can carry a minimum term, which is stated up front.",
+        a: "No. Member, Growth, and Pro are month to month. SEO add-ons and Dedicated engagements carry a 3-month minimum, which is stated up front.",
       },
     ],
   },
@@ -242,7 +242,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "SEO services",
     metaTitle: "SEO Services: Technical, Local and On-Page SEO",
     metaDescription:
-      "Rank on Google and Bing for the searches that bring customers. Technical SEO, local SEO, structured data, and ongoing content on a flat monthly plan from $300.",
+      "Rank on Google and Bing for the searches that bring customers. Technical SEO, local SEO, structured data, and ongoing content. An add-on to any plan from $1,250 a month.",
     eyebrow: "SEO",
     lead: [
       "Most small and midsize businesses rank for their own name and nothing else. Search engine optimization closes that gap: it gets the pages that describe what you sell in front of the people searching for it on Google and Bing.",
@@ -299,7 +299,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "How much do SEO services cost?",
-        a: "SEO work is part of the subscription plans: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee. Audits, foundations, local SEO, and ongoing SEO are items in the service catalog.",
+        a: "SEO is an add-on to any plan. Starter SEO is $1,250 per month. Full SEO is $2,500 per month, and Full SEO, GEO, and AEO is $4,000 per month. Dedicated Jump includes Starter SEO, and Dedicated Pro includes Full SEO, GEO, and AEO.",
       },
     ],
   },
@@ -310,7 +310,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Generative engine optimization (GEO) agency",
     metaTitle: "Generative Engine Optimization (GEO) Agency & Services",
     metaDescription:
-      "GEO services that get your business named and cited by ChatGPT, Perplexity, Gemini, Claude, and Copilot. AI visibility audits, entity and structured data work, and monthly monitoring from $300.",
+      "GEO services that get your business named and cited by ChatGPT, Perplexity, Gemini, Claude, and Copilot. AI visibility audits, entity and structured data work, and monthly monitoring. Part of the $4,000 a month Full SEO, GEO, and AEO add-on.",
     eyebrow: "GENERATIVE ENGINE OPTIMIZATION",
     lead: [
       "Generative engine optimization (GEO) is the practice of making your business the one an AI assistant names when someone asks it for a recommendation. When a buyer asks ChatGPT, Perplexity, Gemini, Claude, or Copilot which company to hire, the assistant writes an answer from sources it can read and trust. GEO makes sure your business is one of those sources.",
@@ -371,7 +371,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "How much do GEO services cost?",
-        a: "GEO runs on the same subscription plans as the rest of N.O.D.E.: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee.",
+        a: "GEO is part of the Full SEO, GEO, and AEO add-on at $4,000 per month, which can be added to any plan. It is included in Dedicated Pro.",
       },
     ],
   },
@@ -382,7 +382,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Answer engine optimization (AEO)",
     metaTitle: "Answer Engine Optimization (AEO) Services",
     metaDescription:
-      "What is AEO? Answer engine optimization structures your content so Google, Bing, AI assistants, and voice assistants can lift your answer directly into their results. AEO services from $300 a month.",
+      "What is AEO? Answer engine optimization structures your content so Google, Bing, AI assistants, and voice assistants can lift your answer directly into their results. Part of the $4,000 a month Full SEO, GEO, and AEO add-on.",
     eyebrow: "ANSWER ENGINE OPTIMIZATION",
     lead: [
       "Answer engine optimization (AEO) means structuring your content so that search engines and assistants can take your answer and show it directly: in a featured snippet, an AI Overview, a ChatGPT or Perplexity answer, or a response read aloud by a voice assistant. The searcher gets the answer without clicking through a list of links, and your business is the one that supplied it.",
@@ -439,7 +439,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "How much do AEO services cost?",
-        a: "AEO runs on the same subscription plans as the rest of N.O.D.E.: $300 per month on Member, $500 on Growth, and $900 on Pro, plus a one-time setup fee.",
+        a: "AEO is part of the Full SEO, GEO, and AEO add-on at $4,000 per month, which can be added to any plan. It is included in Dedicated Pro.",
       },
     ],
   },
@@ -457,7 +457,7 @@ export const PROCESS_STEPS = [
   },
   {
     title: "Your team builds it",
-    body: "A project manager assigns the work to in-house designers and developers. Most deliverables arrive in 48 to 72 business hours.",
+    body: "A project manager assigns the work to in-house designers and developers. Delivery takes 2 to 5 business days, depending on your plan.",
   },
   {
     title: "Approve or revise",

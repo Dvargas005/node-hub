@@ -22,14 +22,14 @@ const TAGLINE: Record<string, string> = {
 };
 
 const TURNAROUND: Record<string, string> = {
-  "dedicated-light": "Next business day response",
-  "dedicated-jump": "Next business day response",
-  "dedicated-pro": "Continuous delivery",
+  "dedicated-light": "Receipt confirmed next business day",
+  "dedicated-jump": "Receipt confirmed next business day",
+  "dedicated-pro": "24/7 service",
 };
 
 const SEO_FEATURE: Record<string, string> = {
   "dedicated-jump": "SEO Starter included",
-  "dedicated-pro": "Full SEO included",
+  "dedicated-pro": "Full SEO, GEO, and AEO included",
 };
 
 export function DedicatedClient({

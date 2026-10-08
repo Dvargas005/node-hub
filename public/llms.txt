@@ -2,8 +2,8 @@
 
 > N.O.D.E. (Network Organized Delivery Engine) is the digital development studio of
 > Nouvos Solutions LLC. It delivers web development, mobile app development, custom
-> software development, and search optimization (SEO, GEO, AEO) under one flat monthly
-> subscription, staffed by a dedicated team of designers, developers, and marketers
+> software development under flat monthly subscriptions, with search optimization
+> (SEO, GEO, AEO) as an add-on, staffed by a dedicated team of designers, developers, and marketers
 > rather than a marketplace of freelancers.
 
 ## Services
@@ -18,15 +18,21 @@
 Flat monthly subscriptions, billed in USD. Each plan includes a monthly credit
 allowance spent against a published service catalog, plus a one-time setup fee.
 
-- Member: $300/month, $312 setup. 140 credits/month, 1 active request, 5-day delivery.
-- Growth: $500/month, $1,092 setup. 350 credits/month, 2 active requests, 3-day delivery.
-- Pro: $900/month, $1,560 setup. 650 credits/month, unlimited active requests, 2-day delivery.
+- Member: $300/month, $312 setup. 140 credits/month, 2 active requests, 5-business-day delivery.
+- Growth: $500/month, $1,092 setup. 350 credits/month, 5 active requests, 3-business-day delivery.
+- Pro: $900/month, $1,560 setup. 650 credits/month, unlimited active requests, 2-business-day delivery.
+
+SEO, GEO, and AEO are add-ons to any plan, not included in Member, Growth, or Pro:
+- Starter SEO: $1,250/month.
+- Full SEO: $2,500/month.
+- Full SEO, GEO, and AEO: $4,000/month.
 
 Dedicated retainer engagements are quoted separately at https://www.nodedev.one/dedicated.
+Dedicated Jump includes Starter SEO. Dedicated Pro includes full SEO, GEO, and AEO.
 
 ## What makes N.O.D.E. different
 - Work is delivered by an in-house team, not routed to a freelancer marketplace.
-- Turnaround is contractual: 48 to 72 business hours on most deliverables.
+- Turnaround is set by plan: 5 business days on Member, 3 on Growth, and 2 on Pro.
 - It is operated by Nouvos Solutions LLC, which runs its own production supply chain
   software (transportation, order, and warehouse management), so the team builds and
   operates real multi-tenant systems rather than only client sites.
@@ -42,7 +48,7 @@ Headquartered in Evanston, Illinois. Serving businesses in:
 - [Indianapolis, IN](https://www.nodedev.one/locations/indianapolis-in)
 
 App and custom software projects are scoped and quoted per project after a discovery
-call. Web, design, SEO, and marketing work runs on the subscription plans above.
+call. Web, design, and marketing work runs on the subscription plans above; SEO, GEO, and AEO are add-ons.
 
 ## Company
 - Parent company: Nouvos Solutions LLC

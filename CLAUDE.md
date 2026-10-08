@@ -45,9 +45,27 @@ Vigentes desde 2026-09-21: **$300 / $500 / $900 al mes**, setup unico **$312 / $
 - No usar `prisma/setup-stripe.ts --force`: duplica los Products de los 8 planes.
 - Suscriptores existentes quedan en su precio (grandfathered). El script no toca suscripciones.
 
+## SEO / GEO / AEO = add-on (desde 2026-10-01)
+NO estan incluidos en Member / Growth / Pro ni en Dedicated Light. Add-on a cualquier plan:
+**Starter SEO $1,250/mes** · **Full SEO $2,500/mes** · **Full SEO + GEO + AEO $4,000/mes**.
+Dedicated Jump incluye Starter SEO; Dedicated Pro ($19,000/mes) incluye Full SEO, GEO y AEO.
+El copy publico (FAQs, meta descriptions, city pages, llms.txt) no debe decir que el SEO va
+dentro de los planes de $300/$500/$900. Los add-ons aun no tienen Stripe Price: se cotizan.
+
 ## Contexto WAIPAX
 VECTOR / ARC / CITADEL se están consolidando bajo la marca pública www.waipax.com.
 Verificar la dirección de marca vigente antes de agregar o renombrar páginas de producto.
 
 ## Contacto
 CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
+
+## Datos de plan que el copy debe repetir igual (verificado en prod 2026-10-03)
+- Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
+  No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
+- On demand cuesta $5 (pago unico). Member / Growth / Pro son mes a mes; los add-ons de SEO
+  y los planes Dedicated tienen minimo de 3 meses.
+- Nouvos se fundo en 2024: no escribir "anos de experiencia".
+- Sin descuentos de ningun tipo (2026-10-03): el wizard no ofrece ni aplica descuentos; un ticket cuesta
+  siempre el `creditCost` del catalogo. No reintroducir el descuento por plazo extendido.
+- Soporte: solo Dedicated Pro es 24/7. Todos los demas planes: confirmacion de recibido al siguiente
+  dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes.
