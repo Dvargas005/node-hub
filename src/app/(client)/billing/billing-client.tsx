@@ -17,21 +17,27 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Tag, Sparkles,
+  Check, CreditCard, Zap, Crown, ArrowRight, AlertTriangle, Loader2, Package, Sparkles,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { SeoAddOnPicker } from "@/components/seo-addon-picker";
 
 interface Plan {
   id: string; name: string; slug: string; priceMonthly: number;
   setupFee: number; monthlyCredits: number; maxActiveReqs: number;
   deliveryDays: number; stripePriceId: string | null;
   isRecurring: boolean;
+  addOnCharges: Record<string, number | null>;
 }
+
+interface AddOn { slug: string; name: string }
 
 interface Sub {
   id: string; status: string; planSlug: string; planName: string;
   creditsRemaining: number; monthlyCredits: number;
   currentPeriodEnd: string; hasStripeCustomer: boolean;
+  canHaveAddOn: boolean; addOnSlug: string | null; addOnName: string | null;
+  addOnMinTermEndsAt: string | null; addOnCharges: Record<string, number | null>;
 }
 
 interface CreditPack {
@@ -63,19 +69,16 @@ const planFeatureKeys: Record<string, string[]> = {
 };
 
 export function BillingClient({
-  plans, subscription, creditPacks, freeCredits, allianceDiscount,
+  plans, subscription, creditPacks, freeCredits, addOns,
 }: {
   plans: Plan[]; subscription: Sub | null; creditPacks: CreditPack[];
-  freeCredits: number; allianceDiscount: number;
+  freeCredits: number; addOns: AddOn[];
 }) {
   const { t } = useTranslation();
   const router = useRouter();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoDiscount, setPromoDiscount] = useState(0);
   const [customAmount, setCustomAmount] = useState(20);
   const [loadingCustom, setLoadingCustom] = useState(false);
 
@@ -84,6 +87,10 @@ export function BillingClient({
   const [upgradePlanSlug, setUpgradePlanSlug] = useState<string | null>(null);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [upgradeConfirming, setUpgradeConfirming] = useState(false);
+  // SEO add-on: chosen before checkout (new plan) or changed on the active plan
+  const [selectedAddOn, setSelectedAddOn] = useState<string | null>(null);
+  const [addOnChoice, setAddOnChoice] = useState<string | null>(subscription?.addOnSlug ?? null);
+  const [addOnSaving, setAddOnSaving] = useState(false);
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -101,13 +108,35 @@ export function BillingClient({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planSlug, promoCode: promoApplied ? promoCode : undefined }),
+        body: JSON.stringify({
+          planSlug,
+          addOnSlug: selectedAddOn && plans.find((p) => p.slug === planSlug)?.addOnCharges[selectedAddOn] != null ? selectedAddOn : undefined,
+        }),
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; return; }
       setError(data.error || t("common.errorStartingPayment"));
     } catch { setError(t("common.connectionError")); } finally { setLoadingPlan(null); }
   };
+
+  const handleAddOnUpdate = async () => {
+    setAddOnSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/stripe/addon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addOnSlug: addOnChoice }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || t("common.connectionError")); return; }
+      toast.success(t("billing.addon.updated"));
+      router.refresh();
+    } catch { setError(t("common.connectionError")); } finally { setAddOnSaving(false); }
+  };
+
+  const addOnName = (slug: string | null) => addOns.find((a) => a.slug === slug)?.name ?? "";
+  const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US")}`;
 
   const handlePortal = async () => {
     setError("");
@@ -202,10 +231,6 @@ export function BillingClient({
     }
   };
 
-  const effectiveDiscount = promoApplied && promoDiscount > 0 ? promoDiscount : allianceDiscount;
-  const applyDiscount = (cents: number) =>
-    effectiveDiscount > 0 ? Math.round(cents * (1 - effectiveDiscount / 100)) : cents;
-
   const showPricing = !isActive || isCanceled || isExpired;
 
   return (
@@ -298,6 +323,43 @@ export function BillingClient({
         </Card>
       )}
 
+      {/* SEO add-on on the active plan */}
+      {isActive && subscription?.canHaveAddOn && addOns.some((a) => subscription.addOnCharges[a.slug] != null || a.slug === subscription.addOnSlug) && (
+        <Card className="border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)]">
+          <CardHeader>
+            <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">{t("billing.addon.current")}</CardTitle>
+            <p className="font-[var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.6)]">
+              {subscription.addOnSlug ? subscription.addOnName : t("billing.addon.currentNone")}
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SeoAddOnPicker
+              name="addon-active"
+              options={addOns.map((a) => ({ slug: a.slug, name: a.name, chargeCents: subscription.addOnCharges[a.slug] ?? null }))}
+              value={addOnChoice}
+              onChange={setAddOnChoice}
+              noneLabel={t("billing.addon.none")}
+              perMonth={t("billing.addon.perMonth")}
+              includedLabel={t("billing.addon.included")}
+              disabled={addOnSaving}
+            />
+            {subscription.addOnMinTermEndsAt && new Date(subscription.addOnMinTermEndsAt) > new Date() && (
+              <p className="text-xs text-[rgba(245,246,252,0.5)]">
+                {t("billing.addon.minTerm").replace("{date}", new Date(subscription.addOnMinTermEndsAt).toLocaleDateString())}
+              </p>
+            )}
+            <p className="text-xs text-[rgba(245,246,252,0.5)]">{t("billing.addon.billedNow")}</p>
+            <Button
+              onClick={handleAddOnUpdate}
+              disabled={addOnSaving || addOnChoice === subscription.addOnSlug}
+              className="min-h-[44px] bg-[var(--gold-bar)] font-bold text-[var(--asphalt-black)] hover:opacity-90 disabled:opacity-50"
+            >
+              {addOnSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.addon.update")}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Pricing cards */}
       {showPricing && isExpired && (
         <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 p-3 text-sm text-yellow-400 flex items-center gap-2">
@@ -312,13 +374,26 @@ export function BillingClient({
             {isCanceled || isExpired ? t("billing.reactivatePlan") : t("billing.choosePlan")}
           </h2>
           <p className="mb-4 font-[var(--font-atkinson)] text-sm text-[var(--gold-bar)]">{t("billing.payAsYouGo")}</p>
+          {addOns.length > 0 && (
+            <div className="mb-6 space-y-2">
+              <h3 className="font-[var(--font-lexend)] text-base font-semibold text-[var(--ice-white)]">{t("billing.addon.title")}</h3>
+              <p className="font-[var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.6)]">{t("billing.addon.subtitle")}</p>
+              <SeoAddOnPicker
+                name="addon-new"
+                options={addOns.map((a) => ({ slug: a.slug, name: a.name, chargeCents: recurringPlans[0]?.addOnCharges[a.slug] ?? null }))}
+                value={selectedAddOn}
+                onChange={setSelectedAddOn}
+                noneLabel={t("billing.addon.none")}
+                perMonth={t("billing.addon.perMonth")}
+                includedLabel={t("billing.addon.included")}
+              />
+            </div>
+          )}
           <div className="grid gap-6 md:grid-cols-3">
             {recurringPlans.map((plan: Plan) => {
               const Icon = planIcons[plan.slug] || CreditCard;
               const featureKeys = planFeatureKeys[plan.slug] || [];
               const isFeatured = plan.slug === "growth";
-              const discountedPrice = applyDiscount(plan.priceMonthly);
-              const hasDiscount = discountedPrice < plan.priceMonthly;
 
               return (
                 <Card key={plan.id} className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
@@ -331,15 +406,19 @@ export function BillingClient({
                     <Icon className="mx-auto mb-2 h-8 w-8 text-[var(--gold-bar)]" />
                     <CardTitle className="font-[var(--font-lexend)] text-[var(--ice-white)]">{plan.name}</CardTitle>
                     <div className="mt-2">
-                      {hasDiscount && (
-                        <span className="text-sm text-[rgba(245,246,252,0.4)] line-through mr-2">${plan.priceMonthly / 100}</span>
-                      )}
                       <span className="font-[var(--font-lexend)] text-3xl font-bold text-[var(--ice-white)]">
-                        ${discountedPrice / 100}
+                        ${plan.priceMonthly / 100}
                       </span>
                       <span className="text-[rgba(245,246,252,0.5)]">/mo</span>
                     </div>
                     <p className="text-xs text-[rgba(245,246,252,0.4)]">Setup: ${plan.setupFee / 100} USD {t("billing.oneTime")}</p>
+                    {selectedAddOn && plan.addOnCharges[selectedAddOn] != null && (
+                      <p className="mt-2 text-xs font-semibold text-[var(--gold-bar)]">
+                        {t("billing.addon.total")
+                          .replace("{total}", money(plan.priceMonthly + (plan.addOnCharges[selectedAddOn] as number)))
+                          .replace("{addon}", addOnName(selectedAddOn))}
+                      </p>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 mb-6">
@@ -366,49 +445,6 @@ export function BillingClient({
               );
             })}
           </div>
-          {effectiveDiscount > 0 && (
-            <p className="mt-3 text-center text-xs text-[var(--gold-bar)]">
-              {promoApplied ? t("billing.promoApplied").replace("{code}", promoCode).replace("{discount}", String(promoDiscount)) : t("billing.allianceDiscount").replace("{discount}", String(allianceDiscount))}
-            </p>
-          )}
-
-          {/* Promo code input */}
-          {!promoApplied && (
-            <div className="mt-4 flex items-center gap-2 max-w-sm mx-auto">
-              <Tag className="h-4 w-4 text-[rgba(245,246,252,0.4)] shrink-0" />
-              <Input
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder={t("billing.promoCode")}
-                className="flex-1 h-9 border-[rgba(245,246,252,0.2)] bg-[rgba(255,255,255,0.05)] text-[var(--ice-white)] placeholder:text-[rgba(245,246,252,0.3)] text-sm"
-              />
-              <Button
-                size="sm"
-                disabled={!promoCode.trim()}
-                onClick={async () => {
-                  try {
-                    const res = await fetch("/api/billing/validate-promo", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ code: promoCode.trim() }),
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.valid && data.type === "PERCENT_OFF" && data.value > 0) {
-                      setPromoApplied(true);
-                      setPromoDiscount(data.value);
-                    } else {
-                      setError(t("billing.invalidCode"));
-                    }
-                  } catch {
-                    setError(t("billing.invalidCode"));
-                  }
-                }}
-                className="bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)] text-xs h-9"
-              >
-                {t("billing.apply")}
-              </Button>
-            </div>
-          )}
 
           {/* Starter — secondary CTA, text only, no card */}
           {starterPlan && (

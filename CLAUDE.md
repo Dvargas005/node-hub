@@ -50,7 +50,20 @@ NO estan incluidos en Member / Growth / Pro ni en Dedicated Light. Add-on a cual
 **Starter SEO $1,250/mes** · **Full SEO $2,500/mes** · **Full SEO + GEO + AEO $4,000/mes**.
 Dedicated Jump incluye Starter SEO; Dedicated Pro ($19,000/mes) incluye Full SEO, GEO y AEO.
 El copy publico (FAQs, meta descriptions, city pages, llms.txt) no debe decir que el SEO va
-dentro de los planes de $300/$500/$900. Los add-ons aun no tienen Stripe Price: se cotizan.
+dentro de los planes de $300/$500/$900.
+- Cobro: el add-on es una 2da linea en la MISMA suscripcion de Stripe que el plan (un invoice).
+  Logica en `src/lib/addons.ts`; alta/cambio/baja en `POST /api/stripe/addon` (el portal de Stripe
+  no edita suscripciones de 2 lineas). Requiere plan recurrente ACTIVO; sin setup fee; minimo 3 meses
+  (`Subscription.addOnMinTermEndsAt`). Jump paga solo la diferencia (price_data inline sobre el mismo Product).
+- Nunca leer `items.data[0]` como la linea del plan: usar `splitSubscriptionItems()`.
+- Products/Prices: `npx tsx scripts/setup-seo-addons.ts` (dry run) y luego `--apply`.
+- Catalogo de creditos: "SEO Foundation" y "Ongoing SEO" retirados (`scripts/update-seo-pricing.ts`);
+  el SEO Audit gratis se mantiene.
+
+## Codigos promocionales: RETIRADOS (2026-10-01)
+N.O.D.E. no ofrece codigos promocionales. Checkout no aplica descuentos ni muestra el campo de codigo;
+se eliminaron el input de billing, `/api/billing/validate-promo` y el admin de Promos. La tabla
+`promo_codes` queda (vacia) por historial. No reintroducir `allow_promotion_codes`.
 
 ## Contexto WAIPAX
 VECTOR / ARC / CITADEL se están consolidando bajo la marca pública www.waipax.com.

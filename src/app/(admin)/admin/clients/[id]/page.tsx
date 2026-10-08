@@ -19,7 +19,7 @@ export default async function ClientDetailPage({
     db.user.findUnique({
       where: { id },
       include: {
-        subscription: { include: { plan: true } },
+        subscription: { include: { plan: true, addOn: true } },
         referredBy: { select: { name: true, code: true } },
         assignedPm: { select: { id: true, name: true, email: true } },
         tickets: {
@@ -90,6 +90,9 @@ export default async function ClientDetailPage({
                 priceMonthly: client.subscription.plan.priceMonthly,
                 monthlyCredits: client.subscription.plan.monthlyCredits,
               },
+              addOn: client.subscription.addOn
+                ? { name: client.subscription.addOn.name, minTermEndsAt: client.subscription.addOnMinTermEndsAt?.toISOString() ?? null }
+                : null,
             }
           : null,
         freeCredits: client.freeCredits,

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { expireIfNeeded } from "@/lib/sub-expiration";
 import { DedicatedClient } from "./dedicated-client";
+import { addOnChargeFor } from "@/lib/addons";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 const SLUGS = ["dedicated-light", "dedicated-jump", "dedicated-pro"];
 
 export default async function DedicatedPage() {
-  const rows = await db.plan.findMany({ where: { slug: { in: SLUGS } } });
+  const [rows, addOns] = await Promise.all([
+    db.plan.findMany({ where: { slug: { in: SLUGS } }, include: { includedAddOn: true } }),
+    db.addOn.findMany({ where: { isActive: true }, orderBy: { rank: "asc" } }),
+  ]);
   // Preserve Light → Jump → Pro order regardless of DB ordering.
   const plans = SLUGS.map((slug) => rows.find((p) => p.slug === slug)).filter(
     (p): p is NonNullable<typeof p> => Boolean(p),
@@ -40,6 +44,7 @@ export default async function DedicatedPage() {
     <DedicatedClient
       isLoggedIn={!!userId}
       activePlanName={activePlanName}
+      addOns={addOns.map((a) => ({ slug: a.slug, name: a.name }))}
       plans={plans.map((p) => ({
         name: p.name,
         slug: p.slug,
@@ -49,6 +54,8 @@ export default async function DedicatedPage() {
         deliveryDays: p.deliveryDays,
         minTermMonths: p.minTermMonths,
         configured: Boolean(p.stripePriceId),
+        // Jump pays only the difference above its included Starter SEO; Pro includes everything
+        addOnCharges: Object.fromEntries(addOns.map((a) => [a.slug, addOnChargeFor(p, a)])),
       }))}
     />
   );

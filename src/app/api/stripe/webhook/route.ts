@@ -3,6 +3,8 @@ import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { subscriptionActiveEmail } from "@/lib/email-templates";
+import { syncAddOnFromStripe } from "@/lib/addons";
+import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -200,6 +202,15 @@ export async function POST(req: NextRequest) {
           data: { stripeCustomerId: customerId },
         });
 
+        // SEO add-on bought in the same checkout (second line on the subscription)
+        if (subscriptionId) {
+          try {
+            await syncAddOnFromStripe(await stripe.subscriptions.retrieve(subscriptionId));
+          } catch (e) {
+            console.error("[WEBHOOK] Add-on sync failed:", e);
+          }
+        }
+
         await db.processedWebhook.create({ data: { sessionId, type: "subscription" } });
         console.log(`[WEBHOOK] Subscription created: ${userId} → ${plan.name}`);
 
@@ -281,6 +292,8 @@ export async function POST(req: NextRequest) {
           });
           console.log(`[WEBHOOK] Subscription updated: ${subId} → ${mapped}`);
         }
+        // Add-on lines can change here (our /api/stripe/addon, plan upgrades, or the Stripe dashboard)
+        await syncAddOnFromStripe(event.data.object as Stripe.Subscription);
         break;
       }
 
@@ -289,7 +302,7 @@ export async function POST(req: NextRequest) {
         const subId = obj.id as string;
         await db.subscription.updateMany({
           where: { stripeSubscriptionId: subId },
-          data: { status: "CANCELED", creditsRemaining: 0, canceledAt: new Date() },
+          data: { status: "CANCELED", creditsRemaining: 0, canceledAt: new Date(), addOnId: null, addOnStripeItemId: null, addOnMinTermEndsAt: null },
         });
         console.log(`[WEBHOOK] Subscription canceled: ${subId}`);
         break;

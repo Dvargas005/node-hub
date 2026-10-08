@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
 import { requireApiRole } from "@/lib/api-auth";
 import Stripe from "stripe";
+import { syncAddOnFromStripe } from "@/lib/addons";
 
 export async function GET(req: Request) {
   try {
@@ -100,6 +101,15 @@ export async function GET(req: Request) {
         canceledAt: null,
       },
     });
+
+    // SEO add-on bought in the same checkout
+    if (stripeSub?.id) {
+      try {
+        await syncAddOnFromStripe(await stripe.subscriptions.retrieve(stripeSub.id));
+      } catch (e) {
+        console.error("[VERIFY_SESSION] Add-on sync failed:", e);
+      }
+    }
 
     // Save stripeCustomerId on user
     await db.user.update({

@@ -3,6 +3,7 @@ import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import Stripe from "stripe";
+import { addOnChargeFor, addOnStripePrice, reconcileAddOnAfterPlanChange, splitSubscriptionItems } from "@/lib/addons";
 
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
@@ -14,10 +15,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Stripe is not configured" }, { status: 503 });
     }
 
-    const { planSlug, promoCode } = await req.json();
+    const { planSlug, addOnSlug } = await req.json();
     const userId = session.user.id;
 
-    const plan = await db.plan.findUnique({ where: { slug: planSlug } });
+    const plan = await db.plan.findUnique({ where: { slug: planSlug }, include: { includedAddOn: true } });
     if (!plan) {
       return NextResponse.json({ error: `Plan "${planSlug}" not found` }, { status: 404 });
     }
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
       // === UPGRADE FLOW ===
       try {
         const stripeSub = await stripe.subscriptions.retrieve(existingSub.stripeSubscriptionId);
-        const currentItemId = stripeSub.items.data[0]?.id;
+        const currentItemId = (await splitSubscriptionItems(stripeSub)).planItem?.id;
         if (!currentItemId) {
           return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
         }
@@ -66,6 +67,11 @@ export async function POST(req: NextRequest) {
           items: [{ id: currentItemId, price: plan.stripePriceId! }],
           proration_behavior: "create_prorations",
         });
+
+        // 1b. Keep the SEO add-on consistent with the new plan (drop it if the plan now
+        // includes that tier, re-price it if the included tier changed).
+        const addOnResult = await reconcileAddOnAfterPlanChange(stripe, existingSub.stripeSubscriptionId, plan);
+        if (addOnResult !== "none") console.log(`[STRIPE_UPGRADE] add-on ${addOnResult} on ${existingSub.stripeSubscriptionId}`);
 
         // 2. Charge setup fee difference as one-time invoice item
         const setupFeeDifference = (plan.setupFee || 0) - (existingSub.plan.setupFee || 0);
@@ -149,6 +155,15 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+    // SEO add-on: only on a recurring plan, and only tiers the plan does not already include.
+    const addOn = addOnSlug ? await db.addOn.findUnique({ where: { slug: addOnSlug } }) : null;
+    if (addOnSlug && (!addOn || addOnChargeFor(plan, addOn) === null)) {
+      return NextResponse.json(
+        { error: `The "${addOnSlug}" add-on is not available with the ${plan.name} plan. Add-ons require an active monthly plan.` },
+        { status: 400 },
+      );
+    }
+
     // ── ONE-TIME plan (Starter) — mode: "payment", no subscription, no setup fee
     if (!plan.isRecurring) {
       const oneTimeParams: Stripe.Checkout.SessionCreateParams = {
@@ -166,9 +181,13 @@ export async function POST(req: NextRequest) {
     // ── Recurring plan flow (Member, Growth, Pro)
 
     // Build line items
-    const lineItems: { price: string; quantity: number }[] = [
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
       { price: plan.stripePriceId, quantity: 1 },
     ];
+    if (addOn) {
+      // No setup fee on add-ons; the 3-month minimum is tracked on our side (addOnMinTermEndsAt).
+      lineItems.push({ ...addOnStripePrice(plan, addOn), quantity: 1 });
+    }
 
     // I16 + REGLA 2: Setup fee with 3-month reactivation logic
     let chargeSetupFee = true;
@@ -193,6 +212,7 @@ export async function POST(req: NextRequest) {
         : 0;
 
     const subscriptionMetadata: Record<string, string> = { userId, planSlug };
+    if (addOn) subscriptionMetadata.addOnSlug = addOn.slug;
     if (carryCredits > 0) subscriptionMetadata.carryCredits = String(carryCredits);
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
@@ -207,16 +227,7 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    // Apply promo code if provided, otherwise allow manual entry in Stripe Checkout
-    if (promoCode) {
-      const promotionCodes = await stripe.promotionCodes.list({ code: promoCode, active: true, limit: 1 });
-      if (promotionCodes.data.length > 0) {
-        checkoutParams.discounts = [{ promotion_code: promotionCodes.data[0].id }];
-      }
-    }
-    if (!checkoutParams.discounts) {
-      checkoutParams.allow_promotion_codes = true;
-    }
+    // Promo codes are retired (2026-10-01): no discounts, and Checkout shows no code field.
 
     const checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
 

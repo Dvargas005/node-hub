@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/session";
 import { expireIfNeeded } from "@/lib/sub-expiration";
 import { BillingClient } from "./billing-client";
+import { addOnChargeFor } from "@/lib/addons";
 
 export const dynamic = "force-dynamic";
 
@@ -9,14 +10,15 @@ export default async function BillingPage() {
   const session = await requireAuth();
   const userId = session.user.id;
 
-  const [plans, rawSubscription, creditPacks, user] = await Promise.all([
+  const [plans, rawSubscription, creditPacks, user, addOns] = await Promise.all([
     db.plan.findMany({
       where: { isActive: true, isHidden: false },
       orderBy: { priceMonthly: "asc" },
+      include: { includedAddOn: true },
     }),
     db.subscription.findUnique({
       where: { userId },
-      include: { plan: true },
+      include: { plan: { include: { includedAddOn: true } }, addOn: true },
     }),
     db.creditPack.findMany({
       where: { isActive: true },
@@ -24,22 +26,17 @@ export default async function BillingPage() {
     }),
     db.user.findUnique({
       where: { id: userId },
-      select: { freeCredits: true, allianceId: true },
+      select: { freeCredits: true },
     }),
+    db.addOn.findMany({ where: { isActive: true }, orderBy: { rank: "asc" } }),
   ]);
+
+  // Monthly add-on charge per plan (null = not available, e.g. already included)
+  const chargesFor = (plan: Parameters<typeof addOnChargeFor>[0]) =>
+    Object.fromEntries(addOns.map((a) => [a.slug, addOnChargeFor(plan, a)])) as Record<string, number | null>;
 
   // Lazy-expire one-time plans (Starter) past their period end
   const subscription = await expireIfNeeded(rawSubscription as any);
-
-  // Check if user has LEN alliance for discount
-  let allianceDiscount = 0;
-  if (user?.allianceId) {
-    const alliance = await db.alliance.findUnique({
-      where: { id: user.allianceId },
-      select: { discountPercent: true },
-    });
-    allianceDiscount = alliance?.discountPercent || 0;
-  }
 
   return (
     <BillingClient
@@ -54,7 +51,9 @@ export default async function BillingPage() {
         deliveryDays: p.deliveryDays,
         stripePriceId: p.stripePriceId,
         isRecurring: p.isRecurring,
+        addOnCharges: chargesFor(p),
       }))}
+      addOns={addOns.map((a) => ({ slug: a.slug, name: a.name }))}
       subscription={
         subscription
           ? {
@@ -66,6 +65,11 @@ export default async function BillingPage() {
               monthlyCredits: subscription.plan.monthlyCredits,
               currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
               hasStripeCustomer: !!subscription.stripeCustomerId,
+              canHaveAddOn: !!subscription.stripeSubscriptionId && subscription.plan.isRecurring,
+              addOnSlug: subscription.addOn?.slug ?? null,
+              addOnName: subscription.addOn?.name ?? null,
+              addOnMinTermEndsAt: subscription.addOnMinTermEndsAt?.toISOString() ?? null,
+              addOnCharges: chargesFor(subscription.plan),
             }
           : null
       }
@@ -77,7 +81,6 @@ export default async function BillingPage() {
         stripePriceId: p.stripePriceId,
       }))}
       freeCredits={user?.freeCredits || 0}
-      allianceDiscount={allianceDiscount}
     />
   );
 }
