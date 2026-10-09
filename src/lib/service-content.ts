@@ -461,6 +461,6 @@ export const PROCESS_STEPS = [
   },
   {
     title: "Approve or revise",
-    body: "Request revisions until it is right. Approve on the first round and earn bonus credits.",
+    body: "Request revisions until it is right, then approve the delivery.",
   },
 ];

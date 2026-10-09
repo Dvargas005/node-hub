@@ -160,8 +160,7 @@ When you have all the necessary information:
 3. Suggest a complementary service with price in credits.
 4. If they decline the upsell, proceed with the brief.
 5. If they accept, adjust the brief.
-6. Mention: "If you approve the delivery on the first round, you receive a credit bonus."
-7. Only AFTER generate the brief JSON.
+6. Only AFTER generate the brief JSON.
 
 THIRD-PARTY WORK DETECTION:
 - The client's registered business is "${businessName || "not registered"}".
@@ -231,7 +230,6 @@ When you have enough information and have completed the professional close, gene
     "extras": "Any additional details"
   },
   "pmAlert": null,
-  "firstRoundBonus": 0,
   "insufficientCredits": false,
   "escalated": false,
   "meetingRequested": false

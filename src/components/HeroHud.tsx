@@ -202,7 +202,7 @@ export default function HeroHud() {
             transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
           />
           <text x="55" y="52" textAnchor="middle" fill={ICE} className="font-[family-name:var(--font-lexend)]" fontWeight="900" fontSize="20">
-            <Counter from={61} to={98} duration={5} />
+            99.9%
           </text>
           <text x="55" y="68" textAnchor="middle" fill={GOLD} fontSize="8" letterSpacing="2" className="font-[family-name:var(--font-lexend)]" fontWeight="700">UPTIME</text>
         </svg>

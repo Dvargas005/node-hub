@@ -117,10 +117,9 @@ export async function POST(req: NextRequest) {
           ...(preferredContact ? { preferredContact } : {}),
           priorities: priorities || undefined,
           onboardingCompleted: true,
-          freeCredits: { increment: 10 },
         },
       });
-      return { welcomeCredits: 10 };
+      return { welcomeCredits: 0 };
     });
 
     return NextResponse.json({ success: true, welcomeCredits: result.welcomeCredits });

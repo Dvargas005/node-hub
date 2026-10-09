@@ -42,35 +42,19 @@ export async function POST(
         where: { id: ticket.id },
         data: { status: "COMPLETED", completedAt: new Date() },
       });
-
-      // First-round bonus: if approved on round 1 with no revisions
-      const brief = ticket.briefStructured as Record<string, unknown> | null;
-      const bonus = brief?.firstRoundBonus as number | undefined;
-      if (delivery.round === 1 && bonus && bonus > 0) {
-        const hadRevisions = await tx.delivery.findFirst({ where: { ticketId: ticket.id, status: "REVISION_REQUESTED" } });
-        if (!hadRevisions) {
-          await tx.user.update({ where: { id: ticket.userId }, data: { freeCredits: { increment: bonus } } });
-          await tx.ticketMessage.create({
-            data: { ticketId: ticket.id, senderId: session.user.id, senderRole: "CLIENT", content: t("api.notification.bonusCredits", lang).replace("{bonus}", String(bonus)), isInternal: false },
-          });
-        }
-      }
     });
 
     const tktInfo = await db.ticket.findUnique({
       where: { id: params.id },
       select: {
         number: true,
-        briefStructured: true,
         userId: true,
         user: { select: { name: true, email: true } },
         variant: { select: { service: { select: { name: true } } } },
       },
     });
     if (tktInfo) {
-      const brief = tktInfo.briefStructured as Record<string, unknown> | null;
-      const bonus = brief?.firstRoundBonus as number | undefined;
-      const tpl = ticketCompletedEmail(tktInfo.user.name, tktInfo.number, tktInfo.variant.service.name, bonus);
+      const tpl = ticketCompletedEmail(tktInfo.user.name, tktInfo.number, tktInfo.variant.service.name);
       sendEmail(tktInfo.user.email, tpl.subject, tpl.html);
       createNotification(tktInfo.userId, {
         title: t("api.notification.requestCompleted", lang),
