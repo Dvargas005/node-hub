@@ -36,7 +36,7 @@ export function PricingStrip({ plans }: { plans: PublicPlan[] }) {
 export function ServiceCta({ model }: { model: "plan" | "project" }) {
   const primary =
     model === "plan"
-      ? { href: "/register", label: "Start with 10 free credits", external: false }
+      ? { href: "/register", label: "Choose a plan", external: false }
       : { href: DISCOVERY_CALL_URL, label: "Book a discovery call", external: true };
   const secondary =
     model === "plan"

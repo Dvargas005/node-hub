@@ -10,7 +10,7 @@ function wrap(title: string, body: string, link: string, linkText: string) {
 }
 
 export function welcomeEmail(name: string) {
-  return { subject: "Welcome to N.O.D.E.!", html: wrap("Hi, " + name + "!", "<p>Your N.O.D.E. account has been created. You have 10 free credits to explore the platform.</p><p>Set up your business profile and discover everything we can do for your business.</p>", "/dashboard", "Go to my dashboard →") };
+  return { subject: "Welcome to N.O.D.E.!", html: wrap("Hi, " + name + "!", "<p>Your N.O.D.E. account has been created.</p><p>Set up your business profile and discover everything we can do for your business.</p>", "/dashboard", "Go to my dashboard →") };
 }
 
 export function ticketCreatedEmail(name: string, num: number, svc: string) {
@@ -25,9 +25,8 @@ export function deliveryReadyEmail(name: string, num: number, svc: string) {
   return { subject: `Request #${num} — Delivery ready`, html: wrap("Your delivery is ready!", `<p>Hi ${name}, the delivery for <strong>${svc}</strong> (request <strong>#${num}</strong>) is ready for your review.</p><p>Review it and approve, or request adjustments if you need changes.</p>`, "/tickets", "Review delivery →") };
 }
 
-export function ticketCompletedEmail(name: string, num: number, svc: string, bonus?: number) {
-  const bonusLine = bonus ? `<p style="color:#FFC919;">+${bonus} bonus credits for approving on the first round!</p>` : "";
-  return { subject: `Request #${num} completed`, html: wrap("Request completed!", `<p>Hi ${name}, your request <strong>#${num}</strong> (<strong>${svc}</strong>) has been completed.</p>${bonusLine}<p>Ready for your next project?</p>`, "/request", "New request →") };
+export function ticketCompletedEmail(name: string, num: number, svc: string) {
+  return { subject: `Request #${num} completed`, html: wrap("Request completed!", `<p>Hi ${name}, your request <strong>#${num}</strong> (<strong>${svc}</strong>) has been completed.</p><p>Ready for your next project?</p>`, "/request", "New request →") };
 }
 
 export function subscriptionActiveEmail(name: string, plan: string, credits: number, minTermMonths = 0) {

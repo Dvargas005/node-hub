@@ -77,7 +77,8 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
 - On demand cuesta $5 (pago unico). Member / Growth / Pro tienen compromiso de 12 meses con pago
   mensual (Erich, 2026-10-08; ver "Compromiso minimo" abajo). No escribir
-  "mes a mes" ni "sin contratos largos". La tarifa de $150/hora se publica solo en Clutch. Los add-ons de SEO
+  "mes a mes" ni "sin contratos largos". La tarifa de $150/hora se publica solo en Clutch y GoodFirms (no en nodedev.one).
+  Sin creditos gratis al registrarse (2026-10-09): el onboarding ya no suma 10 creditos y el copy no los ofrece. Los add-ons de SEO
   y los planes Dedicated tienen minimo de 3 meses.
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
 - Sin descuentos de ningun tipo (2026-10-03): el wizard no ofrece ni aplica descuentos; un ticket cuesta
