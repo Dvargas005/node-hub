@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { centsPerCreditFor, PLAN_CENTS_PER_CREDIT } from "@/lib/credit-pricing";
 
 export async function POST(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT", "ADMIN", "PM"]);
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     });
     const existingSub = await db.subscription.findUnique({
       where: { userId },
-      select: { stripeCustomerId: true },
+      select: { stripeCustomerId: true, plan: { select: { slug: true } } },
     });
 
     let customerId = userRecord?.stripeCustomerId || existingSub?.stripeCustomerId || undefined;
@@ -49,10 +50,27 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+    // Pack Prices in Stripe are 1:1. On demand buyers pay their own rate, charged inline.
+    const centsPerCredit = centsPerCreditFor(existingSub?.plan.slug);
+    const lineItem =
+      centsPerCredit === PLAN_CENTS_PER_CREDIT
+        ? { price: pack.stripePriceId, quantity: 1 }
+        : {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: `N.O.D.E. credits: ${pack.credits}`,
+                description: `${pack.credits} credits at $${(centsPerCredit / 100).toFixed(2)} each`,
+              },
+              unit_amount: pack.credits * centsPerCredit,
+            },
+            quantity: 1,
+          };
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       customer: customerId,
-      line_items: [{ price: pack.stripePriceId, quantity: 1 }],
+      line_items: [lineItem],
       success_url: `${baseUrl}/dashboard?pack=success`,
       cancel_url: `${baseUrl}/billing`,
       metadata: { userId, packId: pack.id, credits: String(pack.credits), type: "credit_pack" },

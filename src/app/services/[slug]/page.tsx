@@ -186,7 +186,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           </h2>
           <p className="mt-4 max-w-3xl font-[family-name:var(--font-atkinson)] text-lg text-[#F5F6FC]/75">
             Every plan includes a monthly credit allowance you spend on items from the service catalog.
-            Member, Growth, and Pro run on a 12-month commitment, billed monthly.
+            Member, Growth, and Pro run on a 12-month commitment, billed monthly, or on the Flexible rate:
+            a 3-month minimum, then month to month.
           </p>
           <div className="mt-10">
             <PricingStrip plans={plans} />

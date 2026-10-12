@@ -31,7 +31,7 @@ const SECTIONS: { title: string; body: string[] }[] = [
     title: "Plans and prices",
     body: [
       "Prices are in US dollars and are shown on our pricing pages and at checkout before you pay. Member, Growth, and Pro plans include a monthly credit allowance and a one-time setup fee charged with the first payment. Dedicated plans are billed monthly and include their stated credit allowance.",
-      "On demand is a one-time payment for one month of platform access. It does not renew automatically. Credits on On demand are bought separately as needed.",
+      "On demand is a one-time payment for one month of platform access. It does not renew automatically. Credits on On demand are bought separately as needed, at the per-credit price shown before you pay.",
       "Mobile app and custom software projects are not part of the subscription plans. They are scoped and quoted in a separate written proposal, and that proposal governs the project.",
       "SEO, GEO, and AEO are add-ons billed monthly with your plan, unless your Dedicated plan states that they are included.",
     ],
@@ -39,9 +39,9 @@ const SECTIONS: { title: string; body: string[] }[] = [
   {
     title: "Minimum terms and automatic renewal",
     body: [
-      "Member, Growth, and Pro have a 12-month minimum term, billed monthly. Dedicated plans and SEO add-ons have a 3-month minimum term, billed monthly. The minimum term and the monthly amount are shown at checkout before you pay.",
+      "Member, Growth, and Pro are offered on two terms: the 12-month rate, with a 12-month minimum term, and the Flexible rate, with a 3-month minimum term at a higher monthly price. Both are billed monthly. Dedicated plans and SEO add-ons have a 3-month minimum term, billed monthly. The minimum term and the monthly amount are shown at checkout before you pay.",
       "Your subscription renews automatically every month and is charged to the payment method on file until you cancel. After the minimum term ends, the subscription continues month to month at the same monthly price, and you can cancel at any time.",
-      "Upgrading to a higher plan during a minimum term keeps your original minimum term end date.",
+      "Upgrading to a higher plan on the same term keeps your original minimum term end date. You can move from the Flexible rate to the 12-month rate at any time: on the same plan, the 12-month rate and a new 12-month minimum term start at your next billing date; on a higher plan, they start when you upgrade. Moving from the 12-month rate to the Flexible rate is not available from the Billing page; contact support.",
     ],
   },
   {

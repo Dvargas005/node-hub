@@ -135,15 +135,20 @@ const C = {
     pricing: {
       setup: "Setup",
       oneTime: "one-time",
-      payg: "…or pay as you go with 1:1 credits.",
-      note: "Each minimum plan shown here has a small cap to help small and midsize businesses. Member, Growth, and Pro run on a 12-month commitment, billed monthly.",
+      payg: "…or pay as you go: $5 for one month of access, credits at $2.75 each.",
+      note: "Each minimum plan shown here has a small cap to help small and midsize businesses. Member, Growth, and Pro run on a 12-month commitment billed monthly, or on the Flexible rate: a 3-month minimum, then month to month.",
+      termLabel: "Billing term",
+      termAnnual: "12-month rate",
+      termFlex: "Flexible rate",
+      termAnnualNote: "12-month commitment, billed monthly.",
+      termFlexNote: "3-month minimum, then month to month. Priced 25% above the 12-month rate.",
       noteCta: "For more comprehensive plans visit",
       noteLink: "Dedicated Growth",
       seoAddon: "SEO, GEO, and AEO are add-ons to any plan: Starter SEO is $1,250/mo, Full SEO is $2,500/mo, and Full SEO, GEO, and AEO is $4,000/mo. Dedicated Jump includes Starter SEO. Dedicated Pro includes Full SEO, GEO, and AEO.",
       plans: [
-        { name: "Member", front: 300, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
-        { name: "Growth", front: 500, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited active requests. All plan services, fastest turnaround.", ft: false },
+        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
+        { name: "Growth", front: 500, flex: 625, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content.", ft: true },
+        { name: "Pro", front: 900, flex: 1125, setup: 1560, per: "/mo", desc: "Unlimited active requests. All plan services, fastest turnaround.", ft: false },
       ],
     },
     wl: { title: "Ready to start?", sub: "Create your account, pick a plan, and your team starts on your first request.", cta: "Get started", login: "Already have an account?" },
@@ -197,15 +202,20 @@ const C = {
     pricing: {
       setup: "Configuración",
       oneTime: "única vez",
-      payg: "…o paga sobre la marcha con créditos 1:1.",
-      note: "Cada plan mínimo que se muestra aquí tiene un límite reducido para ayudar a pequeñas y medianas empresas. Member, Growth y Pro tienen un compromiso de 12 meses con pago mensual.",
+      payg: "…o paga sobre la marcha: $5 por un mes de acceso, créditos a $2.75 cada uno.",
+      note: "Cada plan mínimo que se muestra aquí tiene un límite reducido para ayudar a pequeñas y medianas empresas. Member, Growth y Pro tienen un compromiso de 12 meses con pago mensual, o la tarifa flexible: mínimo de 3 meses, después mes a mes.",
+      termLabel: "Plazo de pago",
+      termAnnual: "Tarifa 12 meses",
+      termFlex: "Tarifa flexible",
+      termAnnualNote: "Compromiso de 12 meses con pago mensual.",
+      termFlexNote: "Mínimo de 3 meses, después mes a mes. Cuesta 25% más que la tarifa de 12 meses.",
       noteCta: "Para planes más completos visita",
       noteLink: "Dedicated Growth",
       seoAddon: "SEO, GEO y AEO son complementos para cualquier plan: SEO Starter cuesta $1,250/mes, SEO completo $2,500/mes, y SEO, GEO y AEO completos $4,000/mes. Dedicated Jump incluye SEO Starter. Dedicated Pro incluye SEO, GEO y AEO completos.",
       plans: [
-        { name: "Member", front: 300, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
-        { name: "Growth", front: 500, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Solicitudes activas ilimitadas. Todos los servicios del plan, turnaround más rápido.", ft: false },
+        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
+        { name: "Growth", front: 500, flex: 625, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido.", ft: true },
+        { name: "Pro", front: 900, flex: 1125, setup: 1560, per: "/mes", desc: "Solicitudes activas ilimitadas. Todos los servicios del plan, turnaround más rápido.", ft: false },
       ],
     },
     wl: { title: "Listo para empezar?", sub: "Crea tu cuenta, elige un plan y tu equipo empieza con tu primera solicitud.", cta: "Comenzar", login: "¿Ya tienes cuenta?" },
@@ -438,7 +448,7 @@ function ManifestoSection({ lang }: { lang: "en" | "es" }) {
 
 function AnimatedPrice({ value, className }: { value: number; className?: string }) {
   const spring = useSpring(value, { damping: 30, stiffness: 120 });
-  const display = useTransform(spring, (v) => `$${Math.round(v)}`);
+  const display = useTransform(spring, (v) => `$${SETUP_PRICE_FORMAT.format(Math.round(v))}`);
   useEffect(() => { spring.set(value); }, [value, spring]);
   return <motion.span className={className}>{display}</motion.span>;
 }
@@ -470,6 +480,7 @@ function AnimatedSetup({ value, className }: { value: number; className?: string
 
 export default function Home() {
   const [lang, setLang] = useState<"en" | "es">("en");
+  const [term, setTerm] = useState<"annual" | "flex">("annual");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [wlEmail, setWlEmail] = useState("");
@@ -743,9 +754,28 @@ export default function Home() {
       <section id="pricing" className="relative bg-[#FFC919] overflow-hidden">
         <div className="absolute inset-0 opacity-[0.12] mix-blend-multiply pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "256px 256px" }} />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16">
+          <div role="radiogroup" aria-label={t.pricing.termLabel} className="inline-flex border-2 border-[#130A06] p-1">
+            {(["annual", "flex"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="radio"
+                aria-checked={term === v}
+                onClick={() => setTerm(v)}
+                className={`min-h-[44px] px-5 font-[family-name:var(--font-lexend)] font-bold text-[0.8rem] uppercase tracking-[0.12em] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#130A06] ${
+                  term === v ? "bg-[#130A06] text-[#FFC919]" : "text-[#130A06] hover:bg-[#130A06]/10"
+                }`}
+              >
+                {v === "annual" ? t.pricing.termAnnual : t.pricing.termFlex}
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 font-[family-name:var(--font-atkinson)] text-[0.95rem] text-[#130A06]/70">
+            {term === "annual" ? t.pricing.termAnnualNote : t.pricing.termFlexNote}
+          </p>
 
           {t.pricing.plans.map((pl, i) => {
-            const price = pl.front;
+            const price = term === "flex" ? pl.flex : pl.front;
             const setup = pl.setup;
 
             return (

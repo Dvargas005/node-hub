@@ -75,7 +75,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     faqs: [
       {
         q: "How much does a website cost with N.O.D.E.?",
-        a: "Plans start at $300 per month (Member), with Growth at $500 and Pro at $900, plus a one-time setup fee. Each plan includes a monthly credit allowance that you spend on items from the service catalog, such as a landing page or a multi-page website. You can also buy credits one to one as you go.",
+        a: "Plans start at $300 per month (Member), with Growth at $500 and Pro at $900, plus a one-time setup fee. Each plan includes a monthly credit allowance that you spend on items from the service catalog, such as a landing page or a multi-page website. Each plan also has a Flexible rate with a 3-month minimum instead of 12 months: Member $375, Growth $625, and Pro $1,125 per month.",
       },
       {
         q: "How fast is a website delivered?",
@@ -95,7 +95,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "Is there a minimum commitment?",
-        a: "Yes. Member, Growth, and Pro run on a 12-month commitment, billed monthly. SEO add-ons and Dedicated engagements carry a 3-month minimum.",
+        a: "Yes. Member, Growth, and Pro run on a 12-month commitment, billed monthly, or on the Flexible rate: a 3-month minimum, then month to month, priced 25% above the 12-month rate. SEO add-ons and Dedicated engagements carry a 3-month minimum.",
       },
     ],
   },

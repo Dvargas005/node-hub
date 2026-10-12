@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { classifyPlanChange } from "@/lib/plan-terms";
 
 export async function GET(req: NextRequest) {
   const { error, session } = await requireApiRole(["CLIENT"]);
@@ -26,8 +27,41 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Plan not found" }, { status: 404 });
     }
 
-    if (newPlan.priceMonthly <= sub.plan.priceMonthly) {
-      return NextResponse.json({ error: "Only upgrades supported" }, { status: 400 });
+    const change = classifyPlanChange(sub.plan, newPlan);
+    if (change.kind === "blocked") {
+      return NextResponse.json({ error: change.reason }, { status: 400 });
+    }
+
+    const currentPlan = {
+      slug: sub.plan.slug,
+      name: sub.plan.name,
+      priceMonthly: sub.plan.priceMonthly,
+      setupFee: sub.plan.setupFee,
+    };
+
+    // Same tier, Flexible to 12-month: nothing is charged today; the 12-month rate and term
+    // start with the next billing period (see checkout route).
+    if (change.kind === "switch-to-annual") {
+      return NextResponse.json({
+        currentPlan,
+        newPlan: {
+          slug: newPlan.slug,
+          name: newPlan.name,
+          priceMonthly: newPlan.priceMonthly,
+          setupFee: newPlan.setupFee,
+          monthlyCredits: newPlan.monthlyCredits + newPlan.bonusCredits,
+        },
+        currentCredits: sub.creditsRemaining,
+        newPlanCredits: 0,
+        totalCreditsAfter: sub.creditsRemaining,
+        proratedMonthlyDiff: 0,
+        setupFeeDiff: 0,
+        estimatedCharge: 0,
+        daysRemaining: 0,
+        switchTerm: true,
+        termStartsAt: (sub.currentPeriodEnd ?? new Date()).toISOString(),
+        newMinTermMonths: newPlan.minTermMonths,
+      });
     }
 
     // Estimate prorated monthly difference based on days remaining in current period
@@ -44,12 +78,7 @@ export async function GET(req: NextRequest) {
     const estimatedCharge = proratedMonthlyDiff + setupFeeDiff;
 
     return NextResponse.json({
-      currentPlan: {
-        slug: sub.plan.slug,
-        name: sub.plan.name,
-        priceMonthly: sub.plan.priceMonthly,
-        setupFee: sub.plan.setupFee,
-      },
+      currentPlan,
       newPlan: {
         slug: newPlan.slug,
         name: newPlan.name,
@@ -64,6 +93,8 @@ export async function GET(req: NextRequest) {
       setupFeeDiff,
       estimatedCharge,
       daysRemaining,
+      switchTerm: false,
+      restartTermMonths: change.restartTermMonths ?? null,
     });
   } catch (err) {
     console.error("[UPGRADE_PREVIEW]", err);

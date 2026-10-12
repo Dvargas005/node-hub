@@ -26,6 +26,12 @@ export function PricingStrip({ plans }: { plans: PublicPlan[] }) {
             <li>{p.deliveryDays}-business-day delivery</li>
             {p.minTermMonths > 0 && <li>{p.minTermMonths}-month commitment, billed monthly</li>}
           </ul>
+          {p.flex && (
+            <p className="mt-6 border-t border-[#130A06]/15 pt-4 font-[family-name:var(--font-atkinson)] text-sm text-[#130A06]/80">
+              <span className="font-bold">Flexible: {formatUsd(p.flex.priceMonthly)}/mo</span>, {p.flex.minTermMonths}-month
+              minimum, then month to month
+            </p>
+          )}
         </div>
       ))}
     </div>

@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SeoAddOnPicker } from "@/components/seo-addon-picker";
+import { baseSlug, classifyPlanChange, isFlexSlug } from "@/lib/plan-terms";
+import { centsPerCreditFor, PLAN_CENTS_PER_CREDIT } from "@/lib/credit-pricing";
 
 interface Plan {
   id: string; name: string; slug: string; priceMonthly: number;
@@ -57,7 +59,15 @@ interface UpgradePreview {
   setupFeeDiff: number;
   estimatedCharge: number;
   daysRemaining: number;
+  /** Same tier, Flexible to 12-month: nothing charged now, new rate and term from termStartsAt. */
+  switchTerm?: boolean;
+  termStartsAt?: string;
+  newMinTermMonths?: number;
+  /** Flexible to a higher 12-month tier: a new term of this length starts with the upgrade. */
+  restartTermMonths?: number | null;
 }
+
+type Term = "annual" | "flex";
 
 const planIcons: Record<string, typeof CreditCard> = {
   starter: Sparkles, member: CreditCard, growth: Zap, pro: Crown,
@@ -97,6 +107,8 @@ export function BillingClient({
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [canceling, setCanceling] = useState(false);
   const [cancelEndsAt, setCancelEndsAt] = useState<string | null>(null);
+  // 12-month rate vs Flexible rate; active subscribers start on the term they are on
+  const [term, setTerm] = useState<Term>(subscription && isFlexSlug(subscription.planSlug) ? "flex" : "annual");
 
   const totalCredits = freeCredits + (subscription?.creditsRemaining || 0);
   const isActive = subscription?.status === "ACTIVE";
@@ -106,6 +118,41 @@ export function BillingClient({
 
   const starterPlan = plans.find((p: Plan) => p.slug === "starter");
   const recurringPlans = plans.filter((p: Plan) => p.slug !== "starter");
+  const flexPlans = recurringPlans.filter((p: Plan) => isFlexSlug(p.slug));
+  const annualPlans = recurringPlans.filter((p: Plan) => !isFlexSlug(p.slug));
+  const shownPlans = term === "flex" && flexPlans.length ? flexPlans : annualPlans;
+  const centsPerCredit = centsPerCreditFor(subscription?.planSlug);
+  const creditPrice = (credits: number) =>
+    `$${((credits * centsPerCredit) / 100).toLocaleString("en-US", { minimumFractionDigits: centsPerCredit % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+
+  const termToggle = flexPlans.length > 0 && (
+    <div className="mb-6">
+      <div role="radiogroup" aria-label={t("billing.term.label")} className="inline-flex border border-[rgba(245,246,252,0.15)] p-1">
+        {(["annual", "flex"] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            role="radio"
+            aria-checked={term === v}
+            onClick={() => setTerm(v)}
+            className={`min-h-[44px] px-4 text-sm font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--gold-bar)] ${
+              term === v ? "bg-[var(--gold-bar)] text-[var(--asphalt-black)]" : "text-[rgba(245,246,252,0.7)] hover:text-[var(--ice-white)]"
+            }`}
+          >
+            {t(v === "annual" ? "billing.term.annual" : "billing.term.flex")}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-[rgba(245,246,252,0.5)]">
+        {t(term === "annual" ? "billing.term.annualNote" : "billing.term.flexNote")}
+      </p>
+    </div>
+  );
+
+  const commitmentLine = (plan: Plan) =>
+    isFlexSlug(plan.slug)
+      ? t("billing.commitment.flexLine").replace("{months}", String(plan.minTermMonths))
+      : t("billing.commitment.planLine").replace("{months}", String(plan.minTermMonths));
 
   const handleSubscribe = async (planSlug: string) => {
     setLoadingPlan(planSlug);
@@ -239,7 +286,11 @@ export function BillingClient({
         toast.error(data.error || t("common.upgradeFailed"));
         return;
       }
-      if (data.upgraded) {
+      if (data.switchedTerm) {
+        toast.success(t("billing.term.switched"));
+        closeUpgradeDialog();
+        router.refresh();
+      } else if (data.upgraded) {
         toast.success(t("billing.upgrade.success").replace("{credits}", String(data.totalCredits)));
         closeUpgradeDialog();
         router.refresh();
@@ -431,7 +482,7 @@ export function BillingClient({
               <p className="font-[var(--font-atkinson)] text-sm text-[rgba(245,246,252,0.6)]">{t("billing.addon.subtitle")}</p>
               <SeoAddOnPicker
                 name="addon-new"
-                options={addOns.map((a) => ({ slug: a.slug, name: a.name, chargeCents: recurringPlans[0]?.addOnCharges[a.slug] ?? null }))}
+                options={addOns.map((a) => ({ slug: a.slug, name: a.name, chargeCents: shownPlans[0]?.addOnCharges[a.slug] ?? null }))}
                 value={selectedAddOn}
                 onChange={setSelectedAddOn}
                 noneLabel={t("billing.addon.none")}
@@ -440,11 +491,12 @@ export function BillingClient({
               />
             </div>
           )}
+          {termToggle}
           <div className="grid gap-6 md:grid-cols-3">
-            {recurringPlans.map((plan: Plan) => {
-              const Icon = planIcons[plan.slug] || CreditCard;
-              const featureKeys = planFeatureKeys[plan.slug] || [];
-              const isFeatured = plan.slug === "growth";
+            {shownPlans.map((plan: Plan) => {
+              const Icon = planIcons[baseSlug(plan.slug)] || CreditCard;
+              const featureKeys = planFeatureKeys[baseSlug(plan.slug)] || [];
+              const isFeatured = baseSlug(plan.slug) === "growth";
 
               return (
                 <Card key={plan.id} className={`relative overflow-visible border-[rgba(245,246,252,0.1)] bg-[rgba(255,255,255,0.03)] transition-transform hover:-translate-y-1 ${isFeatured ? "border-[var(--gold-bar)] shadow-[0_0_30px_rgba(255,201,25,0.08)]" : ""}`}>
@@ -480,7 +532,7 @@ export function BillingClient({
                       ))}
                       {plan.minTermMonths > 0 && (
                         <li className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
-                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t("billing.commitment.planLine").replace("{months}", String(plan.minTermMonths))}
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {commitmentLine(plan)}
                         </li>
                       )}
                     </ul>
@@ -539,9 +591,11 @@ export function BillingClient({
                 <CardContent className="py-4 text-center space-y-2">
                   <Package className="h-6 w-6 text-[var(--gold-bar)] mx-auto" />
                   <p className="font-[var(--font-lexend)] font-bold text-[var(--ice-white)]">{pack.name}</p>
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px]">1:1</Badge>
+                  {centsPerCredit === PLAN_CENTS_PER_CREDIT && (
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px]">1:1</Badge>
+                  )}
                   <p className="text-2xl font-bold text-[var(--gold-bar)]">{pack.credits} <span className="text-sm font-normal">credits</span></p>
-                  <p className="text-sm text-[rgba(245,246,252,0.5)]">${pack.priceInCents / 100} USD</p>
+                  <p className="text-sm text-[rgba(245,246,252,0.5)]">{creditPrice(pack.credits)} USD</p>
                   <Button
                     onClick={() => handleBuyPack(pack.id)}
                     disabled={loadingPack === pack.id || !pack.stripePriceId}
@@ -563,13 +617,19 @@ export function BillingClient({
           <h2 className="font-[var(--font-lexend)] text-lg font-semibold text-[var(--ice-white)] mb-4">
             {t("billing.plans")}
           </h2>
+          {termToggle}
           <div className="grid gap-6 md:grid-cols-3">
-            {recurringPlans.map((plan: Plan) => {
-              const Icon = planIcons[plan.slug] || CreditCard;
-              const featureKeys = planFeatureKeys[plan.slug] || [];
-              const isFeatured = plan.slug === "growth";
+            {shownPlans.map((plan: Plan) => {
+              const Icon = planIcons[baseSlug(plan.slug)] || CreditCard;
+              const featureKeys = planFeatureKeys[baseSlug(plan.slug)] || [];
+              const isFeatured = baseSlug(plan.slug) === "growth";
               const isCurrent = plan.slug === subscription.planSlug;
-              const isUpgrade = plan.priceMonthly > (plans.find((p: Plan) => p.slug === subscription.planSlug)?.priceMonthly || 0);
+              const change = classifyPlanChange(
+                { slug: subscription.planSlug, priceMonthly: plans.find((p: Plan) => p.slug === subscription.planSlug)?.priceMonthly || 0 },
+                plan,
+              );
+              const isUpgrade = change.kind !== "blocked";
+              const isSameTier = baseSlug(plan.slug) === baseSlug(subscription.planSlug);
 
               return (
                 <Card
@@ -607,7 +667,7 @@ export function BillingClient({
                       ))}
                       {plan.minTermMonths > 0 && (
                         <li className="flex items-center gap-2 text-sm text-[rgba(245,246,252,0.7)]">
-                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {t("billing.commitment.planLine").replace("{months}", String(plan.minTermMonths))}
+                          <Check className="h-4 w-4 text-[var(--gold-bar)] shrink-0" /> {commitmentLine(plan)}
                         </li>
                       )}
                     </ul>
@@ -625,11 +685,11 @@ export function BillingClient({
                             : "bg-[rgba(255,255,255,0.1)] text-[var(--ice-white)] hover:bg-[rgba(255,255,255,0.15)]"
                         }`}
                       >
-                        {t("billing.upgrade").replace("{plan}", plan.name)}
+                        {change.kind === "switch-to-annual" ? t("billing.term.switchCta") : t("billing.upgrade").replace("{plan}", plan.name)}
                       </Button>
                     ) : (
                       <p className="text-xs text-center text-[rgba(245,246,252,0.4)] py-2">
-                        {t("billing.downgrade")}
+                        {isSameTier ? t("billing.term.contactSupport") : t("billing.downgrade")}
                       </p>
                     )}
                   </CardContent>
@@ -654,6 +714,40 @@ export function BillingClient({
           {!upgradePreview ? (
             <div className="py-8 text-center">
               <Loader2 className="h-6 w-6 animate-spin mx-auto text-[var(--gold-bar)]" />
+            </div>
+          ) : upgradePreview.switchTerm ? (
+            <div className="space-y-3 text-sm">
+              <div className="rounded-md border border-[rgba(245,246,252,0.1)] p-3 space-y-2">
+                <p className="text-[rgba(245,246,252,0.7)]">
+                  {t("billing.upgrade.monthlyChange")
+                    .replace("{current}", String(upgradePreview.currentPlan.priceMonthly / 100))
+                    .replace("{new}", String(upgradePreview.newPlan.priceMonthly / 100))}
+                </p>
+                <p className="text-xs text-[rgba(245,246,252,0.5)]">
+                  {t("billing.term.switchDetail")
+                    .replace("{date}", new Date(upgradePreview.termStartsAt ?? Date.now()).toLocaleDateString("en-US"))
+                    .replace("{months}", String(upgradePreview.newMinTermMonths ?? 12))}
+                </p>
+              </div>
+              <p className="text-center text-base font-bold text-[var(--ice-white)] pt-2">
+                {t("billing.upgrade.estimatedCharge").replace("{amount}", "0.00")}
+              </p>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={closeUpgradeDialog}
+                  className="flex-1 border-[rgba(245,246,252,0.2)] text-[var(--ice-white)]"
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  onClick={confirmUpgrade}
+                  disabled={upgradeLoading}
+                  className="flex-1 bg-[var(--gold-bar)] text-[var(--asphalt-black)] hover:opacity-90 font-bold"
+                >
+                  {upgradeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.term.switchConfirm")}
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-3 text-sm">
@@ -692,6 +786,12 @@ export function BillingClient({
                   {t("billing.upgrade.totalCredits").replace("{credits}", String(upgradePreview.totalCreditsAfter))}
                 </p>
               </div>
+
+              {upgradePreview.restartTermMonths ? (
+                <p className="text-xs text-[rgba(245,246,252,0.6)]">
+                  {t("billing.term.restartNote").replace("{months}", String(upgradePreview.restartTermMonths))}
+                </p>
+              ) : null}
 
               <p className="text-center text-base font-bold text-[var(--ice-white)] pt-2">
                 {t("billing.upgrade.estimatedCharge").replace("{amount}", (upgradePreview.estimatedCharge / 100).toFixed(2))}
@@ -765,7 +865,7 @@ export function BillingClient({
                   </Button>
                 </div>
                 <p className="mt-2 text-xs text-[rgba(245,246,252,0.5)]">
-                  ${customAmount} = {customAmount} credits
+                  {creditPrice(customAmount)} = {customAmount} credits
                 </p>
                 <p className="text-[10px] text-[rgba(245,246,252,0.4)]">
                   {t("billing.customCredits.min")} · {t("billing.customCredits.max")}

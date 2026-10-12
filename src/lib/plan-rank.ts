@@ -9,6 +9,8 @@
  * An unknown / missing slug ranks 0 (below everything) so an unrecognized plan
  * can never silently pass a gate.
  */
+import { baseSlug } from "@/lib/plan-terms";
+
 export const PLAN_RANK: Record<string, number> = {
   member: 1,
   growth: 2,
@@ -20,7 +22,8 @@ export const PLAN_RANK: Record<string, number> = {
 
 export function planRank(slug: string | null | undefined): number {
   if (!slug) return 0;
-  return PLAN_RANK[slug] ?? 0;
+  // Flexible plans ("growth-flex") rank as their tier: the term changes billing, not access.
+  return PLAN_RANK[baseSlug(slug)] ?? 0;
 }
 
 /** True if a subscriber on `planSlug` meets a variant's `minPlan` requirement. */
