@@ -28,6 +28,9 @@ export function middleware(req: NextRequest) {
   // crawlers never carry one. Exact segment match so "/servicesX" stays gated.
   if (/^\/(services|locations)(\/[^/]+)?\/?$/.test(pathname)) return NextResponse.next();
 
+  // Terms of Service: public, linked from the footers and checkout
+  if (pathname === "/terms") return NextResponse.next();
+
   // Public agreement signing (token-gated in the page/API itself)
   if (pathname.startsWith("/sign-agreement")) return NextResponse.next();
 

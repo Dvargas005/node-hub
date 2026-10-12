@@ -95,6 +95,10 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes,
   ni "activacion en 24 horas" / "tu PM lo revisa hoy": el plazo es el siguiente dia habil.
 
+## Trabajo en curso (2026-10-12)
+Plan de precios Opcion C (termino Flexible +25%, nuevo precio On demand, pagina /terms): leer
+`docs/pricing-option-c/README.md` ANTES de tocar precios, Stripe o copy de planes.
+
 ## Compromiso minimo (12 meses en Member / Growth / Pro, 3 en Dedicated)
 - Regla (Erich, 2026-10-08): 12 meses con pago mensual; despues sigue mes a mes y se cancela cuando quiera.
   Salida anticipada: NO es autoservicio, el cliente escribe a soporte y nosotros decidimos.
@@ -102,7 +106,7 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   Y `verify-session` (cualquiera puede correr primero). Un upgrade conserva la fecha original.
 - Cancelar: solo `POST /api/stripe/cancel` (cancela al fin del periodo y revisa el plazo del plan y del add-on).
   La cancelacion esta APAGADA en el portal de Stripe; no volver a encenderla o el plazo deja de aplicarse.
-- Checkout muestra el compromiso junto al boton de pago (`custom_text.submit`). No hay pagina de Terminos todavia.
+- Checkout muestra el compromiso junto al boton de pago (`custom_text.submit`). La pagina de Terminos es `/terms` (`src/app/terms/page.tsx`); mantenerla alineada con el codigo.
 - Datos fuera del codigo: `npx tsx scripts/set-plan-commitment.ts` (dry run) y luego `--apply`
   (minTermMonths en la DB, descripcion de los Products, portal sin cancelar). No toca suscripciones existentes.
 - Test: `npx tsx --test src/lib/commitment.test.ts`. `npm run lint` no esta configurado (pide setup interactivo).
