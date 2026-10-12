@@ -44,7 +44,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do we need to meet in person?",
-        a: "No. Our team delivers through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it. If an in-person meeting matters for your project, ask and we will tell you what is possible.",
+        a: "No, but you can. We work in person across Chicagoland, and most work runs through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
       },
     ],
   },
@@ -74,7 +74,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do we need to meet in person?",
-        a: "No. Our team delivers through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
+        a: "No, but you can. We work in person across Milwaukee and southeastern Wisconsin, and most work runs through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
       },
     ],
   },
@@ -118,6 +118,8 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     lead: [
       "N.O.D.E. builds websites, mobile apps, and custom software for Indianapolis businesses, and runs the SEO that gets them found. We are based in the Chicago area and work remotely with clients across central Indiana.",
       "Indianapolis sits at the crossroads of more interstate highways than almost any other U.S. city, which has made it one of the country's major distribution hubs. Our parent company builds logistics software, so distribution and supply chain businesses here get a team that knows their world.",
+      "For a central Indiana distributor or third-party logistics provider, that usually means a website that explains your lanes, warehouses, and service area clearly, plus the practical tools behind it: quote and booking requests, shipment status pages for customers, and connections to the order and warehouse systems you already run.",
+      "Indianapolis businesses are one hour ahead of us, on Eastern Time. We book calls in your time zone and plan delivery windows in business days, so a 3-business-day request on the Growth plan lands on the same schedule it would anywhere else.",
     ],
     faqs: [
       {
@@ -135,6 +137,10 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       {
         q: "Can you help us get found in local search?",
         a: "Yes. Local SEO covers your Google Business Profile, consistent business details across the web, and location pages for the areas you serve.",
+      },
+      {
+        q: "Can you build a quote or shipment tracking tool for a logistics company?",
+        a: "Yes. Quote request flows, customer portals with shipment status, and integrations with order and warehouse systems are custom software work, scoped and quoted after a discovery call.",
       },
     ],
   },

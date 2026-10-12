@@ -13,6 +13,7 @@ import {
   OG_IMAGE_WIDTH,
   ORG_NAME,
   PHONE,
+  SAME_AS,
   SERVICES,
   SITE_URL,
 } from "@/lib/seo";
@@ -40,8 +41,9 @@ export const metadata: Metadata = {
   // canonical origin so previews never emit a canonical pointing at themselves.
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "N.O.D.E. | Web, App & Software Development by Subscription",
-    template: "%s | N.O.D.E. by Nouvos",
+    // Plain "NODE" on purpose: searchers type "node", and "N.O.D.E." tokenizes as single letters.
+    default: "Web Development Subscription for Small Businesses | NODE by Nouvos",
+    template: "%s | NODE by Nouvos",
   },
   description: DESCRIPTION,
   applicationName: ORG_NAME,
@@ -69,7 +71,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "N.O.D.E. | Web, App & Software Development by Subscription",
+    title: "Web Development Subscription for Small Businesses | NODE by Nouvos",
     description: DESCRIPTION,
     url: SITE_URL,
     siteName: ORG_NAME,
@@ -86,7 +88,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "N.O.D.E. | Web, App & Software Development by Subscription",
+    title: "Web Development Subscription for Small Businesses | NODE by Nouvos",
     description: DESCRIPTION,
     images: [OG_IMAGE],
   },
@@ -105,8 +107,22 @@ const organizationSchema = {
   "@type": "ProfessionalService",
   "@id": `${SITE_URL}/#organization`,
   name: ORG_NAME,
-  alternateName: ["N.O.D.E.", "NODE by Nouvos", "Network Organized Delivery Engine"],
+  alternateName: ["NODE by Nouvos", "N.O.D.E.", "NODE", "nodedev", "Network Organized Delivery Engine"],
   legalName: LEGAL_NAME,
+  foundingDate: "2024",
+  founder: { "@type": "Person", name: "Erich Betancourt", jobTitle: "CEO" },
+  slogan: "Web development, design, and marketing on one monthly plan",
+  knowsAbout: [
+    "Web development",
+    "Next.js",
+    "WordPress",
+    "Mobile app development",
+    "Custom software development",
+    "Multi-tenant SaaS",
+    "Search engine optimization",
+    "Generative engine optimization",
+    "Answer engine optimization",
+  ],
   url: SITE_URL,
   logo: `${SITE_URL}/logos/NOUVOS.ONE_white@2x.png`,
   image: `${SITE_URL}${OG_IMAGE}`,
@@ -123,7 +139,7 @@ const organizationSchema = {
   // Must match the Google Business Profile service areas exactly.
   areaServed: AREA_SERVED,
   knowsLanguage: ["en", "es"],
-  sameAs: ["https://nouvos.one", "https://www.linkedin.com/company/111339069", "https://clutch.co/profile/nouvos-solutions"],
+  sameAs: SAME_AS,
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "N.O.D.E. Services",
@@ -137,6 +153,21 @@ const organizationSchema = {
       },
     })),
   },
+};
+
+/**
+ * WebSite graph: Google reads `name` / `alternateName` here to choose the site
+ * name shown above results, which is how "NODE by Nouvos" replaces the bare domain.
+ */
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
+  name: "NODE by Nouvos",
+  alternateName: ["N.O.D.E. by Nouvos", "nodedev.one"],
+  url: SITE_URL,
+  publisher: { "@id": `${SITE_URL}/#organization` },
+  inLanguage: "en-US",
 };
 
 export default function RootLayout({
@@ -156,6 +187,7 @@ export default function RootLayout({
       </head>
       <body className="bg-[#130A06] text-[#F5F6FC] antialiased">
         <JsonLd data={organizationSchema} />
+        <JsonLd data={websiteSchema} />
         {children}
         <Toaster theme="dark" />
       </body>

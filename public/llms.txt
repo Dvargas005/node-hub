@@ -1,4 +1,4 @@
-# N.O.D.E. by Nouvos
+# NODE by Nouvos (N.O.D.E.)
 
 > N.O.D.E. (Network Organized Delivery Engine) is the digital development studio of
 > Nouvos Solutions LLC. It delivers web development, design, and marketing under flat
@@ -56,7 +56,10 @@ App and custom software projects are scoped and quoted per project after a disco
 call. Web, design, and marketing work runs on the subscription plans above; SEO, GEO, and AEO are add-ons.
 
 ## Company
+- Also known as: NODE by Nouvos, N.O.D.E. by Nouvos, nodedev
+- Founded: 2024
 - Parent company: Nouvos Solutions LLC
+- Directory profiles: https://clutch.co/profile/nouvos-solutions, https://www.goodfirms.co/company/nouvos-solutions-llc
 - Address: 909 Davis Street, Suite 500, Evanston, IL 60201
 - Phone: +1 224-640-1785
 - Website: https://www.nodedev.one
