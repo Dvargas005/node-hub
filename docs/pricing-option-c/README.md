@@ -25,9 +25,9 @@ no discounts except C-level corporate ones, Stripe Prices are immutable, use scr
 | GoodFirms SEO add-on sentence | DONE, live 2026-10-12 |
 | Terms page `/terms` (current offer only, no Flexible yet) | PR #43 (branch `feat/terms-page`): page, footer links, sitemap, public route, checkout notice links to /terms. LIVE 2026-10-12 (merged; Vercel missed the Git push, deployed with `vercel --prod`; verified /terms 200, footer links, sitemap) |
 | Confirm On demand credit price | DONE: $2.75 (Erich, 2026-10-12) |
-| Code (branch `feat/flexible-term`): term rules, checkout, upgrade preview, billing toggle, On demand $2.75, homepage toggle, copy, Terms, CLAUDE.md | PR open, waiting on Erich's merge |
-| Stripe + DB: `scripts/setup-flexible-plans.ts --apply` (3 Prices, 3 plan rows, Product descriptions) | Dry run OK. Run ONLY after the PR is live (rows are public on /billing) |
-| Clutch + GoodFirms descriptions | TODO (after the site is live) |
+| Code (branch `feat/flexible-term`): term rules, checkout, upgrade preview, billing toggle, On demand $2.75, homepage toggle, copy, Terms, CLAUDE.md | LIVE 2026-10-12 (PR #44; homepage, service and city pages verified) |
+| Stripe + DB: `scripts/setup-flexible-plans.ts --apply` (3 Prices, 3 plan rows, Product descriptions) | DONE 2026-10-12 on LIVE Stripe: price_1UPlzhAVdSL3AA7neA3oyoyV ($375), price_1UPlziAVdSL3AA7nuASiUUjq ($625), price_1UPlzjAVdSL3AA7n8ZBcoE3t ($1,125); rows member-flex/growth-flex/pro-flex verified; re-run is a no-op |
+| Clutch + GoodFirms descriptions | DONE 2026-10-12: added "A Flexible rate with a 3-month minimum, then month to month, is also available from $375 per month." GoodFirms public verified; Clutch saved and verified in the editor, public profile still pending (recheck) |
 | Counsel review of Terms | Erich, pending |
 
 ## 3. Why C (the audit findings that drove it)
