@@ -38,9 +38,9 @@ const MIN_TERM_MONTHS = 12;
 
 // Keep in sync with prisma/setup-stripe.ts
 const DESCRIPTIONS: Record<string, string> = {
-  member: "Entry plan: design and content essentials for your business. 12-month commitment, billed monthly.",
-  growth: "Full creative power: design, web and content with priority. 12-month commitment, billed monthly.",
-  pro: "Premium: all services, dedicated PM, 2-business-day turnaround. 12-month commitment, billed monthly.",
+  member: "Entry plan: design and content essentials for your business. Billed monthly; the minimum term is shown at checkout.",
+  growth: "Full creative power: design, web, and content. Billed monthly; the minimum term is shown at checkout.",
+  pro: "Premium: all plan services, unlimited active requests, 2-business-day turnaround. Billed monthly; the minimum term is shown at checkout.",
 };
 
 async function main() {

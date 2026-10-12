@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { flexSlug } from "@/lib/plan-terms";
 
 export interface PublicPlan {
   slug: string;
@@ -10,6 +11,8 @@ export interface PublicPlan {
   deliveryDays: number;
   /** Minimum commitment in months; 0 = none. */
   minTermMonths: number;
+  /** Flexible term (src/lib/plan-terms.ts), or null if the flex row is missing. */
+  flex: { priceMonthly: number; minTermMonths: number } | null;
 }
 
 const PUBLIC_SLUGS = ["member", "growth", "pro"] as const;
@@ -25,7 +28,7 @@ const PUBLIC_SLUGS = ["member", "growth", "pro"] as const;
 export async function getPublicPlans(): Promise<PublicPlan[]> {
   try {
     const rows = await db.plan.findMany({
-      where: { slug: { in: [...PUBLIC_SLUGS] }, isActive: true },
+      where: { slug: { in: [...PUBLIC_SLUGS, ...PUBLIC_SLUGS.map(flexSlug)] }, isActive: true },
     });
     return PUBLIC_SLUGS.map((slug) => rows.find((r) => r.slug === slug))
       .filter((r): r is NonNullable<typeof r> => Boolean(r))
@@ -37,6 +40,10 @@ export async function getPublicPlans(): Promise<PublicPlan[]> {
         monthlyCredits: r.monthlyCredits,
         deliveryDays: r.deliveryDays,
         minTermMonths: r.minTermMonths,
+        flex: (() => {
+          const f = rows.find((x) => x.slug === flexSlug(r.slug));
+          return f ? { priceMonthly: f.priceMonthly / 100, minTermMonths: f.minTermMonths } : null;
+        })(),
       }));
   } catch (err) {
     console.error("[PUBLIC_PLANS] Failed to load plans:", err);

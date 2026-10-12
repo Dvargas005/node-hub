@@ -3,7 +3,8 @@ import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 import Stripe from "stripe";
-import { commitmentNotice } from "@/lib/commitment";
+import { commitmentNotice, minTermEndFor } from "@/lib/commitment";
+import { classifyPlanChange } from "@/lib/plan-terms";
 import { addOnChargeFor, addOnStripePrice, reconcileAddOnAfterPlanChange, splitSubscriptionItems } from "@/lib/addons";
 
 export async function POST(req: NextRequest) {
@@ -45,12 +46,53 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ url: portal.url });
       }
 
-      // Downgrade not supported via self-service
-      if (plan.priceMonthly <= existingSub.plan.priceMonthly) {
-        return NextResponse.json(
-          { error: "Only upgrades are supported. Contact support to downgrade." },
-          { status: 400 },
-        );
+      // Downgrades and 12-month to Flexible are not self-service (src/lib/plan-terms.ts)
+      const change = classifyPlanChange(existingSub.plan, plan);
+      if (change.kind === "blocked") {
+        return NextResponse.json({ error: change.reason }, { status: 400 });
+      }
+
+      // === TERM SWITCH: same tier, Flexible to 12-month ===
+      // The 12-month price starts next period (no proration, no setup fee, credits unchanged),
+      // and so does the new 12-month term.
+      if (change.kind === "switch-to-annual") {
+        try {
+          const stripeSub = await stripe.subscriptions.retrieve(existingSub.stripeSubscriptionId);
+          const planItem = (await splitSubscriptionItems(stripeSub)).planItem;
+          if (!planItem) {
+            return NextResponse.json({ error: "Subscription item not found" }, { status: 500 });
+          }
+          await stripe.subscriptions.update(existingSub.stripeSubscriptionId, {
+            items: [{ id: planItem.id, price: plan.stripePriceId! }],
+            proration_behavior: "none",
+            metadata: { ...stripeSub.metadata, planSlug: plan.slug, minTermMonths: String(plan.minTermMonths) },
+          });
+          const termStart = new Date(planItem.current_period_end * 1000);
+          const minTermEndsAt = minTermEndFor(termStart, plan.minTermMonths);
+          await db.subscription.update({
+            where: { id: existingSub.id },
+            data: { planId: plan.id, minTermEndsAt },
+          });
+          await db.notification.create({
+            data: {
+              userId,
+              title: "Plan switched to the 12-month rate",
+              message: `${plan.name} is now on the 12-month rate starting ${termStart.toLocaleDateString("en-US")}. ${commitmentNotice(plan.minTermMonths)}`,
+              type: "payment",
+              link: "/billing",
+            },
+          });
+          return NextResponse.json({
+            upgraded: true,
+            switchedTerm: true,
+            plan: plan.name,
+            totalCredits: existingSub.creditsRemaining,
+            termStartsAt: termStart.toISOString(),
+          });
+        } catch (switchErr) {
+          console.error("[STRIPE_TERM_SWITCH]", switchErr);
+          return NextResponse.json({ error: "Term switch failed" }, { status: 500 });
+        }
       }
 
       // === UPGRADE FLOW ===
@@ -101,6 +143,8 @@ export async function POST(req: NextRequest) {
           data: {
             planId: plan.id,
             creditsRemaining: newTotalCredits,
+            // Flexible to a higher 12-month tier: the 12-month term starts with the upgrade.
+            ...(change.restartTermMonths ? { minTermEndsAt: minTermEndFor(new Date(), change.restartTermMonths) } : {}),
           },
         });
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { FLEX_SUFFIX } from "@/lib/plan-terms";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
 
@@ -44,7 +45,8 @@ export async function GET() {
         where: { id: userId },
         select: { priorities: true, companyAnalysis: true },
       }),
-      db.plan.findMany({ where: { isActive: true, isRecurring: true, isHidden: false }, orderBy: { priceMonthly: "asc" } }),
+      // 12-month rows only: a Flexible row has the same credits, so it would just duplicate its tier
+      db.plan.findMany({ where: { isActive: true, isRecurring: true, isHidden: false, NOT: { slug: { endsWith: FLEX_SUFFIX } } }, orderBy: { priceMonthly: "asc" } }),
       db.service.findMany({
         where: { isActive: true },
         include: { variants: { where: { isActive: true }, orderBy: { creditCost: "asc" } } },

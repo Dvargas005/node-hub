@@ -12,7 +12,7 @@ no discounts except C-level corporate ones, Stripe Prices are immutable, use scr
 | Flexible term | **3-month minimum, then month to month, at +25%** over the 12-month rate |
 | Flexible prices | Member **$375**/mo, Growth **$625**/mo, Pro **$1,125**/mo. Setup fees unchanged ($312 / $1,092 / $1,560) |
 | 12-month prices | Unchanged: $300 / $500 / $900, 12-month commitment, billed monthly |
-| On demand credits | Raise above the plans' per-credit cost. **ASSUMED $2.50 per credit** (Claude's proposal; Erich approved "new on demand credit price" without restating the number). **Confirm with Erich before applying to Stripe.** The $5 On demand access fee stays |
+| On demand credits | **$2.75 per credit** (Erich, 2026-10-12). Applies to On demand buyers only; subscribers of any plan keep $1 per extra credit. The $5 On demand access fee stays (one month, no renewal) |
 | Terms page | Claude writes it as a plain statement; Erich reviews with counsel and adjusts. Ship a version now so any subscription today or tomorrow has published terms |
 | Toggle label | "12-month rate" / "Flexible rate". Show Flexible as the higher price. **No "Save X%" badge** (that is discount framing; only C-level corporate discounts are allowed) |
 | Wording | Never "No contract". Say "Flexible: 3-month minimum, then month to month" |
@@ -23,13 +23,11 @@ no discounts except C-level corporate ones, Stripe Prices are immutable, use scr
 |---|---|
 | Consistency audit + copy fixes (PR #42) | DONE, live 2026-10-12 |
 | GoodFirms SEO add-on sentence | DONE, live 2026-10-12 |
-| Terms page `/terms` (current offer only, no Flexible yet) | PR #43 (branch `feat/terms-page`): page, footer links, sitemap, public route, checkout notice links to /terms. Needs Erich to merge, then verify live |
-| Confirm On demand credit price ($2.50 assumed) | TODO, ask Erich |
-| Stripe: Flexible Prices + On demand credit price | TODO |
-| App: Flexible plans, toggle, checkout, billing | TODO |
-| Site copy, i18n, llms.txt, CLAUDE.md rule rewrite | TODO |
+| Terms page `/terms` (current offer only, no Flexible yet) | PR #43 (branch `feat/terms-page`): page, footer links, sitemap, public route, checkout notice links to /terms. LIVE 2026-10-12 (merged; Vercel missed the Git push, deployed with `vercel --prod`; verified /terms 200, footer links, sitemap) |
+| Confirm On demand credit price | DONE: $2.75 (Erich, 2026-10-12) |
+| Code (branch `feat/flexible-term`): term rules, checkout, upgrade preview, billing toggle, On demand $2.75, homepage toggle, copy, Terms, CLAUDE.md | PR open, waiting on Erich's merge |
+| Stripe + DB: `scripts/setup-flexible-plans.ts --apply` (3 Prices, 3 plan rows, Product descriptions) | Dry run OK. Run ONLY after the PR is live (rows are public on /billing) |
 | Clutch + GoodFirms descriptions | TODO (after the site is live) |
-| Terms page update for Flexible + new credit price | TODO (same PR as Flexible) |
 | Counsel review of Terms | Erich, pending |
 
 ## 3. Why C (the audit findings that drove it)
@@ -142,6 +140,8 @@ Flexible they are grandfathered: treat Flexible as a one-way door per subscriber
 - Terms changes: posted with a new effective date; material changes emailed to active subscribers.
 
 ## 6. Found while auditing (not fixed, separate tickets)
+
+- Vercel did not auto-deploy the PR #43 merge to main (no deployment, no GitHub status). If it happens again, check the Git integration in Vercel project settings; workaround `vercel --prod` from a clean `main`.
 
 - `webhook/route.ts:245` reads `items.data[0]` for period dates; repo rule says use `splitSubscriptionItems()`.
   Harmless today (plan and add-on share a period) but violates the rule.

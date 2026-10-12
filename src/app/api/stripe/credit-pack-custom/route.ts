@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/api-auth";
+import { centsPerCreditFor } from "@/lib/credit-pricing";
 
 const MIN_CREDITS = 5;
 const MAX_CREDITS = 9999;
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     const userId = session.user.id;
 
     // Active subscription required
-    const subscription = await db.subscription.findUnique({ where: { userId } });
+    const subscription = await db.subscription.findUnique({ where: { userId }, include: { plan: { select: { slug: true } } } });
     if (!subscription || subscription.status !== "ACTIVE") {
       return NextResponse.json({ error: "Active subscription required" }, { status: 400 });
     }
@@ -57,6 +58,8 @@ export async function POST(req: NextRequest) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // On demand pays more per credit than plan subscribers (src/lib/credit-pricing.ts)
+    const centsPerCredit = centsPerCreditFor(subscription.plan.slug);
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -67,9 +70,9 @@ export async function POST(req: NextRequest) {
             currency: "usd",
             product_data: {
               name: `${credits} Credits — N.O.D.E.`,
-              description: `Custom credit pack: ${credits} credits (1:1)`,
+              description: `Custom credit pack: ${credits} credits at $${(centsPerCredit / 100).toFixed(2)} each`,
             },
-            unit_amount: credits * 100,
+            unit_amount: credits * centsPerCredit,
           },
           quantity: 1,
         },

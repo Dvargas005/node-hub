@@ -75,9 +75,13 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 ## Datos de plan que el copy debe repetir igual (verificado en prod 2026-10-03)
 - Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
   No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
-- On demand cuesta $5 (pago unico). Member / Growth / Pro tienen compromiso de 12 meses con pago
-  mensual (Erich, 2026-10-08; ver "Compromiso minimo" abajo). No escribir
-  "mes a mes" ni "sin contratos largos". La tarifa de $150/hora se publica solo en Clutch y GoodFirms (no en nodedev.one).
+- On demand cuesta $5 (pago unico, un mes, no se renueva); sus creditos cuestan $2.75 c/u (Erich, 2026-10-12;
+  `src/lib/credit-pricing.ts`). Los suscriptores de cualquier plan pagan creditos extra a $1 (1:1).
+- Member / Growth / Pro tienen DOS plazos (Erich, 2026-10-12): tarifa 12 meses ($300/$500/$900, compromiso de
+  12 meses con pago mensual) y tarifa Flexible ($375/$625/$1,125 = +25%, minimo de 3 meses, despues mes a mes).
+  Filas `member-flex` / `growth-flex` / `pro-flex`; reglas de cambio en `src/lib/plan-terms.ts`. "Mes a mes" solo
+  se escribe para la tarifa Flexible ("minimo de 3 meses, despues mes a mes"). Nunca "sin contrato" ni
+  "sin contratos largos", y nunca un badge "Ahorra X%" (eso es marco de descuento). La tarifa de $150/hora se publica solo en Clutch y GoodFirms (no en nodedev.one).
   Sin creditos gratis al registrarse (2026-10-09): el onboarding ya no suma 10 creditos y el copy no los ofrece. Los add-ons de SEO
   y los planes Dedicated tienen minimo de 3 meses.
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
@@ -95,11 +99,11 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes,
   ni "activacion en 24 horas" / "tu PM lo revisa hoy": el plazo es el siguiente dia habil.
 
-## Trabajo en curso (2026-10-12)
-Plan de precios Opcion C (termino Flexible +25%, nuevo precio On demand, pagina /terms): leer
-`docs/pricing-option-c/README.md` ANTES de tocar precios, Stripe o copy de planes.
+## Opcion C de precios (2026-10-12)
+Historia, decisiones y estado en `docs/pricing-option-c/README.md`. Leer ANTES de tocar precios, Stripe o copy de planes.
+Stripe/DB de la tarifa Flexible: `npx tsx scripts/setup-flexible-plans.ts` (dry run) y luego `--apply`.
 
-## Compromiso minimo (12 meses en Member / Growth / Pro, 3 en Dedicated)
+## Compromiso minimo (12 meses en Member / Growth / Pro, 3 en Flexible y Dedicated)
 - Regla (Erich, 2026-10-08): 12 meses con pago mensual; despues sigue mes a mes y se cancela cuando quiera.
   Salida anticipada: NO es autoservicio, el cliente escribe a soporte y nosotros decidimos.
 - `Plan.minTermMonths` -> `Subscription.minTermEndsAt`, calculado en `src/lib/commitment.ts`. Lo fijan el webhook
