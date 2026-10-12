@@ -94,7 +94,7 @@ const C = {
     cap: {
       eyebrow: "A DIGITAL DEVELOPMENT COMPANY",
       title: "Everything your business needs to grow online — built in-house.",
-      sub: "N.O.D.E. is a full digital development studio. Design, web, apps, cloud, AI, and marketing — a real team of specialists delivering under one subscription.",
+      sub: "N.O.D.E. is a full digital development studio. Design, web, and marketing run on one subscription, and apps and custom software are quoted per project. A real team of specialists delivers all of it.",
       services: ["Custom Technology", "Web Development", "Mobile App Development", "Cloud Infrastructure", "MVP Development", "E-commerce Development", "AI Integration", "Business Spin-Off", "Innovation & Digital Transformation", "Agile Methodologies", "Business Consulting", "UX/UI Design", "Branding & Naming", "Digital Marketing", "Growth Marketing", "E-commerce Marketing", "SEO", "Automation"],
     },
     banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
@@ -110,10 +110,10 @@ const C = {
       ],
     },
     proc: [
-      { num: "01", label: "// 01", title: "START IN UNDER 24 HOURS", para: "Pick the plan that fits your business. Plans run on a 12-month commitment billed monthly, with no fine print and no surprises. Your digital team activates the moment you subscribe. One monthly payment gives you access to dedicated designers, developers, and marketers.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Custom Projects", "04"]] },
+      { num: "01", label: "// 01", title: "START ON THE NEXT BUSINESS DAY", para: "Pick the plan that fits your business. Plans run on a 12-month commitment billed monthly. Your team confirms receipt of every request on the next business day. One monthly payment gives you access to dedicated designers, developers, and marketers.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Custom Projects", "04"]] },
       { num: "02", label: "// 02", title: "AI-GUIDED BRIEFING SYSTEM", para: "You don't need to know design or tech to request what you need. Our smart assistant guides you step by step to articulate your request. The result is a professional brief your team can execute without back and forth.", list: [["Smart Wizard", "01"], ["Auto-categorization", "02"], ["File Attachments", "03"], ["Brief Generation", "04"], ["PM Escalation", "05"]] },
       { num: "03", label: "// 03", title: "YOUR DEDICATED CREATIVE TEAM", para: "Behind every request is a real team. Graphic designers, AI-assisted developers, and specialized community managers. Your project manager coordinates everything — you just receive finished work in 2 to 5 business days, depending on your plan.", list: [["Graphic Design", "01"], ["AI-Assisted Development", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
-      { num: "04", label: "// 04", title: "APPROVE, ITERATE, SCALE", para: "Receive ready-to-use deliverables. Need adjustments? Request unlimited revisions. As your business grows, your plan grows with you — more credits, more speed, more services.", list: [["Unlimited Revisions", "01"], ["Quality Assurance", "02"], ["Credit Packs", "03"], ["Plan Upgrades", "04"]] },
+      { num: "04", label: "// 04", title: "APPROVE, ITERATE, SCALE", para: "Receive ready-to-use deliverables. Need adjustments? Two revision rounds are included per request, and each extra round costs 10% of the request's credits. As your business grows, your plan grows with you: more credits, more speed, more services.", list: [["2 Revision Rounds Included", "01"], ["Quality Assurance", "02"], ["Credit Packs", "03"], ["Plan Upgrades", "04"]] },
     ],
     about: { title: "Why N.O.D.E. exists", para: "N.O.D.E. is born from Nouvos Solutions — a logistics technology company that builds and runs systems for the global supply chain. We know what it means to operate with distributed teams, manage deliveries with real deadlines, and scale operations without losing quality. We apply exactly that mindset to creative services: clear processes, predictable deliveries, technology that amplifies human talent." },
     manifesto: {
@@ -142,8 +142,8 @@ const C = {
       seoAddon: "SEO, GEO, and AEO are add-ons to any plan: Starter SEO is $1,250/mo, Full SEO is $2,500/mo, and Full SEO, GEO, and AEO is $4,000/mo. Dedicated Jump includes Starter SEO. Dedicated Pro includes Full SEO, GEO, and AEO.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
-        { name: "Growth", front: 500, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content with priority.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited scale. All plan services, dedicated PM, fastest turnaround.", ft: false },
+        { name: "Growth", front: 500, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content.", ft: true },
+        { name: "Pro", front: 900, setup: 1560, per: "/mo", desc: "Unlimited active requests. All plan services, fastest turnaround.", ft: false },
       ],
     },
     wl: { title: "Ready to start?", sub: "Create your account, pick a plan, and your team starts on your first request.", cta: "Get started", login: "Already have an account?" },
@@ -156,7 +156,7 @@ const C = {
     cap: {
       eyebrow: "UNA EMPRESA DE DESARROLLO DIGITAL",
       title: "Todo lo que tu negocio necesita para crecer en línea — hecho en casa.",
-      sub: "N.O.D.E. es un estudio completo de desarrollo digital. Diseño, web, apps, cloud, AI y marketing — un equipo real de especialistas entregando bajo una sola suscripción.",
+      sub: "N.O.D.E. es un estudio completo de desarrollo digital. Diseño, web y marketing van en una sola suscripción, y las apps y el software a la medida se cotizan por proyecto. Un equipo real de especialistas entrega todo.",
       services: ["Tecnología a la Medida", "Desarrollo de Sitios Web", "Desarrollo de Aplicaciones Móviles", "Infraestructura Cloud", "Desarrollo MVP", "Desarrollo E-commerce", "Integración AI", "Spin Off Empresarial", "Innovación y Transformación Digital", "Metodologías Ágiles", "Consultoría de Negocios", "Diseño UX/UI", "Branding y Naming", "Marketing Digital", "Growth Marketing", "E-commerce Marketing", "SEO", "Automatización"],
     },
     banner: ["E-commerce", "Social Media", "Web Development", "Integrations", "Digital Maintenance"],
@@ -172,10 +172,10 @@ const C = {
       ],
     },
     proc: [
-      { num: "01", label: "// 01", title: "ACTÍVATE EN MENOS DE 24 HORAS", para: "Elige el plan que se ajuste a tu negocio. Los planes tienen un compromiso de 12 meses con pago mensual, sin letra chica y sin sorpresas. Tu equipo digital se activa desde el momento en que te suscribes. Un solo pago mensual te da acceso a diseñadores, developers y marketers dedicados.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Proyectos Custom", "04"]] },
+      { num: "01", label: "// 01", title: "ARRANCA EL SIGUIENTE DÍA HÁBIL", para: "Elige el plan que se ajuste a tu negocio. Los planes tienen un compromiso de 12 meses con pago mensual. Tu equipo confirma el recibido de cada solicitud el siguiente día hábil. Un solo pago mensual te da acceso a diseñadores, developers y marketers dedicados.", list: [["Plan Member", "01"], ["Plan Growth", "02"], ["Plan Pro", "03"], ["Proyectos Custom", "04"]] },
       { num: "02", label: "// 02", title: "SISTEMA DE BRIEFING GUIADO POR AI", para: "No necesitas saber de diseño ni de tecnología para pedir lo que necesitas. Nuestro asistente inteligente te guía paso a paso para articular tu solicitud. El resultado es un brief profesional que nuestro equipo puede ejecutar sin idas y vueltas.", list: [["Smart Wizard", "01"], ["Auto-categorización", "02"], ["Adjuntos de Archivos", "03"], ["Generación de Brief", "04"], ["Escalación a PM", "05"]] },
       { num: "03", label: "// 03", title: "TU EQUIPO CREATIVO DEDICADO", para: "Detrás de cada solicitud hay un equipo real. Diseñadores gráficos, desarrolladores asistidos por AI, y community managers especializados. Tu project manager coordina todo — tú solo recibes el trabajo terminado en 2 a 5 días hábiles, según tu plan.", list: [["Diseño Gráfico", "01"], ["Desarrollo AI-Asistido", "02"], ["Community Management", "03"], ["Project Management", "04"], ["Quality Assurance", "05"]] },
-      { num: "04", label: "// 04", title: "APRUEBA, ITERA, ESCALA", para: "Recibe entregas listas para usar. Si necesitas ajustes, pide revisiones ilimitadas. A medida que tu negocio crece, tu plan crece contigo — más créditos, más velocidad, más servicios.", list: [["Revisiones Ilimitadas", "01"], ["Control de Calidad", "02"], ["Packs de Créditos", "03"], ["Upgrades de Plan", "04"]] },
+      { num: "04", label: "// 04", title: "APRUEBA, ITERA, ESCALA", para: "Recibe entregas listas para usar. Si necesitas ajustes, cada solicitud incluye dos rondas de revisión, y cada ronda adicional cuesta el 10% de los créditos de la solicitud. A medida que tu negocio crece, tu plan crece contigo: más créditos, más velocidad, más servicios.", list: [["2 Rondas de Revisión Incluidas", "01"], ["Control de Calidad", "02"], ["Packs de Créditos", "03"], ["Upgrades de Plan", "04"]] },
     ],
     about: { title: "Por qué existe N.O.D.E.", para: "N.O.D.E. nace de Nouvos Solutions — una empresa de tecnología logística que construye y opera sistemas para la cadena de suministro global. Sabemos lo que significa operar con equipos distribuidos, gestionar entregas con deadlines reales, y escalar operaciones sin perder calidad. Aplicamos exactamente esa mentalidad a los servicios creativos: procesos claros, entregas predecibles, tecnología que amplifica al talento humano." },
     manifesto: {
@@ -204,8 +204,8 @@ const C = {
       seoAddon: "SEO, GEO y AEO son complementos para cualquier plan: SEO Starter cuesta $1,250/mes, SEO completo $2,500/mes, y SEO, GEO y AEO completos $4,000/mes. Dedicated Jump incluye SEO Starter. Dedicated Pro incluye SEO, GEO y AEO completos.",
       plans: [
         { name: "Member", front: 300, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
-        { name: "Growth", front: 500, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido con prioridad.", ft: true },
-        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Escala ilimitada. Todos los servicios del plan, PM dedicado, turnaround más rápido.", ft: false },
+        { name: "Growth", front: 500, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido.", ft: true },
+        { name: "Pro", front: 900, setup: 1560, per: "/mes", desc: "Solicitudes activas ilimitadas. Todos los servicios del plan, turnaround más rápido.", ft: false },
       ],
     },
     wl: { title: "Listo para empezar?", sub: "Crea tu cuenta, elige un plan y tu equipo empieza con tu primera solicitud.", cta: "Comenzar", login: "¿Ya tienes cuenta?" },

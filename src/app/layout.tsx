@@ -32,7 +32,7 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 const DESCRIPTION =
-  "Web, app, and software development on flat monthly subscriptions, with SEO, GEO, and AEO as add-ons. A dedicated team of designers, developers, and marketers from Nouvos Solutions.";
+  "Web development, design, and marketing on flat monthly subscriptions, SEO, GEO, and AEO as add-ons, and apps and custom software quoted per project. An in-house team from Nouvos Solutions.";
 
 export const metadata: Metadata = {
   // Without metadataBase, Next resolves relative OG/canonical URLs against the

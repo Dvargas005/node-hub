@@ -1,9 +1,9 @@
 # N.O.D.E. by Nouvos
 
 > N.O.D.E. (Network Organized Delivery Engine) is the digital development studio of
-> Nouvos Solutions LLC. It delivers web development, mobile app development, custom
-> software development under flat monthly subscriptions, with search optimization
-> (SEO, GEO, AEO) as an add-on, staffed by a dedicated team of designers, developers, and marketers
+> Nouvos Solutions LLC. It delivers web development, design, and marketing under flat
+> monthly subscriptions, search optimization (SEO, GEO, AEO) as an add-on, and mobile
+> app and custom software development quoted per project, staffed by a dedicated team of designers, developers, and marketers
 > rather than a marketplace of freelancers.
 
 ## Services
@@ -38,6 +38,7 @@ Dedicated Jump includes Starter SEO. Dedicated Pro includes full SEO, GEO, and A
   software (transportation, order, and warehouse management), so the team builds and
   operates real multi-tenant systems rather than only client sites.
 - Bilingual delivery in English and Spanish.
+- Two revision rounds are included per request; each extra round costs 10% of the request's credits.
 - Clients own what is built for them: work is paid upfront, and the code, design, and
   content belong to the client.
 
