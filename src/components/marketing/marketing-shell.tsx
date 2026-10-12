@@ -133,7 +133,10 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <p className="max-w-7xl mx-auto px-4 md:px-12 pb-10 font-[family-name:var(--font-atkinson)] text-xs text-[#F5F6FC]/50">
-          © 2026 Nouvos Solutions LLC
+          © 2026 Nouvos Solutions LLC ·{" "}
+          <a href="/terms" className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
+            Terms of Service
+          </a>
         </p>
       </footer>
     </div>

@@ -837,6 +837,7 @@ export default function Home() {
           {CITIES.map((c) => (
             <a key={c.slug} href={`/locations/${c.slug}`} className="hover:text-[#FFC919] transition-colors">{c.city}, {c.stateCode}</a>
           ))}
+          <a href="/terms" className="hover:text-[#FFC919] transition-colors">Terms of Service</a>
         </nav>
         <div className="max-w-7xl mx-auto mt-8 text-center">
           <a

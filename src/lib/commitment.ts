@@ -24,5 +24,5 @@ export function isInMinTerm(minTermEndsAt: Date | null | undefined, now: Date = 
 
 /** Shown on Stripe Checkout next to the pay button, and reused in the activation email. */
 export function commitmentNotice(minTermMonths: number): string {
-  return `${minTermMonths}-month commitment, billed monthly. After that, your plan continues monthly and you can cancel at any time.`;
+  return `${minTermMonths}-month commitment, billed monthly. After that, your plan continues monthly and you can cancel at any time. Terms: www.nodedev.one/terms`;
 }
