@@ -64,7 +64,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         title: "Ongoing changes",
-        body: "New pages, copy updates, and fixes handled as regular requests against your plan, with unlimited revisions until you approve.",
+        body: "New pages, copy updates, and fixes handled as regular requests against your plan, with two revision rounds included per request and each extra round at 10% of the request's credits.",
       },
     ],
     fit: [
@@ -95,7 +95,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "Is there a minimum commitment?",
-        a: "Yes. Member, Growth, and Pro run on a 12-month commitment, billed monthly. SEO add-ons and Dedicated engagements carry a 3-month minimum. Every term is stated up front.",
+        a: "Yes. Member, Growth, and Pro run on a 12-month commitment, billed monthly. SEO add-ons and Dedicated engagements carry a 3-month minimum.",
       },
     ],
   },
@@ -449,7 +449,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
 export const PROCESS_STEPS = [
   {
     title: "Pick a plan or book a call",
-    body: "Subscribe to a plan and your team activates within 24 hours, or book a discovery call for custom app and software projects.",
+    body: "Subscribe to a plan and your team confirms receipt of each request on the next business day, or book a discovery call for custom app and software projects.",
   },
   {
     title: "Brief it with the AI assistant",

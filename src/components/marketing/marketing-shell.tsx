@@ -63,8 +63,8 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           <div>
             <p className="font-[family-name:var(--font-lexend)] font-black text-2xl">N.O.D.E.</p>
             <p className="mt-3 font-[family-name:var(--font-atkinson)] text-sm leading-relaxed text-[#F5F6FC]/70">
-              Web, app, and software development plus SEO under one monthly subscription. By
-              Nouvos Solutions LLC.
+              Web, design, and marketing on one monthly subscription, SEO as an add-on, and apps and
+              custom software quoted per project. By Nouvos Solutions LLC.
             </p>
           </div>
 

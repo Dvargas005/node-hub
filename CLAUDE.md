@@ -83,8 +83,17 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 - Nouvos se fundo en 2024: no escribir "anos de experiencia".
 - Sin descuentos de ningun tipo (2026-10-03): el wizard no ofrece ni aplica descuentos; un ticket cuesta
   siempre el `creditCost` del catalogo. No reintroducir el descuento por plazo extendido.
+  Unica excepcion (Erich, 2026-10-09): descuentos corporativos decididos a nivel C. Erich avisa cuando y cuales;
+  no agregar, sugerir ni activar ningun otro descuento, promo, credito gratis o bono. Las "alliances" del admin
+  (discountPercent/bonusCredits) quedan sin usar hasta ese aviso.
+- Revisiones (Erich, 2026-10-12): 2 rondas incluidas por solicitud; desde la 3ra cada ronda cuesta el 10% de los
+  creditos de la solicitud (`api/tickets/[id]/revision/route.ts`). No escribir "revisiones ilimitadas".
+- Project manager: no escribir "PM dedicado"; el copy correcto es "Project manager coordinates your requests".
+- Apps y software a la medida se cotizan por proyecto: ningun tagline ni meta description puede decir que van
+  "bajo una suscripcion". No escribir "sin letra chica" ni "todos los terminos por adelantado" (no hay pagina de Terminos).
 - Soporte: solo Dedicated Pro es 24/7. Todos los demas planes: confirmacion de recibido al siguiente
-  dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes.
+  dia habil despues del email o la notificacion. No escribir "soporte 24/7" ni "soporte prioritario" en otros planes,
+  ni "activacion en 24 horas" / "tu PM lo revisa hoy": el plazo es el siguiente dia habil.
 
 ## Compromiso minimo (12 meses en Member / Growth / Pro, 3 en Dedicated)
 - Regla (Erich, 2026-10-08): 12 meses con pago mensual; despues sigue mes a mes y se cancela cuando quiera.

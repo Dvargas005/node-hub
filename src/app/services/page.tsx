@@ -6,7 +6,7 @@ import { SERVICES, SITE_URL } from "@/lib/seo";
 
 const TITLE = "Web, App & Software Development and SEO Services";
 const DESCRIPTION =
-  "N.O.D.E. services: web development, mobile app development, custom software development, and SEO, GEO and AEO, delivered by an in-house team on a monthly subscription.";
+  "N.O.D.E. services: web development, mobile app development, custom software development, and SEO, GEO and AEO, delivered by an in-house team. Web work runs on a monthly subscription; apps and custom software are quoted per project.";
 
 export const metadata: Metadata = {
   title: TITLE,
