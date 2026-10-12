@@ -595,7 +595,7 @@ export default function Home() {
           >
             {/* Accessible heading for screen readers / SEO; the visible wordmark
                 is rendered as live code glyphs on the canvas below. */}
-            <h1 className="sr-only">N.O.D.E., your ally on digital development</h1>
+            <h1 className="sr-only">NODE by Nouvos: web development subscription for small businesses</h1>
             <HeroWordmark />
           </motion.div>
           <motion.p
@@ -853,9 +853,9 @@ export default function Home() {
             </a>
           </div>
           <div className="flex gap-8 font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/40">
-            <a href="#" className="hover:text-[#FFC919] transition-colors">Twitter</a>
-            <a href="#" className="hover:text-[#FFC919] transition-colors">LinkedIn</a>
-            <a href="#" className="hover:text-[#FFC919] transition-colors">Instagram</a>
+            <a href="https://www.linkedin.com/company/111339069" target="_blank" rel="noopener noreferrer" className="hover:text-[#FFC919] transition-colors">LinkedIn</a>
+            <a href="https://clutch.co/profile/nouvos-solutions" target="_blank" rel="noopener noreferrer" className="hover:text-[#FFC919] transition-colors">Clutch</a>
+            <a href="https://www.goodfirms.co/company/nouvos-solutions-llc" target="_blank" rel="noopener noreferrer" className="hover:text-[#FFC919] transition-colors">GoodFirms</a>
           </div>
           <p className="font-[family-name:var(--font-atkinson)] text-sm text-[#F5F6FC]/30">{t.footer}</p>
         </div>

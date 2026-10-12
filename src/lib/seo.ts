@@ -26,6 +26,14 @@ export const ORG_NAME = "N.O.D.E. by Nouvos";
 export const LEGAL_NAME = "Nouvos Solutions LLC";
 export const CONTACT_EMAIL = "support@nouvos.one";
 
+/** Profiles that describe the same business. Keep in sync with the directory listings. */
+export const SAME_AS = [
+  "https://nouvos.one",
+  "https://www.linkedin.com/company/111339069",
+  "https://clutch.co/profile/nouvos-solutions",
+  "https://www.goodfirms.co/company/nouvos-solutions-llc",
+];
+
 /**
  * Service lines N.O.D.E. sells. Single source of truth: the sitemap, the
  * services index, the Organization JSON-LD `hasOfferCatalog`, and llms.txt all
