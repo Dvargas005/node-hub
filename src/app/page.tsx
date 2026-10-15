@@ -146,7 +146,7 @@ const C = {
       noteLink: "Dedicated Growth",
       seoAddon: "SEO, GEO, and AEO are add-ons to any plan: Starter SEO is $1,250/mo, Full SEO is $2,500/mo, and Full SEO, GEO, and AEO is $4,000/mo. Dedicated Jump includes Starter SEO. Dedicated Pro includes Full SEO, GEO, and AEO.",
       plans: [
-        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials.", ft: false },
+        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mo", desc: "Your digital starter kit. Design and content essentials, plus hosting and small edits for your website.", ft: false },
         { name: "Growth", front: 500, flex: 625, setup: 1092, per: "/mo", desc: "Full creative power. Design, web, and content.", ft: true },
         { name: "Pro", front: 900, flex: 1125, setup: 1560, per: "/mo", desc: "Unlimited active requests. All plan services, fastest turnaround.", ft: false },
       ],
@@ -213,7 +213,7 @@ const C = {
       noteLink: "Dedicated Growth",
       seoAddon: "SEO, GEO y AEO son complementos para cualquier plan: SEO Starter cuesta $1,250/mes, SEO completo $2,500/mes, y SEO, GEO y AEO completos $4,000/mes. Dedicated Jump incluye SEO Starter. Dedicated Pro incluye SEO, GEO y AEO completos.",
       plans: [
-        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial.", ft: false },
+        { name: "Member", front: 300, flex: 375, setup: 312, per: "/mes", desc: "Tu kit digital inicial. Diseño y contenido esencial, más hosting y pequeñas ediciones de tu sitio web.", ft: false },
         { name: "Growth", front: 500, flex: 625, setup: 1092, per: "/mes", desc: "Poder creativo completo. Diseño, web y contenido.", ft: true },
         { name: "Pro", front: 900, flex: 1125, setup: 1560, per: "/mes", desc: "Solicitudes activas ilimitadas. Todos los servicios del plan, turnaround más rápido.", ft: false },
       ],

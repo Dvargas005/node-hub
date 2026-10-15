@@ -34,6 +34,7 @@ const SECTIONS: { title: string; body: string[] }[] = [
       "On demand is a one-time payment for one month of platform access. It does not renew automatically. Credits on On demand are bought separately as needed, at the per-credit price shown before you pay.",
       "Mobile app and custom software projects are not part of the subscription plans. They are scoped and quoted in a separate written proposal, and that proposal governs the project.",
       "SEO, GEO, and AEO are add-ons billed monthly with your plan, unless your Dedicated plan states that they are included.",
+      "The Member plan includes hosting for your website and small edits to it. If you buy a website as a one-time project and do not subscribe to a plan, you pay for hosting directly to your hosting provider.",
     ],
   },
   {

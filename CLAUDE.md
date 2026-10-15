@@ -80,6 +80,9 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
   sujeto al alcance". Nunca "delivered in X days", "entrega en X dias" ni una fecha garantizada.
 - On demand cuesta $5 (pago unico, un mes, no se renueva); sus creditos cuestan $2.75 c/u (Erich, 2026-10-12;
   `src/lib/credit-pricing.ts`). Los suscriptores de cualquier plan pagan creditos extra a $1 (1:1).
+- Member incluye hosting del sitio y ediciones pequenas (Erich, 2026-10-15). Sin plan, el cliente paga el hosting
+  directo al proveedor. Los sitios de pago unico (Small $500 / Medium $750 / Large $1,500, Stripe Payment Links,
+  2 rondas de revision, pago por adelantado) se construyen en las cuentas del cliente; el setup de $312 de Member aplica igual.
 - Member / Growth / Pro tienen DOS plazos (Erich, 2026-10-12): tarifa 12 meses ($300/$500/$900, compromiso de
   12 meses con pago mensual) y tarifa Flexible ($375/$625/$1,125 = +25%, minimo de 3 meses, despues mes a mes).
   Filas `member-flex` / `growth-flex` / `pro-flex`; reglas de cambio en `src/lib/plan-terms.ts`. "Mes a mes" solo

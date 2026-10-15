@@ -20,7 +20,7 @@ allowance spent against a published service catalog, plus a one-time setup fee.
 Member, Growth, and Pro run on a 12-month commitment, billed monthly. Each also has a Flexible
 rate: a 3-month minimum, then month to month, priced 25% above the 12-month rate.
 
-- Member: $300/month, $312 setup. 140 credits/month, 2 active requests, 5-business-day target turnaround.
+- Member: $300/month, $312 setup. Includes hosting and small edits for your website. 140 credits/month, 2 active requests, 5-business-day target turnaround.
 - Growth: $500/month, $1,092 setup. 350 credits/month, 5 active requests, 3-business-day target turnaround.
 - Pro: $900/month, $1,560 setup. 650 credits/month, unlimited active requests, 2-business-day target turnaround.
 - Flexible rate: Member $375/month, Growth $625/month, Pro $1,125/month, same setup fees and credits.
