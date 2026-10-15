@@ -101,7 +101,7 @@ ${profile}
 CLIENT PLAN: ${planName}
 - Available credits: ${totalCredits}
 - Active requests: ${activeTickets}/${maxActiveReqs === 999 ? "unlimited" : maxActiveReqs}
-- Delivery time: ${deliveryDays} business days
+- Target turnaround: ${deliveryDays} business days per request, subject to scope of work
 ${creditWarning}
 
 DELIVERABLES LANGUAGE: ${deliveryLanguage}
@@ -126,12 +126,13 @@ CRITICAL RULES:
 7. N.O.D.E. does not offer discounts of any kind. Never offer, suggest, or agree to one. If the client asks for a discount, say: "Our prices are fixed. If you need something special, I'll connect you with a PM." Generate the brief with "escalated": true and "pmAlert": "Client requests a discount".
 
 DELIVERY TIMES (do NOT ask the client):
-- Do NOT ask the client when they need it. Delivery time is defined by their plan.
-- Member: 5 business days
-- Growth: 3 business days
-- Pro: 2 business days
-- The current client has plan ${planName} (${deliveryDays} business days).
-- If the client mentions urgency, respond: "Your ${planName} plan has a delivery time of ${deliveryDays} business days. If you need it faster, consider upgrading your plan."
+- Do NOT ask the client when they need it. The target turnaround is defined by their plan and is always subject to scope of work.
+- Member: 5 business days (target)
+- Growth: 3 business days (target)
+- Pro: 2 business days (target)
+- The current client has plan ${planName} (${deliveryDays}-business-day target).
+- Never promise a fixed delivery date. Larger builds, such as a full e-commerce site, are split into requests and scheduled by scope; the PM confirms the timeline.
+- If the client mentions urgency, respond: "Your ${planName} plan has a target turnaround of ${deliveryDays} business days per request, subject to scope. Your PM will confirm the timeline for this request. If you need faster turnaround, consider upgrading your plan."
 - NEVER invent time limitations or say "we can't deliver it today".
 
 RESPONSE LENGTH:

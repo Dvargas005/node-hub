@@ -83,7 +83,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "dallas-tx",
     metaTitle: "Web, App & Software Development in Dallas, TX",
     metaDescription:
-      "Dallas web development, app development, custom software, and SEO from N.O.D.E., on Central Time. Flat monthly plans from $300, delivered in 2 to 5 business days.",
+      "Dallas web development, app development, custom software, and SEO from N.O.D.E., on Central Time. Flat monthly plans from $300, with target turnaround of 2 to 5 business days, subject to scope.",
     h1: "Web, app, and software development in Dallas",
     lead: [
       "N.O.D.E. builds websites, mobile apps, and custom software for businesses in Dallas and across the Dallas-Fort Worth metroplex, and runs the SEO that gets them found. We are based on Central Time, the same as you, and work through video calls and our own delivery platform.",
@@ -113,13 +113,13 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "indianapolis-in",
     metaTitle: "Web, App & Software Development in Indianapolis, IN",
     metaDescription:
-      "Indianapolis web development, app development, custom software, and SEO from N.O.D.E. Flat monthly plans from $300, delivered in 2 to 5 business days.",
+      "Indianapolis web development, app development, custom software, and SEO from N.O.D.E. Flat monthly plans from $300, with target turnaround of 2 to 5 business days, subject to scope.",
     h1: "Web, app, and software development in Indianapolis",
     lead: [
       "N.O.D.E. builds websites, mobile apps, and custom software for Indianapolis businesses, and runs the SEO that gets them found. We are based in the Chicago area and work remotely with clients across central Indiana.",
       "Indianapolis sits at the crossroads of more interstate highways than almost any other U.S. city, which has made it one of the country's major distribution hubs. Our parent company builds logistics software, so distribution and supply chain businesses here get a team that knows their world.",
       "For a central Indiana distributor or third-party logistics provider, that usually means a website that explains your lanes, warehouses, and service area clearly, plus the practical tools behind it: quote and booking requests, shipment status pages for customers, and connections to the order and warehouse systems you already run.",
-      "Indianapolis businesses are one hour ahead of us, on Eastern Time. We book calls in your time zone and plan delivery windows in business days, so a 3-business-day request on the Growth plan lands on the same schedule it would anywhere else.",
+      "Indianapolis businesses are one hour ahead of us, on Eastern Time. We book calls in your time zone and plan delivery windows in business days, so a request with a 3-business-day target on the Growth plan runs on the same schedule it would anywhere else.",
     ],
     faqs: [
       {

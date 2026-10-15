@@ -75,6 +75,9 @@ CEO / Producto: Erich Betancourt (erich@nouvos.one) · Tech Lead: Daniel Vargas
 ## Datos de plan que el copy debe repetir igual (verificado en prod 2026-10-03)
 - Solicitudes activas: Member 2 · Growth 5 · Pro ilimitadas. Entrega: 5 / 3 / 2 dias habiles.
   No escribir "48 a 72 horas habiles" ni "24-48h": el plazo lo define el plan.
+  Los plazos son OBJETIVOS, siempre sujetos al alcance del trabajo (Erich, 2026-10-15): un e-commerce
+  completo no sale en 5 dias. Escribir "target turnaround ... subject to scope of work" / "plazo objetivo ...
+  sujeto al alcance". Nunca "delivered in X days", "entrega en X dias" ni una fecha garantizada.
 - On demand cuesta $5 (pago unico, un mes, no se renueva); sus creditos cuestan $2.75 c/u (Erich, 2026-10-12;
   `src/lib/credit-pricing.ts`). Los suscriptores de cualquier plan pagan creditos extra a $1 (1:1).
 - Member / Growth / Pro tienen DOS plazos (Erich, 2026-10-12): tarifa 12 meses ($300/$500/$900, compromiso de
