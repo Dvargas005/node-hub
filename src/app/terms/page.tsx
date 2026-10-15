@@ -60,7 +60,7 @@ const SECTIONS: { title: string; body: string[] }[] = [
   {
     title: "Delivery, revisions, and support",
     body: [
-      "Each plan states a target delivery window in business days. Delivery windows apply to complete requests; larger work may be split into several requests.",
+      "Each plan states a target delivery window in business days. Delivery windows are targets, not guarantees, and are always subject to scope of work. They apply to complete requests; larger work, such as a full e-commerce site, may be split into several requests and scheduled by scope.",
       "Each request includes two revision rounds. From the third revision round on, each additional round costs 10% of the credits charged for that request.",
       "We confirm receipt of requests and messages on the next business day. Dedicated Pro includes 24/7 service.",
     ],

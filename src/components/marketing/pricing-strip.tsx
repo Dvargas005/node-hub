@@ -23,7 +23,7 @@ export function PricingStrip({ plans }: { plans: PublicPlan[] }) {
           <ul className="mt-6 space-y-2 font-[family-name:var(--font-atkinson)] text-sm text-[#130A06]/80">
             <li>{formatUsd(p.setupFee)} one-time setup</li>
             <li>{p.monthlyCredits} credits per month</li>
-            <li>{p.deliveryDays}-business-day delivery</li>
+            <li>{p.deliveryDays}-business-day target turnaround, subject to scope</li>
             {p.minTermMonths > 0 && <li>{p.minTermMonths}-month commitment, billed monthly</li>}
           </ul>
           {p.flex && (
