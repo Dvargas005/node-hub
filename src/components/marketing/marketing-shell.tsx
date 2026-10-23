@@ -136,6 +136,15 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           © 2026 Nouvos Solutions LLC ·{" "}
           <a href="/terms" className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
             Terms of Service
+          </a>{" "}
+          ·{" "}
+          <a
+            href="/capability-statement.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+          >
+            Capability Statement (PDF)
           </a>
         </p>
       </footer>
