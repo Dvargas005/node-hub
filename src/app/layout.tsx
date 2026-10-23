@@ -3,6 +3,7 @@ import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { JsonLd } from "@/components/JsonLd";
+import { VercelAnalytics } from "@/components/VercelAnalytics";
 import {
   ADDRESS,
   AREA_SERVED,
@@ -190,6 +191,7 @@ export default function RootLayout({
         <JsonLd data={websiteSchema} />
         {children}
         <Toaster theme="dark" />
+        <VercelAnalytics />
       </body>
     </html>
   );
