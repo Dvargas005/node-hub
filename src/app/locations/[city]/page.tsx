@@ -6,7 +6,7 @@ import { Faq, MarketingShell, focusRing } from "@/components/marketing/marketing
 import { PricingStrip, ServiceCta } from "@/components/marketing/pricing-strip";
 import { CITY_CONTENT } from "@/lib/city-content";
 import { getPublicPlans } from "@/lib/public-plans";
-import { CITIES, SERVICES, SITE_URL, type CitySlug } from "@/lib/seo";
+import { CITIES, SERVICES, SITE_URL, areaServedFor, type CitySlug } from "@/lib/seo";
 
 export const revalidate = 3600;
 export const dynamicParams = false;
@@ -48,7 +48,7 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
 
   const plans = await getPublicPlans();
   const url = `${SITE_URL}/locations/${city.slug}`;
-  const place = { "@type": "City", name: `${city.city}, ${city.stateCode}`, sameAs: city.wikidata };
+  const areaServed = areaServedFor(city);
 
   const schema = {
     "@context": "https://schema.org",
@@ -63,11 +63,11 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
       },
       ...SERVICES.map((s) => ({
         "@type": "Service",
-        name: `${s.name} in ${city.city}, ${city.stateCode}`,
+        name: `${s.name} in ${city.label}`,
         description: s.summary,
         url: `${SITE_URL}/services/${s.slug}`,
         provider: { "@id": `${SITE_URL}/#organization` },
-        areaServed: place,
+        areaServed,
       })),
       {
         "@type": "FAQPage",
@@ -83,7 +83,7 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
           { "@type": "ListItem", position: 2, name: "Locations", item: `${SITE_URL}/locations` },
-          { "@type": "ListItem", position: 3, name: `${city.city}, ${city.stateCode}`, item: url },
+          { "@type": "ListItem", position: 3, name: city.label, item: url },
         ],
       },
     ],
@@ -99,12 +99,10 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
           <span aria-hidden="true"> / </span>
           <Link href="/locations" className={`hover:text-[#FFC919] ${focusRing}`}>Locations</Link>
           <span aria-hidden="true"> / </span>
-          <span aria-current="page">
-            {city.city}, {city.stateCode}
-          </span>
+          <span aria-current="page">{city.label}</span>
         </nav>
         <p className="mt-10 font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919]">
-          {city.city.toUpperCase()}, {city.stateCode} / {city.timeZone.toUpperCase()}
+          {city.label.toUpperCase()} / {city.timeZone.toUpperCase()}
         </p>
         <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-lexend)] font-black text-[clamp(2.25rem,6vw,4.5rem)] leading-[1.05]">
           {content.h1}
@@ -141,6 +139,22 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
         </div>
       </section>
 
+      <section aria-labelledby="areas" className="max-w-7xl mx-auto px-4 md:px-12 mt-24">
+        <h2 id="areas" className="font-[family-name:var(--font-lexend)] font-black text-3xl md:text-4xl">
+          {content.areasHeading}
+        </h2>
+        <p className="mt-4 max-w-3xl font-[family-name:var(--font-atkinson)] text-lg text-[#F5F6FC]/75">
+          {content.areasIntro}
+        </p>
+        <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-3 font-[family-name:var(--font-atkinson)] text-base text-[#F5F6FC]/80">
+          {city.suburbs.map((s) => (
+            <li key={s}>
+              {s}, {city.stateCode}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {plans.length > 0 && (
         <section aria-labelledby="plans" className="max-w-7xl mx-auto px-4 md:px-12 mt-24">
           <h2 id="plans" className="font-[family-name:var(--font-lexend)] font-black text-3xl md:text-4xl">
@@ -173,7 +187,7 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
           {CITIES.filter((c) => c.slug !== city.slug).map((c) => (
             <li key={c.slug}>
               <Link href={`/locations/${c.slug}`} className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
-                {c.city}, {c.stateCode} <span aria-hidden="true">→</span>
+                {c.label} <span aria-hidden="true">→</span>
               </Link>
             </li>
           ))}

@@ -47,11 +47,16 @@ Dedicated Jump includes Starter SEO. Dedicated Pro includes full SEO, GEO, and A
   content belong to the client.
 
 ## Locations
-Headquartered in Evanston, Illinois. Serving businesses in:
-- [Chicago, IL](https://www.nodedev.one/locations/chicago-il)
-- [Milwaukee, WI](https://www.nodedev.one/locations/milwaukee-wi)
-- [Dallas, TX](https://www.nodedev.one/locations/dallas-tx)
-- [Indianapolis, IN](https://www.nodedev.one/locations/indianapolis-in)
+Headquartered in Evanston, Illinois. In-person meetings are available by appointment in
+Illinois and Wisconsin; Indiana and Texas are served remotely. Serving businesses in:
+- [Chicago, IL](https://www.nodedev.one/locations/chicago-il): plus Skokie, Oak Park, Park Ridge, Des Plaines, Arlington Heights, Schaumburg, Elmhurst, Oak Brook, Downers Grove, Naperville, Aurora, Joliet, Orland Park.
+- [Evanston, IL](https://www.nodedev.one/locations/evanston-il): plus Wilmette, Kenilworth, Winnetka, Glenview, Northbrook, Lincolnwood, Morton Grove, Rogers Park.
+- [Lake County, IL](https://www.nodedev.one/locations/lake-county-il): Waukegan, Gurnee, Libertyville, Mundelein, Vernon Hills, Lake Forest, Highland Park, Lake Zurich, Grayslake, Lake Villa, Antioch, Round Lake.
+- [Kenosha, WI](https://www.nodedev.one/locations/kenosha-wi): plus Pleasant Prairie, Somers, Bristol, Salem Lakes, Twin Lakes, Paddock Lake, Racine, Mount Pleasant, Sturtevant.
+- [Milwaukee, WI](https://www.nodedev.one/locations/milwaukee-wi): plus Wauwatosa, West Allis, Waukesha, Brookfield, Greenfield, Oak Creek, Franklin, Glendale, Mequon, Menomonee Falls, New Berlin.
+- [Northwest Indiana](https://www.nodedev.one/locations/northwest-indiana): Hammond, Gary, Munster, Highland, Schererville, Merrillville, Crown Point, Hobart, Portage, Valparaiso, Chesterton, Michigan City.
+- [Indianapolis, IN](https://www.nodedev.one/locations/indianapolis-in): plus Carmel, Fishers, Noblesville, Westfield, Zionsville, Lawrence, Greenwood, Plainfield, Avon, Brownsburg.
+- [Dallas, TX](https://www.nodedev.one/locations/dallas-tx): plus Fort Worth, Plano, Irving, Arlington, Frisco, Richardson, Garland, McKinney.
 
 App and custom software projects are scoped and quoted per project after a discovery
 call. Web, design, and marketing work runs on the subscription plans above; SEO, GEO, and AEO are add-ons.

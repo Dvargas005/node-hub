@@ -3,9 +3,9 @@ import Link from "next/link";
 import { MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
 import { ADDRESS, CITIES } from "@/lib/seo";
 
-const TITLE = "Locations: Chicago, Milwaukee, Dallas, Indianapolis";
+const TITLE = "Locations: Chicago, Evanston, Milwaukee, Kenosha, Indiana";
 const DESCRIPTION =
-  "N.O.D.E. serves businesses in Chicago, Milwaukee, Dallas, and Indianapolis from its headquarters in Evanston, IL.";
+  "NODE by Nouvos serves businesses in Chicago and its suburbs, Evanston, Lake County, Kenosha, Milwaukee, Northwest Indiana, Indianapolis, and Dallas from its headquarters in Evanston, IL.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -39,7 +39,7 @@ export default function LocationsIndex() {
               className={`group block bg-[#130A06] p-8 md:p-10 hover:bg-[#1c110c] transition-colors duration-200 ${focusRing}`}
             >
               <h2 className="font-[family-name:var(--font-lexend)] font-black text-2xl md:text-3xl group-hover:text-[#FFC919] transition-colors duration-200">
-                {c.city}, {c.stateCode} <span aria-hidden="true">→</span>
+                {c.label} <span aria-hidden="true">→</span>
               </h2>
               <p className="mt-3 font-[family-name:var(--font-atkinson)] text-base text-[#F5F6FC]/75">
                 {c.state} / {c.timeZone}

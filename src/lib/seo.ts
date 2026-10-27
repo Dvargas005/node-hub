@@ -108,47 +108,137 @@ export const GEO = { latitude: 42.0478781, longitude: -87.6842666 } as const;
  * Metros with a dedicated location page. One page per city covering every
  * service line, rather than a page per service per city: near-duplicate
  * city-swapped pages are what Google's doorway-page policy penalizes.
+ *
+ * Suburbs get no page of their own for the same reason. They are listed on
+ * their metro's page and in the areaServed schema instead. Only add a new
+ * location when there is something true and specific to say about it.
  */
 export const CITIES = [
   {
     slug: "chicago-il",
     city: "Chicago",
+    label: "Chicago, IL",
+    placeType: "City",
     state: "Illinois",
     stateCode: "IL",
     timeZone: "Central Time",
     wikidata: "https://www.wikidata.org/wiki/Q1297",
+    suburbs: [
+      "Skokie", "Oak Park", "Park Ridge", "Des Plaines", "Arlington Heights", "Schaumburg",
+      "Elmhurst", "Oak Brook", "Downers Grove", "Naperville", "Aurora", "Joliet", "Orland Park",
+    ],
+  },
+  {
+    slug: "evanston-il",
+    city: "Evanston",
+    label: "Evanston, IL",
+    placeType: "City",
+    state: "Illinois",
+    stateCode: "IL",
+    timeZone: "Central Time",
+    wikidata: "https://www.wikidata.org/wiki/Q462799",
+    suburbs: [
+      "Skokie", "Wilmette", "Kenilworth", "Winnetka", "Glenview", "Northbrook",
+      "Lincolnwood", "Morton Grove", "Rogers Park",
+    ],
+  },
+  {
+    slug: "lake-county-il",
+    city: "Lake County",
+    label: "Lake County, IL",
+    placeType: "AdministrativeArea",
+    state: "Illinois",
+    stateCode: "IL",
+    timeZone: "Central Time",
+    wikidata: "https://www.wikidata.org/wiki/Q484263",
+    suburbs: [
+      "Waukegan", "Gurnee", "Libertyville", "Mundelein", "Vernon Hills", "Lake Forest",
+      "Highland Park", "Lake Zurich", "Grayslake", "Lake Villa", "Antioch", "Round Lake",
+    ],
+  },
+  {
+    slug: "kenosha-wi",
+    city: "Kenosha",
+    label: "Kenosha, WI",
+    placeType: "City",
+    state: "Wisconsin",
+    stateCode: "WI",
+    timeZone: "Central Time",
+    wikidata: "https://www.wikidata.org/wiki/Q462161",
+    suburbs: [
+      "Pleasant Prairie", "Somers", "Bristol", "Salem Lakes", "Twin Lakes", "Paddock Lake",
+      "Racine", "Mount Pleasant", "Sturtevant",
+    ],
   },
   {
     slug: "milwaukee-wi",
     city: "Milwaukee",
+    label: "Milwaukee, WI",
+    placeType: "City",
     state: "Wisconsin",
     stateCode: "WI",
     timeZone: "Central Time",
     wikidata: "https://www.wikidata.org/wiki/Q37836",
+    suburbs: [
+      "Wauwatosa", "West Allis", "Waukesha", "Brookfield", "Greenfield", "Oak Creek",
+      "Franklin", "Glendale", "Mequon", "Menomonee Falls", "New Berlin",
+    ],
   },
   {
-    slug: "dallas-tx",
-    city: "Dallas",
-    state: "Texas",
-    stateCode: "TX",
+    slug: "northwest-indiana",
+    city: "Northwest Indiana",
+    label: "Northwest Indiana",
+    placeType: "Place",
+    state: "Indiana",
+    stateCode: "IN",
     timeZone: "Central Time",
-    wikidata: "https://www.wikidata.org/wiki/Q16557",
+    wikidata: "https://www.wikidata.org/wiki/Q7060084",
+    suburbs: [
+      "Hammond", "Gary", "Munster", "Highland", "Schererville", "Merrillville",
+      "Crown Point", "Hobart", "Portage", "Valparaiso", "Chesterton", "Michigan City",
+    ],
   },
   {
     slug: "indianapolis-in",
     city: "Indianapolis",
+    label: "Indianapolis, IN",
+    placeType: "City",
     state: "Indiana",
     stateCode: "IN",
     timeZone: "Eastern Time",
     wikidata: "https://www.wikidata.org/wiki/Q6346",
+    suburbs: [
+      "Carmel", "Fishers", "Noblesville", "Westfield", "Zionsville", "Lawrence",
+      "Greenwood", "Plainfield", "Avon", "Brownsburg",
+    ],
+  },
+  {
+    slug: "dallas-tx",
+    city: "Dallas",
+    label: "Dallas, TX",
+    placeType: "City",
+    state: "Texas",
+    stateCode: "TX",
+    timeZone: "Central Time",
+    wikidata: "https://www.wikidata.org/wiki/Q16557",
+    suburbs: [
+      "Fort Worth", "Plano", "Irving", "Arlington", "Frisco", "Richardson", "Garland", "McKinney",
+    ],
   },
 ] as const;
 
 export type CitySlug = (typeof CITIES)[number]["slug"];
+export type City = (typeof CITIES)[number];
 
-/** schema.org areaServed entries for every target metro. */
-export const AREA_SERVED = CITIES.map((c) => ({
-  "@type": "City",
-  name: `${c.city}, ${c.stateCode}`,
-  sameAs: c.wikidata,
-}));
+/** schema.org Place for a location, plus its listed suburbs as cities in the same state. */
+export function areaServedFor(c: City) {
+  return [
+    { "@type": c.placeType, name: c.label, sameAs: c.wikidata },
+    ...c.suburbs.map((s) => ({ "@type": "City", name: `${s}, ${c.stateCode}` })),
+  ];
+}
+
+/** schema.org areaServed entries for every target location (suburbs deduplicated). */
+export const AREA_SERVED = Array.from(
+  new Map(CITIES.flatMap(areaServedFor).map((p) => [p.name, p])).values(),
+);

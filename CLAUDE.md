@@ -120,3 +120,12 @@ Stripe/DB de la tarifa Flexible: `npx tsx scripts/setup-flexible-plans.ts` (dry 
 - Datos fuera del codigo: `npx tsx scripts/set-plan-commitment.ts` (dry run) y luego `--apply`
   (minTermMonths en la DB, descripcion de los Products, portal sin cancelar). No toca suscripciones existentes.
 - Test: `npx tsx --test src/lib/commitment.test.ts`. `npm run lint` no esta configurado (pide setup interactivo).
+
+## Ubicaciones / SEO local (2026-10-27)
+Paginas en `/locations/[city]`, fuente unica `CITIES` en `src/lib/seo.ts` (copy en `src/lib/city-content.ts`):
+Chicago, Evanston, Lake County IL, Kenosha, Milwaukee, Northwest Indiana, Indianapolis, Dallas.
+- Los suburbios NO tienen pagina propia (doorway pages): van en `CITIES[].suburbs`, se listan en la pagina del metro
+  y en el `areaServed` del schema. Agregar una ubicacion nueva solo si hay algo cierto y especifico que decir.
+- Presencial (con cita) solo en Illinois y Wisconsin. Indiana y Texas se atienden remoto; no escribir lo contrario.
+- La direccion de Davis St es oficina registrada (solo correo), no un estudio abierto al publico.
+- Sin Google Business Profile por decision de Erich (2026-09-21).
