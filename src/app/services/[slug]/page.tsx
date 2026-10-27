@@ -227,7 +227,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             {CITIES.map((city) => (
               <li key={city.slug}>
                 <Link href={`/locations/${city.slug}`} className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
-                  {c.serviceType} in {city.city}, {city.stateCode} <span aria-hidden="true">→</span>
+                  {c.serviceType} in {city.label} <span aria-hidden="true">→</span>
                 </Link>
               </li>
             ))}

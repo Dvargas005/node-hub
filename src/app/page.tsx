@@ -865,7 +865,7 @@ export default function Home() {
             <a key={s.slug} href={`/services/${s.slug}`} className="hover:text-[#FFC919] transition-colors">{s.name}</a>
           ))}
           {CITIES.map((c) => (
-            <a key={c.slug} href={`/locations/${c.slug}`} className="hover:text-[#FFC919] transition-colors">{c.city}, {c.stateCode}</a>
+            <a key={c.slug} href={`/locations/${c.slug}`} className="hover:text-[#FFC919] transition-colors">{c.label}</a>
           ))}
           <a href="/terms" className="hover:text-[#FFC919] transition-colors">Terms of Service</a>
           <a href="/capability-statement.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#FFC919] transition-colors">Capability Statement (PDF)</a>

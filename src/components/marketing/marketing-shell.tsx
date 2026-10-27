@@ -97,7 +97,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
                     href={`/locations/${c.slug}`}
                     className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
                   >
-                    {c.city}, {c.stateCode}
+                    {c.label}
                   </Link>
                 </li>
               ))}
