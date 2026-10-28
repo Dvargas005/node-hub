@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
+import { INDUSTRY_CONTENT } from "@/lib/industry-content";
 import { CITIES, SERVICES, SITE_URL } from "@/lib/seo";
+import { WORK } from "@/lib/work-content";
 
 /**
  * Public marketing surface only. Authenticated routes, /dedicated,
@@ -42,6 +44,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...CITIES.map((city) => ({
       url: `${SITE_URL}/locations/${city.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    {
+      url: `${SITE_URL}/work`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    ...WORK.map((w) => ({
+      url: `${SITE_URL}/work/${w.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    ...Object.keys(INDUSTRY_CONTENT).map((slug) => ({
+      url: `${SITE_URL}/industries/${slug}`,
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.8,
