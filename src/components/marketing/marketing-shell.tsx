@@ -47,6 +47,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               Plans
             </Link>
             <Link
+              href="/free-website-check"
+              className={`hidden lg:inline font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+            >
+              Free check
+            </Link>
+            <Link
               href="/login"
               className={`hidden md:inline font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
             >
@@ -95,6 +101,14 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
                   className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
                 >
                   Logistics companies
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/free-website-check"
+                  className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+                >
+                  Free website check
                 </Link>
               </li>
               <li>

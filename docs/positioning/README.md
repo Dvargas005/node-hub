@@ -69,7 +69,7 @@ Ordered by cost to the company, cheapest first.
 | B1 | Push pages ranking 6 to 28 into top 5: deeper copy, FAQ blocks, internal links from location pages and case studies | $0 | S to M | Biggest click upside; GSC shows which queries |
 | B2 | "Built by NODE" footer credit on W.A.R. and COnovate (already on Zana, WECL, Postres Mary, WAIPAX) | $0 | XS | Needs each client's OK |
 | B3 | Dogfood GEO/AEO on nodedev.one: FAQ schema on service pages, answer-first sections, keep `llms.txt` current | $0 | S | `llms.txt` and Phase 1 entity fixes already exist |
-| B4 | Free website check on nodedev.one, reusing `site_audit.py` + PageSpeed from Agents outreach | ~$0 (PageSpeed API free tier) | M | A free tool, not a discount; confirm with Erich against the no-freebies policy |
+| B4 | DONE 2026-10-29 (PR, /free-website-check). Free website check on nodedev.one, reusing `site_audit.py` + PageSpeed from Agents outreach | ~$0 (PageSpeed API free tier) | M | A free tool, not a discount; confirm with Erich against the no-freebies policy |
 | B5 | Illinois BEP / minority-owned certification listings (SAM already shows Hispanic-owned SDB) | free to low, check each program's fee | S (paperwork) | Directory links + buyer/prime visibility |
 | B6 | Chamber memberships: Evanston, Lake County, Kenosha Area Business Alliance | annual dues, check before joining | S | Local links; only join where a buyer pool exists |
 | B7 | More industry pages (business services, consumer) once logistics proves out | $0 | S each | One entry in `industry-content.ts` |

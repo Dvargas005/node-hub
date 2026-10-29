@@ -17,6 +17,9 @@
 ## Industries
 - [Logistics, 3PL, and freight](https://www.nodedev.one/industries/logistics): Websites, quote forms, portals, and integrations for small logistics and supply chain firms.
 
+## Free tools
+- [Free Website Check](https://www.nodedev.one/free-website-check): Grades any public page on search basics, AI-answer readiness (structured data, AI crawler access, llms.txt, crawlable text), and Google PageSpeed mobile score. Free, no signup, nothing stored.
+
 ## Work
 - [All case studies](https://www.nodedev.one/work)
 - [WECL](https://www.nodedev.one/work/wecl): Editorial website for a supply chain and logistics consulting firm.
