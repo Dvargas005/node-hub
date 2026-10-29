@@ -8,6 +8,7 @@ import {
   gradePage,
   isBlockedAddress,
   normalizeTargetUrl,
+  schemaTypes,
   type FetchResult,
 } from "./website-check";
 
@@ -82,4 +83,10 @@ test("a bare page fails the basics and AI checks", () => {
 test("noindex in a header is caught", () => {
   const report = gradePage(page(GOOD, { headers: { "x-robots-tag": "noindex" } }), { robots: null, llms: false, sitemap: false, pagespeedMobile: null }, "https://example.com/");
   assert.equal(report.items.find((i) => i.id === "indexable")?.status, "fail");
+});
+
+test("any LocalBusiness subtype counts as business markup", () => {
+  assert.equal(schemaTypes('<script type="application/ld+json">{"@type":"ClothingStore","name":"W.A.R."}</script>').hasBusiness, true);
+  assert.equal(schemaTypes('<script type="application/ld+json">{"@type":"Plumber","telephone":"+1-555"}</script>').hasBusiness, true);
+  assert.equal(schemaTypes('<script type="application/ld+json">{"@type":"WebSite","name":"x"}</script>').hasBusiness, false);
 });

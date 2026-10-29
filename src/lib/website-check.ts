@@ -242,28 +242,39 @@ function metaContent(metas: Array<Record<string, string>>, key: string): string 
   return hit?.content !== undefined ? decodeEntities(hit.content) : null;
 }
 
-function collectSchemaTypes(node: unknown, out: Set<string>): void {
-  if (Array.isArray(node)) return node.forEach((n) => collectSchemaTypes(n, out));
+/**
+ * schema.org has hundreds of LocalBusiness subtypes (ClothingStore, Plumber, Bakery...),
+ * so a name list always misses some. A typed node that carries an address or phone is
+ * a business description whatever its type is called.
+ */
+const BUSINESS_TYPE = /(Organization|Business|Service|Store|Shop|Corporation|Restaurant|Agency|Clinic|Office)$/;
+const NON_ENTITY_TYPES = new Set(["WebSite", "WebPage", "PostalAddress", "GeoCoordinates", "ContactPoint", "BreadcrumbList", "ImageObject", "Offer"]);
+
+function collectSchemaTypes(node: unknown, out: Set<string>, found: { business: boolean }): void {
+  if (Array.isArray(node)) return node.forEach((n) => collectSchemaTypes(n, out, found));
   if (!node || typeof node !== "object") return;
   const obj = node as Record<string, unknown>;
   const t = obj["@type"];
-  if (typeof t === "string") out.add(t);
-  if (Array.isArray(t)) t.forEach((x) => typeof x === "string" && out.add(x));
-  for (const value of Object.values(obj)) if (value && typeof value === "object") collectSchemaTypes(value, out);
+  const own = typeof t === "string" ? [t] : Array.isArray(t) ? t.filter((x): x is string => typeof x === "string") : [];
+  own.forEach((x) => out.add(x));
+  if (own.some((x) => BUSINESS_TYPE.test(x))) found.business = true;
+  if (own.some((x) => !NON_ENTITY_TYPES.has(x)) && (obj.address || obj.telephone)) found.business = true;
+  for (const value of Object.values(obj)) if (value && typeof value === "object") collectSchemaTypes(value, out, found);
 }
 
-export function schemaTypes(html: string): { types: Set<string>; invalidBlocks: number } {
+export function schemaTypes(html: string): { types: Set<string>; invalidBlocks: number; hasBusiness: boolean } {
   const types = new Set<string>();
+  const found = { business: false };
   let invalidBlocks = 0;
   const re = /<script\b[^>]*type\s*=\s*["']?application\/ld\+json["']?[^>]*>([\s\S]*?)<\/script>/gi;
   for (const m of Array.from(html.matchAll(re))) {
     try {
-      collectSchemaTypes(JSON.parse(m[1]), types);
+      collectSchemaTypes(JSON.parse(m[1]), types, found);
     } catch {
       invalidBlocks++;
     }
   }
-  return { types, invalidBlocks };
+  return { types, invalidBlocks, hasBusiness: found.business };
 }
 
 function visibleWordCount(html: string): number {
@@ -453,9 +464,7 @@ export function gradePage(page: FetchResult, aux: AuxFiles, requestedUrl: string
   );
 
   // --- AI answers (GEO / AEO) ---------------------------------------------
-  const { types, invalidBlocks } = schemaTypes(html);
-  const businessTypes = ["Organization", "LocalBusiness", "ProfessionalService", "Corporation", "Store", "Restaurant", "MedicalBusiness", "Dentist", "Physician", "LegalService", "HomeAndConstructionBusiness", "AutomotiveBusiness", "FinancialService"];
-  const hasBusiness = businessTypes.some((t) => types.has(t)) || Array.from(types).some((t) => /Business|Service$/.test(t));
+  const { types, invalidBlocks, hasBusiness } = schemaTypes(html);
   add(
     "ai",
     "schema",
