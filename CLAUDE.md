@@ -145,5 +145,7 @@ Logica y pruebas: `src/lib/website-check.ts`, `npx tsx --test src/lib/website-ch
   y sigue redirects a mano. No reemplazar por `fetch()` directo ni quitar `isBlockedAddress`.
 - Rate limit 6 checks / 15 min por IP, en memoria (por instancia de Vercel).
 - PageSpeed mobile es opcional: sin `GOOGLE_PAGESPEED_API_KEY` la cuota sin key esta agotada y el item se omite.
+  La key vive en GCP proyecto `nouvos-outreach`, nombre `node-hub-website-check-pagespeed`, restringida SOLO a PageSpeed API
+  (gratis, 25k consultas/dia). No usar la key `outreach-places-pagespeed`: incluye Places, que si cobra.
 - Mismas senales que `site_audit.py` de Agents outreach (copyright viejo, tap-to-call, PageSpeed) para que el outreach y la herramienta coincidan.
 - Copy sin precios. CTA = /register y la pagina de GEO.
