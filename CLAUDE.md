@@ -11,7 +11,8 @@ Landing + waitlist + checkout de suscripción.
 - **Backend:** Prisma + PostgreSQL (`@prisma/adapter-pg`) · Redis (ioredis)
 - **Auth:** **Better Auth** — igual que el resto del ecosistema. NO usar Clerk.
 - **Pagos:** Stripe · **Email:** Resend · **AI:** `@google/generative-ai`
-- **Deploy:** Vercel (`vercel.json`)
+- **Deploy:** Vercel (`vercel.json`). Produccion (nodedev.one) = equipo **nouvos team** (`tigresvercel/node-hub`).
+  Existe otro proyecto `ebetanco16s-projects/node-hub` SIN dominios: no es produccion, no poner env vars ahi.
 - **Tipografía:** Lexend + Atkinson Hyperlegible (`next/font/google`)
 
 ## Comandos
