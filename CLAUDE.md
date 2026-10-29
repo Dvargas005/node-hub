@@ -137,3 +137,13 @@ Plan, reglas y backlog de posicionamiento en `docs/positioning/README.md`.
 - Zanapronto aparece como "Nouvos product", no como cliente. WAIPAX espera a que www.waipax.com responda (404 el 2026-10-28).
 - Sin numeros de resultados hasta que el cliente los envie: `results` queda undefined y la seccion no se renderiza. Sin citas/testimonios.
 - Rutas publicas nuevas deben agregarse al regex de `src/middleware.ts`; si no, redirigen a /login y Google no las ve.
+
+## Free website check (2026-10-29)
+`/free-website-check` (pagina + FAQ/WebApplication schema) y `POST /api/website-check`. Publico, sin login, no guarda nada.
+Logica y pruebas: `src/lib/website-check.ts`, `npx tsx --test src/lib/website-check.test.ts`.
+- La URL viene de un anonimo: el fetch valida CADA respuesta DNS dentro del `lookup` del socket (anti DNS rebinding)
+  y sigue redirects a mano. No reemplazar por `fetch()` directo ni quitar `isBlockedAddress`.
+- Rate limit 6 checks / 15 min por IP, en memoria (por instancia de Vercel).
+- PageSpeed mobile es opcional: sin `GOOGLE_PAGESPEED_API_KEY` la cuota sin key esta agotada y el item se omite.
+- Mismas senales que `site_audit.py` de Agents outreach (copyright viejo, tap-to-call, PageSpeed) para que el outreach y la herramienta coincidan.
+- Copy sin precios. CTA = /register y la pagina de GEO.

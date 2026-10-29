@@ -28,6 +28,9 @@ export function middleware(req: NextRequest) {
   // crawlers never carry one. Exact segment match so "/servicesX" stays gated.
   if (/^\/(services|locations|work|industries)(\/[^/]+)?\/?$/.test(pathname)) return NextResponse.next();
 
+  // Free website check: public lead tool, crawlable on purpose
+  if (pathname === "/free-website-check") return NextResponse.next();
+
   // Terms of Service: public, linked from the footers and checkout
   if (pathname === "/terms") return NextResponse.next();
 
