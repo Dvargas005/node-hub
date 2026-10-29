@@ -639,11 +639,17 @@ async function pagespeedMobileScore(url: string): Promise<number | null> {
       signal: AbortSignal.timeout(45_000),
       cache: "no-store",
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Logged without the request URL: it carries the API key.
+      const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+      console.error("[WEBSITE_CHECK] PageSpeed", res.status, body?.error?.message?.slice(0, 200) ?? "");
+      return null;
+    }
     const json = (await res.json()) as { lighthouseResult?: { categories?: { performance?: { score?: number | null } } } };
     const score = json.lighthouseResult?.categories?.performance?.score;
     return typeof score === "number" ? Math.round(score * 100) : null;
-  } catch {
+  } catch (err) {
+    console.error("[WEBSITE_CHECK] PageSpeed", err instanceof Error ? err.name : "error");
     return null;
   }
 }
