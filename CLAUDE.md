@@ -129,3 +129,11 @@ Chicago, Evanston, Lake County IL, Kenosha, Milwaukee, Northwest Indiana, Indian
 - Presencial (con cita) solo en Illinois y Wisconsin. Indiana y Texas se atienden remoto; no escribir lo contrario.
 - La direccion de Davis St es oficina registrada (solo correo), no un estudio abierto al publico.
 - Sin Google Business Profile por decision de Erich (2026-09-21).
+
+## Casos de estudio e industrias (2026-10-28)
+`/work`, `/work/[slug]` (fuente `src/lib/work-content.ts`) y `/industries/[slug]` (fuente `src/lib/industry-content.ts`, hoy solo `logistics`).
+Plan, reglas y backlog de posicionamiento en `docs/positioning/README.md`.
+- Clientes nombrables (Erich, 2026-10-28): WECL, COnovate, W.A.R. Nunca el cliente de e-commerce que pidio no ser nombrado.
+- Zanapronto aparece como "Nouvos product", no como cliente. WAIPAX espera a que www.waipax.com responda (404 el 2026-10-28).
+- Sin numeros de resultados hasta que el cliente los envie: `results` queda undefined y la seccion no se renderiza. Sin citas/testimonios.
+- Rutas publicas nuevas deben agregarse al regex de `src/middleware.ts`; si no, redirigen a /login y Google no las ve.

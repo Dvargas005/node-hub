@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ADDRESS, CITIES, CONTACT_EMAIL, PHONE, SERVICES } from "@/lib/seo";
 
 /**
- * Server-rendered frame for the SEO pages (/services, /locations).
+ * Server-rendered frame for the SEO pages (/services, /locations, /work, /industries).
  *
  * Deliberately not the landing page's nav: that one is a client component with
  * framer-motion and a JS language toggle, and these pages have to be complete
@@ -33,6 +33,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               className={`font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
             >
               Services
+            </Link>
+            <Link
+              href="/work"
+              className={`hidden sm:inline font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+            >
+              Work
             </Link>
             <Link
               href="/#pricing"
@@ -83,6 +89,22 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/industries/logistics"
+                  className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+                >
+                  Logistics companies
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/work"
+                  className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+                >
+                  Our work
+                </Link>
+              </li>
             </ul>
           </div>
 
