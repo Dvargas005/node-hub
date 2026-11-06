@@ -6,9 +6,13 @@ import { JsonLd } from "@/components/JsonLd";
 import {
   ADDRESS,
   AREA_SERVED,
+  CONTACT_EMAIL,
+  FOUNDER_ID,
   GEO,
   LEGAL_NAME,
+  LOGO_URL,
   OG_IMAGE,
+  OG_IMAGE_ALT,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
   ORG_NAME,
@@ -32,8 +36,9 @@ const atkinson = Atkinson_Hyperlegible({
   display: "swap",
 });
 
+// Kept under ~160 characters so Google does not truncate it.
 const DESCRIPTION =
-  "Web development, design, and marketing on flat monthly subscriptions, SEO, GEO, and AEO as add-ons, and apps and custom software quoted per project. An in-house team from Nouvos Solutions.";
+  "Web development, design, and marketing on flat monthly plans from an in-house team. SEO, GEO, and AEO add-ons. Apps and custom software quoted per project.";
 
 export const metadata: Metadata = {
   // Without metadataBase, Next resolves relative OG/canonical URLs against the
@@ -82,7 +87,7 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: OG_IMAGE_WIDTH,
         height: OG_IMAGE_HEIGHT,
-        alt: "N.O.D.E. by Nouvos Solutions",
+        alt: OG_IMAGE_ALT,
       },
     ],
   },
@@ -107,10 +112,10 @@ const organizationSchema = {
   "@type": "ProfessionalService",
   "@id": `${SITE_URL}/#organization`,
   name: ORG_NAME,
-  alternateName: ["NODE by Nouvos", "N.O.D.E.", "NODE", "nodedev", "Network Organized Delivery Engine"],
+  alternateName: ["N.O.D.E. by Nouvos", "N.O.D.E.", "NODE", "nodedev", "Network Organized Delivery Engine"],
   legalName: LEGAL_NAME,
   foundingDate: "2024",
-  founder: { "@type": "Person", name: "Erich Betancourt", jobTitle: "CEO" },
+  founder: { "@type": "Person", "@id": FOUNDER_ID, name: "Erich Betancourt", jobTitle: "CEO" },
   slogan: "Web development, design, and marketing on one monthly plan",
   knowsAbout: [
     "Web development",
@@ -124,16 +129,24 @@ const organizationSchema = {
     "Answer engine optimization",
   ],
   url: SITE_URL,
-  logo: `${SITE_URL}/logos/NOUVOS.ONE_white@2x.png`,
+  logo: `${SITE_URL}${LOGO_URL}`,
   image: `${SITE_URL}${OG_IMAGE}`,
   description: DESCRIPTION,
-  email: "support@nouvos.one",
+  email: CONTACT_EMAIL,
   parentOrganization: {
     "@type": "Organization",
     name: LEGAL_NAME,
     url: "https://nouvos.one",
   },
   telephone: PHONE,
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: CONTACT_EMAIL,
+    telephone: PHONE,
+    availableLanguage: ["English", "Spanish"],
+    url: `${SITE_URL}/contact`,
+  },
   address: { "@type": "PostalAddress", ...ADDRESS },
   geo: { "@type": "GeoCoordinates", ...GEO },
   // Must match the Google Business Profile service areas exactly.
@@ -142,7 +155,7 @@ const organizationSchema = {
   sameAs: SAME_AS,
   hasOfferCatalog: {
     "@type": "OfferCatalog",
-    name: "N.O.D.E. Services",
+    name: "NODE by Nouvos services",
     itemListElement: SERVICES.map((service) => ({
       "@type": "Offer",
       itemOffered: {
@@ -163,7 +176,7 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": `${SITE_URL}/#website`,
-  name: "NODE by Nouvos",
+  name: ORG_NAME,
   alternateName: ["N.O.D.E. by Nouvos", "nodedev.one"],
   url: SITE_URL,
   publisher: { "@id": `${SITE_URL}/#organization` },

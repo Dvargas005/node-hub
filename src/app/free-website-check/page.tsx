@@ -2,19 +2,13 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { WebsiteCheckForm } from "@/components/marketing/website-check-form";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, pageMetadata } from "@/lib/seo";
 
 const TITLE = "Free Website Check: SEO, AI Search, and Mobile Speed";
 const DESCRIPTION =
-  "Check any website for free in under a minute: search basics, whether ChatGPT, Perplexity, and Google's AI can read and cite it, and Google's mobile speed score. No signup.";
+  "Check any website free in under a minute: search basics, whether ChatGPT, Perplexity, and Google AI can read and cite it, and mobile speed. No signup.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/free-website-check" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/free-website-check" },
-  twitter: { title: TITLE, description: DESCRIPTION },
-};
+export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/free-website-check" });
 
 /**
  * What the checker grades, in plain words. Rendered as static HTML so crawlers

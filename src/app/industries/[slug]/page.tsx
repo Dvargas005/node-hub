@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { Faq, MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
 import { ServiceCta } from "@/components/marketing/pricing-strip";
 import { INDUSTRY_CONTENT, industryFor } from "@/lib/industry-content";
-import { AREA_SERVED, SITE_URL } from "@/lib/seo";
+import { AREA_SERVED, SITE_URL, pageMetadata } from "@/lib/seo";
 import { PROCESS_STEPS } from "@/lib/service-content";
 import { workInIndustry, type IndustrySlug } from "@/lib/work-content";
 
@@ -24,13 +24,7 @@ export async function generateMetadata({
   const c = industryFor(slug);
   if (!c) return {};
   const path = `/industries/${c.slug}`;
-  return {
-    title: c.metaTitle,
-    description: c.metaDescription,
-    alternates: { canonical: path },
-    openGraph: { title: c.metaTitle, description: c.metaDescription, url: path },
-    twitter: { title: c.metaTitle, description: c.metaDescription },
-  };
+  return pageMetadata({ title: c.metaTitle, description: c.metaDescription, path });
 }
 
 export default async function IndustryPage({ params }: { params: Promise<{ slug: string }> }) {

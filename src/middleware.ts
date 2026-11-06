@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
+import { routeAccess } from "@/lib/route-access";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -11,34 +10,10 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/img")) return NextResponse.next();
   if (pathname.includes(".")) return NextResponse.next();
 
-  // API routes — pass through (auth checked in route handlers)
-  if (pathname.startsWith("/api/")) return NextResponse.next();
-
-  // Landing page — always public
-  if (pathname === "/") return NextResponse.next();
-
-  // Hidden Early Adopters landing — public (auth-aware in the page itself)
-  if (pathname === "/early-adopters") return NextResponse.next();
-
-  // Hidden Dedicated Growth retainers landing — public (auth-aware in the page itself)
-  if (pathname === "/dedicated") return NextResponse.next();
-
-  // SEO marketing pages (/services, /locations, /work, /industries and one level below each).
-  // Must stay public: without a session cookie these would 302 to /login, and
-  // crawlers never carry one. Exact segment match so "/servicesX" stays gated.
-  if (/^\/(services|locations|work|industries)(\/[^/]+)?\/?$/.test(pathname)) return NextResponse.next();
-
-  // Free website check: public lead tool, crawlable on purpose
-  if (pathname === "/free-website-check") return NextResponse.next();
-
-  // Terms of Service: public, linked from the footers and checkout
-  if (pathname === "/terms") return NextResponse.next();
-
-  // Public agreement signing (token-gated in the page/API itself)
-  if (pathname.startsWith("/sign-agreement")) return NextResponse.next();
-
-  // Auth pages — always allow (cookie may be expired)
-  if (authPaths.includes(pathname)) return NextResponse.next();
+  // Only the logged-in app is gated (src/lib/route-access.ts). Everything else,
+  // including paths that do not exist, goes to Next so a missing page is a real
+  // 404 instead of a redirect to /login. API routes check auth in each handler.
+  if (routeAccess(pathname) === "public") return NextResponse.next();
 
   // Production uses __Secure- prefix on HTTPS
   const sessionToken =

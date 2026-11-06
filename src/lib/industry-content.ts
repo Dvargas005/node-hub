@@ -29,7 +29,7 @@ export const INDUSTRY_CONTENT: Record<IndustrySlug, IndustryContent> = {
     h1: "Websites and software for small logistics companies",
     metaTitle: "Web Development for 3PLs, Freight, and Logistics Companies",
     metaDescription:
-      "Websites, quote forms, and custom software for small logistics, 3PL, freight, and supply chain firms, from a team that runs its own supply chain software. Plans from $300 per month.",
+      "Websites, quote forms, and custom software for small logistics, 3PL, and freight firms, from a team that runs its own supply chain software. Plans from $300.",
     eyebrow: "LOGISTICS, 3PL, AND FREIGHT",
     lead: [
       "Small logistics, 3PL, freight, and supply chain firms win work on trust and speed, but their websites rarely show either. Shippers want to see the lanes, services, and industries you cover, and a quick way to ask for a quote.",

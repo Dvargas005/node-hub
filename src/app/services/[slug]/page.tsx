@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { Faq, MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
 import { PricingStrip, ServiceCta } from "@/components/marketing/pricing-strip";
 import { getPublicPlans } from "@/lib/public-plans";
-import { AREA_SERVED, CITIES, SERVICES, SITE_URL, type ServiceSlug } from "@/lib/seo";
+import { AREA_SERVED, CITIES, SERVICES, SITE_URL, pageMetadata, type ServiceSlug } from "@/lib/seo";
 import { PROCESS_STEPS, SERVICE_CONTENT } from "@/lib/service-content";
 
 // Static at build, refreshed hourly so a price rotation reaches these pages
@@ -30,13 +30,7 @@ export async function generateMetadata({
   const c = contentFor(slug);
   if (!c) return {};
   const path = `/services/${c.slug}`;
-  return {
-    title: c.metaTitle,
-    description: c.metaDescription,
-    alternates: { canonical: path },
-    openGraph: { title: c.metaTitle, description: c.metaDescription, url: path },
-    twitter: { title: c.metaTitle, description: c.metaDescription },
-  };
+  return pageMetadata({ title: c.metaTitle, description: c.metaDescription, path });
 }
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {

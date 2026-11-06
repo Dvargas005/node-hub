@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { pageMetadata } from "@/lib/seo";
 
 const TITLE = "Terms of Service";
 const DESCRIPTION =
-  "Terms of Service for N.O.D.E. by Nouvos Solutions LLC: plans, minimum terms, automatic renewal, cancellation, credits, revisions, and ownership.";
+  "Terms of Service for NODE by Nouvos (Nouvos Solutions LLC): plans, minimum terms, renewal, cancellation, credits, revisions, and ownership.";
 const EFFECTIVE = "October 12, 2026";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/terms" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/terms" },
-  twitter: { title: TITLE, description: DESCRIPTION },
-};
+export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/terms" });
 
 /**
  * Keep every statement here in sync with the code and docs/pricing-option-c/README.md

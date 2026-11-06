@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
 import { ServiceCta } from "@/components/marketing/pricing-strip";
 import { industryFor } from "@/lib/industry-content";
-import { SERVICES, SITE_URL } from "@/lib/seo";
+import { SERVICES, SITE_URL, pageMetadata } from "@/lib/seo";
 import { WORK, workFor } from "@/lib/work-content";
 
 export const dynamicParams = false;
@@ -23,13 +23,7 @@ export async function generateMetadata({
   const w = workFor(slug);
   if (!w) return {};
   const path = `/work/${w.slug}`;
-  return {
-    title: w.metaTitle,
-    description: w.metaDescription,
-    alternates: { canonical: path },
-    openGraph: { title: w.metaTitle, description: w.metaDescription, url: path },
-    twitter: { title: w.metaTitle, description: w.metaDescription },
-  };
+  return pageMetadata({ title: w.metaTitle, description: w.metaDescription, path });
 }
 
 export default async function WorkPage({ params }: { params: Promise<{ slug: string }> }) {

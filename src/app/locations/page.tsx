@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
-import { ADDRESS, CITIES } from "@/lib/seo";
+import { ADDRESS, CITIES, pageMetadata } from "@/lib/seo";
 
 const TITLE = "Locations: Chicago, Evanston, Milwaukee, Kenosha, Indiana";
 const DESCRIPTION =
-  "NODE by Nouvos serves businesses in Chicago and its suburbs, Evanston, Lake County, Kenosha, Milwaukee, Northwest Indiana, Indianapolis, and Dallas from its headquarters in Evanston, IL.";
+  "NODE by Nouvos serves Chicago and suburbs, Evanston, Lake County, Kenosha, Milwaukee, Northwest Indiana, Indianapolis, and Dallas from Evanston, IL.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/locations" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/locations" },
-  twitter: { title: TITLE, description: DESCRIPTION },
-};
+export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/locations" });
 
 export default function LocationsIndex() {
   return (
