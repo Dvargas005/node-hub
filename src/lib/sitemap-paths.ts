@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { GUIDES } from "@/lib/guide-content";
 import { INDUSTRY_CONTENT } from "@/lib/industry-content";
 import { CITIES, SERVICES } from "@/lib/seo";
 import { WORK } from "@/lib/work-content";
@@ -25,6 +26,8 @@ export function sitemapPaths(): { path: string; changeFrequency: Freq; priority:
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    { path: "/guides", changeFrequency: "weekly", priority: 0.7 },
+    ...GUIDES.map((g) => ({ path: `/guides/${g.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
   ];
 }

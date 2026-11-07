@@ -167,3 +167,11 @@ Auditoria completa: `Projects\WAIPAX\NODE-listings\seo-geo-aeo-audit-2026-11-06.
 - `/about`, `/contact`, `/pricing`: precios de la DB (`getPublicPlans`, `getPublicAddOns`, `getOnDemandPrice`). Contacto publico
   = support@nouvos.one (Erich, 2026-11-06: se queda el dominio nouvos.one). Sin formulario de contacto a proposito.
 - About solo lleva hechos confirmados y ya publicos. Ninguna certificacion o clasificacion sin confirmacion de Erich.
+
+## Guias (2026-11-06)
+`/guides` y `/guides/[slug]`, fuente unica `src/lib/guide-content.ts` (Article + FAQPage schema, autor = la organizacion).
+- Cada guia abre con una respuesta corta ("Short answer") que responde el titulo sola: es lo que citan Google y los asistentes de IA.
+- Sin estadisticas de mercado ni precios de competidores (no hay fuente). Nuestros numeros deben coincidir con los planes.
+- `npx tsx --test src/lib/guide-content.test.ts` bloquea "unlimited revisions", "no contract", "24/7", "delivered in", "discount",
+  guiones largos, "month to month" sin minimo, meta descriptions de mas de 160 caracteres y links internos rotos.
+- Al editar una guia, subir su `updated` (alimenta el sitemap y el `dateModified`).

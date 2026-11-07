@@ -113,6 +113,14 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               </li>
               <li>
                 <Link
+                  href="/guides"
+                  className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
+                >
+                  Guides
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/work"
                   className={`text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
                 >
