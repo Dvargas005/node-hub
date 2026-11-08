@@ -175,3 +175,12 @@ Auditoria completa: `Projects\WAIPAX\NODE-listings\seo-geo-aeo-audit-2026-11-06.
 - `npx tsx --test src/lib/guide-content.test.ts` bloquea "unlimited revisions", "no contract", "24/7", "delivered in", "discount",
   guiones largos, "month to month" sin minimo, meta descriptions de mas de 160 caracteres y links internos rotos.
 - Al editar una guia, subir su `updated` (alimenta el sitemap y el `dateModified`).
+
+## Paginas de ciudad (2026-11-08)
+`src/lib/city-content.ts`: ademas de `lead` y `faqs`, cada ciudad puede tener `sections` (texto propio de esa metro),
+`work` (casos de estudio) y `guides` (slugs de guias). La pagina dice que los casos no son de esa ciudad: no inventar clientes locales.
+- Prioridad por datos de Search Console (28 dias a 2026-11-06): Northwest Indiana (posicion 17 a 47, el mas cerca de pagina 1),
+  Indianapolis (1,044 impresiones, posicion 79) y Milwaukee (389, posicion 55). Revisar ahi antes de tocar otras ciudades.
+- `npx tsx --test src/lib/city-content.test.ts` bloquea "N.O.D.E." en el texto (la marca para buscadores es NODE by Nouvos;
+  el logotipo del header sigue siendo N.O.D.E.), "runs the SEO" (SEO es add-on), las frases prohibidas de siempre, guiones largos,
+  titulos de mas de 75 con el sufijo, descripciones de mas de 160 y links a casos o guias que no existen.
