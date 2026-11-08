@@ -1,3 +1,5 @@
+import { GUIDES } from "@/lib/guide-content";
+
 /**
  * When each public page last changed in a way a search engine should recrawl
  * for: its main copy, its structured data, or the links on it. The sitemap's
@@ -9,6 +11,7 @@
  * site where it moves without the content moving, which is what happened when
  * the sitemap stamped every URL with the build time.
  *
+ * Guides carry their own `updated` date in src/lib/guide-content.ts and are merged in below.
  * page-dates.test.ts fails if a sitemap URL has no entry here.
  */
 export const PAGE_UPDATED: Record<string, string> = {
@@ -42,6 +45,8 @@ export const PAGE_UPDATED: Record<string, string> = {
   "/work/we-all-related": "2026-11-06",
   "/work/zanapronto": "2026-11-06",
   "/industries/logistics": "2026-11-06",
+  "/guides": "2026-11-06",
+  ...Object.fromEntries(GUIDES.map((g) => [`/guides/${g.slug}`, g.updated])),
 };
 
 /** Last-updated date for a site-relative path, or undefined if it has none. */

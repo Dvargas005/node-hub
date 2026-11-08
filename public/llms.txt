@@ -11,6 +11,14 @@
 - [About](https://www.nodedev.one/about): Who runs the company, registration facts (SAM.gov UEI D2WRAJAE2AR3, CAGE 262A0), and how we work.
 - [Contact](https://www.nodedev.one/contact): Email, phone, WhatsApp, discovery call, and mailing address.
 
+## Guides
+- [All guides](https://www.nodedev.one/guides)
+- [How much does a small business website cost?](https://www.nodedev.one/guides/small-business-website-cost)
+- [Website subscription vs. agency project](https://www.nodedev.one/guides/website-subscription-vs-agency)
+- [How to get your business recommended by ChatGPT and other AI assistants](https://www.nodedev.one/guides/get-recommended-by-chatgpt)
+- [SEO vs. GEO vs. AEO: what is the difference?](https://www.nodedev.one/guides/seo-vs-geo-vs-aeo)
+- [What should a logistics or 3PL company website include?](https://www.nodedev.one/guides/logistics-company-website)
+
 ## Services
 - [Web Development](https://www.nodedev.one/services/web-development): Custom websites and web applications built on Next.js and TypeScript.
 - [App Development](https://www.nodedev.one/services/app-development): iOS and Android apps from one shared codebase, through store submission.
