@@ -49,7 +49,7 @@ export const WORK: WorkItem[] = [
     liveUrl: "https://weclogistic.net",
     metaTitle: "WECL Logistics Website: Case Study",
     metaDescription:
-      "How NODE by Nouvos built an editorial website for WECL, a supply chain and logistics consulting firm: services, industries, insights, and a clear path to contact.",
+      "How NODE by Nouvos built an editorial website for WECL, a supply chain and logistics consulting firm: services, industries, insights, and a clear contact path.",
     h1: "An editorial website for a logistics consulting firm",
     summary:
       "World Enterprise Complete Logistics (WECL) advises companies on supply chain and logistics. We designed and built a multi-page site that explains what they do, who they do it for, and how to start a conversation.",
@@ -90,7 +90,7 @@ export const WORK: WorkItem[] = [
     liveUrl: "https://conovateinc.com",
     metaTitle: "COnovate Website Rebuild: WordPress to Astro Case Study",
     metaDescription:
-      "How NODE by Nouvos replaced a WordPress and Elementor site for COnovate, a Wauwatosa, WI battery materials company, with a fast static site, a news section, and redirects for every old URL.",
+      "How NODE by Nouvos moved COnovate, a Wauwatosa, WI battery materials company, off WordPress and Elementor to a fast static site with redirects for old URLs.",
     h1: "Rebuilding a battery materials startup's site off WordPress",
     summary:
       "COnovate, Inc. develops advanced anode materials for lithium-ion batteries. We replaced their WordPress and Elementor theme site with a clean, fast static site they can grow.",
@@ -132,7 +132,7 @@ export const WORK: WorkItem[] = [
     liveUrl: "https://weallrelated.com",
     metaTitle: "W.A.R. We All Related Website: Case Study",
     metaDescription:
-      "How NODE by Nouvos built a fast static website for W.A.R. (We All Related), a Detroit apparel movement, with every call to action routed straight to the founder.",
+      "How NODE by Nouvos built a fast static site for W.A.R. (We All Related), a Detroit apparel movement, with every call to action routed straight to the founder.",
     h1: "A brand site for a Detroit apparel movement",
     summary:
       "W.A.R. (We All Related) is a Detroit apparel movement. We built a site that carries the brand's message and its collection, and sends every inquiry straight to the founder.",
@@ -169,7 +169,7 @@ export const WORK: WorkItem[] = [
     liveUrl: "https://www.zanapronto.com",
     metaTitle: "Zanapronto: Multi-Tenant Healthcare SaaS Built by Nouvos",
     metaDescription:
-      "Zanapronto is a Nouvos product: a multi-tenant platform for doctors with a public page per doctor, self-service booking, a patient portal, and messaging over WhatsApp, email, and in-app, with mobile apps.",
+      "Zanapronto, a Nouvos product: a multi-tenant platform for doctors with booking, a patient portal, WhatsApp, email, and in-app messaging, and mobile apps.",
     h1: "A multi-tenant platform for doctors and their patients",
     summary:
       "Zanapronto is our own product, not a client project. It is the kind of system NODE builds when a project goes past a website: multi-tenant software with a web app, mobile apps, and messaging.",

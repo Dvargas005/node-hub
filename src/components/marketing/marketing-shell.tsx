@@ -41,10 +41,10 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               Work
             </Link>
             <Link
-              href="/#pricing"
+              href="/pricing"
               className={`hidden sm:inline font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#F5F6FC]/70 hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}
             >
-              Plans
+              Pricing
             </Link>
             <Link
               href="/free-website-check"
@@ -170,6 +170,18 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
         </div>
         <p className="max-w-7xl mx-auto px-4 md:px-12 pb-10 font-[family-name:var(--font-atkinson)] text-xs text-[#F5F6FC]/50">
           © 2026 Nouvos Solutions LLC ·{" "}
+          {[
+            ["/about", "About"],
+            ["/pricing", "Pricing"],
+            ["/contact", "Contact"],
+          ].map(([href, label]) => (
+            <span key={href}>
+              <Link href={href} className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
+                {label}
+              </Link>{" "}
+              ·{" "}
+            </span>
+          ))}
           <a href="/terms" className={`hover:text-[#FFC919] transition-colors duration-200 ${focusRing}`}>
             Terms of Service
           </a>{" "}

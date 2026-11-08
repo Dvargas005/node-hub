@@ -137,7 +137,7 @@ Plan, reglas y backlog de posicionamiento en `docs/positioning/README.md`.
 - Clientes nombrables (Erich, 2026-10-28): WECL, COnovate, W.A.R. Nunca el cliente de e-commerce que pidio no ser nombrado.
 - Zanapronto aparece como "Nouvos product", no como cliente. WAIPAX espera a que www.waipax.com responda (404 el 2026-10-28).
 - Sin numeros de resultados hasta que el cliente los envie: `results` queda undefined y la seccion no se renderiza. Sin citas/testimonios.
-- Rutas publicas nuevas deben agregarse al regex de `src/middleware.ts`; si no, redirigen a /login y Google no las ve.
+- Rutas publicas: ver "SEO tecnico" abajo (`src/lib/route-access.ts`).
 
 ## Free website check (2026-10-29)
 `/free-website-check` (pagina + FAQ/WebApplication schema) y `POST /api/website-check`. Publico, sin login, no guarda nada.
@@ -150,3 +150,20 @@ Logica y pruebas: `src/lib/website-check.ts`, `npx tsx --test src/lib/website-ch
   (gratis, 25k consultas/dia). No usar la key `outreach-places-pagespeed`: incluye Places, que si cobra.
 - Mismas senales que `site_audit.py` de Agents outreach (copyright viejo, tap-to-call, PageSpeed) para que el outreach y la herramienta coincidan.
 - Copy sin precios. CTA = /register y la pagina de GEO.
+
+## SEO tecnico (2026-11-06)
+Auditoria completa: `Projects\WAIPAX\NODE-listings\seo-geo-aeo-audit-2026-11-06.md` (fuera de este repo a proposito).
+- Acceso por ruta: `src/lib/route-access.ts`. Solo la app con login (`PROTECTED_SEGMENTS`) redirige a /login; todo lo demas
+  pasa a Next, asi una URL inexistente da 404 real (antes daba 307 a /login). Cada carpeta nueva de primer nivel en `src/app`
+  debe clasificarse en `PROTECTED_SEGMENTS` o `PUBLIC_SEGMENTS`; `npx tsx --test src/lib/route-access.test.ts` falla si no.
+  Una ruta de la app sin clasificar quedaria PUBLICA: correr ese test antes de cada PR que agregue rutas.
+- Metadata de paginas publicas: usar SIEMPRE `pageMetadata()` de `src/lib/seo.ts`. Un `openGraph` armado a mano reemplaza
+  el del layout y la pagina queda sin imagen para compartir. Imagen: `public/img/og-card.png` (1200x630).
+- Marca para buscadores: `ORG_NAME` = "NODE by Nouvos"; N.O.D.E. solo como alternateName. Logo del schema = `/icon-512.png`
+  (el PNG blanco no se ve sobre fondo blanco). Meta descriptions de 160 caracteres o menos.
+- Sitemap: `<lastmod>` sale de `src/lib/page-dates.ts`, no de la hora del build. Al cambiar el copy, schema o links de una
+  pagina, subir su fecha en el mismo commit (IndexNow solo avisa URLs con lastmod de los ultimos 3 dias). Lista de URLs en
+  `src/lib/sitemap-paths.ts`; `src/lib/page-dates.test.ts` exige fecha para cada una.
+- `/about`, `/contact`, `/pricing`: precios de la DB (`getPublicPlans`, `getPublicAddOns`, `getOnDemandPrice`). Contacto publico
+  = support@nouvos.one (Erich, 2026-11-06: se queda el dominio nouvos.one). Sin formulario de contacto a proposito.
+- About solo lleva hechos confirmados y ya publicos. Ninguna certificacion o clasificacion sin confirmacion de Erich.

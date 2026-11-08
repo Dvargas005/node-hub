@@ -867,6 +867,10 @@ export default function Home() {
           {CITIES.map((c) => (
             <a key={c.slug} href={`/locations/${c.slug}`} className="hover:text-[#FFC919] transition-colors">{c.label}</a>
           ))}
+          <a href="/about" className="hover:text-[#FFC919] transition-colors">About</a>
+          <a href="/pricing" className="hover:text-[#FFC919] transition-colors">Pricing</a>
+          <a href="/contact" className="hover:text-[#FFC919] transition-colors">Contact</a>
+          <a href="/work" className="hover:text-[#FFC919] transition-colors">Our work</a>
           <a href="/terms" className="hover:text-[#FFC919] transition-colors">Terms of Service</a>
           <a href="/capability-statement.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#FFC919] transition-colors">Capability Statement (PDF)</a>
         </nav>

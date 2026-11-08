@@ -34,7 +34,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Web development on a monthly subscription",
     metaTitle: "Web Development Services by Subscription",
     metaDescription:
-      "Landing pages, business websites, online stores, and custom web tools built by an in-house team. Flat monthly plans from $300, with target turnaround of 2 to 5 business days, subject to scope.",
+      "Websites, online stores, and web tools built by an in-house team on flat monthly plans from $300. Target turnaround of 2 to 5 business days, subject to scope.",
     eyebrow: "WEB DEVELOPMENT",
     lead: [
       "Most small and midsize businesses buy a website once, pay a large invoice, and then watch it go stale because every change is a new quote. N.O.D.E. works the other way: one monthly plan, a team that already knows your site, and changes delivered in days instead of billed by the hour.",
@@ -106,7 +106,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Mobile app development for iOS and Android",
     metaTitle: "Mobile App Development Services (iOS and Android)",
     metaDescription:
-      "iOS and Android apps designed, built, and taken through App Store and Google Play review by the team that ships Nouvos products. Scoped per project after a discovery call.",
+      "iOS and Android apps designed, built, and taken through App Store and Google Play review by the team behind Nouvos products. Quoted per project.",
     eyebrow: "APP DEVELOPMENT",
     lead: [
       "An app is a product, not a page. It has to pass App Store and Google Play review, survive operating system updates, and keep working after launch. N.O.D.E. builds apps with the same team that designs, ships, and operates Nouvos's own products.",
@@ -174,7 +174,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Custom software development",
     metaTitle: "Custom Software Development Services",
     metaDescription:
-      "Multi-tenant SaaS platforms, internal tools, and system integrations built by the team behind Nouvos's production supply chain software. Scoped per project after a discovery call.",
+      "Multi-tenant SaaS, internal tools, and integrations from the team behind Nouvos's own supply chain software. Scoped and quoted per project.",
     eyebrow: "SOFTWARE DEVELOPMENT",
     lead: [
       "N.O.D.E. comes out of Nouvos Solutions, a technology company that builds and runs its own software in production, including supply chain systems for transportation, orders, and warehouses. That is the experience we bring to custom software: multi-tenant architecture, real deadlines, and systems that keep running after the demo.",
@@ -242,7 +242,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "SEO services",
     metaTitle: "SEO Services: Technical, Local and On-Page SEO",
     metaDescription:
-      "Rank on Google and Bing for the searches that bring customers. Technical SEO, local SEO, structured data, and ongoing content. An add-on to any plan from $1,250 a month.",
+      "Rank on Google and Bing for the searches that bring customers: technical, local, and on-page SEO and structured data. An add-on to any plan from $1,250 a month.",
     eyebrow: "SEO",
     lead: [
       "Most small and midsize businesses rank for their own name and nothing else. Search engine optimization closes that gap: it gets the pages that describe what you sell in front of the people searching for it on Google and Bing.",
@@ -310,7 +310,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Generative engine optimization (GEO) agency",
     metaTitle: "Generative Engine Optimization (GEO) Agency & Services",
     metaDescription:
-      "GEO services that get your business named and cited by ChatGPT, Perplexity, Gemini, Claude, and Copilot. AI visibility audits, entity and structured data work, and monthly monitoring. Part of the $4,000 a month Full SEO, GEO, and AEO add-on.",
+      "GEO services that get your business named and cited by ChatGPT, Perplexity, Gemini, Claude, and Copilot. Part of the $4,000 a month SEO, GEO, and AEO add-on.",
     eyebrow: "GENERATIVE ENGINE OPTIMIZATION",
     lead: [
       "Generative engine optimization (GEO) is the practice of making your business the one an AI assistant names when someone asks it for a recommendation. When a buyer asks ChatGPT, Perplexity, Gemini, Claude, or Copilot which company to hire, the assistant writes an answer from sources it can read and trust. GEO makes sure your business is one of those sources.",
@@ -382,7 +382,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     h1: "Answer engine optimization (AEO)",
     metaTitle: "Answer Engine Optimization (AEO) Services",
     metaDescription:
-      "What is AEO? Answer engine optimization structures your content so Google, Bing, AI assistants, and voice assistants can lift your answer directly into their results. Part of the $4,000 a month Full SEO, GEO, and AEO add-on.",
+      "What is AEO? Structuring content so Google, Bing, and AI and voice assistants quote it as the answer. Part of the $4,000 a month SEO, GEO, and AEO add-on.",
     eyebrow: "ANSWER ENGINE OPTIMIZATION",
     lead: [
       "Answer engine optimization (AEO) means structuring your content so that search engines and assistants can take your answer and show it directly: in a featured snippet, an AI Overview, a ChatGPT or Perplexity answer, or a response read aloud by a voice assistant. The searcher gets the answer without clicking through a list of links, and your business is the one that supplied it.",

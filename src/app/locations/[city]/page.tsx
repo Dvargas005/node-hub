@@ -6,7 +6,7 @@ import { Faq, MarketingShell, focusRing } from "@/components/marketing/marketing
 import { PricingStrip, ServiceCta } from "@/components/marketing/pricing-strip";
 import { CITY_CONTENT } from "@/lib/city-content";
 import { getPublicPlans } from "@/lib/public-plans";
-import { CITIES, SERVICES, SITE_URL, areaServedFor, type CitySlug } from "@/lib/seo";
+import { CITIES, SERVICES, SITE_URL, areaServedFor, pageMetadata, type CitySlug } from "@/lib/seo";
 
 export const revalidate = 3600;
 export const dynamicParams = false;
@@ -31,13 +31,7 @@ export async function generateMetadata({
   if (!found) return {};
   const { content } = found;
   const path = `/locations/${content.slug}`;
-  return {
-    title: content.metaTitle,
-    description: content.metaDescription,
-    alternates: { canonical: path },
-    openGraph: { title: content.metaTitle, description: content.metaDescription, url: path },
-    twitter: { title: content.metaTitle, description: content.metaDescription },
-  };
+  return pageMetadata({ title: content.metaTitle, description: content.metaDescription, path });
 }
 
 export default async function LocationPage({ params }: { params: Promise<{ city: string }> }) {

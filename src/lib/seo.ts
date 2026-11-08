@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 /**
  * Shared SEO constants for the N.O.D.E. hub.
  *
@@ -12,18 +14,30 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 /**
- * Default Open Graph / Twitter share image.
- *
- * STOPGAP: hero.png is 1264x842 (3:2), not the 1200x630 (1.91:1) that Facebook,
- * LinkedIn, X, and Slack crop to. It renders, but it gets letterboxed. Replace
- * with a purpose-built 1200x630 card and update this constant.
+ * Default Open Graph / Twitter share image: a purpose-built 1200x630 card
+ * (1.91:1, what Facebook, LinkedIn, X, and Slack crop to), about 80 KB.
+ * Every page gets it through pageMetadata(); before that only the home page
+ * had a share image, because a page-level `openGraph` replaces the layout's
+ * whole object, images included.
  */
-export const OG_IMAGE = "/img/hero.png";
-export const OG_IMAGE_WIDTH = 1264;
-export const OG_IMAGE_HEIGHT = 842;
+export const OG_IMAGE = "/img/og-card.png";
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+export const OG_IMAGE_ALT = "NODE by Nouvos: web development on one monthly plan";
 
-export const ORG_NAME = "N.O.D.E. by Nouvos";
+/**
+ * Search-facing brand. Plain "NODE": searchers type "node", and "N.O.D.E."
+ * tokenizes as four single letters. N.O.D.E. stays as an alternateName.
+ */
+export const ORG_NAME = "NODE by Nouvos";
+
+/** Organization logo for search results. The square app icon reads on white; the white wordmark PNG did not. */
+export const LOGO_URL = "/icon-512.png";
+
 export const LEGAL_NAME = "Nouvos Solutions LLC";
+
+/** Schema @id for the founder, so the Organization and the About page describe one person. */
+export const FOUNDER_ID = `${SITE_URL}/about#erich-betancourt`;
 export const CONTACT_EMAIL = "support@nouvos.one";
 
 /** Profiles that describe the same business. Keep in sync with the directory listings. */
@@ -89,6 +103,38 @@ export type ServiceSlug = (typeof SERVICES)[number]["slug"];
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = "/"): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/**
+ * Metadata for a public page: title, description, canonical, and complete
+ * Open Graph + Twitter blocks with the share image. Use this instead of
+ * hand-building `openGraph`, which silently drops the layout's image.
+ */
+export function pageMetadata({
+  title,
+  description,
+  path,
+}: {
+  title: string;
+  description: string;
+  path: string;
+}): Metadata {
+  const image = { url: OG_IMAGE, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, alt: OG_IMAGE_ALT };
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      title,
+      description,
+      url: path,
+      siteName: ORG_NAME,
+      locale: "en_US",
+      type: "website",
+      images: [image],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
+  };
 }
 
 export const PHONE = "+1-224-640-1785";

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { ON_DEMAND_PLAN_SLUG } from "@/lib/credit-pricing";
 import { flexSlug } from "@/lib/plan-terms";
 
 export interface PublicPlan {
@@ -53,3 +54,38 @@ export async function getPublicPlans(): Promise<PublicPlan[]> {
 
 export const formatUsd = (dollars: number) =>
   `$${dollars.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+export interface PublicAddOn {
+  slug: string;
+  name: string;
+  /** Dollars, not cents. */
+  priceMonthly: number;
+  minTermMonths: number;
+}
+
+/** Active SEO / GEO / AEO add-ons, cheapest tier first. Same table checkout reads. [] if the DB is unreachable. */
+export async function getPublicAddOns(): Promise<PublicAddOn[]> {
+  try {
+    const rows = await db.addOn.findMany({ where: { isActive: true }, orderBy: { rank: "asc" } });
+    return rows.map((r) => ({
+      slug: r.slug,
+      name: r.name,
+      priceMonthly: r.priceMonthly / 100,
+      minTermMonths: r.minTermMonths,
+    }));
+  } catch (err) {
+    console.error("[PUBLIC_PLANS] Failed to load add-ons:", err);
+    return [];
+  }
+}
+
+/** On demand: one month of platform access, no renewal. null if the row is missing or the DB is unreachable. */
+export async function getOnDemandPrice(): Promise<number | null> {
+  try {
+    const row = await db.plan.findFirst({ where: { slug: ON_DEMAND_PLAN_SLUG, isActive: true } });
+    return row ? row.priceMonthly / 100 : null;
+  } catch (err) {
+    console.error("[PUBLIC_PLANS] Failed to load On demand:", err);
+    return null;
+  }
+}

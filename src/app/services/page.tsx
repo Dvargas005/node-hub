@@ -2,19 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
-import { SERVICES, SITE_URL } from "@/lib/seo";
+import { SERVICES, SITE_URL, pageMetadata } from "@/lib/seo";
 
 const TITLE = "Web, App & Software Development and SEO Services";
 const DESCRIPTION =
-  "N.O.D.E. services: web development, mobile app development, custom software development, and SEO, GEO and AEO, delivered by an in-house team. Web work runs on a monthly subscription; apps and custom software are quoted per project.";
+  "Web development, mobile apps, custom software, and SEO, GEO, and AEO from an in-house team. Web work is on monthly plans; apps and software are quoted.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/services" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/services" },
-  twitter: { title: TITLE, description: DESCRIPTION },
-};
+export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/services" });
 
 export default function ServicesIndex() {
   const schema = {

@@ -26,7 +26,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "chicago-il",
     metaTitle: "Web, App & Software Development in Chicago, IL",
     metaDescription:
-      "Chicago web development, app development, custom software, and SEO from N.O.D.E., headquartered in Evanston, IL. Flat monthly plans from $300.",
+      "Chicago web development, app development, custom software, and SEO add-ons from NODE by Nouvos, headquartered in Evanston, IL. Monthly plans from $300.",
     h1: "Web, app, and software development in Chicago",
     areasHeading: "Chicago suburbs we serve",
     areasIntro:
@@ -93,7 +93,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "lake-county-il",
     metaTitle: "Web Design & Development in Lake County, IL",
     metaDescription:
-      "Web design, web development, apps, and custom software for Lake County, IL businesses in Waukegan, Gurnee, Libertyville, and Lake Forest. In person by appointment. Plans from $300.",
+      "Web design, development, apps, and software for Lake County, IL businesses in Waukegan, Gurnee, Libertyville, and Lake Forest. In person by appointment.",
     h1: "Web design and development in Lake County, Illinois",
     areasHeading: "Lake County communities we serve",
     areasIntro:
@@ -126,7 +126,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "kenosha-wi",
     metaTitle: "Web Design & Development in Kenosha, WI",
     metaDescription:
-      "Kenosha and Racine web design, web development, apps, and custom software from NODE by Nouvos. In person across southeastern Wisconsin. Plans from $300; SEO as an add-on.",
+      "Kenosha and Racine web design, development, apps, and custom software from NODE by Nouvos. In person across southeastern Wisconsin. Plans from $300.",
     h1: "Web design and development in Kenosha",
     areasHeading: "Kenosha and Racine County communities we serve",
     areasIntro: "We work in person across Kenosha and Racine counties along the I-94 corridor.",
@@ -159,7 +159,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "northwest-indiana",
     metaTitle: "Web Design & Development in Northwest Indiana",
     metaDescription:
-      "Web design, web development, apps, and custom software for Northwest Indiana businesses in Hammond, Merrillville, Crown Point, and Valparaiso. Central Time. Plans from $300.",
+      "Web design, development, apps, and custom software for Northwest Indiana businesses in Hammond, Merrillville, Crown Point, and Valparaiso. From $300/mo.",
     h1: "Web design and development in Northwest Indiana",
     areasHeading: "Northwest Indiana communities we serve",
     areasIntro:
@@ -193,7 +193,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "milwaukee-wi",
     metaTitle: "Milwaukee Software Development Agency & Web Developers",
     metaDescription:
-      "Software development agency and web developers for Milwaukee businesses: websites, apps, and custom software from NODE by Nouvos, on Central Time. Monthly plans from $300.",
+      "Software development agency and web developers for Milwaukee businesses: websites, apps, and custom software from NODE by Nouvos. Monthly plans from $300.",
     h1: "Software development agency and web developers for Milwaukee",
     areasHeading: "Milwaukee suburbs we serve",
     areasIntro:
@@ -226,7 +226,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "dallas-tx",
     metaTitle: "Web, App & Software Development in Dallas, TX",
     metaDescription:
-      "Dallas web development, app development, custom software, and SEO from N.O.D.E., on Central Time. Flat monthly plans from $300, with target turnaround of 2 to 5 business days, subject to scope.",
+      "Dallas web development, app development, custom software, and SEO add-ons from NODE by Nouvos, served remotely on Central Time. Monthly plans from $300.",
     h1: "Web, app, and software development in Dallas",
     areasHeading: "Dallas-Fort Worth cities we serve",
     areasIntro:
@@ -259,7 +259,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     slug: "indianapolis-in",
     metaTitle: "Indianapolis Web Development Company & App Developers",
     metaDescription:
-      "Web development company serving Indianapolis and central Indiana: websites, mobile apps, and custom software from NODE by Nouvos. Monthly plans from $300; apps quoted per project.",
+      "Web development company for Indianapolis and central Indiana: websites, mobile apps, and custom software from NODE by Nouvos. Monthly plans from $300.",
     h1: "Web development company for Indianapolis businesses",
     areasHeading: "Indianapolis suburbs we serve",
     areasIntro:

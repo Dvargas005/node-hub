@@ -2,20 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, pageMetadata } from "@/lib/seo";
 import { WORK } from "@/lib/work-content";
 
 const TITLE = "Our Work: Websites, Apps, and Software We Have Built";
 const DESCRIPTION =
-  "Case studies from NODE by Nouvos: websites for a logistics consulting firm, a battery materials startup, and an apparel brand, plus Zanapronto, our own multi-tenant healthcare platform.";
+  "Case studies from NODE by Nouvos: sites for a logistics consulting firm, a battery materials startup, and an apparel brand, plus our platform Zanapronto.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/work" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/work" },
-  twitter: { title: TITLE, description: DESCRIPTION },
-};
+export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: "/work" });
 
 export default function WorkIndex() {
   const schema = {
