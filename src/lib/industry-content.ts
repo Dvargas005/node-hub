@@ -3,7 +3,7 @@ import type { IndustrySlug } from "@/lib/work-content";
 /**
  * Long-form copy for the /industries/[slug] pages.
  *
- * Same rules as service-content.ts: every claim must be true of N.O.D.E. today.
+ * Same rules as service-content.ts: every claim must be true of NODE today.
  * Websites and small web tools run on plan credits; portals, integrations, and
  * apps are quoted per project. SEO is an add-on, never inside a plan. A new
  * industry only gets a page when there is real work to point at (see WORK).
@@ -33,7 +33,7 @@ export const INDUSTRY_CONTENT: Record<IndustrySlug, IndustryContent> = {
     eyebrow: "LOGISTICS, 3PL, AND FREIGHT",
     lead: [
       "Small logistics, 3PL, freight, and supply chain firms win work on trust and speed, but their websites rarely show either. Shippers want to see the lanes, services, and industries you cover, and a quick way to ask for a quote.",
-      "N.O.D.E. is operated by Nouvos Solutions LLC, which builds and runs its own production supply chain software for transportation, order, and warehouse management. We already speak the language of loads, lanes, and warehouses, so you spend less time explaining your business and more time reviewing finished work.",
+      "NODE is operated by Nouvos Solutions LLC, which builds and runs its own production supply chain software for transportation, order, and warehouse management. We already speak the language of loads, lanes, and warehouses, so you spend less time explaining your business and more time reviewing finished work.",
     ],
     needs: [
       {
@@ -66,7 +66,7 @@ export const INDUSTRY_CONTENT: Record<IndustrySlug, IndustryContent> = {
     faqs: [
       {
         q: "Do you only work with logistics companies?",
-        a: "No. N.O.D.E. serves small businesses in many industries. Logistics is a focus because Nouvos builds and runs its own supply chain software, so we understand how these businesses work.",
+        a: "No. NODE serves small businesses in many industries. Logistics is a focus because Nouvos builds and runs its own supply chain software, so we understand how these businesses work.",
       },
       {
         q: "Can you build a customer portal or connect to our TMS or WMS?",

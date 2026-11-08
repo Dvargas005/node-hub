@@ -1,4 +1,5 @@
 import type { CitySlug } from "@/lib/seo";
+import type { WorkSlug } from "@/lib/work-content";
 
 /**
  * Copy for /locations/[city].
@@ -18,6 +19,17 @@ export interface CityContent {
   /** Heading and intro for the suburbs list rendered from CITIES[].suburbs. */
   areasHeading: string;
   areasIntro: string;
+  /**
+   * Longer, metro-specific sections rendered after the services grid. Added
+   * where Search Console shows real impressions, so the page answers what
+   * those searchers want. Same rule as the lead: true and specific, no
+   * invented local clients.
+   */
+  sections?: { heading: string; paragraphs: string[]; bullets?: string[] }[];
+  /** Case studies to show as proof. None of them are in this metro; the page says so. */
+  work?: WorkSlug[];
+  /** Guide slugs from guide-content.ts to link as further reading. */
+  guides?: string[];
   faqs: { q: string; a: string }[];
 }
 
@@ -32,12 +44,14 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     areasIntro:
       "Beyond the city we work with businesses across Cook, DuPage, and Will counties. Evanston and the North Shore, and Lake County, each have their own page.",
     lead: [
-      "N.O.D.E. is headquartered in Evanston, just north of Chicago, which makes Chicagoland our home market. We build websites, mobile apps, and custom software for Chicago businesses, and we offer the SEO that gets them found as an add-on to any plan.",
+      "NODE is headquartered in Evanston, just north of Chicago, which makes Chicagoland our home market. We build websites, mobile apps, and custom software for Chicago businesses, and we offer the SEO that gets them found as an add-on to any plan.",
       "Our parent company, Nouvos Solutions, builds software for transportation, orders, and warehouses. Chicago is the center of the country's freight rail network and one of its largest logistics markets, so we know the operations side of the businesses we build for here, not only the marketing side.",
     ],
+    work: ["wecl", "we-all-related"],
+    guides: ["small-business-website-cost", "website-subscription-vs-agency", "get-recommended-by-chatgpt"],
     faqs: [
       {
-        q: "Where is N.O.D.E. located?",
+        q: "Where is NODE located?",
         a: "Our headquarters is at 909 Davis Street, Suite 500, Evanston, IL 60201, on Chicago's North Shore. We serve businesses across Chicago and the surrounding suburbs.",
       },
       {
@@ -50,7 +64,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do we need to meet in person?",
-        a: "No, but you can. We work in person across Chicagoland, and most work runs through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
+        a: "No, but you can. We work in person across Chicagoland, and most work runs through video calls and the NODE platform, where you brief work, review it, and approve it.",
       },
     ],
   },
@@ -69,6 +83,8 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       "Most Evanston businesses are independent: restaurants and shops downtown and along Central Street and Main Street, professional practices, and companies that grew up around Northwestern University. They tend to need the same things: a fast site that shows up in local searches, hours and menus that stay current, and pages that turn visits into calls and bookings.",
       "The Member plan includes hosting and small edits, so a local business can hand off the website entirely instead of juggling a host, a developer, and a designer.",
     ],
+    work: ["wecl", "we-all-related"],
+    guides: ["small-business-website-cost", "website-subscription-vs-agency", "get-recommended-by-chatgpt"],
     faqs: [
       {
         q: "Can we meet in person in Evanston?",
@@ -102,6 +118,8 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       "NODE by Nouvos works with businesses across Lake County, Illinois, from Waukegan and Gurnee to Libertyville, Mundelein, and the lakes region around Lake Villa and Antioch. We build websites, mobile apps, and custom software, and offer SEO as an add-on to any plan.",
       "Lake County mixes corporate campuses along the Tollway with family-owned shops, contractors, and seasonal businesses around the Chain O'Lakes and Six Flags Great America in Gurnee. For most of them, local search decides who gets the call: \"near me\" searches, map results, and reviews.",
     ],
+    work: ["we-all-related", "wecl"],
+    guides: ["small-business-website-cost", "website-subscription-vs-agency"],
     faqs: [
       {
         q: "Do you meet in person in Lake County?",
@@ -135,6 +153,8 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       "The I-94 corridor between Chicago and Milwaukee has filled with distribution centers and manufacturers, especially around Pleasant Prairie, Kenosha, and Mount Pleasant. Our parent company, Nouvos Solutions, builds transportation, order, and warehouse software, so we understand the operations side of these businesses, not only the website.",
       "Kenosha's downtown, lakefront, and HarborPark businesses compete for many of the same customers as businesses across the Illinois line, so showing up in searches from both states matters.",
     ],
+    work: ["wecl", "we-all-related"],
+    guides: ["small-business-website-cost", "logistics-company-website"],
     faqs: [
       {
         q: "Do you meet in person in Kenosha?",
@@ -157,13 +177,37 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
 
   "northwest-indiana": {
     slug: "northwest-indiana",
-    metaTitle: "Web Design & Development in Northwest Indiana",
+    metaTitle: "Northwest Indiana Web Design & Development (NWI)",
     metaDescription:
-      "Web design, development, apps, and custom software for Northwest Indiana businesses in Hammond, Merrillville, Crown Point, and Valparaiso. From $300/mo.",
-    h1: "Web design and development in Northwest Indiana",
+      "NWI web design and development for businesses in Hammond, Merrillville, Crown Point, and Valparaiso: websites, apps, and custom software. From $300/mo.",
+    h1: "Web design and development in Northwest Indiana (NWI)",
     areasHeading: "Northwest Indiana communities we serve",
     areasIntro:
       "We serve businesses in Lake, Porter, and LaPorte counties remotely, on the same Central Time as Chicago.",
+    sections: [
+      {
+        heading: "What an NWI business website needs to do",
+        paragraphs: [
+          "Many businesses in the Region sell on both sides of the state line: to customers in Lake and Porter counties and to the south suburbs of Chicago. A good site names the communities you actually serve, on both sides, so search engines and AI assistants can match you to the right searches.",
+          "What the site needs depends on the business. These are the projects we see most often:",
+        ],
+        bullets: [
+          "Contractors and trades: a page for each service and service area, photos of finished work, and a quote request form that reaches your phone.",
+          "Manufacturers and industrial suppliers: capability and product pages, downloadable spec sheets, and a request for quote form.",
+          "Logistics and warehousing: lanes, facilities, and equipment explained clearly, with quote and booking requests.",
+          "Professional and medical practices: accurate hours, online booking, and clear directions for each location.",
+        ],
+      },
+      {
+        heading: "Getting found in local search in the Region",
+        paragraphs: [
+          "Google and AI assistants build their picture of a local business from your website plus what the rest of the web says about you. Your name, address, phone, and hours need to match everywhere they appear: your site, your Google Business Profile, and directories like Bing Places and Apple Business Connect.",
+          "If you have a storefront or office, a complete Google Business Profile matters as much as the website. If you serve customers at their location, service area pages for the towns you cover do the same job. Local SEO is an add-on to any plan, and our free website check shows what search engines and AI tools can read on your site today.",
+        ],
+      },
+    ],
+    work: ["wecl", "conovate"],
+    guides: ["small-business-website-cost", "logistics-company-website", "seo-vs-geo-vs-aeo"],
     lead: [
       "NODE by Nouvos builds websites, mobile apps, and custom software for businesses in Lake, Porter, and LaPorte counties, and offers the SEO that gets them found as an add-on. Northwest Indiana runs on Central Time, like our Chicago-area headquarters, so we keep the same business hours as you.",
       "The region's economy is built on steel, manufacturing, and the logistics that serve them, with the Port of Indiana at Burns Harbor and freight moving on I-80, I-90, and I-65. Our parent company builds logistics software, so industrial and distribution businesses here get a team that understands their operations.",
@@ -198,8 +242,33 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     areasHeading: "Milwaukee suburbs we serve",
     areasIntro:
       "We work with businesses across Milwaukee, Waukesha, and Ozaukee counties. Kenosha and Racine have their own page.",
+    sections: [
+      {
+        heading: "Custom software and web apps for Milwaukee companies",
+        paragraphs: [
+          "Most of the software work Milwaukee businesses ask about sits between the website and the systems that run the company: a customer portal, a quoting tool, an internal app that replaces a spreadsheet, or an integration that stops someone from typing the same order twice.",
+          "Our team builds and runs Nouvos's own production software, including multi-tenant SaaS and supply chain systems for transportation, orders, and warehouses. That is the experience we bring to client projects: software that keeps running after launch, not just a demo.",
+        ],
+        bullets: [
+          "Quote and order request tools that feed your existing systems.",
+          "Customer and dealer portals with accounts, documents, and order status.",
+          "Internal tools for scheduling, inventory, and approvals.",
+          "Integrations between your ERP, CRM, accounting, and website.",
+          "Web apps and mobile apps for iOS and Android.",
+        ],
+      },
+      {
+        heading: "How a software project runs",
+        paragraphs: [
+          "We start with a discovery call about the workflow you need to support. We write it down as a scope covering the screens, the data, and the integrations, then quote it before any work begins. You review and approve the work in the NODE platform as it is built.",
+          "After launch, ongoing work can continue as a Dedicated engagement, which gives you a team that already knows your system instead of hiring for a role you may not need full time.",
+        ],
+      },
+    ],
+    work: ["zanapronto", "wecl"],
+    guides: ["website-subscription-vs-agency", "small-business-website-cost"],
     lead: [
-      "N.O.D.E. builds websites, mobile apps, and custom software for Milwaukee businesses, and runs the SEO that gets them found. We are based in Evanston, Illinois, about 80 miles south, and on the same Central Time as you.",
+      "NODE builds websites, mobile apps, and custom software for Milwaukee businesses, and offers the SEO that gets them found as an add-on. We are based in Evanston, Illinois, about 80 miles south, and on the same Central Time as you.",
       "Milwaukee has one of the strongest manufacturing economies in the Midwest. Manufacturers and distributors often need more than a website: quote request tools, dealer portals, and integrations with the systems that run the shop floor. That is the kind of software our team builds.",
     ],
     faqs: [
@@ -217,7 +286,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do we need to meet in person?",
-        a: "No, but you can. We work in person across Milwaukee and southeastern Wisconsin, and most work runs through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
+        a: "No, but you can. We work in person across Milwaukee and southeastern Wisconsin, and most work runs through video calls and the NODE platform, where you brief work, review it, and approve it.",
       },
     ],
   },
@@ -232,9 +301,11 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     areasIntro:
       "We serve businesses across the metroplex remotely.",
     lead: [
-      "N.O.D.E. builds websites, mobile apps, and custom software for businesses in Dallas and across the Dallas-Fort Worth metroplex, and runs the SEO that gets them found. We are based on Central Time, the same as you, and work through video calls and our own delivery platform.",
+      "NODE builds websites, mobile apps, and custom software for businesses in Dallas and across the Dallas-Fort Worth metroplex, and offers the SEO that gets them found as an add-on. We are based on Central Time, the same as you, and work through video calls and our own delivery platform.",
       "DFW is one of the largest freight and distribution markets in the country. Our parent company, Nouvos Solutions, builds transportation, order, and warehouse software, so logistics and distribution businesses in Dallas get a team that understands how their operations actually run.",
     ],
+    work: ["wecl", "zanapronto"],
+    guides: ["logistics-company-website", "small-business-website-cost"],
     faqs: [
       {
         q: "Do you work with businesses in Dallas-Fort Worth?",
@@ -242,7 +313,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do you have experience with logistics companies?",
-        a: "Yes. Nouvos Solutions, the company behind N.O.D.E., builds and runs its own software for transportation, order, and warehouse management.",
+        a: "Yes. Nouvos Solutions, the company behind NODE, builds and runs its own software for transportation, order, and warehouse management.",
       },
       {
         q: "How much does app or software development cost?",
@@ -250,7 +321,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
       },
       {
         q: "Do we need to meet in person?",
-        a: "No. Our team delivers through video calls and the N.O.D.E. platform, where you brief work, review it, and approve it.",
+        a: "No. Our team delivers through video calls and the NODE platform, where you brief work, review it, and approve it.",
       },
     ],
   },
@@ -264,8 +335,38 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     areasHeading: "Indianapolis suburbs we serve",
     areasIntro:
       "We serve businesses across the Indianapolis metro remotely, including Hamilton, Boone, Johnson, and Hendricks counties.",
+    sections: [
+      {
+        heading: "App development for Indianapolis businesses",
+        paragraphs: [
+          "App work is scoped as a project, not sold as a plan credit, because a real app needs a real estimate. After a discovery call we send a written scope and a fixed quote for the first release. We build iOS and Android from a shared codebase where it fits, handle App Store and Google Play submission, and support the app after launch.",
+          "App projects are paid upfront, so the code, the designs, and the store listings belong to your business. Typical first releases for Indianapolis businesses:",
+        ],
+        bullets: [
+          "A customer app for booking, ordering, or checking status.",
+          "A field app for drivers, technicians, or crews.",
+          "An internal app for warehouse, inventory, or approvals work.",
+          "An MVP that proves a product idea with real users before a full build.",
+        ],
+      },
+      {
+        heading: "Questions to ask any Indianapolis web developer",
+        paragraphs: [
+          "Whether you hire us or someone else, these questions separate a good fit from a costly one. Here is how we answer them.",
+        ],
+        bullets: [
+          "What does the monthly cost cover? Our plans include monthly credits for web, design, and marketing work, and Member includes hosting and small edits.",
+          "How do I request changes, and how fast do they happen? You brief work in the NODE platform, and each plan has a target turnaround in business days.",
+          "Is SEO included? Not in the base plan. SEO, GEO, and AEO are add-ons, so you only pay for search work when you want it.",
+          "Can you build more than the website? Yes. Apps and custom software are scoped and quoted as separate projects.",
+          "What is the commitment? Plans run on a 12-month commitment, or on the Flexible rate with a 3-month minimum and then month to month.",
+        ],
+      },
+    ],
+    work: ["wecl", "zanapronto"],
+    guides: ["logistics-company-website", "website-subscription-vs-agency", "small-business-website-cost"],
     lead: [
-      "N.O.D.E. builds websites, mobile apps, and custom software for Indianapolis businesses, and runs the SEO that gets them found. We are based in the Chicago area and work remotely with clients across central Indiana.",
+      "NODE builds websites, mobile apps, and custom software for Indianapolis businesses, and offers the SEO that gets them found as an add-on. We are based in the Chicago area and work remotely with clients across central Indiana.",
       "Indianapolis sits at the crossroads of more interstate highways than almost any other U.S. city, which has made it one of the country's major distribution hubs. Our parent company builds logistics software, so distribution and supply chain businesses here get a team that knows their world.",
       "For a central Indiana distributor or third-party logistics provider, that usually means a website that explains your lanes, warehouses, and service area clearly, plus the practical tools behind it: quote and booking requests, shipment status pages for customers, and connections to the order and warehouse systems you already run.",
       "Indianapolis businesses are one hour ahead of us, on Eastern Time. We book calls in your time zone and plan delivery windows in business days, so a request with a 3-business-day target on the Growth plan runs on the same schedule it would anywhere else.",
@@ -273,7 +374,7 @@ export const CITY_CONTENT: Record<CitySlug, CityContent> = {
     faqs: [
       {
         q: "Do you work with businesses in Indianapolis?",
-        a: "Yes. We serve Indianapolis and central Indiana remotely through video calls and the N.O.D.E. platform.",
+        a: "Yes. We serve Indianapolis and central Indiana remotely through video calls and the NODE platform.",
       },
       {
         q: "Are you an Indiana web development company?",

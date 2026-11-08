@@ -5,7 +5,9 @@ import { JsonLd } from "@/components/JsonLd";
 import { Faq, MarketingShell, focusRing } from "@/components/marketing/marketing-shell";
 import { PricingStrip, ServiceCta } from "@/components/marketing/pricing-strip";
 import { CITY_CONTENT } from "@/lib/city-content";
+import { guideFor } from "@/lib/guide-content";
 import { getPublicPlans } from "@/lib/public-plans";
+import { workFor } from "@/lib/work-content";
 import { CITIES, SERVICES, SITE_URL, areaServedFor, pageMetadata, type CitySlug } from "@/lib/seo";
 
 export const revalidate = 3600;
@@ -41,6 +43,8 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
   const { city, content } = found;
 
   const plans = await getPublicPlans();
+  const work = (content.work ?? []).map(workFor).filter((w) => w !== undefined);
+  const guides = (content.guides ?? []).map(guideFor).filter((g) => g !== undefined);
   const url = `${SITE_URL}/locations/${city.slug}`;
   const areaServed = areaServedFor(city);
 
@@ -133,6 +137,29 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
         </div>
       </section>
 
+      {content.sections?.map((s, i) => (
+        <section key={s.heading} aria-labelledby={`section-${i}`} className="max-w-7xl mx-auto px-4 md:px-12 mt-24">
+          <h2 id={`section-${i}`} className="max-w-4xl font-[family-name:var(--font-lexend)] font-black text-3xl md:text-4xl">
+            {s.heading}
+          </h2>
+          <div className="mt-6 max-w-3xl space-y-5 font-[family-name:var(--font-atkinson)] text-lg leading-relaxed text-[#F5F6FC]/80">
+            {s.paragraphs.map((p) => (
+              <p key={p.slice(0, 40)}>{p}</p>
+            ))}
+            {s.bullets && (
+              <ul className="space-y-3">
+                {s.bullets.map((b) => (
+                  <li key={b} className="flex gap-4">
+                    <span aria-hidden="true" className="text-[#FFC919]">/</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      ))}
+
       <section aria-labelledby="areas" className="max-w-7xl mx-auto px-4 md:px-12 mt-24">
         <h2 id="areas" className="font-[family-name:var(--font-lexend)] font-black text-3xl md:text-4xl">
           {content.areasHeading}
@@ -161,6 +188,47 @@ export default async function LocationPage({ params }: { params: Promise<{ city:
           <div className="mt-10">
             <PricingStrip plans={plans} />
           </div>
+        </section>
+      )}
+
+      {(work.length > 0 || guides.length > 0) && (
+        <section aria-labelledby="proof" className="max-w-7xl mx-auto px-4 md:px-12 mt-24">
+          <h2 id="proof" className="font-[family-name:var(--font-lexend)] font-black text-3xl md:text-4xl">
+            Our work and guides
+          </h2>
+          <p className="mt-4 max-w-3xl font-[family-name:var(--font-atkinson)] text-lg text-[#F5F6FC]/75">
+            Projects we have shipped for clients and for our own products, outside {city.city}, plus straight
+            answers to the questions businesses ask before hiring a web developer.
+          </p>
+          <ul className="mt-10 grid gap-px bg-[#F5F6FC]/10 sm:grid-cols-2">
+            {work.map((w) => (
+              <li key={w.slug} className="bg-[#130A06]">
+                <Link href={`/work/${w.slug}`} className={`group block h-full p-8 ${focusRing}`}>
+                  <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#FFC919]">
+                    Case study
+                  </p>
+                  <h3 className="mt-3 font-[family-name:var(--font-lexend)] font-bold text-xl group-hover:text-[#FFC919] transition-colors duration-200">
+                    {w.name}: {w.industryLabel} <span aria-hidden="true">→</span>
+                  </h3>
+                  <p className="mt-3 font-[family-name:var(--font-atkinson)] text-base leading-relaxed text-[#F5F6FC]/75">
+                    {w.h1}
+                  </p>
+                </Link>
+              </li>
+            ))}
+            {guides.map((g) => (
+              <li key={g.slug} className="bg-[#130A06]">
+                <Link href={`/guides/${g.slug}`} className={`group block h-full p-8 ${focusRing}`}>
+                  <p className="font-[family-name:var(--font-lexend)] font-bold text-[0.75rem] uppercase tracking-[0.2em] text-[#FFC919]">
+                    Guide
+                  </p>
+                  <h3 className="mt-3 font-[family-name:var(--font-lexend)] font-bold text-xl group-hover:text-[#FFC919] transition-colors duration-200">
+                    {g.title} <span aria-hidden="true">→</span>
+                  </h3>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

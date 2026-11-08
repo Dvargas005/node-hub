@@ -3,7 +3,7 @@ import type { ServiceSlug } from "@/lib/seo";
 /**
  * Long-form copy for the /services/[slug] pages.
  *
- * Every claim here has to be true of N.O.D.E. today: the landing page copy and
+ * Every claim here has to be true of NODE today: the landing page copy and
  * the service catalog (prisma/seed-services.ts) are the reference. Web and SEO
  * work is sold as credit items on the subscription plans; app and custom
  * software work is NOT in the credit catalog and is scoped as a custom project
@@ -37,7 +37,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       "Websites, online stores, and web tools built by an in-house team on flat monthly plans from $300. Target turnaround of 2 to 5 business days, subject to scope.",
     eyebrow: "WEB DEVELOPMENT",
     lead: [
-      "Most small and midsize businesses buy a website once, pay a large invoice, and then watch it go stale because every change is a new quote. N.O.D.E. works the other way: one monthly plan, a team that already knows your site, and changes delivered in days instead of billed by the hour.",
+      "Most small and midsize businesses buy a website once, pay a large invoice, and then watch it go stale because every change is a new quote. NODE works the other way: one monthly plan, a team that already knows your site, and changes delivered in days instead of billed by the hour.",
       "Every site is built by our in-house developers on a modern stack (Next.js and TypeScript), deployed fast, and kept current as your business changes. You request work through a guided brief, your project manager assigns it, and you review finished work instead of managing freelancers.",
     ],
     model: "plan",
@@ -74,7 +74,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     ],
     faqs: [
       {
-        q: "How much does a website cost with N.O.D.E.?",
+        q: "How much does a website cost with NODE?",
         a: "Plans start at $300 per month (Member), with Growth at $500 and Pro at $900, plus a one-time setup fee. Each plan includes a monthly credit allowance that you spend on items from the service catalog, such as a landing page or a multi-page website. Each plan also has a Flexible rate with a 3-month minimum instead of 12 months: Member $375, Growth $625, and Pro $1,125 per month.",
       },
       {
@@ -109,7 +109,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       "iOS and Android apps designed, built, and taken through App Store and Google Play review by the team behind Nouvos products. Quoted per project.",
     eyebrow: "APP DEVELOPMENT",
     lead: [
-      "An app is a product, not a page. It has to pass App Store and Google Play review, survive operating system updates, and keep working after launch. N.O.D.E. builds apps with the same team that designs, ships, and operates Nouvos's own products.",
+      "An app is a product, not a page. It has to pass App Store and Google Play review, survive operating system updates, and keep working after launch. NODE builds apps with the same team that designs, ships, and operates Nouvos's own products.",
       "App work is scoped as a custom project or a Dedicated engagement rather than a credit item, because a real app needs a real estimate. We start with a discovery call, turn it into a written scope, and quote it before any work begins.",
     ],
     model: "project",
@@ -177,7 +177,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       "Multi-tenant SaaS, internal tools, and integrations from the team behind Nouvos's own supply chain software. Scoped and quoted per project.",
     eyebrow: "SOFTWARE DEVELOPMENT",
     lead: [
-      "N.O.D.E. comes out of Nouvos Solutions, a technology company that builds and runs its own software in production, including supply chain systems for transportation, orders, and warehouses. That is the experience we bring to custom software: multi-tenant architecture, real deadlines, and systems that keep running after the demo.",
+      "NODE comes out of Nouvos Solutions, a technology company that builds and runs its own software in production, including supply chain systems for transportation, orders, and warehouses. That is the experience we bring to custom software: multi-tenant architecture, real deadlines, and systems that keep running after the demo.",
       "Custom software is scoped as a project or a Dedicated engagement. We start by understanding the workflow you need to support, write it down as a scope, and quote it before building.",
     ],
     model: "project",
@@ -231,7 +231,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
       },
       {
         q: "Do you build AI features?",
-        a: "Yes, where they save real time: guided intake, document processing, and assistants inside a workflow. N.O.D.E.'s own request system uses an AI-guided briefing assistant.",
+        a: "Yes, where they save real time: guided intake, document processing, and assistants inside a workflow. NODE's own request system uses an AI-guided briefing assistant.",
       },
     ],
   },
@@ -246,7 +246,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     eyebrow: "SEO",
     lead: [
       "Most small and midsize businesses rank for their own name and nothing else. Search engine optimization closes that gap: it gets the pages that describe what you sell in front of the people searching for it on Google and Bing.",
-      "N.O.D.E. starts with the foundation that search engines need to read your site, fixes what keeps pages out of the index, and then builds the pages and content that target the searches your customers actually make. It runs as a monthly service, so it keeps up as results change.",
+      "NODE starts with the foundation that search engines need to read your site, fixes what keeps pages out of the index, and then builds the pages and content that target the searches your customers actually make. It runs as a monthly service, so it keeps up as results change.",
     ],
     model: "plan",
     deliverables: [
@@ -283,7 +283,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     faqs: [
       {
         q: "What is the difference between SEO, GEO, and AEO?",
-        a: "SEO (search engine optimization) improves how your site ranks in search engines like Google and Bing. GEO (generative engine optimization) improves how often AI tools such as ChatGPT, Perplexity, Claude, and Gemini name your business in their answers. AEO (answer engine optimization) structures your content so engines can lift it directly into answers, featured snippets, and voice results. They share a foundation, and N.O.D.E. offers all three; see the GEO and AEO pages for how each works.",
+        a: "SEO (search engine optimization) improves how your site ranks in search engines like Google and Bing. GEO (generative engine optimization) improves how often AI tools such as ChatGPT, Perplexity, Claude, and Gemini name your business in their answers. AEO (answer engine optimization) structures your content so engines can lift it directly into answers, featured snippets, and voice results. They share a foundation, and NODE offers all three; see the GEO and AEO pages for how each works.",
       },
       {
         q: "How long does SEO take to work?",
@@ -314,7 +314,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     eyebrow: "GENERATIVE ENGINE OPTIMIZATION",
     lead: [
       "Generative engine optimization (GEO) is the practice of making your business the one an AI assistant names when someone asks it for a recommendation. When a buyer asks ChatGPT, Perplexity, Gemini, Claude, or Copilot which company to hire, the assistant writes an answer from sources it can read and trust. GEO makes sure your business is one of those sources.",
-      "It is different from ranking a page. An AI answer has room for a few names, not ten blue links, and it is assembled from your own site plus what the rest of the web says about you. N.O.D.E. works on both sides: what AI crawlers can read on your site, and the third-party sources they cite.",
+      "It is different from ranking a page. An AI answer has room for a few names, not ten blue links, and it is assembled from your own site plus what the rest of the web says about you. NODE works on both sides: what AI crawlers can read on your site, and the third-party sources they cite.",
     ],
     model: "plan",
     deliverables: [
@@ -386,7 +386,7 @@ export const SERVICE_CONTENT: Record<ServiceSlug, ServiceContent> = {
     eyebrow: "ANSWER ENGINE OPTIMIZATION",
     lead: [
       "Answer engine optimization (AEO) means structuring your content so that search engines and assistants can take your answer and show it directly: in a featured snippet, an AI Overview, a ChatGPT or Perplexity answer, or a response read aloud by a voice assistant. The searcher gets the answer without clicking through a list of links, and your business is the one that supplied it.",
-      "AEO is about format as much as content. Engines favor a clear question, a direct answer in the first sentence or two, and supporting detail they can parse. N.O.D.E. finds the questions your customers ask and rebuilds the pages that should answer them.",
+      "AEO is about format as much as content. Engines favor a clear question, a direct answer in the first sentence or two, and supporting detail they can parse. NODE finds the questions your customers ask and rebuilds the pages that should answer them.",
     ],
     model: "plan",
     deliverables: [

@@ -15,6 +15,8 @@ import { GUIDES } from "@/lib/guide-content";
  * page-dates.test.ts fails if a sitemap URL has no entry here.
  */
 export const PAGE_UPDATED: Record<string, string> = {
+  // 2026-11-08: city pages gain metro sections and work/guide links; service and
+  // industry copy says NODE instead of N.O.D.E.
   // 2026-11-06: sitewide Organization schema (name, logo, contactPoint), footer
   // links to /about, /contact, /pricing, and new meta descriptions.
   "/": "2026-11-06",
@@ -22,21 +24,21 @@ export const PAGE_UPDATED: Record<string, string> = {
   "/contact": "2026-11-06",
   "/pricing": "2026-11-06",
   "/services": "2026-11-06",
-  "/services/web-development": "2026-11-06",
-  "/services/app-development": "2026-11-06",
-  "/services/software-development": "2026-11-06",
-  "/services/seo": "2026-11-06",
-  "/services/generative-engine-optimization": "2026-11-06",
-  "/services/answer-engine-optimization": "2026-11-06",
+  "/services/web-development": "2026-11-08",
+  "/services/app-development": "2026-11-08",
+  "/services/software-development": "2026-11-08",
+  "/services/seo": "2026-11-08",
+  "/services/generative-engine-optimization": "2026-11-08",
+  "/services/answer-engine-optimization": "2026-11-08",
   "/locations": "2026-11-06",
-  "/locations/chicago-il": "2026-11-06",
-  "/locations/evanston-il": "2026-11-06",
-  "/locations/lake-county-il": "2026-11-06",
-  "/locations/kenosha-wi": "2026-11-06",
-  "/locations/milwaukee-wi": "2026-11-06",
-  "/locations/northwest-indiana": "2026-11-06",
-  "/locations/indianapolis-in": "2026-11-06",
-  "/locations/dallas-tx": "2026-11-06",
+  "/locations/chicago-il": "2026-11-08",
+  "/locations/evanston-il": "2026-11-08",
+  "/locations/lake-county-il": "2026-11-08",
+  "/locations/kenosha-wi": "2026-11-08",
+  "/locations/milwaukee-wi": "2026-11-08",
+  "/locations/northwest-indiana": "2026-11-08",
+  "/locations/indianapolis-in": "2026-11-08",
+  "/locations/dallas-tx": "2026-11-08",
   "/free-website-check": "2026-11-06",
   "/terms": "2026-11-06",
   "/work": "2026-11-06",
@@ -44,7 +46,7 @@ export const PAGE_UPDATED: Record<string, string> = {
   "/work/conovate": "2026-11-06",
   "/work/we-all-related": "2026-11-06",
   "/work/zanapronto": "2026-11-06",
-  "/industries/logistics": "2026-11-06",
+  "/industries/logistics": "2026-11-08",
   "/guides": "2026-11-06",
   ...Object.fromEntries(GUIDES.map((g) => [`/guides/${g.slug}`, g.updated])),
 };
