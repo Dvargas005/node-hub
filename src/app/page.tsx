@@ -585,7 +585,7 @@ export default function Home() {
         {/* Layer 4: animated telemetry HUD (perfect loops) — frames the robot + wordmark */}
         <HeroHud />
         <div className="relative z-10 text-center px-6 w-full">
-          <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.3em] text-[#FFC919] mb-6" style={{ textShadow: "0 1px 14px rgba(19,10,6,0.95)" }}>{t.hero.label}</p></RevealLine>
+          <RevealLine delay={0.2}><p className="font-[family-name:var(--font-lexend)] font-bold text-[0.6rem] sm:text-[0.7rem] md:text-[0.75rem] uppercase tracking-[0.15em] sm:tracking-[0.3em] text-[#FFC919] mb-6" style={{ textShadow: "0 1px 14px rgba(19,10,6,0.95)" }}>{t.hero.label}</p></RevealLine>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
